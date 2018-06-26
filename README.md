@@ -6,8 +6,8 @@
 - Elm 0.18.0
 
 ## Preinstall
-Installing Ruby - https://gorails.com/setup/osx/10.13-high-sierra#ruby
-Postgresql - https://gorails.com/setup/osx/10.13-high-sierra#postgresql
+- Installing Ruby - https://gorails.com/setup/osx/10.13-high-sierra#ruby
+- Postgresql - https://gorails.com/setup/osx/10.13-high-sierra#postgresql
 
 ## Setup
 ```
