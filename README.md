@@ -7,12 +7,16 @@
 
 ## Preinstall
 Installing Ruby - https://gorails.com/setup/osx/10.13-high-sierra#ruby
+Postgresql - https://gorails.com/setup/osx/10.13-high-sierra#postgresql
 
 ## Setup
 ```
 git clone git@github.com:chain-partners/eoshub.io.git
+cd eoshub.io
 gem install bundler
 bundle install
+touch .env
+echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" > .env
 ```
 
 ## Run
