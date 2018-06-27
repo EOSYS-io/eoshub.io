@@ -28,14 +28,13 @@ ENV RAILS_ROOT /app
 
 RUN mkdir -p $RAILS_ROOT
 WORKDIR $RAILS_ROOT
-COPY . $RAILS_ROOT
+COPY --chown=www-data:www-data . $RAILS_ROOT
 RUN mkdir -p /app/tmp/pids  # For "sidekiq"
 
 RUN bundle install --with alpha --path $BUNDLE_DIR
 RUN bundle exec rake assets:precompile
 
 RUN chown -R www-data:www-data $BUNDLE_DIR
-RUN chown -R www-data:www-data $RAILS_ROOT
 
 # Command
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
