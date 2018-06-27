@@ -9,6 +9,7 @@ ENV RAILS_MAX_THREADS 10
 #ENV MAX_THREADS 10
 # Dead connection이 있을 수 있으므로 스레드 개수보다 크게
 ENV DB_POOL 20
+ARG RAILS_MASTER_KEY
 
 # Setting nginx
 COPY deploy/alpha/nginx.conf /etc/nginx/nginx.conf
