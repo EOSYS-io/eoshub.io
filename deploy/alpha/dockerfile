@@ -1,0 +1,40 @@
+FROM eosys/rails
+
+ENV TZ Asia/Seoul
+ENV RACK_ENV alpha
+ENV RAILS_ENV alpha
+ENV RAILS_LOG_TO_STDOUT true
+ENV WEB_CONCURRENCY 2
+ENV RAILS_MAX_THREADS 10
+#ENV MAX_THREADS 10
+# Dead connection이 있을 수 있으므로 스레드 개수보다 크게
+ENV DB_POOL 20
+
+# Setting nginx
+COPY deploy/alpha/nginx.conf /etc/nginx/nginx.conf
+COPY deploy/proxy.conf /etc/nginx/proxy.conf
+COPY deploy/nginx_error_json_response.conf /etc/nginx/nginx_error_json_response.conf
+
+# Setting supervisor
+COPY deploy/alpha/supervisord.conf /etc/supervisord.conf
+
+# Setting logrotate
+# COPY deploy/logrotate.conf /etc/logrotate.d/eoshub_io
+
+# Rails app
+ENV BUNDLE_DIR /bundle
+ENV RAILS_ROOT /app
+
+RUN mkdir -p $RAILS_ROOT
+WORKDIR $RAILS_ROOT
+COPY . $RAILS_ROOT
+RUN mkdir -p /app/tmp/pids  # For "sidekiq"
+
+RUN bundle install --with alpha --path $BUNDLE_DIR
+RUN bundle exec rake assets:precompile
+
+RUN chown -R www-data:www-data $BUNDLE_DIR
+RUN chown -R www-data:www-data $RAILS_ROOT
+
+# Command
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
