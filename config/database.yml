@@ -18,12 +18,12 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  url: <%= ENV['TEST_DATABASE_URL'] || Rails.application.secrets[:database_url] %>
+  url: <%= ENV['TEST_DATABASE_URL'] || Rails.application.credentials.test[:database_url] %>
 
 alpha:
   <<: *default
-  url: <%= Rails.application.secrets[:database_url] %>
+  url: <%= Rails.application.credentials.alpha[:database_url] %>
 
 production:
   <<: *default
-  url: <%= Rails.application.secrets[:database_url] %>
+  url: <%= Rails.application.credentials.production[:database_url] %>
