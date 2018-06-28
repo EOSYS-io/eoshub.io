@@ -22,6 +22,7 @@ echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" > .env
 ## Run
 ```
 rails s(erver)
+bin/webpack-dev-server # for development
 ```
 
 ## Elm Source Location
