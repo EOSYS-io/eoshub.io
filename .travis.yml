@@ -45,8 +45,7 @@ jobs:
         - sudo apt-get update
         - sudo apt-get install jq -y
         # install ecs-deploy
-        - curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | \
-        - sudo tee -a /usr/bin/ecs-deploy
+        - curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee -a /usr/bin/ecs-deploy
         - sudo chmod +x /usr/bin/ecs-deploy
       script:
         - if [ -z "$TRAVIS_TAG" ]; then
