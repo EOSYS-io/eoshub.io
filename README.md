@@ -17,6 +17,7 @@ gem install bundler
 bundle install
 touch .env
 echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" > .env
+rails db:create
 cp ${MASTER_KEY_PATH}/master.key config
 ```
 
