@@ -54,7 +54,7 @@ jobs:
             export DOCKER_TAG=$TRAVIS_TAG;
           fi
         # update an AWS ECS service with the new image
-        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$TRAVIS_BRANCH -i $DOCKER_HUB_REPO:$DOCKER_TAG
+        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$TRAVIS_BRANCH -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 180
 
 notifications:
   email: false
