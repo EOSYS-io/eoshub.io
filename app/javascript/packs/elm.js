@@ -3,11 +3,19 @@
 // It will render "Hello Elm!" within the page.
 
 import Elm from '../Main'
+import { checkWalletStatus } from './wallet'
 
 document.addEventListener('DOMContentLoaded', () => {
-  const target = document.getElementById("elm-target")
+  const target = document.getElementById('elm-target')
 
-  if (target) {
-    Elm.Main.embed(target)
+  if (!target) {
+    return;  
   }
+
+  const app = Elm.Main.embed(target);
+
+  app.ports.checkWalletStatus.subscribe(() => {
+    const walletStatus = checkWalletStatus();
+    app.ports.receiveWalletStatus.send(walletStatus);
+  });
 })
