@@ -1,3 +1,7 @@
+branches:
+  only:
+  - master
+  - alpha
 sudo: required
 
 jobs:
@@ -25,18 +29,6 @@ jobs:
       language: bash
       services:
         - docker
-      script:
-        - if [ -z "$TRAVIS_TAG" ]; then
-            export DOCKER_TAG=$TRAVIS_COMMIT;
-          else
-            export DOCKER_TAG=$TRAVIS_TAG;
-          fi
-        - docker build -f deploy/alpha/dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
-        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-        - docker push $DOCKER_HUB_REPO:$DOCKER_TAG
-    - stage: Deploy
-      if: type != pull_request
-      language: bash
       install:
         # install AWS SDK
         - pip install --user awscli
@@ -53,6 +45,9 @@ jobs:
           else
             export DOCKER_TAG=$TRAVIS_TAG;
           fi
+        - docker build -f deploy/alpha/dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
+        - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push $DOCKER_HUB_REPO:$DOCKER_TAG
         # update an AWS ECS service with the new image
         - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$TRAVIS_BRANCH -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 600
 
