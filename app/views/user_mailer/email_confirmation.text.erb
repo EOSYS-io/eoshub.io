@@ -1,5 +1,5 @@
 Hi <%= @user.name %>,
 
-Thanks for the EOS account creation! To confirm your EOS account creation click the URL below.
+<%= I18n.t('user_mailer.body') %>
 
 <%= confirm_email_user_url(@user.confirm_token) %>
