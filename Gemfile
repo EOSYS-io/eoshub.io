@@ -51,6 +51,8 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-watcher-listen', '~> 2.0.0'
+  # Add a comment summarizing the current schema to the top or bottom of each of your models, routes.rb, ...
+  gem 'annotate', require: false
 end
 
 group :test do
