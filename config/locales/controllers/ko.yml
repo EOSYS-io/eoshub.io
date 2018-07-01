@@ -1,0 +1,5 @@
+ko:
+  users:
+    create_ok: '계정 생성을 위해 이메일 인증이 필요합니다. 인증 메일이 수신되었는지 이메일을 확인해주세요.'
+    already_confirmed_email: 'EOS 계정 생성을 위해 이미 사용된 이메일입니다.'
+    failed_to_create_email_verification_log: '시스템에 문제가 있어 이메일 인증 기록을 저장하는데 실패했습니다.'

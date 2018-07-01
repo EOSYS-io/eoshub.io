@@ -1,0 +1,5 @@
+en:
+  users:
+    create_ok: 'Email verification is required to create an account. Please check your email whether a verification email has arrived.'
+    already_confirmed_email: 'This email has already been used to create an EOS account.'
+    failed_to_create_email_verification_log: 'Failed to create an email verification log'
