@@ -3,7 +3,7 @@
 # Table name: users
 #
 #  id              :bigint(8)        not null, primary key
-#  confirm_token   :string(22)
+#  confirm_token   :string(22)       default("")
 #  email           :string(255)      not null
 #  email_confirmed :boolean          default(FALSE)
 #  created_at      :datetime         not null
