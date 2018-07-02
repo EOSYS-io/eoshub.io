@@ -1,0 +1,5 @@
+Hi <%= @user.name %>,
+
+<%= I18n.t('user_mailer.body') %>
+
+<%= confirm_email_user_url(@user.confirm_token) %>

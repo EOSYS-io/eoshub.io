@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: users
+#
+#  id              :bigint(8)        not null, primary key
+#  confirm_token   :string(22)       default("")
+#  email           :string(255)      not null
+#  email_confirmed :boolean          default(FALSE)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+# Indexes
+#
+#  index_users_on_email  (email)
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alice:
+  email: alice@chain.partners
+  email_confirmed: false
+  confirm_token: Sp6pKEQ8DMpRWrYOZGxmTw
+
+bob:
+  email: bob@chain.partners
+  email_confirmed: false
+  confirm_token:
