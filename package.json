@@ -4,7 +4,11 @@
   "dependencies": {
     "@rails/webpacker": "3.5",
     "elm": "^0.18.0",
-    "elm-webpack-loader": "^4.5.0"
+    "elm-webpack-loader": "^4.5.0",
+    "eosjs": "^15.0.3",
+    "eslint": "^5.0.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-plugin-import": "^2.13.0"
   },
   "devDependencies": {
     "elm-hot-loader": "^0.5.4",
