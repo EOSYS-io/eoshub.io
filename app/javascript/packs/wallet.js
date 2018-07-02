@@ -1,5 +1,5 @@
+import walletStatus from './constant';
 import { getScatter } from './state';
-import { walletStatus } from './constant';
 
 // TODO(heejae): Make this file as an interface. It just deal with Scatter wallet for now.
 function checkWalletStatus() {

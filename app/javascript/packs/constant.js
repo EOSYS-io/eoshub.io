@@ -1,7 +1,7 @@
 const walletStatus = {
-  authenticated: "WALLET_STATUS_AUTHENTICATED",
-  loaded: "WALLET_STATUS_LOADED",
-  notFound: "WALLET_STATUS_NOT_FOUND",
+  authenticated: 'WALLET_STATUS_AUTHENTICATED',
+  loaded: 'WALLET_STATUS_LOADED',
+  notFound: 'WALLET_STATUS_NOT_FOUND',
 };
 
-export { walletStatus };
+export default walletStatus;
