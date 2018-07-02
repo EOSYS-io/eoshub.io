@@ -1,5 +1,5 @@
 const walletStatus = {
-  unauthenticated: "WALLET_STATUS_UNAUTHENTICATED",
+  authenticated: "WALLET_STATUS_AUTHENTICATED",
   loaded: "WALLET_STATUS_LOADED",
   notFound: "WALLET_STATUS_NOT_FOUND",
 };
