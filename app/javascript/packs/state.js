@@ -3,7 +3,7 @@ let walletStates = {
     scatter: null,
     eosjs: null,
     account: '',
-    permission: '',
+    authority: '',
   },
 };
 
