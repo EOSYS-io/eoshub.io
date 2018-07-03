@@ -12,3 +12,9 @@ port checkWalletStatus : () -> Cmd msg
 
 
 port receiveWalletStatus : (String -> msg) -> Sub msg
+
+
+port authenticateAccount : () -> Cmd msg
+
+
+port invalidateAccount : () -> Cmd msg

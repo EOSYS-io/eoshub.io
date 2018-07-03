@@ -41,6 +41,8 @@ view model =
 type Message
     = CheckWalletStatus
     | UpdateWalletStatus String
+    | AuthenticateAccount
+    | InvalidateAccount
     | None
 
 
@@ -56,6 +58,12 @@ update message model =
 
         UpdateWalletStatus str ->
             ( { model | walletStatus = (decodeWalletStatus str) }, Cmd.none )
+
+        AuthenticateAccount ->
+            ( model, Port.authenticateAccount () )
+
+        InvalidateAccount ->
+            ( model, Port.invalidateAccount () )
 
         _ ->
             ( model, Cmd.none )
