@@ -1,17 +1,21 @@
 module Wallet exposing (..)
 
 
-type WalletStatus
+type Status
     = AUTHENTICATED
     | LOADED
     | NOTFOUND
 
 
-decodeWalletStatus : String -> WalletStatus
-decodeWalletStatus string =
-    if (string == "WALLET_STATUS_AUTHENTICATED") then
-        AUTHENTICATED
-    else if (string == "WALLET_STATUS_LOADED") then
-        LOADED
+type alias WalletStatus =
+    { status : Status, account : String, authority : String }
+
+
+decodeWalletStatus : { status : String, account : String, authority : String } -> WalletStatus
+decodeWalletStatus { status, account, authority } =
+    if (status == "WALLET_STATUS_AUTHENTICATED") then
+        { status = AUTHENTICATED, account = account, authority = authority }
+    else if (status == "WALLET_STATUS_LOADED") then
+        { status = LOADED, account = "", authority = "" }
     else
-        NOTFOUND
+        { status = NOTFOUND, account = "", authority = "" }
