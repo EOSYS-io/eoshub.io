@@ -1,7 +1,7 @@
 let walletStates = {
   scatter: {
-    scatter: null,
-    eosjs: null,
+    scatterClient: null,
+    eosjsClient: null,
     account: '',
     authority: '',
   },
