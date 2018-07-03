@@ -28,7 +28,8 @@ bundle install
 cp ${MASTER_KEY_PATH}/master.key config
 
 touch .env
-echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" > .env
+echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" >> .env
+echo "TEST_DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_test" >> .env
 rails db:create
 ```
 
