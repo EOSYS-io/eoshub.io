@@ -11,4 +11,10 @@ port checkWalletStatus : () -> Cmd msg
 -- Currently, status of Wallet is defined in three categories 'authenticated', 'loaded', 'notFound'
 
 
-port receiveWalletStatus : (String -> msg) -> Sub msg
+port receiveWalletStatus : ({ status : String, account : String, authority : String } -> msg) -> Sub msg
+
+
+port authenticateAccount : () -> Cmd msg
+
+
+port invalidateAccount : () -> Cmd msg
