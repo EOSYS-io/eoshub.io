@@ -3,9 +3,18 @@ import 'babel-polyfill';
 import eos from 'eosjs';
 
 import Elm from '../Main'; // eslint-disable-line import/no-unresolved
-import { checkWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
+import { getWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
 import { scatterConfig, eosjsConfig } from './config';
 import { getScatter, updateScatter } from './state';
+
+function createResponseStatus() {
+  const { account, authority } = getScatter();
+  return {
+    status: getWalletStatus(),
+    account,
+    authority,
+  };
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('elm-target');
@@ -17,8 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const app = Elm.Main.embed(target);
 
   app.ports.checkWalletStatus.subscribe(() => {
-    const walletStatus = checkWalletStatus();
-    app.ports.receiveWalletStatus.send(walletStatus);
+    app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
   app.ports.authenticateAccount.subscribe(async () => {
@@ -27,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error(err);
     }
+    app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
   app.ports.invalidateAccount.subscribe(async () => {
@@ -35,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error(err);
     }
+    app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 });
 
@@ -47,7 +57,7 @@ document.addEventListener('scatterLoaded', () => {
   const stateScatter = getScatter();
   updateScatter({
     ...stateScatter,
-    scatter,
-    eosjs,
+    scatterClient: scatter,
+    eosjsClient: eosjs,
   });
 });
