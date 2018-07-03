@@ -5,10 +5,10 @@ import { scatterConfig } from './config';
 import { getScatter, updateScatter } from './state';
 
 // TODO(heejae): Make this file as an interface. It just deal with Scatter wallet for now.
-function checkWalletStatus() {
-  const { scatterClient, account, permission } = getScatter();
+function getWalletStatus() {
+  const { scatterClient, account, authority } = getScatter();
   if (scatterClient) {
-    if (account && permission) {
+    if (account && authority) {
       return walletStatus.authenticated;
     }
 
@@ -24,7 +24,7 @@ async function authenticateAccount() {
   const scatter = getScatter();
   const { chainId, blockchain } = scatterConfig;
 
-  if (scatter.scatterClient.identity) {
+  if (scatter.scatterClient && scatter.scatterClient.identity) {
     await scatter.scatterClient.forgetIdentity();
   }
 
@@ -49,7 +49,7 @@ async function authenticateAccount() {
 
 async function invalidateAccount() {
   const scatter = getScatter();
-  if (scatter.scatterClient.identity) {
+  if (scatter.scatterClient && scatter.scatterClient.identity) {
     await scatter.scatterClient.forgetIdentity();
   }
 
@@ -60,4 +60,4 @@ async function invalidateAccount() {
   });
 }
 
-export { checkWalletStatus, authenticateAccount, invalidateAccount };
+export { getWalletStatus, authenticateAccount, invalidateAccount };
