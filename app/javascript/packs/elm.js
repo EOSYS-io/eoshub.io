@@ -27,8 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   app.ports.checkWalletStatus.subscribe(async () => {
     app.ports.receiveWalletStatus.send(createResponseStatus());
-    const { eosjsClient } = getScatter();
-    console.log(await eosjsClient.transfer('aa', 'bb', '0.1000 EOS', ''));
   });
 
   app.ports.authenticateAccount.subscribe(async () => {
@@ -47,6 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(err);
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
+  });
+
+  app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
+    try {
+      const { eosjsClient } = getScatter();
+      const contract = await eosjsClient.contract(account);
+      await contract[action](payload);
+    } catch (err) {
+      console.error(err);
+    }
   });
 });
 
