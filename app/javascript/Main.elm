@@ -5,7 +5,7 @@ import Html.Events exposing (..)
 import Html.Attributes exposing (..)
 import Action exposing (Action(Transfer), TransferMsg, encodeAction)
 import Port
-import Wallet exposing (WalletStatus, Status(NOTFOUND), decodeWalletStatus)
+import Wallet exposing (WalletStatus, Status(NotFound), decodeWalletStatus)
 
 
 -- MODEL
@@ -30,7 +30,7 @@ type TransferMsgFormField
 
 init : ( Model, Cmd Message )
 init =
-    ( { walletStatus = { status = NOTFOUND, account = "", authority = "" }
+    ( { walletStatus = { status = NotFound, account = "", authority = "" }
       , transferMsg = { from = "", to = "", quantity = "", memo = "" }
       }
     , Cmd.none
