@@ -24,11 +24,16 @@ async function authenticateAccount() {
   const scatter = getScatter();
   const { chainId, blockchain } = scatterConfig;
 
-  if (scatter.scatterClient && scatter.scatterClient.identity) {
-    await scatter.scatterClient.forgetIdentity();
+  const { scatterClient } = scatter;
+  if (!scatterClient) {
+    throw new Error('Scatter must be installed to authenticate.');
   }
 
-  const { accounts } = await scatter.scatterClient.getIdentity({
+  if (scatterClient.identity) {
+    await scatterClient.forgetIdentity();
+  }
+
+  const { accounts } = await scatterClient.getIdentity({
     accounts: [{ chainId, blockchain }],
   });
   const eosAccounts = _.filter(
@@ -51,13 +56,12 @@ async function invalidateAccount() {
   const scatter = getScatter();
   if (scatter.scatterClient && scatter.scatterClient.identity) {
     await scatter.scatterClient.forgetIdentity();
+    updateScatter({
+      ...scatter,
+      account: '',
+      autority: '',
+    });
   }
-
-  updateScatter({
-    ...scatter,
-    account: '',
-    autority: '',
-  });
 }
 
 export { getWalletStatus, authenticateAccount, invalidateAccount };

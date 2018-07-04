@@ -25,8 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const app = Elm.Main.embed(target);
 
-  app.ports.checkWalletStatus.subscribe(() => {
+  app.ports.checkWalletStatus.subscribe(async () => {
     app.ports.receiveWalletStatus.send(createResponseStatus());
+    const { eosjsClient } = getScatter();
+    console.log(await eosjsClient.transfer('aa', 'bb', '0.1000 EOS', ''));
   });
 
   app.ports.authenticateAccount.subscribe(async () => {
