@@ -1,5 +1,8 @@
 port module Port exposing (..)
 
+import Json.Encode as JE
+
+
 -- A port for asking status of Wallet in JS.
 
 
@@ -18,3 +21,6 @@ port authenticateAccount : () -> Cmd msg
 
 
 port invalidateAccount : () -> Cmd msg
+
+
+port pushAction : JE.Value -> Cmd msg

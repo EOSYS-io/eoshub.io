@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const app = Elm.Main.embed(target);
 
-  app.ports.checkWalletStatus.subscribe(() => {
+  app.ports.checkWalletStatus.subscribe(async () => {
     app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
@@ -45,6 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error(err);
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
+  });
+
+  app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
+    try {
+      const { eosjsClient } = getScatter();
+      const contract = await eosjsClient.contract(account);
+      await contract[action](payload);
+    } catch (err) {
+      console.error(err);
+    }
   });
 });
 

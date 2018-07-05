@@ -2,9 +2,9 @@ module Wallet exposing (..)
 
 
 type Status
-    = AUTHENTICATED
-    | LOADED
-    | NOTFOUND
+    = Authenticated
+    | Loaded
+    | NotFound
 
 
 type alias WalletStatus =
@@ -14,8 +14,8 @@ type alias WalletStatus =
 decodeWalletStatus : { status : String, account : String, authority : String } -> WalletStatus
 decodeWalletStatus { status, account, authority } =
     if (status == "WALLET_STATUS_AUTHENTICATED") then
-        { status = AUTHENTICATED, account = account, authority = authority }
+        { status = Authenticated, account = account, authority = authority }
     else if (status == "WALLET_STATUS_LOADED") then
-        { status = LOADED, account = "", authority = "" }
+        { status = Loaded, account = "", authority = "" }
     else
-        { status = NOTFOUND, account = "", authority = "" }
+        { status = NotFound, account = "", authority = "" }
