@@ -6,6 +6,8 @@ import Html.Attributes exposing (..)
 import Action exposing (Action(Transfer), TransferMsg, encodeAction)
 import Port
 import Wallet exposing (WalletStatus, Status(NotFound), decodeWalletStatus)
+import View.Notification
+import Response exposing (decodeScatterResponse)
 
 
 -- MODEL
@@ -14,6 +16,7 @@ import Wallet exposing (WalletStatus, Status(NotFound), decodeWalletStatus)
 type alias Model =
     { walletStatus : Wallet.WalletStatus
     , transferMsg : TransferMsg
+    , notification : View.Notification.Msg
     }
 
 
@@ -32,6 +35,7 @@ init : ( Model, Cmd Message )
 init =
     ( { walletStatus = { status = NotFound, account = "", authority = "" }
       , transferMsg = { from = "", to = "", quantity = "", memo = "" }
+      , notification = View.Notification.None
       }
     , Cmd.none
     )
@@ -58,7 +62,7 @@ setTransferMsgField field value ({ transferMsg } as model) =
 
 
 view : Model -> Html Message
-view { walletStatus, transferMsg } =
+view { walletStatus, transferMsg, notification } =
     -- TODO(heejae): Split transfer form to a separate file.
     div []
         [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
@@ -116,6 +120,7 @@ view { walletStatus, transferMsg } =
                     [ text "Submit" ]
                 ]
             ]
+        , div [] [ View.Notification.view notification ]
         ]
 
 
@@ -130,6 +135,7 @@ type Message
     | InvalidateAccount
     | SetTransferMsgField TransferMsgFormField String
     | SubmitAction
+    | UpdateScatterResponse { code : Int, type_ : String, message : String }
     | None
 
 
@@ -158,6 +164,9 @@ update message model =
         SetTransferMsgField field value ->
             ( setTransferMsgField field value model, Cmd.none )
 
+        UpdateScatterResponse resp ->
+            ( { model | notification = decodeScatterResponse resp }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -168,7 +177,10 @@ update message model =
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    Port.receiveWalletStatus UpdateWalletStatus
+    Sub.batch
+        [ Port.receiveWalletStatus UpdateWalletStatus
+        , Port.receiveScatterResponse UpdateScatterResponse
+        ]
 
 
 
