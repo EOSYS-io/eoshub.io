@@ -24,3 +24,6 @@ port invalidateAccount : () -> Cmd msg
 
 
 port pushAction : JE.Value -> Cmd msg
+
+
+port receiveScatterResponse : ({ code : Int, type_ : String, message : String } -> msg) -> Sub msg

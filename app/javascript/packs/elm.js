@@ -16,6 +16,15 @@ function createResponseStatus() {
   };
 }
 
+function createScatterReponse(code, type, msg) {
+  if (code === 200) return { code: 200, type_: '', message: '' };
+  return {
+    code,
+    type_: type,
+    message: msg,
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const target = document.getElementById('elm-target');
 
@@ -30,31 +39,47 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   app.ports.authenticateAccount.subscribe(async () => {
+    let response = createScatterReponse(200);
     try {
       await authenticateAccount();
     } catch (err) {
-      console.error(err);
+      if (err.isError && err.isError === true) {
+        // Deal with scatter error.
+        const { code, type, message } = err;
+        response = createScatterReponse(code, type, message);
+      }
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
+    app.ports.receiveScatterResponse.send(response);
   });
 
   app.ports.invalidateAccount.subscribe(async () => {
     try {
       await invalidateAccount();
     } catch (err) {
-      console.error(err);
+      if (err.isError && err.isError === true) {
+        // Deal with scatter error.
+        const { code, type, message } = err;
+        app.ports.receiveScatterResponse.send(createScatterReponse(code, type, message));
+      }
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
   app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
+    let response = createScatterReponse(200);
     try {
       const { eosjsClient } = getScatter();
       const contract = await eosjsClient.contract(account);
       await contract[action](payload);
     } catch (err) {
-      console.error(err);
+      if (err.isError && err.isError === true) {
+        // Deal with scatter error.
+        const { code, type, message } = err;
+        response = createScatterReponse(code, type, message);
+      }
     }
+    app.ports.receiveScatterResponse.send(response);
   });
 });
 
