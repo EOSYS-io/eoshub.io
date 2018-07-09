@@ -20,7 +20,7 @@ Alpha: [![Build Status](https://travis-ci.org/EOSYS-io/eoshub.io.svg?branch=alph
 
 ## Setup
 ```
-git clone git@github.com:chain-partners/eoshub.io.git
+git clone git@github.com:EOSYS-io/eoshub.io.git
 cd eoshub.io
 gem install bundler
 bundle install
@@ -30,6 +30,10 @@ cp ${MASTER_KEY_PATH}/master.key config
 touch .env
 echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" >> .env
 echo "TEST_DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_test" >> .env
+  
+yarn install
+yarn run elm package install -y
+  
 rails db:create
 ```
 
