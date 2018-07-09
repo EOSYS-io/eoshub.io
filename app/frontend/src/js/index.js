@@ -2,10 +2,10 @@
 import 'babel-polyfill';
 import eos from 'eosjs';
 
-import Elm from './elm/Main'; // eslint-disable-line import/no-unresolved
-import { getWalletStatus, authenticateAccount, invalidateAccount } from './js/wallet';
-import { scatterConfig, eosjsConfig } from './js/config';
-import { getScatter, updateScatter } from './js/state';
+import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
+import { getWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
+import { scatterConfig, eosjsConfig } from './config';
+import { getScatter, updateScatter } from './state';
 
 function createResponseStatus() {
   const { account, authority } = getScatter();
