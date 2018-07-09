@@ -8,6 +8,7 @@ type Route
     = IndexRoute
     | SearchRoute
     | VotingRoute
+    | TransferRoute
     | NotFoundRoute
 
 
@@ -17,6 +18,7 @@ route =
         [ map IndexRoute top
         , map SearchRoute (s "search")
         , map VotingRoute (s "voting")
+        , map TransferRoute (s "transfer")
         ]
 
 
