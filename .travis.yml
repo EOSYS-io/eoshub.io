@@ -20,6 +20,8 @@ jobs:
         - TEST_DATABASE_URL=postgresql://postgres:@localhost/eoshub_test
       before_install:
         - nvm install 8
+        - yarn install
+        - yarn run elm package install -y
       before_script:
         - psql -c 'create database eoshub_test;' -U postgres
         - bundle exec rake db:migrate
