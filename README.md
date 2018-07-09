@@ -30,10 +30,11 @@ cp ${MASTER_KEY_PATH}/master.key config
 touch .env
 echo "DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_dev" >> .env
 echo "TEST_DATABASE_URL=postgresql://${OSX_USERNAME}:@localhost/eoshub_test" >> .env
-  
+
+# Install yarn and elm dependencies.
 yarn install
 yarn run elm package install -y
-  
+
 rails db:create
 ```
 
@@ -45,10 +46,19 @@ rails s(erver)
 bin/webpack-dev-server # for development
 ```
 
+## Test
+- Elm
+  ```
+  yarn run elm-test # Run this command on the project root directory.
+  ```
+  - Make sure that elm-package.json in test/frontend should contain all dependencies of
+  elm-packge.json in the root directory.
+
 ## Frontend Source Location
 ```
 app/frontend
 ```
+
 ## CI
 - Travis https://travis-ci.org/
 - DockerHub https://hub.docker.com/r/eosys/eoshub.io/
