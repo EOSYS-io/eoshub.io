@@ -1,7 +1,8 @@
 // Must import babel-polyfill only one time to support ES7!
 import 'babel-polyfill';
 import eos from 'eosjs';
-import Elm from '../Main'; // eslint-disable-line import/no-unresolved
+
+import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
 import { getWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
 import { scatterConfig, eosjsConfig } from './config';
 import { getScatter, updateScatter } from './state';

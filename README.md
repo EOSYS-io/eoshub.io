@@ -41,9 +41,9 @@ rails s(erver)
 bin/webpack-dev-server # for development
 ```
 
-## Elm Source Location
+## Frontend Source Location
 ```
-app/javascript
+app/frontend
 ```
 ## CI
 - Travis https://travis-ci.org/
