@@ -23,6 +23,7 @@
 /elm-stuff
 /node_modules
 /yarn-error.log
+/test/frontend/elm/elm-stuff
 
 /public/assets
 /public/js
@@ -32,8 +33,6 @@
 /config/master.key
 /public/packs
 /public/packs-test
-/elm-stuff
-/node_modules
 yarn-debug.log*
 .yarn-integrity
 

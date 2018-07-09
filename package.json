@@ -13,6 +13,7 @@
     "browserify-incremental": "^3.1.1",
     "elm": "^0.18.0",
     "elm-format": "^0.6.1-alpha",
+    "elm-test": "^0.18.12",
     "elm-webpack-loader": "^4.5.0",
     "eosjs": "^15.0.3",
     "es6-promise": "^4.2.4",

@@ -28,6 +28,8 @@ jobs:
         - bundle exec rake assets:precompile
       script:
         - bundle exec rake test
+        # Test elm.
+        - yarn run elm-test
     - stage: Build and push docker image
       if: type != pull_request
       language: bash
