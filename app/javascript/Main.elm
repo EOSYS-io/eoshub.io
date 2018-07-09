@@ -8,6 +8,11 @@ import Port
 import Wallet exposing (WalletStatus, Status(NotFound), decodeWalletStatus)
 import View.Notification
 import Response exposing (decodeScatterResponse)
+import Navigation exposing (Location)
+import Route exposing (..)
+import Page.Search as Search
+import Page.Voting as Voting
+import Page.NotFound as NotFound
 
 
 -- MODEL
@@ -17,6 +22,7 @@ type alias Model =
     { walletStatus : Wallet.WalletStatus
     , transferMsg : TransferMsg
     , notification : View.Notification.Msg
+    , route : Route
     }
 
 
@@ -31,11 +37,12 @@ type TransferMsgFormField
 -- INIT
 
 
-init : ( Model, Cmd Message )
-init =
+init : Location -> ( Model, Cmd Message )
+init location =
     ( { walletStatus = { status = NotFound, account = "", authority = "" }
       , transferMsg = { from = "", to = "", quantity = "", memo = "" }
       , notification = View.Notification.None
+      , route = Route.parseLocation location
       }
     , Cmd.none
     )
@@ -62,66 +69,77 @@ setTransferMsgField field value ({ transferMsg } as model) =
 
 
 view : Model -> Html Message
-view { walletStatus, transferMsg, notification } =
-    -- TODO(heejae): Split transfer form to a separate file.
-    div []
-        [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
-            [ text "Hello Elm!" ]
-        , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.account ]
-        , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.authority ]
-        , button [ onClick CheckWalletStatus ] [ text "Check" ]
-        , button [ onClick AuthenticateAccount ] [ text "Attach Scatter" ]
-        , button [ onClick InvalidateAccount ] [ text "Detach Scatter" ]
-        , div []
-            [ Html.form
-                [ onSubmit SubmitAction ]
-                [ label []
-                    [ text "From"
-                    , input
-                        [ type_ "text"
-                        , placeholder "From"
-                        , onInput <| (SetTransferMsgField From)
-                        , value transferMsg.from
+view { walletStatus, transferMsg, notification, route } =
+    case route of
+        IndexRoute ->
+            -- TODO(heejae): Split transfer form to a separate file.
+            div []
+                [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
+                    [ text "Hello Elm!" ]
+                , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.account ]
+                , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.authority ]
+                , button [ onClick CheckWalletStatus ] [ text "Check" ]
+                , button [ onClick AuthenticateAccount ] [ text "Attach Scatter" ]
+                , button [ onClick InvalidateAccount ] [ text "Detach Scatter" ]
+                , div []
+                    [ Html.form
+                        [ onSubmit SubmitAction ]
+                        [ label []
+                            [ text "From"
+                            , input
+                                [ type_ "text"
+                                , placeholder "From"
+                                , onInput <| (SetTransferMsgField From)
+                                , value transferMsg.from
+                                ]
+                                []
+                            ]
+                        , label []
+                            [ text "To"
+                            , input
+                                [ type_ "text"
+                                , placeholder "To"
+                                , onInput <| SetTransferMsgField To
+                                , value transferMsg.to
+                                ]
+                                []
+                            ]
+                        , label []
+                            [ text "Quantity"
+                            , input
+                                [ type_ "text"
+                                , placeholder "EOS"
+                                , onInput <| SetTransferMsgField Quantity
+                                , value transferMsg.quantity
+                                ]
+                                []
+                            ]
+                        , label []
+                            [ text "Memo"
+                            , input
+                                [ type_ "text"
+                                , placeholder "Memo"
+                                , onInput <| SetTransferMsgField Memo
+                                , value transferMsg.memo
+                                ]
+                                []
+                            ]
+                        , button
+                            []
+                            [ text "Submit" ]
                         ]
-                        []
                     ]
-                , label []
-                    [ text "To"
-                    , input
-                        [ type_ "text"
-                        , placeholder "To"
-                        , onInput <| SetTransferMsgField To
-                        , value transferMsg.to
-                        ]
-                        []
-                    ]
-                , label []
-                    [ text "Quantity"
-                    , input
-                        [ type_ "text"
-                        , placeholder "EOS"
-                        , onInput <| SetTransferMsgField Quantity
-                        , value transferMsg.quantity
-                        ]
-                        []
-                    ]
-                , label []
-                    [ text "Memo"
-                    , input
-                        [ type_ "text"
-                        , placeholder "Memo"
-                        , onInput <| SetTransferMsgField Memo
-                        , value transferMsg.memo
-                        ]
-                        []
-                    ]
-                , button
-                    []
-                    [ text "Submit" ]
+                , div [] [ View.Notification.view notification ]
                 ]
-            ]
-        , div [] [ View.Notification.view notification ]
-        ]
+
+        SearchRoute ->
+            Html.map SearchMessage (Search.view Search.initModel)
+
+        VotingRoute ->
+            Html.map VotingMessage (Voting.view Voting.initModel)
+
+        NotFoundRoute ->
+            NotFound.view
 
 
 
@@ -137,6 +155,9 @@ type Message
     | SubmitAction
     | UpdateScatterResponse { code : Int, type_ : String, message : String }
     | None
+    | OnLocationChange Location
+    | SearchMessage Search.Message
+    | VotingMessage Voting.Message
 
 
 
@@ -167,6 +188,9 @@ update message model =
         UpdateScatterResponse resp ->
             ( { model | notification = decodeScatterResponse resp }, Cmd.none )
 
+        OnLocationChange location ->
+            ( { model | route = parseLocation location }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -189,7 +213,7 @@ subscriptions model =
 
 main : Program Never Model Message
 main =
-    Html.program
+    Navigation.program OnLocationChange
         { init = init
         , view = view
         , update = update
