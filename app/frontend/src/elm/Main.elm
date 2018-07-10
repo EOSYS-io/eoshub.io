@@ -3,11 +3,14 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Html.Attributes exposing (..)
+import Message exposing (..)
+import Model exposing (..)
 import Port
-import Wallet exposing (WalletStatus, Status(NotFound), decodeWalletStatus)
+import Wallet exposing (decodeWalletStatus)
 import Response exposing (decodeScatterResponse)
 import Navigation exposing (Location)
 import Route exposing (..)
+import Page exposing (..)
 import Page.Search as Search
 import Page.Voting as Voting
 import Page.NotFound as NotFound
@@ -15,24 +18,13 @@ import Page.Transfer as Transfer
 import View.Notification
 
 
--- MODEL
-
-
-type alias Model =
-    { walletStatus : Wallet.WalletStatus
-    , route : Route
-    , notification : View.Notification.Msg
-    }
-
-
-
 -- INIT
 
 
 init : Location -> ( Model, Cmd Message )
 init location =
-    ( { walletStatus = { status = NotFound, account = "", authority = "" }
-      , route = Route.parseLocation location
+    ( { walletStatus = { status = Wallet.NotFound, account = "", authority = "" }
+      , page = location |> Route.parseLocation |> getPage
       , notification = View.Notification.None
       }
     , Cmd.none
@@ -44,10 +36,9 @@ init location =
 
 
 view : Model -> Html Message
-view { walletStatus, route, notification } =
-    case route of
-        IndexRoute ->
-            -- TODO(heejae): Split transfer form to a separate file.
+view { walletStatus, page, notification } =
+    case page of
+        IndexPage ->
             div []
                 [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
                     [ text "Hello Elm!" ]
@@ -59,33 +50,17 @@ view { walletStatus, route, notification } =
                 , div [] [ View.Notification.view notification ]
                 ]
 
-        SearchRoute ->
-            Html.map SearchMessage (Search.view Search.initModel)
+        SearchPage subModel ->
+            Html.map SearchMessage (Search.view subModel)
 
-        VotingRoute ->
-            Html.map VotingMessage (Voting.view Voting.initModel)
+        VotingPage subModel ->
+            Html.map VotingMessage (Voting.view subModel)
 
-        TransferRoute ->
-            Html.map TransferMessage (Transfer.view Transfer.initModel)
+        TransferPage subModel ->
+            Html.map TransferMessage (Transfer.view subModel)
 
-        NotFoundRoute ->
+        NotFoundPage ->
             NotFound.view
-
-
-
--- MESSAGE
-
-
-type Message
-    = CheckWalletStatus -- TODO(heejae): Modify CheckWalletStatus to have a name of Wallet plugin(ex. Scatter).
-    | UpdateWalletStatus { status : String, account : String, authority : String }
-    | AuthenticateAccount
-    | InvalidateAccount
-    | UpdateScatterResponse { code : Int, type_ : String, message : String }
-    | OnLocationChange Location
-    | SearchMessage Search.Message
-    | VotingMessage Voting.Message
-    | TransferMessage Transfer.Message
 
 
 
@@ -99,7 +74,7 @@ update message model =
             ( model, Port.checkWalletStatus () )
 
         UpdateWalletStatus payload ->
-            ( { model | walletStatus = (decodeWalletStatus payload) }, Cmd.none )
+            ( { model | walletStatus = decodeWalletStatus payload }, Cmd.none )
 
         AuthenticateAccount ->
             ( model, Port.authenticateAccount () )
@@ -108,13 +83,13 @@ update message model =
             ( model, Port.invalidateAccount () )
 
         UpdateScatterResponse resp ->
-            ( { model | notification = decodeScatterResponse resp }, Cmd.none )
+            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
 
         OnLocationChange location ->
-            ( { model | route = parseLocation location }, Cmd.none )
+            ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
 
         _ ->
-            ( model, Cmd.none )
+            updatePage message model.page model
 
 
 

@@ -14,10 +14,6 @@ type alias Model =
     { transfer : TransferMsg }
 
 
-
--- INIT
-
-
 initModel : Model
 initModel =
     { transfer = { from = "", to = "", quantity = "", memo = "" }
@@ -28,16 +24,16 @@ initModel =
 -- MESSAGE
 
 
-type Message
-    = SetTransferMsgField TransferMsgFormField String
-    | SubmitAction
-
-
 type TransferMsgFormField
     = From
     | To
     | Quantity
     | Memo
+
+
+type Message
+    = SetTransferMsgField TransferMsgFormField String
+    | SubmitAction
 
 
 
@@ -117,7 +113,7 @@ update message ({ transfer } as model) =
 
 
 
--- UTILITY FUNCTIONS
+-- Utility functions.
 
 
 setTransferMsgField : TransferMsgFormField -> String -> Model -> Model

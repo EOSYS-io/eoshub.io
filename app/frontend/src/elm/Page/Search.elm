@@ -5,7 +5,7 @@ import Html.Attributes exposing (placeholder)
 import Html.Events exposing (onClick)
 
 
--- Model
+-- MODEL
 
 
 type alias Model =
@@ -18,7 +18,7 @@ initModel =
 
 
 
--- Updates
+-- UPDATES
 
 
 type Message
@@ -33,7 +33,7 @@ update msg model =
 
 
 
--- View
+-- VIEW
 
 
 view : Model -> Html Message

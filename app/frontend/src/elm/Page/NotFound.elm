@@ -3,7 +3,7 @@ module Page.NotFound exposing (..)
 import Html exposing (Html, div, h1, text)
 
 
--- View
+-- VIEW
 
 
 view : Html msg

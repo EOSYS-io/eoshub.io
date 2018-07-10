@@ -3,7 +3,7 @@ module Page.Voting exposing (..)
 import Html exposing (Html, div, h1, text, input)
 
 
--- Model
+-- MODEL
 
 
 type alias Model =
@@ -20,7 +20,7 @@ initModel =
 
 
 
--- Update
+-- UPDATE
 
 
 type Message
@@ -39,12 +39,12 @@ update msg model =
 
 
 
--- View
+-- VIEW
 
 
-view : model -> Html Message
-view model =
+view : Model -> Html Message
+view { bp, account } =
     div []
-        [ h1 [] [ text "voting page" ]
+        [ h1 [] [ text (bp ++ account) ]
         , input [] []
         ]
