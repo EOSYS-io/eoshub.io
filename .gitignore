@@ -23,16 +23,16 @@
 /elm-stuff
 /node_modules
 /yarn-error.log
+/test/frontend/elm/elm-stuff
 
 /public/assets
+/public/js
 .byebug_history
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
 /public/packs
 /public/packs-test
-/elm-stuff
-/node_modules
 yarn-debug.log*
 .yarn-integrity
 
