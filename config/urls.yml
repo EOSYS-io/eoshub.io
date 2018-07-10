@@ -7,7 +7,6 @@ development:
 
 test:
   <<: *default
-  eos_wallet_node_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:5000
 
 alpha:
   <<: *default

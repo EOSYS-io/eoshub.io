@@ -54,6 +54,14 @@ bin/webpack-dev-server # for development
   - Make sure that elm-package.json in test/frontend should contain all dependencies of
   elm-packge.json in the root directory.
 
+- Rails
+  ```
+  docker pull eosys/eos-wallet-node-alpha
+  # EOS_ACCOUNT and EOS_PRIVATE_KEY for mainnet
+  docker run -d -p 5000:80 --name eos-wallet-node -e "EOS_PRIVATE_KEY=$EOS_PRIVATE_KEY" -e "EOS_ACCOUNT=$EOS_ACCOUNT" eosys/eos-wallet-node-alpha
+  rails t(est)
+  ```
+
 ## Frontend Source Location
 ```
 app/frontend
