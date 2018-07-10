@@ -19,7 +19,7 @@ jobs:
         - RAILS_ENV=test
         - TEST_DATABASE_URL=postgresql://postgres:@localhost/eoshub_test
       before_install:
-        - nvm install 8
+        - nvm install 10
         - yarn install
         - yarn run elm package install -y
       before_script:
