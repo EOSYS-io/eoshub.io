@@ -28,8 +28,8 @@ updatePage msg page model =
     case ( msg, page ) of
         ( SearchMessage subMsg, SearchPage subModel ) ->
             let
-                newPage =
-                    Search (Search.update subMsg subModel)
+                newModel =
+                    Search.update subMsg subModel
             in
                 ( { model | page = newModel |> SearchPage }, Cmd.none )
 
@@ -42,8 +42,8 @@ updatePage msg page model =
 
         ( VotingMessage subMsg, VotingPage subModel ) ->
             let
-                newPage =
-                    Voting (Voting.update subMsg subModel)
+                newModel =
+                    Voting.update subMsg subModel
             in
                 ( { model | page = newModel |> VotingPage }, Cmd.none )
 
