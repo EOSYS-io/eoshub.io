@@ -1,0 +1,194 @@
+{
+    "broadcast": true,
+    "transaction": {
+        "compression": "none",
+        "transaction": {
+            "expiration": "2018-07-10T05:24:51",
+            "ref_block_num": 10501,
+            "ref_block_prefix": 798209809,
+            "net_usage_words": 0,
+            "max_cpu_usage_ms": 0,
+            "delay_sec": 0,
+            "context_free_actions": [],
+            "actions": [
+                {
+                    "account": "eosio",
+                    "name": "newaccount",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": "0000000000ea3055a012458bfaac8d3a010000000100028bbd0cc3be68562a36d2ff40d112ce6b8bf3ed51a7ec2fb5276292a925bfe3c101000000010000000100028bbd0cc3be68562a36d2ff40d112ce6b8bf3ed51a7ec2fb5276292a925bfe3c101000000"
+                },
+                {
+                    "account": "eosio",
+                    "name": "buyrambytes",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": "0000000000ea3055a012458bfaac8d3a00200000"
+                },
+                {
+                    "account": "eosio",
+                    "name": "delegatebw",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": "0000000000ea3055a012458bfaac8d3ae80300000000000004454f5300000000e80300000000000004454f530000000000"
+                }
+            ],
+            "transaction_extensions": []
+        },
+        "signatures": [
+            "SIG_K1_KcvKNkmBDeZ6nHzKw4bJVpwCmocsUy8ZF7Kg6VKygxbwwc8KxCGuFfAvTKGggSDnzaJvLroiMTqnF2idcGmiYF4xYTnzKP"
+        ]
+    },
+    "transaction_id": "741a8ac1617607b629d2776761f7dcbdb258713630eb4f189d48659f4a21b471",
+    "processed": {
+        "id": "741a8ac1617607b629d2776761f7dcbdb258713630eb4f189d48659f4a21b471",
+        "receipt": {
+            "status": "executed",
+            "cpu_usage_us": 6282,
+            "net_usage_words": 42
+        },
+        "elapsed": 6282,
+        "net_usage": 336,
+        "scheduled": false,
+        "action_traces": [
+            {
+                "receipt": {
+                    "receiver": "eosio",
+                    "act_digest": "dbe154704c75f40e388e27fc555f0ee0835f3f4706e5fa5ccef7dd127d1595f0",
+                    "global_sequence": 141594,
+                    "recv_sequence": 141592,
+                    "auth_sequence": [
+                        [
+                            "eosio",
+                            141589
+                        ]
+                    ],
+                    "code_sequence": 0,
+                    "abi_sequence": 0
+                },
+                "act": {
+                    "account": "eosio",
+                    "name": "newaccount",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": {
+                        "creator": "eosio",
+                        "name": "beautyofcode",
+                        "owner": {
+                            "threshold": 1,
+                            "keys": [
+                                {
+                                    "key": "EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3",
+                                    "weight": 1
+                                }
+                            ],
+                            "accounts": [],
+                            "waits": []
+                        },
+                        "active": {
+                            "threshold": 1,
+                            "keys": [
+                                {
+                                    "key": "EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3",
+                                    "weight": 1
+                                }
+                            ],
+                            "accounts": [],
+                            "waits": []
+                        }
+                    },
+                    "hex_data": "0000000000ea3055a012458bfaac8d3a010000000100028bbd0cc3be68562a36d2ff40d112ce6b8bf3ed51a7ec2fb5276292a925bfe3c101000000010000000100028bbd0cc3be68562a36d2ff40d112ce6b8bf3ed51a7ec2fb5276292a925bfe3c101000000"
+                },
+                "elapsed": 6092,
+                "cpu_usage": 0,
+                "console": "",
+                "total_cpu_usage": 0,
+                "trx_id": "741a8ac1617607b629d2776761f7dcbdb258713630eb4f189d48659f4a21b471",
+                "inline_traces": []
+            },
+            {
+                "receipt": {
+                    "receiver": "eosio",
+                    "act_digest": "11a8359b3997ef5846bdb8b1292c44496b3a118244be27443443824494c0e80d",
+                    "global_sequence": 141595,
+                    "recv_sequence": 141593,
+                    "auth_sequence": [
+                        [
+                            "eosio",
+                            141590
+                        ]
+                    ],
+                    "code_sequence": 0,
+                    "abi_sequence": 0
+                },
+                "act": {
+                    "account": "eosio",
+                    "name": "buyrambytes",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": "0000000000ea3055a012458bfaac8d3a00200000"
+                },
+                "elapsed": 5,
+                "cpu_usage": 0,
+                "console": "",
+                "total_cpu_usage": 0,
+                "trx_id": "741a8ac1617607b629d2776761f7dcbdb258713630eb4f189d48659f4a21b471",
+                "inline_traces": []
+            },
+            {
+                "receipt": {
+                    "receiver": "eosio",
+                    "act_digest": "ff2955d8f52bfc4ba44742aba094504f9925c290438e639ceae7516ce35e991f",
+                    "global_sequence": 141596,
+                    "recv_sequence": 141594,
+                    "auth_sequence": [
+                        [
+                            "eosio",
+                            141591
+                        ]
+                    ],
+                    "code_sequence": 0,
+                    "abi_sequence": 0
+                },
+                "act": {
+                    "account": "eosio",
+                    "name": "delegatebw",
+                    "authorization": [
+                        {
+                            "actor": "eosio",
+                            "permission": "active"
+                        }
+                    ],
+                    "data": "0000000000ea3055a012458bfaac8d3ae80300000000000004454f5300000000e80300000000000004454f530000000000"
+                },
+                "elapsed": 2,
+                "cpu_usage": 0,
+                "console": "",
+                "total_cpu_usage": 0,
+                "trx_id": "741a8ac1617607b629d2776761f7dcbdb258713630eb4f189d48659f4a21b471",
+                "inline_traces": []
+            }
+        ],
+        "except": null
+    }
+}

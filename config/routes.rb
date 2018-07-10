@@ -5,6 +5,7 @@ Rails.application.routes.draw do
   resources :users do
     member do
       get :confirm_email
+      post :create_eos_account
     end
   end
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
