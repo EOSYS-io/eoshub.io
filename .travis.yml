@@ -51,8 +51,10 @@ jobs:
           elif [ "$TRAVIS_BRANCH" == "master" ]; then
             export DEPLOYMENT_ENV=production DOCKER_TAG=$TRAVIS_TAG;
           fi
+        # Docker build
         - docker build -f deploy/$DEPLOYMENT_ENV/Dockerfile.db_migration -t $DOCKER_HUB_REPO_DB_MIGRATION-$DEPLOYMENT_ENV:latest --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
         - docker build -f deploy/$DEPLOYMENT_ENV/dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
+        # Docker push
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         - docker push $DOCKER_HUB_REPO_DB_MIGRATION-$DEPLOYMENT_ENV:latest
         - docker push $DOCKER_HUB_REPO:$DOCKER_TAG
