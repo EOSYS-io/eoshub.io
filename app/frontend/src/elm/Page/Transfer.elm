@@ -1,9 +1,9 @@
 module Page.Transfer exposing (..)
 
+import Action exposing (Action(Transfer), TransferMsg, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Action exposing (Action(Transfer), TransferMsg, encodeAction)
 import Port
 
 

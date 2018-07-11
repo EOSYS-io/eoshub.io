@@ -1,7 +1,7 @@
-module Route exposing (..)
+module Route exposing (Route(..), route, parseLocation)
 
 import Navigation exposing (Location)
-import UrlParser exposing (..)
+import UrlParser exposing (Parser, parsePath, oneOf, map, top, s)
 
 
 type Route
@@ -24,7 +24,7 @@ route =
 
 parseLocation : Location -> Route
 parseLocation location =
-    case (parsePath route location) of
+    case parsePath route location of
         Just route ->
             route
 

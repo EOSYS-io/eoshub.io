@@ -1,12 +1,12 @@
-module Model exposing (..)
+module Model exposing (Model, updatePage)
 
-import Page exposing (..)
+import Message exposing (Message(..))
+import Page exposing (Page(..))
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
-import Message exposing (..)
 import View.Notification
-import Wallet exposing (decodeWalletStatus)
+import Wallet
 
 
 -- MODEL

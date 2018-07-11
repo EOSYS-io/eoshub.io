@@ -1,21 +1,21 @@
 module Main exposing (..)
 
 import Html exposing (..)
-import Html.Events exposing (..)
 import Html.Attributes exposing (..)
-import Message exposing (..)
-import Model exposing (..)
-import Port
-import Wallet exposing (decodeWalletStatus)
-import Response exposing (decodeScatterResponse)
+import Html.Events exposing (..)
+import Message exposing (Message(..))
+import Model exposing (Model, updatePage)
 import Navigation exposing (Location)
-import Route exposing (..)
-import Page exposing (..)
+import Page exposing (Page(..), getPage)
 import Page.Search as Search
 import Page.Voting as Voting
 import Page.NotFound as NotFound
 import Page.Transfer as Transfer
+import Port
+import Response exposing (decodeScatterResponse)
+import Route exposing (Route(..), parseLocation)
 import View.Notification
+import Wallet exposing (decodeWalletStatus)
 
 
 -- INIT
@@ -97,7 +97,7 @@ update message model =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Port.receiveWalletStatus UpdateWalletStatus
         , Port.receiveScatterResponse UpdateScatterResponse

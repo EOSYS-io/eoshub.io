@@ -1,10 +1,9 @@
-module Page exposing (..)
+module Page exposing (Page(..), getPage)
 
-import Message exposing (..)
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
-import Route exposing (Route(SearchRoute, VotingRoute, TransferRoute, IndexRoute))
+import Route exposing (Route(..))
 
 
 type Page

@@ -14,8 +14,8 @@ type alias ScatterResponse =
 
 
 decodeScatterResponse : ScatterResponse -> View.Notification.Msg
-decodeScatterResponse ({ code, type_, message } as resp) =
-    if (code == 200) then
+decodeScatterResponse { code, type_, message } =
+    if code == 200 then
         View.Notification.Ok
     else
         View.Notification.Error { code = code, message = type_ ++ "\n" ++ message }

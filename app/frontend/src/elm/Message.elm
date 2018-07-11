@@ -1,4 +1,4 @@
-module Message exposing (..)
+module Message exposing (Message(..))
 
 import Navigation exposing (Location)
 import Page.Search as Search
@@ -10,7 +10,7 @@ import Page.Transfer as Transfer
 
 
 type Message
-    = CheckWalletStatus -- TODO(heejae): Modify CheckWalletStatus to have a name of Wallet plugin(ex. Scatter).
+    = CheckWalletStatus
     | UpdateWalletStatus { status : String, account : String, authority : String }
     | AuthenticateAccount
     | InvalidateAccount
