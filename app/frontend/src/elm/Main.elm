@@ -7,10 +7,11 @@ import Message exposing (Message(..))
 import Model exposing (Model, updatePage)
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
-import Page.Search as Search
-import Page.Voting as Voting
+import Page.AccountCreate as AccountCreate
 import Page.NotFound as NotFound
+import Page.Search as Search
 import Page.Transfer as Transfer
+import Page.Voting as Voting
 import Port
 import Response exposing (decodeScatterResponse)
 import Route exposing (Route(..), parseLocation)
@@ -49,6 +50,9 @@ view { walletStatus, page, notification } =
                 , button [ onClick InvalidateAccount ] [ text "Detach Scatter" ]
                 , div [] [ View.Notification.view notification ]
                 ]
+
+        AccountCreatePage subModel ->
+            Html.map AccountCreateMessage (AccountCreate.view subModel)
 
         SearchPage subModel ->
             Html.map SearchMessage (Search.view subModel)

@@ -1,11 +1,12 @@
-module Route exposing (Route(..), route, parseLocation)
+module Route exposing (Route(..), parseLocation, route)
 
 import Navigation exposing (Location)
-import UrlParser exposing (Parser, parsePath, oneOf, map, top, s)
+import UrlParser exposing (Parser, map, oneOf, parsePath, s, top)
 
 
 type Route
     = IndexRoute
+    | AccountCreateRoute
     | SearchRoute
     | VotingRoute
     | TransferRoute
@@ -16,6 +17,7 @@ route : Parser (Route -> a) a
 route =
     oneOf
         [ map IndexRoute top
+        , map AccountCreateRoute (s "account_create")
         , map SearchRoute (s "search")
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")
