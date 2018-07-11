@@ -46,16 +46,20 @@ jobs:
         - curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee -a /usr/bin/ecs-deploy
         - sudo chmod +x /usr/bin/ecs-deploy
       script:
-        - if [ -z "$TRAVIS_TAG" ]; then
-            export DOCKER_TAG=$TRAVIS_COMMIT;
-          else
-            export DOCKER_TAG=$TRAVIS_TAG;
+        - if [ "$TRAVIS_BRANCH" == "alpha" ]; then
+            export DEPLOYMENT_ENV=alpha DOCKER_TAG=$TRAVIS_COMMIT;
+          elif [ "$TRAVIS_BRANCH" == "master" ]; then
+            export DEPLOYMENT_ENV=production DOCKER_TAG=$TRAVIS_TAG;
           fi
-        - docker build -f deploy/alpha/dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
+        - docker build -f deploy/$DEPLOYMENT_ENV/Dockerfile.db_migration -t $DOCKER_HUB_REPO_DB_MIGRATION-$DEPLOYMENT_ENV:latest --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
+        - docker build -f deploy/$DEPLOYMENT_ENV/dockerfile -t $DOCKER_HUB_REPO:$DOCKER_TAG --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        - docker push $DOCKER_HUB_REPO_DB_MIGRATION-$DEPLOYMENT_ENV:latest
         - docker push $DOCKER_HUB_REPO:$DOCKER_TAG
+        # DB migration
+        - aws ecs run-task --cluster eosys --task-definition eoshub-db-migration-$DEPLOYMENT_ENV
         # update an AWS ECS service with the new image
-        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$TRAVIS_BRANCH -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 600
+        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$DEPLOYMENT_ENV -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 600
 
 notifications:
   email: false

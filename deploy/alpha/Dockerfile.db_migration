@@ -1,0 +1,25 @@
+FROM eosys/rails
+
+ENV TZ Asia/Seoul
+ENV RACK_ENV alpha
+ENV RAILS_ENV alpha
+ENV RAILS_LOG_TO_STDOUT true
+ENV WEB_CONCURRENCY 2
+ENV RAILS_MAX_THREADS 10
+#ENV MAX_THREADS 10
+# Dead connection이 있을 수 있으므로 스레드 개수보다 크게
+ENV DB_POOL 20
+ARG RAILS_MASTER_KEY
+
+# Rails app
+ENV BUNDLE_DIR /bundle
+ENV RAILS_ROOT /app
+
+RUN mkdir -p $RAILS_ROOT
+WORKDIR $RAILS_ROOT
+COPY . $RAILS_ROOT
+
+RUN bundle install --with alpha --path $BUNDLE_DIR
+
+# Command
+CMD ["bundle", "exec", "rake", "db:migrate"]
