@@ -1,4 +1,4 @@
-module Response exposing (..)
+module Response exposing (decodeScatterResponse)
 
 import View.Notification
 

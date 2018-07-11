@@ -16,6 +16,10 @@ type Msg
     | None
 
 
+
+-- VIEW
+
+
 view : Msg -> Html msg
 view msg =
     let

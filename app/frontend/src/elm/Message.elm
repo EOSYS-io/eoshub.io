@@ -2,16 +2,13 @@ module Message exposing (Message(..))
 
 import Navigation exposing (Location)
 import Page
+import Sidebar
 
 
 -- MESSAGE
 
 
 type Message
-    = CheckWalletStatus
-    | UpdateWalletStatus { status : String, account : String, authority : String }
-    | AuthenticateAccount
-    | InvalidateAccount
-    | UpdateScatterResponse { code : Int, type_ : String, message : String }
-    | OnLocationChange Location
+    = OnLocationChange Location
     | PageMessage Page.Message
+    | SidebarMessage Sidebar.Message
