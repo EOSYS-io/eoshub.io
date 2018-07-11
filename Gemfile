@@ -53,6 +53,8 @@ group :development do
   gem 'spring-watcher-listen', '~> 2.0.0'
   # Add a comment summarizing the current schema to the top or bottom of each of your models, routes.rb, ...
   gem 'annotate', require: false
+  # Preview email in the default browser instead of sending it.
+  gem "letter_opener"
 end
 
 group :test do
@@ -67,3 +69,12 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'browserify-rails'
+
+# HTTP client
+gem "typhoeus"
+
+# library for adding finite state machines to Ruby classes
+gem 'aasm'
+
+# Adds a method to MiniTest that creates a method stub on any instance of a class for the duration of a block
+gem "minitest-stub_any_instance"

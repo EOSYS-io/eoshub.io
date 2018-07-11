@@ -54,6 +54,11 @@ bin/webpack-dev-server # for development
   - Make sure that elm-package.json in test/frontend should contain all dependencies of
   elm-packge.json in the root directory.
 
+- Rails
+  ```
+  rails t(est)
+  ```
+
 ## Frontend Source Location
 ```
 app/frontend
