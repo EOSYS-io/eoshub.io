@@ -1,4 +1,4 @@
-module View.Notification exposing (..)
+module View.Notification exposing (ErrorMsg, Msg(..), view)
 
 import Html exposing (Html, div, text, h1)
 import Html.Attributes exposing (style)
@@ -19,7 +19,7 @@ type Msg
 view : Msg -> Html msg
 view msg =
     let
-        ( message, color ) =
+        ( message_, color ) =
             case msg of
                 Ok ->
                     ( "Success!", "green" )
@@ -31,4 +31,4 @@ view msg =
                     ( "", "" )
     in
         div [ style [ ( "color", color ) ] ]
-            [ h1 [] [ text message ] ]
+            [ h1 [] [ text message_ ] ]

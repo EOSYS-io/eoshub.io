@@ -5,12 +5,12 @@ import Expect
 import Wallet exposing (Status(..), decodeWalletStatus)
 
 
-suite : Test
-suite =
+tests : Test
+tests =
     describe "Wallet module"
         [ describe "decodeWalletStatus"
             [ test "returns Authenticated wallet status with account and authority" <|
-                \_ ->
+                \() ->
                     let
                         msg =
                             { status = "WALLET_STATUS_AUTHENTICATED"
@@ -26,7 +26,7 @@ suite =
                     in
                         Expect.equal (decodeWalletStatus msg) authenticatedWalletStatus
             , test "returns Loaded wallet status with empty account and authority" <|
-                \_ ->
+                \() ->
                     let
                         msg =
                             { status = "WALLET_STATUS_LOADED"
@@ -42,7 +42,7 @@ suite =
                     in
                         Expect.equal (decodeWalletStatus msg) loadedWalletStatus
             , test "returns NotFound wallet status with empty account and authority" <|
-                \_ ->
+                \() ->
                     let
                         msg =
                             { status = "WALLET_STATUS_NOT_FOUND"

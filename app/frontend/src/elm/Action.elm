@@ -1,7 +1,7 @@
-module Action exposing (..)
+module Action exposing (TransferMsg, Action(..), transferMsgToValue, encodeAction)
 
-import Round
 import Json.Encode as JE
+import Round
 
 
 type alias TransferMsg =
@@ -18,8 +18,7 @@ type Action
 
 transferMsgToValue : TransferMsg -> JE.Value
 transferMsgToValue { from, to, quantity, memo } =
-    -- TODO(heejae): Use flags of Elm to keep constants.
-    -- Also, introduce form validation.
+    -- Introduce form validation.
     JE.object
         [ ( "account", JE.string "eosio.token" )
         , ( "action", JE.string "transfer" )
@@ -27,7 +26,7 @@ transferMsgToValue { from, to, quantity, memo } =
           , JE.object
                 [ ( "from", JE.string from )
                 , ( "to", JE.string to )
-                , ( "quantity", JE.string ((quantity |> (String.toFloat >> (Result.withDefault 0) >> (Round.round 4))) ++ (" EOS")) )
+                , ( "quantity", JE.string ((quantity |> formatEosQuantity) ++ " EOS") )
                 , ( "memo", JE.string memo )
                 ]
           )
@@ -39,3 +38,12 @@ encodeAction action =
     case action of
         Transfer msg ->
             transferMsgToValue msg
+
+
+
+-- Internal helper functions.
+
+
+formatEosQuantity : String -> String
+formatEosQuantity =
+    String.toFloat >> Result.withDefault 0 >> Round.round 4

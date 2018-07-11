@@ -1,11 +1,11 @@
-module Page.Search exposing (..)
+module Page.Search exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, div, input, button, text, p)
 import Html.Attributes exposing (placeholder)
 import Html.Events exposing (onClick)
 
 
--- Model
+-- MODEL
 
 
 type alias Model =
@@ -18,7 +18,7 @@ initModel =
 
 
 
--- Updates
+-- UPDATES
 
 
 type Message
@@ -33,13 +33,13 @@ update msg model =
 
 
 
--- View
+-- VIEW
 
 
 view : Model -> Html Message
-view model =
+view { result } =
     div []
         [ input [ placeholder "account / public key" ] []
         , button [ onClick Search ] [ text "검색" ]
-        , p [] [ text model.result ]
+        , p [] [ text result ]
         ]
