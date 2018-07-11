@@ -1,0 +1,29 @@
+{
+    "code": 500,
+    "message": "Internal Service Error",
+    "error": {
+        "code": 3050001,
+        "name": "account_name_exists_exception",
+        "what": "account name already exists",
+        "details": [
+            {
+                "message": "Cannot create account named beautyofcode, as that name is already taken",
+                "file": "eosio_contract.cpp",
+                "line_number": 97,
+                "method": "apply_eosio_newaccount"
+            },
+            {
+                "message": "",
+                "file": "eosio_contract.cpp",
+                "line_number": 126,
+                "method": "apply_eosio_newaccount"
+            },
+            {
+                "message": "",
+                "file": "apply_context.cpp",
+                "line_number": 62,
+                "method": "exec_one"
+            }
+        ]
+    }
+}

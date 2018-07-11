@@ -6,8 +6,6 @@ module UsersHelper
       params: { name: account_name }
     ).run
 
-    logger.debug "#{response.code} #{response.body}" unless response.success?
-
     response.code == 200
   end
 
@@ -18,8 +16,6 @@ module UsersHelper
       headers: {'Content-Type'=> "application/json"},
       body: JSON.generate({account_name: account_name, pubkey: pubkey})
     ).run
-
-    logger.debug "#{response.code} #{response.body}" unless response.success?
 
     response
   end
