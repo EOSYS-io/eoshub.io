@@ -4,18 +4,24 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Message exposing (Message(..))
-import Model exposing (Model, updatePage)
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
-import Page.Search as Search
-import Page.Voting as Voting
-import Page.NotFound as NotFound
-import Page.Transfer as Transfer
 import Port
 import Response exposing (decodeScatterResponse)
 import Route exposing (Route(..), parseLocation)
 import View.Notification
 import Wallet exposing (decodeWalletStatus)
+
+
+-- MODEL
+
+
+type alias Model =
+    { walletStatus : Wallet.WalletStatus
+    , page : Page
+    , notification : View.Notification.Msg
+    }
+
 
 
 -- INIT
@@ -50,17 +56,8 @@ view { walletStatus, page, notification } =
                 , div [] [ View.Notification.view notification ]
                 ]
 
-        SearchPage subModel ->
-            Html.map SearchMessage (Search.view subModel)
-
-        VotingPage subModel ->
-            Html.map VotingMessage (Voting.view subModel)
-
-        TransferPage subModel ->
-            Html.map TransferMessage (Transfer.view subModel)
-
-        NotFoundPage ->
-            NotFound.view
+        _ ->
+            Html.map PageMessage (Page.view page)
 
 
 
@@ -88,8 +85,12 @@ update message model =
         OnLocationChange location ->
             ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
 
-        _ ->
-            updatePage message model.page model
+        PageMessage pageMessage ->
+            let
+                ( newPage, newCmd ) =
+                    Page.update pageMessage model.page
+            in
+                ( { model | page = newPage }, Cmd.map PageMessage newCmd )
 
 
 
