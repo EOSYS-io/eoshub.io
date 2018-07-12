@@ -1,6 +1,6 @@
 module Page.Transfer exposing (..)
 
-import Action exposing (Action(Transfer), TransferMsg, encodeAction)
+import Action exposing (Action(Transfer), TransferMessage, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -11,7 +11,7 @@ import Port
 
 
 type alias Model =
-    { transfer : TransferMsg }
+    { transfer : TransferMessage }
 
 
 initModel : Model
@@ -24,7 +24,7 @@ initModel =
 -- MESSAGE
 
 
-type TransferMsgFormField
+type TransferMessageFormField
     = From
     | To
     | Quantity
@@ -32,7 +32,7 @@ type TransferMsgFormField
 
 
 type Message
-    = SetTransferMsgField TransferMsgFormField String
+    = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
 
 
@@ -51,7 +51,7 @@ view { transfer } =
                     , input
                         [ type_ "text"
                         , placeholder "From"
-                        , onInput <| SetTransferMsgField From
+                        , onInput <| SetTransferMessageField From
                         , value transfer.from
                         ]
                         []
@@ -61,7 +61,7 @@ view { transfer } =
                     , input
                         [ type_ "text"
                         , placeholder "To"
-                        , onInput <| SetTransferMsgField To
+                        , onInput <| SetTransferMessageField To
                         , value transfer.to
                         ]
                         []
@@ -71,7 +71,7 @@ view { transfer } =
                     , input
                         [ type_ "text"
                         , placeholder "EOS"
-                        , onInput <| SetTransferMsgField Quantity
+                        , onInput <| SetTransferMessageField Quantity
                         , value transfer.quantity
                         ]
                         []
@@ -81,7 +81,7 @@ view { transfer } =
                     , input
                         [ type_ "text"
                         , placeholder "Memo"
-                        , onInput <| SetTransferMsgField Memo
+                        , onInput <| SetTransferMessageField Memo
                         , value transfer.memo
                         ]
                         []
@@ -108,16 +108,16 @@ update message ({ transfer } as model) =
             in
                 ( model, cmd )
 
-        SetTransferMsgField field value ->
-            ( setTransferMsgField field value model, Cmd.none )
+        SetTransferMessageField field value ->
+            ( setTransferMessageField field value model, Cmd.none )
 
 
 
 -- Utility functions.
 
 
-setTransferMsgField : TransferMsgFormField -> String -> Model -> Model
-setTransferMsgField field value { transfer } =
+setTransferMessageField : TransferMessageFormField -> String -> Model -> Model
+setTransferMessageField field value { transfer } =
     case field of
         From ->
             { transfer = { transfer | from = value } }

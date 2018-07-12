@@ -1,21 +1,21 @@
 module Main exposing (..)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html
 import Message exposing (Message(..))
-import Model exposing (Model, updatePage)
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
-import Page.Search as Search
-import Page.Voting as Voting
-import Page.NotFound as NotFound
-import Page.Transfer as Transfer
-import Port
-import Response exposing (decodeScatterResponse)
 import Route exposing (Route(..), parseLocation)
-import View.Notification
-import Wallet exposing (decodeWalletStatus)
+import Sidebar
+
+
+-- MODEL
+
+
+type alias Model =
+    { sidebar : Sidebar.Model
+    , page : Page
+    }
+
 
 
 -- INIT
@@ -23,9 +23,8 @@ import Wallet exposing (decodeWalletStatus)
 
 init : Location -> ( Model, Cmd Message )
 init location =
-    ( { walletStatus = { status = Wallet.NotFound, account = "", authority = "" }
-      , page = location |> Route.parseLocation |> getPage
-      , notification = View.Notification.None
+    ( { sidebar = Sidebar.initModel
+      , page = location |> parseLocation |> getPage
       }
     , Cmd.none
     )
@@ -35,32 +34,12 @@ init location =
 -- VIEW
 
 
-view : Model -> Html Message
-view { walletStatus, page, notification } =
-    case page of
-        IndexPage ->
-            div []
-                [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
-                    [ text "Hello Elm!" ]
-                , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.account ]
-                , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text walletStatus.authority ]
-                , button [ onClick CheckWalletStatus ] [ text "Check" ]
-                , button [ onClick AuthenticateAccount ] [ text "Attach Scatter" ]
-                , button [ onClick InvalidateAccount ] [ text "Detach Scatter" ]
-                , div [] [ View.Notification.view notification ]
-                ]
-
-        SearchPage subModel ->
-            Html.map SearchMessage (Search.view subModel)
-
-        VotingPage subModel ->
-            Html.map VotingMessage (Voting.view subModel)
-
-        TransferPage subModel ->
-            Html.map TransferMessage (Transfer.view subModel)
-
-        NotFoundPage ->
-            NotFound.view
+view : Model -> Html.Html Message
+view { sidebar, page } =
+    Html.div []
+        [ Html.map SidebarMessage (Sidebar.view sidebar)
+        , Html.map PageMessage (Page.view page)
+        ]
 
 
 
@@ -70,26 +49,22 @@ view { walletStatus, page, notification } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        CheckWalletStatus ->
-            ( model, Port.checkWalletStatus () )
-
-        UpdateWalletStatus payload ->
-            ( { model | walletStatus = decodeWalletStatus payload }, Cmd.none )
-
-        AuthenticateAccount ->
-            ( model, Port.authenticateAccount () )
-
-        InvalidateAccount ->
-            ( model, Port.invalidateAccount () )
-
-        UpdateScatterResponse resp ->
-            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
-
         OnLocationChange location ->
             ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
 
-        _ ->
-            updatePage message model.page model
+        PageMessage pageMessage ->
+            let
+                ( newPage, newCmd ) =
+                    Page.update pageMessage model.page
+            in
+                ( { model | page = newPage }, Cmd.map PageMessage newCmd )
+
+        SidebarMessage sidebarMessage ->
+            let
+                ( newSidebar, newCmd ) =
+                    Sidebar.update sidebarMessage model.sidebar
+            in
+                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 
 
 
@@ -97,11 +72,8 @@ update message model =
 
 
 subscriptions : Model -> Sub Message
-subscriptions _ =
-    Sub.batch
-        [ Port.receiveWalletStatus UpdateWalletStatus
-        , Port.receiveScatterResponse UpdateScatterResponse
-        ]
+subscriptions { sidebar } =
+    Sub.batch [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar) ]
 
 
 

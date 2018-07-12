@@ -29,8 +29,8 @@ type Message
 
 
 update : Message -> Model -> Model
-update msg model =
-    case msg of
+update message model =
+    case message of
         BpInput val ->
             { model | bp = val }
 
