@@ -61,7 +61,7 @@ type Message
 view : Model -> Html Message
 view { wallet, notification, language } =
     div []
-        [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
+        [ h1 [ class "red", style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
             [ text "Hello Elm!" ]
         , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text wallet.account ]
         , h2 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ] [ text wallet.authority ]
