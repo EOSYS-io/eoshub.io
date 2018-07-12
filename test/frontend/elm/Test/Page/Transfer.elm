@@ -44,7 +44,7 @@ tests =
     describe "Transfer page module"
         [ describe "update"
             [ submitActionTest ]
-        , describe "setTransferMsgField"
+        , describe "setTransferMessageField"
             (let
                 { transfer } =
                     model
@@ -52,19 +52,19 @@ tests =
                 [ test "From" <|
                     \() ->
                         Expect.equal { model | transfer = { transfer | from = "newFrom" } }
-                            (setTransferMsgField From "newFrom" model)
+                            (setTransferMessageField From "newFrom" model)
                 , test "To" <|
                     \() ->
                         Expect.equal { model | transfer = { transfer | to = "newTo" } }
-                            (setTransferMsgField To "newTo" model)
+                            (setTransferMessageField To "newTo" model)
                 , test "Quantity" <|
                     \() ->
                         Expect.equal { model | transfer = { transfer | quantity = "301" } }
-                            (setTransferMsgField Quantity "301" model)
+                            (setTransferMessageField Quantity "301" model)
                 , test "Memo" <|
                     \() ->
                         Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
-                            (setTransferMsgField Memo "newMemo" model)
+                            (setTransferMessageField Memo "newMemo" model)
                 ]
             )
         ]

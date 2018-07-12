@@ -6,7 +6,7 @@ import Json.Encode as JE
 -- A port for asking status of Wallet in JS.
 
 
-port checkWalletStatus : () -> Cmd msg
+port checkWalletStatus : () -> Cmd message
 
 
 
@@ -14,16 +14,16 @@ port checkWalletStatus : () -> Cmd msg
 -- Currently, status of Wallet is defined in three categories 'authenticated', 'loaded', 'notFound'
 
 
-port receiveWalletStatus : ({ status : String, account : String, authority : String } -> msg) -> Sub msg
+port receiveWalletStatus : ({ status : String, account : String, authority : String } -> message) -> Sub message
 
 
-port authenticateAccount : () -> Cmd msg
+port authenticateAccount : () -> Cmd message
 
 
-port invalidateAccount : () -> Cmd msg
+port invalidateAccount : () -> Cmd message
 
 
-port pushAction : JE.Value -> Cmd msg
+port pushAction : JE.Value -> Cmd message
 
 
-port receiveScatterResponse : ({ code : Int, type_ : String, message : String } -> msg) -> Sub msg
+port receiveScatterResponse : ({ code : Int, type_ : String, message : String } -> message) -> Sub message

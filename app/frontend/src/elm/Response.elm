@@ -1,4 +1,4 @@
-module Response exposing (..)
+module Response exposing (decodeScatterResponse)
 
 import View.Notification
 
@@ -13,7 +13,7 @@ type alias ScatterResponse =
     }
 
 
-decodeScatterResponse : ScatterResponse -> View.Notification.Msg
+decodeScatterResponse : ScatterResponse -> View.Notification.Message
 decodeScatterResponse { code, type_, message } =
     if code == 200 then
         View.Notification.Ok
