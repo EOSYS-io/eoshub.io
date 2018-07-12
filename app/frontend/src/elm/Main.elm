@@ -7,13 +7,15 @@ import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
 import Route exposing (Route(..), parseLocation)
 import Sidebar
+import Header
 
 
 -- MODEL
 
 
 type alias Model =
-    { sidebar : Sidebar.Model
+    { header : Header.Model
+    , sidebar : Sidebar.Model
     , page : Page
     }
 
@@ -24,7 +26,8 @@ type alias Model =
 
 init : Location -> ( Model, Cmd Message )
 init location =
-    ( { sidebar = Sidebar.initModel
+    ( { header = Header.initModel
+      , sidebar = Sidebar.initModel
       , page = location |> parseLocation |> getPage
       }
     , Cmd.none
@@ -36,9 +39,10 @@ init location =
 
 
 view : Model -> Html.Html Message
-view { sidebar, page } =
+view { header, sidebar, page } =
     Html.div [ class "container" ]
-        [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
+        [ Html.map HeaderMessage (Header.view header)
+        , Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
         , Html.div [ class "wrapper" ] [ Html.map PageMessage (Page.view page) ]
         ]
 
@@ -52,6 +56,13 @@ update message model =
     case message of
         OnLocationChange location ->
             ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
+
+        HeaderMessage headerMessage ->
+            let
+                ( newHeader, newCmd ) =
+                    Header.update headerMessage model.header
+            in
+                ( { model | header = newHeader }, Cmd.none )
 
         PageMessage pageMessage ->
             let
