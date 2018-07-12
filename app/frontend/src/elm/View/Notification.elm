@@ -1,18 +1,21 @@
-module View.Notification exposing (ErrorMsg, Msg(..), view)
+module View.Notification exposing (ErrorMessage, Message(..), view)
 
 import Html exposing (Html, div, text, h1)
 import Html.Attributes exposing (style)
 
 
-type alias ErrorMsg =
+-- MESSAGE
+
+
+type alias ErrorMessage =
     { code : Int
     , message : String
     }
 
 
-type Msg
+type Message
     = Ok
-    | Error ErrorMsg
+    | Error ErrorMessage
     | None
 
 
@@ -20,16 +23,16 @@ type Msg
 -- VIEW
 
 
-view : Msg -> Html msg
-view msg =
+view : Message -> Html message
+view message =
     let
         ( message_, color ) =
-            case msg of
+            case message of
                 Ok ->
                     ( "Success!", "green" )
 
-                Error { code, message } ->
-                    ( toString code ++ "\n" ++ message, "red" )
+                Error errorMessage ->
+                    ( toString errorMessage.code ++ "\n" ++ errorMessage.message, "red" )
 
                 _ ->
                     ( "", "" )

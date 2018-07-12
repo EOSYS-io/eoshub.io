@@ -23,7 +23,7 @@ type alias Model =
         , account : String
         , authority : String
         }
-    , notification : View.Notification.Msg
+    , notification : View.Notification.Message
     }
 
 

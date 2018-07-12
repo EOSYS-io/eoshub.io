@@ -15,7 +15,7 @@ tests =
                 [ test "authenticated" <|
                     \() ->
                         let
-                            msg =
+                            message =
                                 UpdateWalletStatus
                                     { status = "WALLET_STATUS_AUTHENTICATED"
                                     , account = "ACCOUNT"
@@ -31,11 +31,11 @@ tests =
                                         }
                                 }
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update msg initModel)
+                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
                 , test "loaded" <|
                     \() ->
                         let
-                            msg =
+                            message =
                                 UpdateWalletStatus
                                     { status = "WALLET_STATUS_LOADED"
                                     , account = "acc"
@@ -51,11 +51,11 @@ tests =
                                         }
                                 }
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update msg initModel)
+                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
                 , test "not found" <|
                     \() ->
                         let
-                            msg =
+                            message =
                                 UpdateWalletStatus
                                     { status = "WALLET_STATUS_NOT_FOUND"
                                     , account = "acc"
@@ -71,7 +71,7 @@ tests =
                                         }
                                 }
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update msg initModel)
+                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
                 ]
             , describe "Other Messages"
                 [ test "CheckWalletStatus" <|

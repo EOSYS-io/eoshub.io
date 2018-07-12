@@ -54,26 +54,26 @@ view page =
 
 
 update : Message -> Page -> ( Page, Cmd Message )
-update msg page =
-    case ( msg, page ) of
-        ( SearchMessage subMsg, SearchPage subModel ) ->
+update message page =
+    case ( message, page ) of
+        ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 newModel =
-                    Search.update subMsg subModel
+                    Search.update subMessage subModel
             in
                 ( newModel |> SearchPage, Cmd.none )
 
-        ( TransferMessage subMsg, TransferPage subModel ) ->
+        ( TransferMessage subMessage, TransferPage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    (Transfer.update subMsg subModel)
+                    (Transfer.update subMessage subModel)
             in
                 ( newModel |> TransferPage, Cmd.map TransferMessage subCmd )
 
-        ( VotingMessage subMsg, VotingPage subModel ) ->
+        ( VotingMessage subMessage, VotingPage subModel ) ->
             let
                 newModel =
-                    Voting.update subMsg subModel
+                    Voting.update subMessage subModel
             in
                 ( newModel |> VotingPage, Cmd.none )
 

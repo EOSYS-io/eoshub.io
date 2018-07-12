@@ -18,7 +18,7 @@ initModel =
 
 
 
--- UPDATES
+-- UPDATE
 
 
 type Message
@@ -26,8 +26,8 @@ type Message
 
 
 update : Message -> Model -> Model
-update msg model =
-    case msg of
+update message model =
+    case message of
         Search ->
             { model | result = "result" }
 

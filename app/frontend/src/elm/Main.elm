@@ -4,7 +4,7 @@ import Html
 import Message exposing (Message(..))
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
-import Route
+import Route exposing (Route(..), parseLocation)
 import Sidebar
 
 
@@ -24,7 +24,7 @@ type alias Model =
 init : Location -> ( Model, Cmd Message )
 init location =
     ( { sidebar = Sidebar.initModel
-      , page = location |> Route.parseLocation |> getPage
+      , page = location |> parseLocation |> getPage
       }
     , Cmd.none
     )
@@ -50,7 +50,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         OnLocationChange location ->
-            ( { model | page = location |> Route.parseLocation |> getPage }, Cmd.none )
+            ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
 
         PageMessage pageMessage ->
             let
