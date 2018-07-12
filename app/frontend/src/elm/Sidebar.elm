@@ -3,9 +3,10 @@ module Sidebar exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import View.Notification
 import Port
 import Response exposing (decodeScatterResponse)
+import Translation exposing (Language(..))
+import View.Notification
 
 
 -- MODEL
@@ -18,23 +19,25 @@ type WalletStatus
 
 
 type alias Model =
-    { wallet :
+    { language : Language
+    , notification : View.Notification.Message
+    , wallet :
         { status : WalletStatus
         , account : String
         , authority : String
         }
-    , notification : View.Notification.Message
     }
 
 
 initModel : Model
 initModel =
-    { wallet =
+    { language = English
+    , notification = View.Notification.None
+    , wallet =
         { status = NotFound
         , account = ""
         , authority = ""
         }
-    , notification = View.Notification.None
     }
 
 
@@ -43,11 +46,12 @@ initModel =
 
 
 type Message
-    = CheckWalletStatus
-    | UpdateWalletStatus { status : String, account : String, authority : String }
-    | AuthenticateAccount
+    = AuthenticateAccount
+    | CheckWalletStatus
     | InvalidateAccount
+    | UpdateLanguage Language
     | UpdateScatterResponse { code : Int, type_ : String, message : String }
+    | UpdateWalletStatus { status : String, account : String, authority : String }
 
 
 
@@ -55,7 +59,7 @@ type Message
 
 
 view : Model -> Html Message
-view { wallet, notification } =
+view { wallet, notification, language } =
     div []
         [ h1 [ style [ ( "display", "flex" ), ( "justify-content", "center" ) ] ]
             [ text "Hello Elm!" ]
@@ -64,7 +68,9 @@ view { wallet, notification } =
         , button [ onClick CheckWalletStatus ] [ text "Check" ]
         , button [ onClick AuthenticateAccount ] [ text "Attach Scatter" ]
         , button [ onClick InvalidateAccount ] [ text "Detach Scatter" ]
-        , div [] [ View.Notification.view notification ]
+        , button [ onClick (UpdateLanguage Korean) ] [ text "KO" ]
+        , button [ onClick (UpdateLanguage English) ] [ text "EN" ]
+        , div [] [ View.Notification.view notification language ]
         ]
 
 
@@ -75,6 +81,21 @@ view { wallet, notification } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
+        AuthenticateAccount ->
+            ( model, Port.authenticateAccount () )
+
+        CheckWalletStatus ->
+            ( model, Port.checkWalletStatus () )
+
+        InvalidateAccount ->
+            ( model, Port.invalidateAccount () )
+
+        UpdateLanguage language ->
+            ( { model | language = language }, Cmd.none )
+
+        UpdateScatterResponse resp ->
+            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
+
         UpdateWalletStatus { status, account, authority } ->
             if status == "WALLET_STATUS_AUTHENTICATED" then
                 ( { model | wallet = { status = Authenticated, account = account, authority = authority } }, Cmd.none )
@@ -82,18 +103,6 @@ update message model =
                 ( { model | wallet = { status = Loaded, account = "", authority = "" } }, Cmd.none )
             else
                 ( { model | wallet = { status = NotFound, account = "", authority = "" } }, Cmd.none )
-
-        CheckWalletStatus ->
-            ( model, Port.checkWalletStatus () )
-
-        AuthenticateAccount ->
-            ( model, Port.authenticateAccount () )
-
-        InvalidateAccount ->
-            ( model, Port.invalidateAccount () )
-
-        UpdateScatterResponse resp ->
-            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
 
 
 
