@@ -1,5 +1,7 @@
 // Must import babel-polyfill only one time to support ES7!
 import 'babel-polyfill';
+import '../stylesheets/main.scss';
+
 import eos from 'eosjs';
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
