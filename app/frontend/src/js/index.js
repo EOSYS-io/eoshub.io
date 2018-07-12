@@ -20,8 +20,8 @@ function createScatterReponse(code, type, msg) {
   if (code === 200) return { code: 200, type_: '', message: '' };
   return {
     code,
-    type_: type,
-    message: msg,
+    type_: !type ? '' : type,
+    message: !msg ? '' : msg,
   };
 }
 
