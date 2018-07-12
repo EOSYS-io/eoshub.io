@@ -64,10 +64,10 @@ update message page =
     case ( message, page ) of
         ( AccountCreateMessage subMessage, AccountCreatePage subModel ) ->
             let
-                newModel =
+                ( newModel, subCmd ) =
                     AccountCreate.update subMessage subModel
             in
-            ( newModel |> AccountCreatePage, Cmd.none )
+            ( newModel |> AccountCreatePage, Cmd.map AccountCreateMessage subCmd )
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let

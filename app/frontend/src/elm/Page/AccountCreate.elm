@@ -1,20 +1,24 @@
-module Page.AccountCreate exposing (Message(..), Model, initModel, update, view)
+module Page.AccountCreate exposing (Message(..), Model, createUserRequest, initModel, update, view)
 
-import Html exposing (Html, button, div, input, p, text)
+import Html exposing (Html, button, div, input, li, p, text, ul)
 import Html.Attributes exposing (placeholder)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
+import Http
+import Json.Decode exposing (Decoder, string)
+import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
 
 
 -- MODEL
 
 
 type alias Model =
-    { result : String }
+    { email : String, requestStatus : Response }
 
 
 initModel : Model
 initModel =
-    { result = "" }
+    { email = "", requestStatus = { msg = "" } }
 
 
 
@@ -22,14 +26,25 @@ initModel =
 
 
 type Message
-    = AccountCreate
+    = Email String
+    | CreateUser
+    | NewUser (Result Http.Error Response)
 
 
-update : Message -> Model -> Model
+update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
-        AccountCreate ->
-            { model | result = "result" }
+        Email email ->
+            ( { model | email = email }, Cmd.none )
+
+        CreateUser ->
+            ( model, createUserRequest model )
+
+        NewUser (Ok res) ->
+            ( { model | requestStatus = res } |> Debug.log (toString res), Cmd.none )
+
+        NewUser (Err error) ->
+            ( { model | requestStatus = { msg = toString error } } |> Debug.log (toString error), Cmd.none )
 
 
 
@@ -37,9 +52,42 @@ update msg model =
 
 
 view : Model -> Html Message
-view { result } =
+view model =
     div []
-        [ input [ placeholder "email@example.com" ] []
-        , button [ onClick AccountCreate ] [ text "인증 메일 전송" ]
-        , p [] [ text result ]
+        [ input [ placeholder "email@example.com", onInput Email ] []
+        , button [ onClick CreateUser ] [ text "인증 메일 전송" ]
+        , p [] [ text model.requestStatus.msg ]
         ]
+
+
+
+-- HTTP
+
+
+type alias Response =
+    { msg : String }
+
+
+responseDecoder : Decoder Response
+responseDecoder =
+    decode Response
+        |> required "msg" string
+
+
+createUserBodyParams : Model -> Http.Body
+createUserBodyParams model =
+    Http.jsonBody (Encode.object [ ( "email", Encode.string model.email ) ])
+
+
+postUsers : Model -> Http.Request Response
+postUsers model =
+    Http.post "http://localhost:3000/users" (createUserBodyParams model) responseDecoder
+
+
+createUserRequest : Model -> Cmd Message
+createUserRequest model =
+    Http.send NewUser <| postUsers model
+
+
+
+-- Http.send NewUser (Http.post "http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/users" (createUserBodyParams model) (list string))

@@ -1,12 +1,10 @@
-class UsersController < ApplicationController
+class UsersController < ApiController
   def create
-    @user = User.find_by(email: user_params[:email])
+    @user = User.find_by(email: params[:email])
     if @user.present?
-      if @user.email_confirmed?
-        render status: :bad_request, json: { msg: I18n.t('users.already_confirmed_email') }
-      end
+      render status: :bad_request, json: { msg: I18n.t('users.already_confirmed_email') } unless @user.email_saved?
     else
-      @user = User.new(email: user_params[:email])
+      @user = User.new(email: params[:email])
       unless @user.save
         render status: :internal_server_error, json: { msg: I18n.t('user.failed_to_create_email_verification_log') }
       end
@@ -46,11 +44,5 @@ class UsersController < ApplicationController
         render status: response.code, json: response.body
       end
     end
-  end
-
-  private
-
-  def user_params
-    params.require(:email)
   end
 end
