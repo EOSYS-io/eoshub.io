@@ -1,11 +1,12 @@
 @charset 'UTF-8';
 
-main.join {
-    width:420px;
-    padding:0;
+.container.join {
+    width:620px;
+    padding:0 100px;
 
     ol.progress.bar {
         padding:0;
+        margin-bottom:120px;
 
         display:flex;
         justify-content:space-between;
@@ -25,10 +26,11 @@ main.join {
         }
 
         li {
-
             &:nth-of-type(2) {
                 flex:1 1 0;
             }
+
+            list-style-type:none;
 
             text-align:center;
             font-size:rem(13);
@@ -78,20 +80,19 @@ main.join {
 
 }
 
-main.join article {
+.container.join article {
     h1 {
         text-align:center;
         font-size:rem(24);
         font-weight:300;
         color:#333;
-        white-space:nowrap;
-        margin:0 -200px;
         line-height:1.5;
+        margin:0 -100px;
 
         img {
             width:63px;
             display:block;
-            margin:120px auto 40px;;
+            margin:0 auto 40px;;
         }
     }
 
@@ -128,7 +129,7 @@ main.join article {
         }
 
         input[type='email'] {
-            background:url('../image/icon-mail.svg') left top no-repeat;
+            background:url('/image/icon-mail.svg') left top no-repeat;
             & + button {
                 font-size:rem(13);
                 position:absolute;
@@ -138,7 +139,7 @@ main.join article {
         }
 
         input[type='text'] {
-            background-image:url('../image/icon-id-default.svg#normal');
+            background-image:url('/image/icon-id-default.svg#normal');
             background-position:left top;
             background-repeat:no-repeat;
             background-size:20px 20px;
@@ -151,7 +152,7 @@ main.join article {
 
             
             &[valid] {
-                background-image:url('../image/icon-id-default.svg#valid');
+                background-image:url('/image/icon-id-default.svg#valid');
                 border-color:#79c720;
                 & + span {
                     color:#79c720;
@@ -159,7 +160,7 @@ main.join article {
             }
 
             &[invalid] {
-                background-image:url('../image/icon-id-default.svg#invalid');
+                background-image:url('/image/icon-id-default.svg#invalid');
                 border-color:#ff6b64;
                 & + span {
                     color:#ff6b64;
@@ -182,27 +183,19 @@ main.join article {
     }
 }
 
-main.join .btn_area button.button {
+.container.join .btn_area button.button,
+.container.join .btn_area a.button {
     text-align:center;
 
-    margin-top:24px;
     display:block;
     width:100%;
 
     height:52px;
     line-height:52px;
     font-size:rem(14);
-
-    color:#fff;
-
-    background-color:#536dfe;
-
-    &[disabled] {
-        background-color:#d8d8d8;
-    }
 }
 
-main.join .exist_account {
+.container.join .exist_account {
     margin-top:32px;
     color:#999;
     font-size:rem(14);
@@ -216,8 +209,10 @@ main.join .exist_account {
 }
 
 
-// 퍼블릭/프라이빗 키
-main.join article dl {
+// public/private key
+.container.join article dl.keybox {
+    margin-top:40px;
+
     display:grid;
     grid-template-columns:25% 75%;
 
@@ -239,11 +234,19 @@ main.join article dl {
         text-overflow:ellipsis;
     }
 }
-main.join article button.copy {
+
+.container.join article button.copy {
     border-width:1px;
     height:52px;
     width:100%;
     font-size:rem(14);
     line-height:52px;
     margin-top:16px;
+    margin-bottom:64px;
+}
+
+
+// image margin
+.container.join article img.finished.icon {
+    margin:64px 0;
 }
