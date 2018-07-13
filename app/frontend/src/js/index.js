@@ -1,7 +1,6 @@
 // Must import babel-polyfill only one time to support ES7!
 import 'babel-polyfill';
 import eos from 'eosjs';
-import 'csrf-xhr';
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
 import { getWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
