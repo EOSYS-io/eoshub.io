@@ -1,0 +1,249 @@
+@charset 'UTF-8';
+
+main.join {
+    width:420px;
+    padding:0;
+
+    ol.progress.bar {
+        padding:0;
+
+        display:flex;
+        justify-content:space-between;
+
+        position:relative;
+
+        &:before {
+            content:'';
+            display:block;
+            height:1px;
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            background-color:#d8d8d8;
+            transform:translateY(-28px);
+        }
+
+        li {
+
+            &:nth-of-type(2) {
+                flex:1 1 0;
+            }
+
+            text-align:center;
+            font-size:rem(13);
+            color:#999;
+            position:relative;
+
+            &:before {
+
+                position:absolute;
+                top:0;
+                left:50%;
+                transform:translate(-50%,calc(-100% - 12px));
+                content:'';
+                width:32px;
+                height:32px;
+                border-radius:100%;
+                border-width:5px;
+                border-style:solid;
+
+                box-sizing:border-box;
+
+                border-color:#d8d8d8;
+                background-color:#f2f2f2;
+
+                outline:12px solid #fff;
+
+                z-index:4;
+            }
+
+            color:#333;
+        }
+
+        li.ing {
+            &:before {
+                background-color:#8194ff;
+                border-color:#536dfe;
+            }
+        }
+
+        li.done {
+            &:before {
+                background-color:#ccff90;
+                border-color:#64dd17;
+            }
+        }
+    }
+
+}
+
+main.join article {
+    h1 {
+        text-align:center;
+        font-size:rem(24);
+        font-weight:300;
+        color:#333;
+        white-space:nowrap;
+        margin:0 -200px;
+        line-height:1.5;
+
+        img {
+            width:63px;
+            display:block;
+            margin:120px auto 40px;;
+        }
+    }
+
+    h1 + p {
+        font-size:rem(14);
+        text-align:center;
+        color:#999;
+    }
+
+    form {
+        margin-top:120px;
+        font-size:rem(14);
+        position:relative;
+        color:#333;
+        padding-bottom:10px;
+
+        display:flex;
+
+
+        input {
+            border:0;
+            display:block;
+            flex:1;
+            font-size:inherit;
+            color:inherit;
+            padding-left:31px;
+            outline:0;
+            padding-bottom:14px;
+            border-bottom:1px solid #536dfe;
+
+            &::placeholder {
+                color:#999;
+            }
+        }
+
+        input[type='email'] {
+            background:url('../image/icon-mail.svg') left top no-repeat;
+            & + button {
+                font-size:rem(13);
+                position:absolute;
+                right:0;
+            }
+
+        }
+
+        input[type='text'] {
+            background-image:url('../image/icon-id-default.svg#normal');
+            background-position:left top;
+            background-repeat:no-repeat;
+            background-size:20px 20px;
+
+            & + span {
+                font-size:rem(13);
+                position:absolute;
+                right:0;
+            }
+
+            
+            &[valid] {
+                background-image:url('../image/icon-id-default.svg#valid');
+                border-color:#79c720;
+                & + span {
+                    color:#79c720;
+                }
+            }
+
+            &[invalid] {
+                background-image:url('../image/icon-id-default.svg#invalid');
+                border-color:#ff6b64;
+                & + span {
+                    color:#ff6b64;
+                }
+            }
+        }
+
+        button {
+            color:inherit;
+            font-size:inherit;
+        }
+
+
+    }
+
+    h2 {
+        font-size:rem(24);
+        text-align:center;
+        margin:48px 0 64px;
+    }
+}
+
+main.join .btn_area button.button {
+    text-align:center;
+
+    margin-top:24px;
+    display:block;
+    width:100%;
+
+    height:52px;
+    line-height:52px;
+    font-size:rem(14);
+
+    color:#fff;
+
+    background-color:#536dfe;
+
+    &[disabled] {
+        background-color:#d8d8d8;
+    }
+}
+
+main.join .exist_account {
+    margin-top:32px;
+    color:#999;
+    font-size:rem(14);
+    text-align:center;
+
+    a {
+        margin-left:0.6em;
+        color:#536dfe;
+        text-decoration:underline;
+    }
+}
+
+
+// 퍼블릭/프라이빗 키
+main.join article dl {
+    display:grid;
+    grid-template-columns:25% 75%;
+
+    dt,dd  {
+        background-color:#f5f7f9;
+        box-sizing:border-box;
+        padding:19px 16px;
+        font-size:rem(14);
+        margin-top:1px;
+    }
+
+    dt {
+        color:#333;
+    }
+
+    dd {
+        color:#999;
+        overflow-x:hidden;
+        text-overflow:ellipsis;
+    }
+}
+main.join article button.copy {
+    border-width:1px;
+    height:52px;
+    width:100%;
+    font-size:rem(14);
+    line-height:52px;
+    margin-top:16px;
+}

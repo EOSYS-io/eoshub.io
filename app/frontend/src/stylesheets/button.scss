@@ -1,0 +1,100 @@
+@charset 'UTF-8';
+
+button[type='button'],
+a.button,
+input[type='submit'] {
+    // reset
+    cursor:pointer;
+    border-width:0;
+    border-style:solid;
+    border-color:transparent;
+
+    font-family:inherit;
+    background:transparent;
+
+    appearance:none;
+
+    display:inline-block;
+    line-height:1.1;
+    box-sizing:border-box;
+    text-align: center;
+    font-family:inherit;
+    border-radius:2px;
+    padding:0;
+    text-decoration:none;
+
+    &:first-letter {
+        text-transform:uppercase;
+    }
+
+
+}
+
+// colorset :: foreground_background
+button[type='button'],
+a.button,
+input[type='submit'] {
+
+    &.blue_white {
+        border-radius: 2px;
+        background-color:#fff;
+        border-color: #536dfe;
+        color:#536dfe;
+    }
+
+    &.white_blue {
+        border-radius: 2px;
+        background-color: #536dfe;
+        border-color: #fff;
+        color:#fff;
+    }
+}
+
+// background image
+button[type='button'],
+a.button {
+    &.bg_icon {
+
+        background-repeat:no-repeat;
+        background-position:center left;
+
+        &:before,
+        &:after {
+            content:'';
+            background-repeat:no-repeat;
+            background-position:center left;
+        }
+
+    }
+}
+
+// image icon only
+button[type='button'],
+a.button {
+    &.icon {
+        text-indent:-999em;
+        background-repeat:no-repeat;
+        background-color:transparent;
+        background-position:left center;
+    }
+}
+
+
+// exception :: special case
+button[type='button'],
+a.button,
+input[type='submit'] {
+    &.bugger.button {
+        background:#600;
+    }
+}
+
+// --------------------------------------------------------------------------------
+// declaration button wrapper element
+// --------------------------------------------------------------------------------
+
+.btn_area {
+}
+
+
+
