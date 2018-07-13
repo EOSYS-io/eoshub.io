@@ -1,6 +1,6 @@
 // Must import babel-polyfill only one time to support ES7!
 import 'babel-polyfill';
-import '../stylesheets/main.scss';
+import '../stylesheets/style.scss';
 
 import eos from 'eosjs';
 
