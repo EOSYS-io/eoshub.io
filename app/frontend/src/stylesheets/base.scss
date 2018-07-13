@@ -90,3 +90,28 @@ address, em {
 em {
     font-weight:500;
 }
+
+
+// Inheritance font size
+input,textarea,table,th,td,fieldset,button {
+    font-size:inherit;
+}
+
+
+// base ux feedback (GUI - mose)
+input[type="submit"],
+button { 
+    cursor:pointer;
+}
+
+
+// common declaration
+.hidden_copy_field {
+    @include screen_reader();
+
+    &::selection,
+    &:focus {
+        @include screen_reader();
+    }
+}
+

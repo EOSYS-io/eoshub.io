@@ -17,6 +17,7 @@ input[type='submit'] {
     display:inline-block;
     line-height:1.1;
     box-sizing:border-box;
+    border-width:1px;
     text-align: center;
     font-family:inherit;
     border-radius:2px;
@@ -47,6 +48,13 @@ input[type='submit'] {
         background-color: #536dfe;
         border-color: #fff;
         color:#fff;
+    }
+
+    &[disabled] {
+        border-color:#d8d8d8;
+        background-color:#d8d8d8;
+        color:#fff;
+        cursor:not-allowed;
     }
 }
 
