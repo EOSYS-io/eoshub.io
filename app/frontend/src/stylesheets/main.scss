@@ -1,5 +1,97 @@
-
 @charset 'UTF-8';
-.red {
-  color: #cf3111
+
+.wrapper {
+
+    $height:52px;
+
+    min-height:760px;
+    height:calc(100vh - 40px * 2);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    section.tick_display {
+        top:0;
+        left:0;
+        right:0;
+        position:absolute;
+        display:flex;
+        justify-content:space-between;
+
+    }
+
+    // section :: search field
+    fieldset {
+        position:relative;
+        width:432px;
+        height:$height;
+    }
+
+    input,button {
+        box-sizing:border-box;
+    }
+
+    input[type=search] {
+        border-radius:4px;
+        border:0;
+        padding:0;
+        width:inherit;
+        height:inherit;
+    }
+
+    button.bugger.button {
+        position:absolute;
+        top:0;
+        right:0;
+        padding:0 20px;
+        color:#333;
+        font-size:rem(14);
+        height:inherit;
+        line-height:$height;
+    }
+
+    // price (ram...eos..)
+    ul,li { 
+        margin:0;
+        padding:0;
+        list-style-type:none;
+    }
+
+    ul.price  {
+        overflow:hidden;
+
+        li {
+            width:300px;
+            height:$height;
+            line-height:52px;
+            float:right;
+            background:#fff;
+
+            font-size:rem(14);
+            color:#333;
+
+            margin-left:12px;
+            padding:0 16px;
+            box-sizing:border-box;
+
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        // price panel decorate
+        span:before {
+            font-size:rem(8);
+        }
+
+        span[data-before='lower']:before {
+            content:'▼';
+            color:#4d6bff;
+        }
+
+        span[data-before='higher']:before {
+            content:'▲';
+            color:#f12f2f;
+        }
+    }
 }

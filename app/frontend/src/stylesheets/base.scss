@@ -1,0 +1,92 @@
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cite, code, del, dfn, em, font, img, ins, q, s, samp, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
+    line-height: 1.3em;
+    border: 0 none;
+}
+
+body {
+    margin: 0 auto;
+    font-size: 100%;
+    line-height: 1.3em;
+    font-family: $font-base-stack;
+    word-break: normal;
+    text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+sub,sup {
+    font-family:inherit;
+}
+
+// for screen reader
+.skip_nav {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+
+    a {
+        display: block;
+        overflow: hidden;
+        width: inherit;
+        height: 0;
+        margin: 0 auto;
+        height: 1px;
+        margin-bottom: -1px;
+        white-space: nowrap;
+        text-align: center;
+        text-indent: -9999px;
+    }
+
+    a:focus,
+    a:active {
+        height: 34px;
+        padding: 1px;
+        border-bottom: 2px solid #ebe8e7;
+        background: #666;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+        text-indent: 0;
+        line-height: 33px;
+    }
+}
+
+
+// heading group
+h1,h2,h3,h4,h5,h6 {
+    font-family:inherit;
+    line-height:1.1;
+    font-weight:normal;
+}
+
+
+// anchor
+a { }
+
+a:link {
+    text-decoration:none;
+}
+
+
+// zero club
+h1,h2,h3,h4,h5,h6,
+figure, figcaption,
+dt,dd,dl,
+iframe,
+fieldset
+{
+    padding:0;
+    margin:0;
+}
+
+iframe {
+    border:0;
+}
+
+// typo
+address, em {
+    font-style:normal;
+}
+
+em {
+    font-weight:500;
+}

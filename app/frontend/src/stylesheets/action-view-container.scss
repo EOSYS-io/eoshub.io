@@ -1,0 +1,38 @@
+@charset 'UTF-8';
+
+.action.view.container {
+
+    overflow:hidden;
+
+    display:flex;
+    flex-flow:row wrap;
+    
+
+    margin-left:-8px;
+    margin-right:-8px;
+
+    a {
+        flex:0 0 calc(100% / 3 - 16px);
+        display:block;
+        color:#999;
+        background-color:#fff;
+        margin:8px;
+        padding:32px;
+        box-sizing:border-box;
+        height:300px;
+    }
+
+    .card {
+
+        height:auto;
+
+        h3 {
+            font-weight:300;
+            font-size:rem(20);
+            color:#333;
+        }
+
+
+    }
+
+}
