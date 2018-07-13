@@ -62,7 +62,7 @@ update message model =
                 ( newHeader, newCmd ) =
                     Header.update headerMessage model.header
             in
-                ( { model | header = newHeader }, Cmd.none )
+                ( { model | header = newHeader }, Cmd.map HeaderMessage newCmd )
 
         PageMessage pageMessage ->
             let
