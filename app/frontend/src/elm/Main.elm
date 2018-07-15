@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html
+import Html.Attributes exposing (class)
 import Message exposing (Message(..))
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
@@ -23,11 +24,15 @@ type alias Model =
 
 init : Location -> ( Model, Cmd Message )
 init location =
-    ( { sidebar = Sidebar.initModel
-      , page = location |> parseLocation |> getPage
-      }
-    , Cmd.none
-    )
+    let
+        ( sidebarModel, sidebarCmd ) =
+            Sidebar.update Sidebar.CheckWalletStatus Sidebar.initModel
+    in
+        ( { sidebar = sidebarModel
+          , page = location |> parseLocation |> getPage
+          }
+        , Cmd.map SidebarMessage sidebarCmd
+        )
 
 
 
@@ -36,9 +41,9 @@ init location =
 
 view : Model -> Html.Html Message
 view { sidebar, page } =
-    Html.div []
-        [ Html.map SidebarMessage (Sidebar.view sidebar)
-        , Html.map PageMessage (Page.view page)
+    Html.div [ class "container" ]
+        [ Html.map SidebarMessage (Html.div [ class "sidebar" ] (Sidebar.view sidebar))
+        , Html.div [ class "wrapper" ] [ Html.map PageMessage (Page.view page) ]
         ]
 
 
