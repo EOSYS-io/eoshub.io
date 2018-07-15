@@ -2,7 +2,8 @@ module Test.Sidebar exposing (tests)
 
 import Expect
 import Port
-import Sidebar exposing (Message(..), WalletStatus(..), initModel, update)
+import Sidebar exposing (Message(..), State(..), initModel, update)
+import Response exposing (WalletStatus(..))
 import Test exposing (..)
 import Translation exposing (Language(Korean))
 import View.Notification
@@ -13,7 +14,7 @@ tests =
     describe "Wallet module"
         [ describe "update"
             [ describe "UpdateWalletStatus"
-                [ test "authenticated" <|
+                [ test "authenticated should both wallet and state" <|
                     \() ->
                         let
                             message =
@@ -30,6 +31,7 @@ tests =
                                         , account = "ACCOUNT"
                                         , authority = "AUTHORITY"
                                         }
+                                    , state = AccountInfo
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
@@ -110,6 +112,11 @@ tests =
                         Expect.equal
                             ( { initModel | language = Korean }, Cmd.none )
                             (update (UpdateLanguage Korean) initModel)
+                , test "UpdateState" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | state = PairWallet }, Cmd.none )
+                            (update (UpdateState PairWallet) initModel)
                 ]
             ]
         ]

@@ -1,4 +1,4 @@
-module Translation exposing (Language(Korean, English), I18n(Success), translate, getMessages)
+module Translation exposing (Language(Korean, English), I18n(..), translate, getMessages)
 
 
 type Language
@@ -14,6 +14,8 @@ type alias Messages =
 
 type I18n
     = Success
+    | Login
+    | NewAccount
 
 
 translate : Language -> I18n -> String
@@ -39,6 +41,10 @@ getMessages : I18n -> Messages
 getMessages i18n =
     case i18n of
         Success ->
-            { korean = "성공!"
-            , english = "Success!"
-            }
+            { korean = "성공!", english = "Success!" }
+
+        Login ->
+            { korean = "로그인", english = "Sign In" }
+
+        NewAccount ->
+            { korean = "신규계정생성", english = "New account" }
