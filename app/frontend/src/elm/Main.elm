@@ -24,15 +24,11 @@ type alias Model =
 
 init : Location -> ( Model, Cmd Message )
 init location =
-    let
-        ( sidebarModel, sidebarCmd ) =
-            Sidebar.update Sidebar.CheckWalletStatus Sidebar.initModel
-    in
-        ( { sidebar = sidebarModel
-          , page = location |> parseLocation |> getPage
-          }
-        , Cmd.map SidebarMessage sidebarCmd
-        )
+    ( { sidebar = Sidebar.initModel
+      , page = location |> parseLocation |> getPage
+      }
+    , Cmd.none
+    )
 
 
 

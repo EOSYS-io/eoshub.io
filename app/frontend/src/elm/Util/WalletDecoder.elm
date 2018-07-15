@@ -1,4 +1,4 @@
-module Response
+module Util.WalletDecoder
     exposing
         ( ScatterResponse
         , Wallet

@@ -3,9 +3,9 @@ module Test.Sidebar exposing (tests)
 import Expect
 import Port
 import Sidebar exposing (Message(..), State(..), initModel, update)
-import Response exposing (WalletStatus(..))
 import Test exposing (..)
 import Translation exposing (Language(Korean))
+import Util.WalletDecoder exposing (WalletStatus(..))
 import View.Notification
 
 
@@ -14,7 +14,7 @@ tests =
     describe "Wallet module"
         [ describe "update"
             [ describe "UpdateWalletStatus"
-                [ test "authenticated should both wallet and state" <|
+                [ test "authenticated should change both wallet and state" <|
                     \() ->
                         let
                             message =
@@ -35,7 +35,7 @@ tests =
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
-                , test "loaded" <|
+                , test "loaded should change state to SignIn" <|
                     \() ->
                         let
                             message =
@@ -52,10 +52,11 @@ tests =
                                         , account = ""
                                         , authority = ""
                                         }
+                                    , state = SignIn
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
-                , test "not found" <|
+                , test "notfound should change state to SignIn" <|
                     \() ->
                         let
                             message =
@@ -72,6 +73,7 @@ tests =
                                         , account = ""
                                         , authority = ""
                                         }
+                                    , state = SignIn
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)

@@ -8,14 +8,27 @@ import { getScatter, updateScatter } from './state';
 function getWalletStatus() {
   const { scatterClient, account, authority } = getScatter();
   if (scatterClient) {
-    if (account && authority) {
-      return walletStatus.authenticated;
+    if (_.isEmpty(account) || _.isEmpty(authority)) {
+      return walletStatus.loaded;
     }
-
-    return walletStatus.loaded;
+    return walletStatus.authenticated;
   }
 
   return walletStatus.notFound;
+}
+
+function getAuthInfo(identity) {
+  const { accounts } = identity;
+  const eosAccounts = _.filter(
+    accounts,
+    account => account.blockchain === 'eos',
+  );
+  if (_.isEmpty(eosAccounts)) {
+    throw new Error('User must have at least one eos account.');
+  }
+
+  const { authority, name } = _.head(accounts);
+  return { authority, name };
 }
 
 // NOTE(heejae): Please wrap async functions with try-catch when in usage.
@@ -33,18 +46,11 @@ async function authenticateAccount() {
     await scatterClient.forgetIdentity();
   }
 
-  const { accounts } = await scatterClient.getIdentity({
+  const identity = await scatterClient.getIdentity({
     accounts: [{ chainId, blockchain }],
   });
-  const eosAccounts = _.filter(
-    accounts,
-    account => account.blockchain === 'eos',
-  );
-  if (_.isEmpty(eosAccounts)) {
-    throw new Error('User must have at least one eos account.');
-  }
 
-  const { authority, name } = _.head(accounts);
+  const { authority, name } = getAuthInfo(identity);
   updateScatter({
     ...scatter,
     account: name,
@@ -64,4 +70,9 @@ async function invalidateAccount() {
   }
 }
 
-export { getWalletStatus, authenticateAccount, invalidateAccount };
+export {
+  getWalletStatus,
+  authenticateAccount,
+  invalidateAccount,
+  getAuthInfo,
+};
