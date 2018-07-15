@@ -4,7 +4,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Port
-import Response
+import Translation exposing (Language(..), I18n(..), translate)
+import Util.WalletDecoder
     exposing
         ( ScatterResponse
         , Wallet
@@ -13,7 +14,6 @@ import Response
         , decodeScatterResponse
         , decodeWalletResponse
         )
-import Translation exposing (Language(..), I18n(..), translate)
 import View.Notification
 
 
@@ -24,6 +24,7 @@ type State
     = SignIn
     | PairWallet
     | AccountInfo
+    | Loading
 
 
 type alias Model =
@@ -43,7 +44,7 @@ initModel =
         , account = ""
         , authority = ""
         }
-    , state = SignIn
+    , state = Loading
     }
 
 
@@ -82,6 +83,9 @@ view { state, wallet, language } =
 
             AccountInfo ->
                 accountInfoView language wallet
+
+            Loading ->
+                loadingView language
         )
     , nav []
         [ div [ class "sns_area" ]
@@ -132,7 +136,13 @@ accountInfoView : Language -> Wallet -> List (Html Message)
 accountInfoView _ { account, authority } =
     [ h2 [] [ text "Succeed to pair a wallet." ]
     , h2 [] [ text (account ++ "@" ++ authority) ]
+    , button [ type_ "middle white_blue button", onClick InvalidateAccount ] [ text "Sign Out" ]
     ]
+
+
+loadingView : Language -> List (Html Message)
+loadingView _ =
+    [ h2 [] [ text "Loading..." ] ]
 
 
 
@@ -140,7 +150,7 @@ accountInfoView _ { account, authority } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ state } as model) =
+update message model =
     case message of
         AuthenticateAccount ->
             ( model, Port.authenticateAccount () )
@@ -157,8 +167,8 @@ update message ({ state } as model) =
         UpdateScatterResponse resp ->
             ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
 
-        UpdateState newState ->
-            ( { model | state = newState }, Cmd.none )
+        UpdateState state ->
+            ( { model | state = state }, Cmd.none )
 
         UpdateWalletStatus resp ->
             let
@@ -171,9 +181,9 @@ update message ({ state } as model) =
                             AccountInfo
 
                         _ ->
-                            state
+                            SignIn
             in
-                ( { model | wallet = newWallet, state = newState }, Cmd.none )
+                update (UpdateState newState) { model | wallet = newWallet }
 
 
 
