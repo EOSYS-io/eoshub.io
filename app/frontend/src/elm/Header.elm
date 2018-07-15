@@ -27,7 +27,15 @@ type alias Model =
 
 type alias Account =
     { account_name : String
-    , core_liquid_balance : String
+    , core_liquid_balance : Maybe String
+    , total_resources : Resource
+    }
+
+
+type alias Resource =
+    { net_weight : String
+    , cpu_weight : String
+    , ram_bytes : Int
     }
 
 
@@ -39,7 +47,12 @@ initModel =
     , keyAccounts = []
     , account =
         { account_name = ""
-        , core_liquid_balance = ""
+        , core_liquid_balance = Just "0 EOS"
+        , total_resources =
+            { net_weight = "0 EOS"
+            , cpu_weight = "0 EOS"
+            , ram_bytes = 0
+            }
         }
     , errMessage = ""
     }
@@ -62,7 +75,7 @@ type Message
     = InputSearch String
     | GetSearchResult String
     | OnFetchAccount (Result Http.Error Account)
-    | OnFecthKeyAccounts (Result Http.Error (List String))
+    | OnFetchKeyAccounts (Result Http.Error (List String))
 
 
 type Query
@@ -107,7 +120,7 @@ update message model =
                                         [ ( "public_key", JE.string query ) ]
                                         |> Http.jsonBody
                             in
-                                post (apiUrl ++ "/v1/history/get_key_accounts") body keyAccountsDecoder |> (Http.send OnFecthKeyAccounts)
+                                post (apiUrl ++ "/v1/history/get_key_accounts") body keyAccountsDecoder |> (Http.send OnFetchKeyAccounts)
 
                         Err _ ->
                             Cmd.none
@@ -115,15 +128,15 @@ update message model =
                 ( model, newCmd )
 
         OnFetchAccount (Ok data) ->
-            ( { model | account = data }, Cmd.none )
+            ( { model | account = data, errMessage = "success" }, Cmd.none )
 
         OnFetchAccount (Err error) ->
             ( { model | errMessage = "invalid length" }, Cmd.none )
 
-        OnFecthKeyAccounts (Ok data) ->
-            ( { model | keyAccounts = data }, Cmd.none )
+        OnFetchKeyAccounts (Ok data) ->
+            ( { model | keyAccounts = data, errMessage = "success" }, Cmd.none )
 
-        OnFecthKeyAccounts (Err error) ->
+        OnFetchKeyAccounts (Err error) ->
             ( { model | errMessage = "invalid length" }, Cmd.none )
 
 
@@ -142,9 +155,16 @@ parseQuery query =
 
 accountDecoder : JD.Decoder Account
 accountDecoder =
-    JD.map2 Account
+    JD.map3 Account
         (JD.field "account_name" JD.string)
-        (JD.field "core_liquid_balance" JD.string)
+        (JD.maybe <| JD.field "core_liquid_balance" JD.string)
+        (JD.field "total_resources"
+            (JD.map3 Resource
+                (JD.field "net_weight" JD.string)
+                (JD.field "cpu_weight" JD.string)
+                (JD.field "ram_bytes" JD.int)
+            )
+        )
 
 
 keyAccountsDecoder : JD.Decoder (List String)
