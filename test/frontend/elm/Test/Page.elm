@@ -11,17 +11,21 @@ import Test exposing (..)
 
 tests : Test
 tests =
+    let
+        flags =
+            { node_env = "test" }
+    in
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
-                \() -> Expect.equal IndexPage (getPage IndexRoute)
+                \() -> Expect.equal IndexPage (getPage ( IndexRoute, flags ))
             , test "VotingRoute" <|
-                \() -> Expect.equal (VotingPage Voting.initModel) (getPage VotingRoute)
+                \() -> Expect.equal (VotingPage (Voting.initModel flags)) (getPage ( VotingRoute, flags ))
             , test "TransferRoute" <|
-                \() -> Expect.equal (TransferPage Transfer.initModel) (getPage TransferRoute)
+                \() -> Expect.equal (TransferPage (Transfer.initModel flags)) (getPage ( TransferRoute, flags ))
             , test "SearchRoute" <|
-                \() -> Expect.equal (SearchPage Search.initModel) (getPage SearchRoute)
+                \() -> Expect.equal (SearchPage (Search.initModel flags)) (getPage ( SearchRoute, flags ))
             , test "NotFoundRoute" <|
-                \() -> Expect.equal NotFoundPage (getPage NotFoundRoute)
+                \() -> Expect.equal NotFoundPage (getPage ( NotFoundRoute, flags ))
             ]
         ]

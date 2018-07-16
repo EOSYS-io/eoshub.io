@@ -15,6 +15,7 @@ model =
         , quantity = "300"
         , memo = "memo"
         }
+    , flags = { node_env = "test" }
     }
 
 
