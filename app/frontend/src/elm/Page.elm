@@ -1,7 +1,9 @@
 module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
-import Page.AccountCreate as AccountCreate
+import Page.AccountCreate.EmailConfirmFailure as EmailConfirmFailure
+import Page.AccountCreate.EmailConfirmed as EmailConfirmed
+import Page.AccountCreate.SendEmail as SendEmail
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
@@ -15,7 +17,9 @@ import Util.Flags exposing (Flags)
 
 type Page
     = IndexPage
-    | AccountCreatePage AccountCreate.Model
+    | SendEmailPage SendEmail.Model
+    | EmailConfirmedPage EmailConfirmed.Model
+    | EmailConfirmFailurePage EmailConfirmFailure.Model
     | SearchPage Search.Model
     | TransferPage Transfer.Model
     | VotingPage Voting.Model
@@ -27,7 +31,9 @@ type Page
 
 
 type Message
-    = AccountCreateMessage AccountCreate.Message
+    = SendEmailMessage SendEmail.Message
+    | EmailConfirmedMessage EmailConfirmed.Message
+    | EmailConfirmFailureMessage EmailConfirmFailure.Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
@@ -40,8 +46,14 @@ type Message
 view : Page -> Html Message
 view page =
     case page of
-        AccountCreatePage subModel ->
-            Html.map AccountCreateMessage (AccountCreate.view subModel)
+        SendEmailPage subModel ->
+            Html.map SendEmailMessage (SendEmail.view subModel)
+
+        EmailConfirmedPage subModel ->
+            Html.map EmailConfirmedMessage (EmailConfirmed.view subModel)
+
+        EmailConfirmFailurePage subModel ->
+            Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel)
 
         SearchPage subModel ->
             Html.map SearchMessage (Search.view subModel)
@@ -63,12 +75,26 @@ view page =
 update : Message -> Page -> ( Page, Cmd Message )
 update message page =
     case ( message, page ) of
-        ( AccountCreateMessage subMessage, AccountCreatePage subModel ) ->
+        ( SendEmailMessage subMessage, SendEmailPage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    AccountCreate.update subMessage subModel
+                    SendEmail.update subMessage subModel
             in
-            ( newModel |> AccountCreatePage, Cmd.map AccountCreateMessage subCmd )
+            ( newModel |> SendEmailPage, Cmd.map SendEmailMessage subCmd )
+
+        ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
+            let
+                newModel =
+                    EmailConfirmed.update subMessage subModel
+            in
+            ( newModel |> EmailConfirmedPage, Cmd.none )
+
+        ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
+            let
+                newModel =
+                    EmailConfirmFailure.update subMessage subModel
+            in
+            ( newModel |> EmailConfirmFailurePage, Cmd.none )
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -102,8 +128,14 @@ update message page =
 getPage : ( Route, Flags ) -> Page
 getPage ( route, flags ) =
     case route of
-        AccountCreateRoute ->
-            AccountCreatePage (AccountCreate.initModel flags)
+        SendEmailRoute ->
+            SendEmailPage (SendEmail.initModel flags)
+
+        EmailConfirmedRoute confirmToken ->
+            EmailConfirmedPage (EmailConfirmed.initModel ( flags, confirmToken ))
+
+        EmailConfirmFailureRoute ->
+            EmailConfirmFailurePage (EmailConfirmFailure.initModel flags)
 
         SearchRoute ->
             SearchPage (Search.initModel flags)

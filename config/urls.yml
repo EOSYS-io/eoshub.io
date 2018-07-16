@@ -1,6 +1,9 @@
 default: &default
-  eos_wallet_node_host: localhost:5000
+  host_url: http://localhost:3000
+  eos_wallet_node_host: http://localhost:5000
   eos_account_url: /account
+  account_create_email_confirmed_url: /account_create/email_confirmed
+  account_create_email_confirm_failure_url: /account_create/email_confirm_failure
 
 development:
   <<: *default
@@ -10,6 +13,7 @@ test:
 
 alpha:
   <<: *default
+  host_url: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com
   eos_wallet_node_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:5000
 
 production:

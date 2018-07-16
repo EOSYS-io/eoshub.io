@@ -1,23 +1,27 @@
-module Route exposing (Route(..), parseLocation, route)
+module Route exposing (Route(..), matchRoute, parseLocation)
 
 import Navigation exposing (Location)
-import UrlParser exposing (Parser, map, oneOf, parsePath, s, top)
+import UrlParser exposing ((</>), Parser, map, oneOf, parsePath, s, string, top)
 
 
 type Route
     = IndexRoute
-    | AccountCreateRoute
+    | SendEmailRoute
+    | EmailConfirmedRoute String
+    | EmailConfirmFailureRoute
     | SearchRoute
     | VotingRoute
     | TransferRoute
     | NotFoundRoute
 
 
-route : Parser (Route -> a) a
-route =
+matchRoute : Parser (Route -> a) a
+matchRoute =
     oneOf
         [ map IndexRoute top
-        , map AccountCreateRoute (s "account_create")
+        , map SendEmailRoute (s "account_create" </> s "send_email")
+        , map EmailConfirmedRoute (s "account_create" </> s "email_confirmed" </> string)
+        , map EmailConfirmFailureRoute (s "account_create" </> s "email_confirm_failure")
         , map SearchRoute (s "search")
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")
@@ -26,7 +30,7 @@ route =
 
 parseLocation : Location -> Route
 parseLocation location =
-    case parsePath route location of
+    case parsePath matchRoute location of
         Just route ->
             route
 

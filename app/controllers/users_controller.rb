@@ -17,12 +17,13 @@ class UsersController < ApiController
   end
 
   def confirm_email
-    user = User.find_by(confirm_token: params[:id])
+    confirm_token = params[:id]
+    user = User.find_by(confirm_token: confirm_token)
     if user.present?
       user.email_confirmed!
-      render json: { msg: "Your email has been confirmed." }, status: :ok
+      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}"
     else
-      render json: { msg: 'Sorry. User does not exist' }, status: :precondition_failed
+      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}"
     end
   end
 
