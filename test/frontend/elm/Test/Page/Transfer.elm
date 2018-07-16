@@ -1,10 +1,10 @@
 module Test.Page.Transfer exposing (..)
 
-import Page.Transfer exposing (..)
-import Test exposing (..)
 import Expect
 import Json.Encode as JE
+import Page.Transfer exposing (..)
 import Port
+import Test exposing (..)
 
 
 model : Model
@@ -36,8 +36,8 @@ submitActionTest =
                   )
                 ]
     in
-        test "SubmitAction" <|
-            \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model)
+    test "SubmitAction" <|
+        \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model)
 
 
 tests : Test
@@ -50,22 +50,22 @@ tests =
                 { transfer } =
                     model
              in
-                [ test "From" <|
-                    \() ->
-                        Expect.equal { model | transfer = { transfer | from = "newFrom" } }
-                            (setTransferMessageField From "newFrom" model)
-                , test "To" <|
-                    \() ->
-                        Expect.equal { model | transfer = { transfer | to = "newTo" } }
-                            (setTransferMessageField To "newTo" model)
-                , test "Quantity" <|
-                    \() ->
-                        Expect.equal { model | transfer = { transfer | quantity = "301" } }
-                            (setTransferMessageField Quantity "301" model)
-                , test "Memo" <|
-                    \() ->
-                        Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
-                            (setTransferMessageField Memo "newMemo" model)
-                ]
+             [ test "From" <|
+                \() ->
+                    Expect.equal { model | transfer = { transfer | from = "newFrom" } }
+                        (setTransferMessageField From "newFrom" model)
+             , test "To" <|
+                \() ->
+                    Expect.equal { model | transfer = { transfer | to = "newTo" } }
+                        (setTransferMessageField To "newTo" model)
+             , test "Quantity" <|
+                \() ->
+                    Expect.equal { model | transfer = { transfer | quantity = "301" } }
+                        (setTransferMessageField Quantity "301" model)
+             , test "Memo" <|
+                \() ->
+                    Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
+                        (setTransferMessageField Memo "newMemo" model)
+             ]
             )
         ]
