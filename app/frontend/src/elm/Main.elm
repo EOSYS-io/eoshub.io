@@ -38,7 +38,7 @@ init location =
 view : Model -> Html.Html Message
 view { sidebar, page } =
     Html.div [ class "container" ]
-        [ Html.map SidebarMessage (Html.div [ class "sidebar" ] (Sidebar.view sidebar))
+        [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
         , Html.div [ class "wrapper" ] [ Html.map PageMessage (Page.view page) ]
         ]
 

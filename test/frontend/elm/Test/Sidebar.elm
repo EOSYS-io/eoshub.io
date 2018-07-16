@@ -119,6 +119,16 @@ tests =
                         Expect.equal
                             ( { initModel | state = PairWallet }, Cmd.none )
                             (update (UpdateState PairWallet) initModel)
+                , test "Fold" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | fold = True }, Cmd.none )
+                            (update Fold initModel)
+                , test "Unfold" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | fold = False }, Cmd.none )
+                            (update Unfold { initModel | fold = True })
                 ]
             ]
         ]
