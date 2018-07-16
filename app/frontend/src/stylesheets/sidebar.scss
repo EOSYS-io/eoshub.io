@@ -1,0 +1,241 @@
+@charset 'UTF-8';
+
+$padding_top:32px;
+$padding_left_right:40px;
+$padding_bottom:36px;
+
+// lnb dashboard layout
+.sidebar {
+    background-color:#fff;
+    padding:$padding_top $padding_left_right $padding_bottom;
+
+    display:flex;
+    flex-flow:column;
+    height:100%;
+    justify-content:space-between;
+
+    position:relative;
+
+}
+
+.sidebar .dashboard.hello_world,
+.sidebar .dashboard.logged {
+    margin:100px 0;
+    flex:1;
+}
+
+.sidebar header {
+    h1 {
+        @include ir();
+        width:91px;
+        height:20px;
+        
+        background:#f00;
+    }
+
+    h1 + button {
+        position:absolute;
+        top:$padding_top;
+        right:$padding_left_right;
+
+        @include ir();
+        width:20px;
+        height:20px;
+    }
+}
+
+// dashboard summary
+.sidebar .dashboard {
+    h2 {
+        color:#333;
+        font-weight:300;
+        line-height:1.4;
+    }
+
+    &.logged h2 {
+        padding-top:16px + 54px;
+        padding-bottom:32px;
+
+        position:relative;
+
+        &:after {
+            content:'';
+            display:block;
+            position:absolute;
+            bottom:0;
+            left:-$padding_left_right;
+            right:-$padding_left_right;
+            height:1px;
+            background-color:#efefef;
+        }
+    }
+}
+
+// dashboard details
+.sidebar .dashboard {
+
+    .panel {
+        color:#999;
+        font-size:rem(14);
+        margin-top:16px;
+
+        p  {
+            line-height:1.5;
+        }
+    }
+
+    .help.info {
+        margin-top:21px;
+        padding-left:20px;
+        background-position:left center;
+        background-color:transparent;
+        background-repeat:no-repeat;
+
+        a {
+            color:#737a8d;
+        }
+    }
+    // button :: login, join
+    .btn_area {
+        a {
+            width:156px;
+            height:52px;
+            line-height:52px;
+            border-width:1px;
+            border-style:solid;
+            font-size:rem(14);
+        }
+    }
+
+    h2 + .panel {
+        margin-top:14px;
+    }
+
+    h2 + .panel + .btn_area {
+        margin-top:40px;
+    }
+}
+
+.sidebar .dashboard.logged {
+    h3 {
+        color:#333;
+        font-size:rem(32);
+        font-weight:300;
+        text-transform:uppercase;
+
+        margin:59px 0;
+    }
+}
+
+// locale, sns link
+.sidebar  nav {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    a {
+        @include ir();
+        width:20px;
+        height:20px;
+
+        margin-right:8px;
+
+        background-color:#f00;
+    }
+
+    // button wrapper
+    div {
+        * {
+        vertical-align:middle;
+        }
+    }
+}
+
+
+// button :: han-eng conversion
+button.lang {
+    font-size:rem(14);
+    margin-left:8px;
+    color:#000;
+}
+
+.lang.ko:lang(ko){
+    font-weight:700;
+}
+.lang.en:lang(en) {
+    font-weight:700;
+}
+
+
+// element :: available wallet for peristalsis
+.sidebar .available_wallet_list {
+    list-style-type:none;
+    padding:0;
+    margin:49px 0 0;
+
+    border-bottom:1px solid #e8e8e8;
+
+    li {
+        color:#333;
+
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+
+        border-top:1px solid #e8e8e8;
+
+        padding-left:56px;
+        padding-right:14px;
+
+        font-size:rem(14);
+        height:88px;
+
+        &:first-letter {
+            text-transform:uppercase;
+        }
+    }
+
+    button {
+        font-size:inherit;
+        color:#536dfe;
+    }
+}
+
+// lnb dashboard graph
+.dashboard.logged .panel .graph {
+    list-style-type:none;
+    padding:0;
+    margin:0;
+
+    li {
+        margin-top:3em;
+        display:flex;
+        flex-direction:column;
+
+        span.tag {
+            order:2;
+        }
+
+        div {
+            $unit:8px;
+
+            @include ir();
+
+            border-radius:$unit;
+            height:$unit;
+            background-color:#f5f7f9;
+            position:relative;
+
+            span {
+                border-radius:inherit;
+                height:inherit;
+                background-color:#536dfe;
+                display:block;
+                left:0;
+                top:0;
+                right:0;
+                bottom:0;
+            }
+        }
+    }
+}

@@ -4,6 +4,7 @@ import Expect
 import Port
 import Sidebar exposing (Message(..), WalletStatus(..), initModel, update)
 import Test exposing (..)
+import Translation exposing (Language(Korean))
 import View.Notification
 
 
@@ -104,6 +105,11 @@ tests =
                             Expect.equal
                                 ( expectedModel, Cmd.none )
                                 (update (UpdateScatterResponse scatterResponse) initModel)
+                , test "UpdateLanguage" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | language = Korean }, Cmd.none )
+                            (update (UpdateLanguage Korean) initModel)
                 ]
             ]
         ]

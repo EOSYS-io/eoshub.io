@@ -1,0 +1,45 @@
+@charset 'UTF-8';
+
+main .wrapper {
+    .action.view.container {
+
+        overflow:hidden;
+
+        display:flex;
+        flex-flow:row wrap;
+
+        $card_margin:8px;
+        $wrapper_padding:40px;
+
+        margin:#{$wrapper_padding + $card_margin} -#{$wrapper_padding + $card_margin};
+        padding:$wrapper_padding;
+
+        a {
+            flex:0 0 calc(100% / 3 - 16px);
+            display:block;
+            color:#999;
+            background-color:#fff;
+            margin:8px;
+            padding:32px;
+            box-sizing:border-box;
+            height:300px;
+
+            transition:box-shadow 0.3s;
+
+            &:hover {
+              box-shadow: 0 28px 40px 0 rgba(0, 0, 0, 0.16);
+            }
+        }
+
+        .card {
+            height:auto;
+
+            h3 {
+                font-weight:300;
+                font-size:rem(20);
+                color:#333;
+            }
+        }
+
+    }
+}

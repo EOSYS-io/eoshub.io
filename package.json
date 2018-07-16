@@ -22,7 +22,9 @@
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
     "fetch": "^1.1.0",
-    "lodash": "^4.17.10"
+    "lodash": "^4.17.10",
+    "node-sass": "^4.9.2",
+    "sass-loader": "^7.0.3"
   },
   "devDependencies": {
     "elm-hot-loader": "^0.5.4",
