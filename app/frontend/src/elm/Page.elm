@@ -1,6 +1,7 @@
 module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
+import Page.AccountCreate.CreateKeys as CreateKeys
 import Page.AccountCreate.EmailConfirmFailure as EmailConfirmFailure
 import Page.AccountCreate.EmailConfirmed as EmailConfirmed
 import Page.AccountCreate.SendEmail as SendEmail
@@ -20,6 +21,7 @@ type Page
     | SendEmailPage SendEmail.Model
     | EmailConfirmedPage EmailConfirmed.Model
     | EmailConfirmFailurePage EmailConfirmFailure.Model
+    | CreateKeysPage CreateKeys.Model
     | SearchPage Search.Model
     | TransferPage Transfer.Model
     | VotingPage Voting.Model
@@ -34,6 +36,7 @@ type Message
     = SendEmailMessage SendEmail.Message
     | EmailConfirmedMessage EmailConfirmed.Message
     | EmailConfirmFailureMessage EmailConfirmFailure.Message
+    | CreateKeysMessage CreateKeys.Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
@@ -54,6 +57,9 @@ view page =
 
         EmailConfirmFailurePage subModel ->
             Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel)
+
+        CreateKeysPage subModel ->
+            Html.map CreateKeysMessage (CreateKeys.view subModel)
 
         SearchPage subModel ->
             Html.map SearchMessage (Search.view subModel)
@@ -96,6 +102,13 @@ update message page =
             in
             ( newModel |> EmailConfirmFailurePage, Cmd.none )
 
+        ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
+            let
+                newModel =
+                    CreateKeys.update subMessage subModel
+            in
+            ( newModel |> CreateKeysPage, Cmd.none )
+
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 newModel =
@@ -136,6 +149,9 @@ getPage ( route, flags ) =
 
         EmailConfirmFailureRoute ->
             EmailConfirmFailurePage (EmailConfirmFailure.initModel flags)
+
+        CreateKeysRoute ->
+            CreateKeysPage (CreateKeys.initModel flags)
 
         SearchRoute ->
             SearchPage (Search.initModel flags)
