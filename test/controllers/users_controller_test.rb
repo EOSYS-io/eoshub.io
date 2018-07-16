@@ -6,14 +6,14 @@ class UsersControllerTest < ActionController::TestCase
   test "should get confirm_email" do
     alice = users(:alice)
     get :confirm_email, params: { id: alice.confirm_token }
-    assert_response :ok
+    assert_redirected_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{alice.confirm_token}"
     assert alice.reload.email_confirmed?
   end
 
   test "should fail to get confirm_email" do
     bob = users(:bob)
     get :confirm_email, params: { id: 'not_exist' }
-    assert_response :precondition_failed
+    assert_redirected_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}"
   end
 
   test "should fail to create aleady exist eos account" do
