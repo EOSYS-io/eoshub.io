@@ -1,7 +1,6 @@
-module Page.AccountCreate.Created exposing (Message(..), Model, initModel, update, view)
+module Page.Account.EmailConfirmFailure exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, button, div, h1, text)
-import Html.Events exposing (onClick)
+import Html exposing (Html, div, h1, text)
 import Util.Flags exposing (Flags)
 
 
@@ -39,6 +38,4 @@ update msg model =
 view : Model -> Html Message
 view model =
     div []
-        [ h1 [] [ text "이오스 계정을 만들었어요." ]
-        , button [ onClick Next ] [ text "다음" ]
-        ]
+        [ h1 [] [ text "인증 실패" ] ]

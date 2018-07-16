@@ -1,12 +1,12 @@
 module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
-import Page.AccountCreate.CreateKeys as CreateKeys
-import Page.AccountCreate.Created as Created
-import Page.AccountCreate.EmailConfirmFailure as EmailConfirmFailure
-import Page.AccountCreate.EmailConfirmed as EmailConfirmed
-import Page.AccountCreate.NameAccount as NameAccount
-import Page.AccountCreate.SendEmail as SendEmail
+import Page.Account.CreateKeys as CreateKeys
+import Page.Account.Created as Created
+import Page.Account.EmailConfirmFailure as EmailConfirmFailure
+import Page.Account.EmailConfirmed as EmailConfirmed
+import Page.Account.NameAccount as NameAccount
+import Page.Account.SendEmail as SendEmail
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer

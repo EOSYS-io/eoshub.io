@@ -1,4 +1,4 @@
-module Page.AccountCreate.SendEmail exposing (Message(..), Model, createUserRequest, initModel, update, view)
+module Page.Account.SendEmail exposing (Message(..), Model, createUserRequest, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul)
 import Html.Attributes exposing (placeholder)

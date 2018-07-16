@@ -1,4 +1,4 @@
-module Page.AccountCreate.EmailConfirmed exposing (Message(..), Model, initModel, update, view)
+module Page.Account.EmailConfirmed exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul)
 import Html.Events exposing (onClick, onInput)
