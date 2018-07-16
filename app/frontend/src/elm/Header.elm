@@ -1,8 +1,8 @@
 module Header exposing (..)
 
-import Html exposing (Html, div, input, button, text)
+import Html exposing (Html, Attribute, div, input, button, text)
 import Html.Attributes exposing (placeholder)
-import Html.Events exposing (onInput, onClick)
+import Html.Events exposing (on, onInput, onClick, keyCode)
 import Http
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE
@@ -142,14 +142,17 @@ update message model =
 
 parseQuery : String -> Result String Query
 parseQuery query =
-    case String.length query of
-        12 ->
+    let
+        -- EOS account's length is less than 12 letters
+        -- EOS public key's length is 53 letters
+        queryLength =
+            String.length query
+    in
+        if queryLength <= 12 then
             Ok AccountQuery
-
-        53 ->
+        else if queryLength == 53 then
             Ok PublicKeyQuery
-
-        _ ->
+        else
             Err "invalid input"
 
 
