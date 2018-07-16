@@ -4,6 +4,7 @@ import Html exposing (Html)
 import Page.AccountCreate.CreateKeys as CreateKeys
 import Page.AccountCreate.EmailConfirmFailure as EmailConfirmFailure
 import Page.AccountCreate.EmailConfirmed as EmailConfirmed
+import Page.AccountCreate.NameAccount as NameAccount
 import Page.AccountCreate.SendEmail as SendEmail
 import Page.NotFound as NotFound
 import Page.Search as Search
@@ -22,6 +23,7 @@ type Page
     | EmailConfirmedPage EmailConfirmed.Model
     | EmailConfirmFailurePage EmailConfirmFailure.Model
     | CreateKeysPage CreateKeys.Model
+    | NameAccountPage NameAccount.Model
     | SearchPage Search.Model
     | TransferPage Transfer.Model
     | VotingPage Voting.Model
@@ -37,6 +39,7 @@ type Message
     | EmailConfirmedMessage EmailConfirmed.Message
     | EmailConfirmFailureMessage EmailConfirmFailure.Message
     | CreateKeysMessage CreateKeys.Message
+    | NameAccountMessage NameAccount.Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
@@ -60,6 +63,9 @@ view page =
 
         CreateKeysPage subModel ->
             Html.map CreateKeysMessage (CreateKeys.view subModel)
+
+        NameAccountPage subModel ->
+            Html.map NameAccountMessage (NameAccount.view subModel)
 
         SearchPage subModel ->
             Html.map SearchMessage (Search.view subModel)
@@ -109,6 +115,13 @@ update message page =
             in
             ( newModel |> CreateKeysPage, Cmd.none )
 
+        ( NameAccountMessage subMessage, NameAccountPage subModel ) ->
+            let
+                ( newModel, subCmd ) =
+                    NameAccount.update subMessage subModel
+            in
+            ( newModel |> NameAccountPage, Cmd.map NameAccountMessage subCmd )
+
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 newModel =
@@ -152,6 +165,9 @@ getPage ( route, flags ) =
 
         CreateKeysRoute ->
             CreateKeysPage (CreateKeys.initModel flags)
+
+        NameAccountRoute confirmToken pubkey ->
+            NameAccountPage (NameAccount.initModel ( flags, confirmToken, pubkey ))
 
         SearchRoute ->
             SearchPage (Search.initModel flags)

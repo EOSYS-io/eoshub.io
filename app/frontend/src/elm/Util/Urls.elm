@@ -18,3 +18,8 @@ eoshub_host flags =
 usersApiUrl : Flags -> String
 usersApiUrl flags =
     eoshub_host flags ++ "/users"
+
+
+createEosAccountUrl : ( Flags, String ) -> String
+createEosAccountUrl ( flags, confirmToken ) =
+    eoshub_host flags ++ "/users/" ++ confirmToken ++ "/create_eos_account"
