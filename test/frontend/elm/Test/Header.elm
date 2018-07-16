@@ -24,9 +24,37 @@ tests =
             , test "public key" <|
                 \() ->
                     Expect.equal (Ok PublicKeyQuery) (parseQuery "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7gSrZcBpunuuTxiYkKqb6d")
+            , test "public key, does not start with 'EOS' " <|
+                \() ->
+                    Expect.equal (Err "invalid input") (parseQuery "eos5uxjV3FYZvwqyAM2StkFEvUvf43F7gSrZcBpunuuTxiYkKqb6d")
             , test "not both" <|
                 \() ->
                     Expect.equal (Err "invalid input") (parseQuery "12345678901234567890")
+            ]
+        , describe "isAccount"
+            [ test "a-z.1-5 True" <|
+                \() ->
+                    Expect.equal (True) (isAccount "abc.xyz12345")
+            , test "a-z.1-5 False" <|
+                \() ->
+                    Expect.equal (False) (isAccount "ABC!@#$67890")
+            , test "{1,12} True" <|
+                \() ->
+                    Expect.equal (True) (isAccount "eosio.ram")
+            , test "{1,12} False" <|
+                \() ->
+                    Expect.equal (False) (isAccount "eosio.ram.eosio.system")
+            ]
+        , describe "isPublicKey"
+            [ test "start with EOS True" <|
+                \() ->
+                    Expect.equal (True) (isPublicKey "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7gSrZcBpunuuTxiYkKqb6d")
+            , test "start with EOS False" <|
+                \() ->
+                    Expect.equal (False) (isPublicKey "eos5uxjV3FYZvwqyAM2StkFEvUvf43F7gSrZcBpunuuTxiYkKqb6d")
+            , test "length 53 False" <|
+                \() ->
+                    Expect.equal (False) (isAccount "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7")
             ]
         , describe "accountDecoder"
             [ test "Account parsing (core_liquid_balance field doesn't exist)" <|

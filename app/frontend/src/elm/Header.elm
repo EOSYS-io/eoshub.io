@@ -7,6 +7,7 @@ import Http
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Json.Encode as JE
+import Regex exposing (regex, contains)
 
 
 -- MODEL
@@ -188,18 +189,24 @@ getFullPath path =
 
 parseQuery : String -> Result String Query
 parseQuery query =
-    let
-        -- EOS account's length is less than 12 letters
-        -- EOS public key's length is 53 letters
-        queryLength =
-            String.length query
-    in
-        if queryLength <= 12 then
-            Ok AccountQuery
-        else if queryLength == 53 then
-            Ok PublicKeyQuery
-        else
-            Err "invalid input"
+    -- EOS account's length is less than 12 letters
+    -- EOS public key's length is 53 letters
+    if isAccount query then
+        Ok AccountQuery
+    else if isPublicKey query then
+        Ok PublicKeyQuery
+    else
+        Err "invalid input"
+
+
+isAccount : String -> Bool
+isAccount query =
+    contains (regex "^[a-z.1-5]{1,12}$") query
+
+
+isPublicKey : String -> Bool
+isPublicKey query =
+    contains (regex "^EOS[\\w]{50}$") query
 
 
 accountDecoder : JD.Decoder Account
