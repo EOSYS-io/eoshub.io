@@ -1,7 +1,27 @@
 module Header exposing (..)
 
-import Html exposing (Html, Attribute, div, input, button, text)
-import Html.Attributes exposing (placeholder)
+import Html
+    exposing
+        ( Html
+        , Attribute
+        , div
+        , section
+        , form
+        , ul
+        , li
+        , span
+        , input
+        , button
+        , text
+        )
+import Html.Attributes
+    exposing
+        ( placeholder
+        , disabled
+        , class
+        , attribute
+        , type_
+        )
 import Html.Events exposing (on, onInput, onClick, keyCode)
 import Http
 import Json.Decode as JD exposing (Decoder)
@@ -278,8 +298,26 @@ post url body decoder =
 view : Model -> Html Message
 view model =
     div []
-        [ input [ placeholder "계정명, 퍼블릭키 검색하기", onInput InputSearch, onEnter (GetSearchResult (model.searchInput)) ] []
-        , button [ onClick (GetSearchResult (model.searchInput)) ] [ text "검색하기" ]
+        [ section [ class "tick_display" ]
+            [ form [ class "search", disabled True ]
+                [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (GetSearchResult (model.searchInput)) ]
+                    []
+                , button [ class "search button", type_ "button", onClick (GetSearchResult (model.searchInput)) ]
+                    [ text "검색하기" ]
+                ]
+            , ul [ class "price" ]
+                [ li []
+                    [ text "이오스 시세                           "
+                    , span [ attribute "data-before" "lower" ]
+                        [ text "1.000 EOS                           " ]
+                    ]
+                , li []
+                    [ text "RAM 가격                            "
+                    , span [ attribute "data-before" "higher" ]
+                        [ text "1.000 EOS                           " ]
+                    ]
+                ]
+            ]
         ]
 
 
