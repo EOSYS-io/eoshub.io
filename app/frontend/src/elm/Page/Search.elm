@@ -1,20 +1,21 @@
 module Page.Search exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, div, input, button, text, p)
+import Html exposing (Html, button, div, input, p, text)
 import Html.Attributes exposing (placeholder)
 import Html.Events exposing (onClick)
+import Util.Flags exposing (Flags)
 
 
 -- MODEL
 
 
 type alias Model =
-    { result : String }
+    { result : String, flags : Flags }
 
 
-initModel : Model
-initModel =
-    { result = "" }
+initModel : Flags -> Model
+initModel flags =
+    { result = "", flags = flags }
 
 
 

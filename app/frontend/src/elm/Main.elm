@@ -6,6 +6,7 @@ import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
 import Route exposing (Route(..), parseLocation)
 import Sidebar
+import Util.Flags exposing (Flags)
 
 
 -- MODEL
@@ -14,6 +15,7 @@ import Sidebar
 type alias Model =
     { sidebar : Sidebar.Model
     , page : Page
+    , flags : Flags
     }
 
 
@@ -21,10 +23,11 @@ type alias Model =
 -- INIT
 
 
-init : Location -> ( Model, Cmd Message )
-init location =
+init : Flags -> Location -> ( Model, Cmd Message )
+init flags location =
     ( { sidebar = Sidebar.initModel
-      , page = location |> parseLocation |> getPage
+      , page = ( location |> parseLocation, flags ) |> getPage
+      , flags = flags
       }
     , Cmd.none
     )
@@ -50,7 +53,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         OnLocationChange location ->
-            ( { model | page = location |> parseLocation |> getPage }, Cmd.none )
+            ( { model | page = ( location |> parseLocation, model.flags ) |> getPage }, Cmd.none )
 
         PageMessage pageMessage ->
             let
@@ -80,9 +83,9 @@ subscriptions { sidebar } =
 -- MAIN
 
 
-main : Program Never Model Message
+main : Program Flags Model Message
 main =
-    Navigation.program OnLocationChange
+    Navigation.programWithFlags OnLocationChange
         { init = init
         , view = view
         , update = update

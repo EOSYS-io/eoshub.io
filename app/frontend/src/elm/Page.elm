@@ -7,6 +7,7 @@ import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
 import Route exposing (Route(..))
+import Util.Flags exposing (Flags)
 
 
 -- MODEL
@@ -98,20 +99,20 @@ update message page =
 -- Utility functions
 
 
-getPage : Route -> Page
-getPage route =
+getPage : ( Route, Flags ) -> Page
+getPage ( route, flags ) =
     case route of
         AccountCreateRoute ->
-            AccountCreatePage AccountCreate.initModel
+            AccountCreatePage (AccountCreate.initModel flags)
 
         SearchRoute ->
-            SearchPage Search.initModel
+            SearchPage (Search.initModel flags)
 
         VotingRoute ->
-            VotingPage Voting.initModel
+            VotingPage (Voting.initModel flags)
 
         TransferRoute ->
-            TransferPage Transfer.initModel
+            TransferPage (Transfer.initModel flags)
 
         IndexRoute ->
             IndexPage

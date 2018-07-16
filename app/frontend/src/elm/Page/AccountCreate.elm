@@ -7,18 +7,20 @@ import Http
 import Json.Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
+import Util.Flags exposing (Flags)
+import Util.Urls as Urls
 
 
 -- MODEL
 
 
 type alias Model =
-    { email : String, requestStatus : Response }
+    { email : String, requestStatus : Response, flags : Flags }
 
 
-initModel : Model
-initModel =
-    { email = "", requestStatus = { msg = "" } }
+initModel : Flags -> Model
+initModel flags =
+    { email = "", requestStatus = { msg = "" }, flags = flags }
 
 
 
@@ -76,18 +78,15 @@ responseDecoder =
 
 createUserBodyParams : Model -> Http.Body
 createUserBodyParams model =
-    Http.jsonBody (Encode.object [ ( "email", Encode.string model.email ) ])
+    Encode.object [ ( "email", Encode.string model.email ) ]
+        |> Http.jsonBody
 
 
 postUsers : Model -> Http.Request Response
 postUsers model =
-    Http.post "http://localhost:3000/users" (createUserBodyParams model) responseDecoder
+    Http.post (Urls.usersApiUrl model.flags) (createUserBodyParams model) responseDecoder
 
 
 createUserRequest : Model -> Cmd Message
 createUserRequest model =
     Http.send NewUser <| postUsers model
-
-
-
--- Http.send NewUser (Http.post "http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/users" (createUserBodyParams model) (list string))
