@@ -2,6 +2,7 @@ module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
 import Page.AccountCreate.CreateKeys as CreateKeys
+import Page.AccountCreate.Created as Created
 import Page.AccountCreate.EmailConfirmFailure as EmailConfirmFailure
 import Page.AccountCreate.EmailConfirmed as EmailConfirmed
 import Page.AccountCreate.NameAccount as NameAccount
@@ -22,6 +23,7 @@ type Page
     | SendEmailPage SendEmail.Model
     | EmailConfirmedPage EmailConfirmed.Model
     | EmailConfirmFailurePage EmailConfirmFailure.Model
+    | CreatedPage Created.Model
     | CreateKeysPage CreateKeys.Model
     | NameAccountPage NameAccount.Model
     | SearchPage Search.Model
@@ -39,6 +41,7 @@ type Message
     | EmailConfirmedMessage EmailConfirmed.Message
     | EmailConfirmFailureMessage EmailConfirmFailure.Message
     | CreateKeysMessage CreateKeys.Message
+    | CreatedMessage Created.Message
     | NameAccountMessage NameAccount.Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
@@ -63,6 +66,9 @@ view page =
 
         CreateKeysPage subModel ->
             Html.map CreateKeysMessage (CreateKeys.view subModel)
+
+        CreatedPage subModel ->
+            Html.map CreatedMessage (Created.view subModel)
 
         NameAccountPage subModel ->
             Html.map NameAccountMessage (NameAccount.view subModel)
@@ -115,6 +121,13 @@ update message page =
             in
             ( newModel |> CreateKeysPage, Cmd.none )
 
+        ( CreatedMessage subMessage, CreatedPage subModel ) ->
+            let
+                newModel =
+                    Created.update subMessage subModel
+            in
+            ( newModel |> CreatedPage, Cmd.none )
+
         ( NameAccountMessage subMessage, NameAccountPage subModel ) ->
             let
                 ( newModel, subCmd ) =
@@ -165,6 +178,9 @@ getPage ( route, flags ) =
 
         CreateKeysRoute ->
             CreateKeysPage (CreateKeys.initModel flags)
+
+        CreatedRoute ->
+            CreatedPage (Created.initModel flags)
 
         NameAccountRoute confirmToken pubkey ->
             NameAccountPage (NameAccount.initModel ( flags, confirmToken, pubkey ))
