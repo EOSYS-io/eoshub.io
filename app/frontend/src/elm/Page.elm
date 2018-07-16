@@ -1,12 +1,12 @@
 module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
+import Page.Account.ConfirmEmail as ConfirmEmail
 import Page.Account.CreateKeys as CreateKeys
 import Page.Account.Created as Created
 import Page.Account.EmailConfirmFailure as EmailConfirmFailure
 import Page.Account.EmailConfirmed as EmailConfirmed
 import Page.Account.NameAccount as NameAccount
-import Page.Account.SendEmail as SendEmail
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
@@ -20,7 +20,7 @@ import Util.Flags exposing (Flags)
 
 type Page
     = IndexPage
-    | SendEmailPage SendEmail.Model
+    | ConfirmEmailPage ConfirmEmail.Model
     | EmailConfirmedPage EmailConfirmed.Model
     | EmailConfirmFailurePage EmailConfirmFailure.Model
     | CreatedPage Created.Model
@@ -37,7 +37,7 @@ type Page
 
 
 type Message
-    = SendEmailMessage SendEmail.Message
+    = ConfirmEmailMessage ConfirmEmail.Message
     | EmailConfirmedMessage EmailConfirmed.Message
     | EmailConfirmFailureMessage EmailConfirmFailure.Message
     | CreateKeysMessage CreateKeys.Message
@@ -55,8 +55,8 @@ type Message
 view : Page -> Html Message
 view page =
     case page of
-        SendEmailPage subModel ->
-            Html.map SendEmailMessage (SendEmail.view subModel)
+        ConfirmEmailPage subModel ->
+            Html.map ConfirmEmailMessage (ConfirmEmail.view subModel)
 
         EmailConfirmedPage subModel ->
             Html.map EmailConfirmedMessage (EmailConfirmed.view subModel)
@@ -93,12 +93,12 @@ view page =
 update : Message -> Page -> ( Page, Cmd Message )
 update message page =
     case ( message, page ) of
-        ( SendEmailMessage subMessage, SendEmailPage subModel ) ->
+        ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    SendEmail.update subMessage subModel
+                    ConfirmEmail.update subMessage subModel
             in
-            ( newModel |> SendEmailPage, Cmd.map SendEmailMessage subCmd )
+            ( newModel |> ConfirmEmailPage, Cmd.map ConfirmEmailMessage subCmd )
 
         ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
             let
@@ -167,8 +167,8 @@ update message page =
 getPage : ( Route, Flags ) -> Page
 getPage ( route, flags ) =
     case route of
-        SendEmailRoute ->
-            SendEmailPage (SendEmail.initModel flags)
+        ConfirmEmailRoute ->
+            ConfirmEmailPage (ConfirmEmail.initModel flags)
 
         EmailConfirmedRoute confirmToken ->
             EmailConfirmedPage (EmailConfirmed.initModel ( flags, confirmToken ))

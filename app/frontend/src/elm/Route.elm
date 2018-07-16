@@ -6,7 +6,7 @@ import UrlParser exposing ((</>), Parser, map, oneOf, parsePath, s, string, top)
 
 type Route
     = IndexRoute
-    | SendEmailRoute
+    | ConfirmEmailRoute
     | EmailConfirmedRoute String
     | EmailConfirmFailureRoute
     | CreateKeysRoute
@@ -22,7 +22,7 @@ matchRoute : Parser (Route -> a) a
 matchRoute =
     oneOf
         [ map IndexRoute top
-        , map SendEmailRoute (s "account" </> s "send_email")
+        , map ConfirmEmailRoute (s "account" </> s "confirm_email")
         , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string)
         , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
         , map CreateKeysRoute (s "account" </> s "create_keys")
