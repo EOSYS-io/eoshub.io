@@ -199,6 +199,7 @@
         right:64px;
         bottom:64px;
 
+        // response
         div {
             width:406px;
             height:96px;
@@ -227,6 +228,13 @@
                 background:url('../image/icon-close-white-transparent.svg') center center no-repeat;
                 width:20px;
                 height:20px;
+
+                outline:0;
+                transition:transform 0.1s;
+
+                &:hover {
+                    transform:scale(1.1);
+                }
             }
         }
 
@@ -238,6 +246,17 @@
         .view.fail {
             background:url('../image/symbol-alert-white.svg') 285px 36px no-repeat #ff6b64;
             background-size:81px;
+        }
+
+        // interaction
+        transition:transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+
+        opacity:0;
+        transform:translateY(100%);
+
+        &.viewing {
+            opacity:1;
+            transform:translateY(0);
         }
     }
 }
