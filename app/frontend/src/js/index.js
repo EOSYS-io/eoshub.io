@@ -5,9 +5,19 @@ import '../stylesheets/style.scss';
 import eos from 'eosjs';
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
-import { getWalletStatus, authenticateAccount, invalidateAccount } from './wallet';
+import {
+  getWalletStatus,
+  authenticateAccount,
+  invalidateAccount,
+  getAuthInfo,
+} from './wallet';
 import { scatterConfig, eosjsConfig } from './config';
-import { getScatter, updateScatter } from './state';
+import {
+  getElm,
+  getScatter,
+  updateElm,
+  updateScatter,
+} from './state';
 
 function createResponseStatus() {
   const { account, authority } = getScatter();
@@ -85,18 +95,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     app.ports.receiveScatterResponse.send(response);
   });
+
+  updateElm(app);
 });
 
 document.addEventListener('scatterLoaded', () => {
   const { scatter } = window;
+
   // Setting window.scatter to null is recommended.
   window.scatter = null;
 
   const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
-  const stateScatter = getScatter();
-  updateScatter({
-    ...stateScatter,
+  let scatterState = {
     scatterClient: scatter,
     eosjsClient: eosjs,
-  });
+    account: '',
+    authority: '',
+  };
+
+  if (scatter.identity) {
+    const { authority, name } = getAuthInfo(scatter.identity);
+    scatterState = {
+      ...scatterState,
+      account: name,
+      authority,
+    };
+  }
+
+  updateScatter(scatterState);
+  const app = getElm();
+  app.ports.receiveWalletStatus.send(createResponseStatus());
 });
+
+// TODO(heejae): This function is a temporary work cause it makes an assumption that
+// elm and scatter finish loading after 0.5 seconds from beginning.
+// Need to find a good way to handle scatter not found.
+window.setTimeout(
+  () => {
+    const { scatterClient } = getScatter();
+    if (!scatterClient) {
+      const app = getElm();
+      app.ports.receiveWalletStatus.send(createResponseStatus());
+    }
+  },
+  500,
+);

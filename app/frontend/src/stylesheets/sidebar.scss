@@ -4,18 +4,11 @@ $padding_top:32px;
 $padding_left_right:40px;
 $padding_bottom:36px;
 
-// lnb dashboard layout
 .sidebar {
     background-color:#fff;
     padding:$padding_top $padding_left_right $padding_bottom;
-
-    display:flex;
-    flex-flow:column;
-    height:100%;
-    justify-content:space-between;
-
-    position:relative;
-
+    box-sizing:border-box;
+    flex:0 0 400px;
 }
 
 .sidebar .dashboard.hello_world,
@@ -24,13 +17,16 @@ $padding_bottom:36px;
     flex:1;
 }
 
+
+
 .sidebar header {
     h1 {
         @include ir();
         width:91px;
         height:20px;
         
-        background:#f00;
+        background:url('../image/ci_eoshub.png') center center no-repeat transparent;
+        background-size:cover;
     }
 
     h1 + button {
@@ -42,8 +38,12 @@ $padding_bottom:36px;
         width:20px;
         height:20px;
     }
-}
 
+    button.folding.button {
+        background:url('../image/lnb_fold_button.svg') left top no-repeat transparent;
+        background-size:cover;
+    }
+}
 // dashboard summary
 .sidebar .dashboard {
     h2 {
@@ -51,29 +51,10 @@ $padding_bottom:36px;
         font-weight:300;
         line-height:1.4;
     }
-
-    &.logged h2 {
-        padding-top:16px + 54px;
-        padding-bottom:32px;
-
-        position:relative;
-
-        &:after {
-            content:'';
-            display:block;
-            position:absolute;
-            bottom:0;
-            left:-$padding_left_right;
-            right:-$padding_left_right;
-            height:1px;
-            background-color:#efefef;
-        }
-    }
 }
 
-// dashboard details
-.sidebar .dashboard {
 
+.sidebar .dashboard {
     .panel {
         color:#999;
         font-size:rem(14);
@@ -95,6 +76,8 @@ $padding_bottom:36px;
             color:#737a8d;
         }
     }
+
+
     // button :: login, join
     .btn_area {
         a {
@@ -116,17 +99,6 @@ $padding_bottom:36px;
     }
 }
 
-.sidebar .dashboard.logged {
-    h3 {
-        color:#333;
-        font-size:rem(32);
-        font-weight:300;
-        text-transform:uppercase;
-
-        margin:59px 0;
-    }
-}
-
 // locale, sns link
 .sidebar  nav {
     display:flex;
@@ -140,7 +112,22 @@ $padding_bottom:36px;
 
         margin-right:8px;
 
-        background-color:#f00;
+        &.sns {
+            background-size:cover;
+            background-position:left top;
+
+            &.fb {
+                background-image:url('../image/ci_facebook.svg');
+            }
+
+            &.twitter {
+                background-image:url('../image/ci_twitter.svg');
+            }
+
+            &.telegram {
+                background-image:url('../image/ci_telegram.svg');
+            }
+        }
     }
 
     // button wrapper
@@ -165,6 +152,27 @@ button.lang {
 .lang.en:lang(en) {
     font-weight:700;
 }
+
+
+// sidebar :: fold/unfold
+.sidebar {
+    transition:margin 0.2s linear;
+}
+
+.sidebar.fold {
+    margin-left:-300px;
+    // flex-basis:100px;
+    overflow:hidden;
+
+    * {
+        visibility:hidden;
+    }
+
+    button.folding.button {
+        visibility:visible;
+    }
+}
+
 
 
 // element :: available wallet for peristalsis
@@ -201,41 +209,176 @@ button.lang {
     }
 }
 
-// lnb dashboard graph
-.dashboard.logged .panel .graph {
-    list-style-type:none;
-    padding:0;
-    margin:0;
 
-    li {
-        margin-top:3em;
+// after logged
+.dashboard.logged {
+
+    div.user_status {
+        height:48px;
         display:flex;
-        flex-direction:column;
+        justify-content:space-between;
+        align-items:center;
 
-        span.tag {
-            order:2;
+        &:before {
+            content:'';
+            display:inline-block;
+            background:url('../image/symbol-smile-white.svg') center center no-repeat #4d6bff;
+            background-size:26px 26px;
+            height:48px;
+            width:48px;
+            border-radius:100%;
+        }
+        
+        h2 {
+            padding:0 16px;
+            flex:1;
+            font-size:rem(16);
+            font-weight:400;
         }
 
-        div {
-            $unit:8px;
-
-            @include ir();
-
-            border-radius:$unit;
-            height:$unit;
-            background-color:#f5f7f9;
+        div.config_panel {
             position:relative;
+            width:20px;
+            height:20px;
+            
+            button.gear {
+                @include ir();
 
-            span {
-                border-radius:inherit;
-                height:inherit;
-                background-color:#536dfe;
+                width:20px;
+                height:20px;
+                background:url('../image/icon-setting.svg') center center no-repeat;
+                background-size:cover;
+            }
+
+            div.menu_list {
+                display:none;
+                position:absolute;
+                z-index:99;
+                top:10px;
+                left:13px;
+                border:1px solid #d8d8d8;
+                border-top:0;
+
+                a {
+                    border-top:1px solid #d8d8d8;
+                    display:block;
+                    background:#fff;
+                    width:135px;
+                    height:40px;
+                    line-height:38px;
+                    text-align:center;
+                    color:#999;
+                    font-size:rem(14);
+
+                    &:hover {
+                        color:#777;
+                        background-color:#f5f5f5;
+                    }
+                }
+            }
+
+            &.expand div.menu_list {
                 display:block;
-                left:0;
-                top:0;
-                right:0;
-                bottom:0;
             }
         }
+    }
+}
+
+.dashboard.logged .panel {
+    h3 {
+        margin:64px 0 133px;
+        text-align:center;
+        font-size:rem(14);
+
+        strong  {
+            font-size:rem(32);
+            font-weight:400;
+            color:#000;
+            display:block;
+            margin-top:4px;
+        }
+    }
+
+    ul.status {
+        position:relative;
+        &:before {
+            content:'';
+            display:block;
+            position:absolute;
+            top:-68px;
+            left:-40px;
+            right:-40px;
+            height:1px;
+            background:#e8e8e8;
+        }
+        display:flex;
+        list-style-type:none;
+        padding:0;
+        margin:0;
+
+        li {
+            flex:1;
+            height:48px;
+            text-align:center;
+            strong {
+                font-weight:400;
+                font-size:rem(18);
+                display:block;
+                color:#000;
+                margin-top:4px;
+            }
+
+            &:first-child {
+                border-right:1px solid #d8d8d8;
+            }
+        }
+    }
+}
+
+
+// lnb dashboard graph
+.dashboard.logged .panel .graph {
+    margin-top:44px;
+
+    $unit:8px;
+
+    border-radius:$unit;
+    height:$unit;
+    background-color:#f5f7f9;
+    position:relative;
+
+    span {
+        border-radius:inherit;
+        height:inherit;
+        background-color:#536dfe;
+        display:block;
+        left:0;
+        top:0;
+        right:0;
+        bottom:0;
+    }
+
+}
+.dashboard.logged .panel p.description  {
+    text-align:center;
+}
+
+
+.dashboard.logged .btn_area .button.manage { 
+    margin-top:64px;
+    width:100%;
+}
+
+.dashboard.logged p.help { 
+    margin-top:16px;
+    font-size:rem(14);
+    text-align:center;
+
+    a {
+        background:url('../image/icon-info-mark.svg') left center no-repeat;
+        background-size:16px 16px;
+        padding-left:20px;
+        font-size:rem(14);
+        color:#737a8d;
     }
 }

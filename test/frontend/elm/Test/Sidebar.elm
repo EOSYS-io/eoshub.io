@@ -2,9 +2,10 @@ module Test.Sidebar exposing (tests)
 
 import Expect
 import Port
-import Sidebar exposing (Message(..), WalletStatus(..), initModel, update)
+import Sidebar exposing (Message(..), State(..), initModel, update)
 import Test exposing (..)
 import Translation exposing (Language(Korean))
+import Util.WalletDecoder exposing (WalletStatus(..))
 import View.Notification
 
 
@@ -13,7 +14,7 @@ tests =
     describe "Wallet module"
         [ describe "update"
             [ describe "UpdateWalletStatus"
-                [ test "authenticated" <|
+                [ test "authenticated should change both wallet and state" <|
                     \() ->
                         let
                             message =
@@ -30,10 +31,11 @@ tests =
                                         , account = "ACCOUNT"
                                         , authority = "AUTHORITY"
                                         }
+                                    , state = AccountInfo
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
-                , test "loaded" <|
+                , test "loaded should change state to SignIn" <|
                     \() ->
                         let
                             message =
@@ -50,10 +52,11 @@ tests =
                                         , account = ""
                                         , authority = ""
                                         }
+                                    , state = SignIn
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
-                , test "not found" <|
+                , test "notfound should change state to SignIn" <|
                     \() ->
                         let
                             message =
@@ -70,6 +73,7 @@ tests =
                                         , account = ""
                                         , authority = ""
                                         }
+                                    , state = SignIn
                                 }
                         in
                             Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
@@ -110,6 +114,21 @@ tests =
                         Expect.equal
                             ( { initModel | language = Korean }, Cmd.none )
                             (update (UpdateLanguage Korean) initModel)
+                , test "UpdateState" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | state = PairWallet }, Cmd.none )
+                            (update (UpdateState PairWallet) initModel)
+                , test "Fold" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | fold = True }, Cmd.none )
+                            (update Fold initModel)
+                , test "Unfold" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | fold = False }, Cmd.none )
+                            (update Unfold { initModel | fold = True })
                 ]
             ]
         ]

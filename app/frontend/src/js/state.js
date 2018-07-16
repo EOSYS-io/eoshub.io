@@ -1,21 +1,38 @@
-let walletStates = {
+let state = {
   scatter: {
     scatterClient: null,
     eosjsClient: null,
     account: '',
     authority: '',
   },
+  elm: null,
 };
 
 function getScatter() {
-  return walletStates.scatter;
+  return state.scatter;
 }
 
 function updateScatter(newScatter) {
-  walletStates = {
-    ...walletStates,
+  state = {
+    ...state,
     scatter: newScatter,
   };
 }
 
-export { getScatter, updateScatter };
+function getElm() {
+  return state.elm;
+}
+
+function updateElm(elm) {
+  state = {
+    ...state,
+    elm,
+  };
+}
+
+export {
+  getElm,
+  getScatter,
+  updateElm,
+  updateScatter,
+};

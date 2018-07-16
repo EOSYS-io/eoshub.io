@@ -1,6 +1,7 @@
 module Main exposing (..)
 
 import Html
+import Html.Attributes exposing (class)
 import Message exposing (Message(..))
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
@@ -39,9 +40,9 @@ init flags location =
 
 view : Model -> Html.Html Message
 view { sidebar, page } =
-    Html.div []
-        [ Html.map SidebarMessage (Sidebar.view sidebar)
-        , Html.map PageMessage (Page.view page)
+    Html.div [ class "container" ]
+        [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
+        , Html.div [ class "wrapper" ] [ Html.map PageMessage (Page.view page) ]
         ]
 
 
