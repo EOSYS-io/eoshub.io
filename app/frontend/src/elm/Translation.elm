@@ -36,6 +36,18 @@ type I18n
     | FastTransactionPossible
     | ManageStaking
     | WhatIsStaking
+    | Transfer
+    | TransferDesc
+    | Vote
+    | VoteDesc
+    | RamMarket
+    | RamMarketDesc
+    | Application
+    | ApplicationDesc
+    | ProxyVote
+    | ProxyVoteDesc
+    | Faq
+    | FaqDesc
 
 
 translate : Language -> I18n -> String
@@ -140,3 +152,41 @@ getMessages i18n =
 
         WhatIsStaking ->
             { korean = "토큰 보관이 뭔가요?", english = "What is staking?" }
+
+        Transfer ->
+            { korean = "전송하기", english = "Transfer" }
+
+        TransferDesc ->
+            { korean = "여기서 토큰을 보내실 수 있어요", english = "Send tokens here" }
+
+        Vote ->
+            { korean = "투표하기", english = "Vote" }
+
+        VoteDesc ->
+            { korean = "홀더라면 투표를!", english = "Vote with your EOS" }
+
+        RamMarket ->
+            { korean = "램마켓", english = "Ram Market" }
+
+        RamMarketDesc ->
+            { korean = "램을 사고 팔 수 있어요", english = "Buy or sell RAM here" }
+
+        Application ->
+            { korean = "어플리케이션", english = "Application" }
+
+        ApplicationDesc ->
+            { korean = "이오스 기반의 다양한 서비스들을 만나보세요"
+            , english = "Meet interesting applications based on EOS"
+            }
+
+        ProxyVote ->
+            { korean = "대리투표", english = "Proxy Voting" }
+
+        ProxyVoteDesc ->
+            { korean = "맡겨 두시면 대신 투표 해드립니다", english = "Delegate your vote to a proxy" }
+
+        Faq ->
+            { korean = "FAQ", english = "FAQ" }
+
+        FaqDesc ->
+            { korean = "이오스에 대해 궁금하신 내용들을 정리했어요", english = "All you need to know about EOS Hub" }
