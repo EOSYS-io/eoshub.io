@@ -103,15 +103,3 @@ input[type="submit"],
 button { 
     cursor:pointer;
 }
-
-
-// common declaration
-.hidden_copy_field {
-    @include screen_reader();
-
-    &::selection,
-    &:focus {
-        @include screen_reader();
-    }
-}
-
