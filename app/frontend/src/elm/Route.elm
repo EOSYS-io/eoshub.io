@@ -11,7 +11,7 @@ type Route
     | EmailConfirmFailureRoute
     | CreateKeysRoute
     | CreatedRoute
-    | NameAccountRoute String String
+    | CreateRoute String String
     | SearchRoute
     | VotingRoute
     | TransferRoute
@@ -27,7 +27,7 @@ matchRoute =
         , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
         , map CreateKeysRoute (s "account" </> s "create_keys")
         , map CreatedRoute (s "account" </> s "created")
-        , map NameAccountRoute (s "account" </> s "name_account" </> string </> string)
+        , map CreateRoute (s "account" </> s "create" </> string </> string)
         , map SearchRoute (s "search")
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")

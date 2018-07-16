@@ -2,11 +2,11 @@ module Page exposing (Message(..), Page(..), getPage, update, view)
 
 import Html exposing (Html)
 import Page.Account.ConfirmEmail as ConfirmEmail
+import Page.Account.Create as Create
 import Page.Account.CreateKeys as CreateKeys
 import Page.Account.Created as Created
 import Page.Account.EmailConfirmFailure as EmailConfirmFailure
 import Page.Account.EmailConfirmed as EmailConfirmed
-import Page.Account.NameAccount as NameAccount
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
@@ -25,7 +25,7 @@ type Page
     | EmailConfirmFailurePage EmailConfirmFailure.Model
     | CreatedPage Created.Model
     | CreateKeysPage CreateKeys.Model
-    | NameAccountPage NameAccount.Model
+    | CreatePage Create.Model
     | SearchPage Search.Model
     | TransferPage Transfer.Model
     | VotingPage Voting.Model
@@ -42,7 +42,7 @@ type Message
     | EmailConfirmFailureMessage EmailConfirmFailure.Message
     | CreateKeysMessage CreateKeys.Message
     | CreatedMessage Created.Message
-    | NameAccountMessage NameAccount.Message
+    | CreateMessage Create.Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
@@ -70,8 +70,8 @@ view page =
         CreatedPage subModel ->
             Html.map CreatedMessage (Created.view subModel)
 
-        NameAccountPage subModel ->
-            Html.map NameAccountMessage (NameAccount.view subModel)
+        CreatePage subModel ->
+            Html.map CreateMessage (Create.view subModel)
 
         SearchPage subModel ->
             Html.map SearchMessage (Search.view subModel)
@@ -128,12 +128,12 @@ update message page =
             in
             ( newModel |> CreatedPage, Cmd.none )
 
-        ( NameAccountMessage subMessage, NameAccountPage subModel ) ->
+        ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    NameAccount.update subMessage subModel
+                    Create.update subMessage subModel
             in
-            ( newModel |> NameAccountPage, Cmd.map NameAccountMessage subCmd )
+            ( newModel |> CreatePage, Cmd.map CreateMessage subCmd )
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -182,8 +182,8 @@ getPage ( route, flags ) =
         CreatedRoute ->
             CreatedPage (Created.initModel flags)
 
-        NameAccountRoute confirmToken pubkey ->
-            NameAccountPage (NameAccount.initModel ( flags, confirmToken, pubkey ))
+        CreateRoute confirmToken pubkey ->
+            CreatePage (Create.initModel ( flags, confirmToken, pubkey ))
 
         SearchRoute ->
             SearchPage (Search.initModel flags)
