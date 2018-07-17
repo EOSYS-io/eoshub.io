@@ -43,10 +43,10 @@ update msg model =
             ( model, createUserRequest model )
 
         NewUser (Ok res) ->
-            ( { model | requestStatus = res } |> Debug.log (toString res), Cmd.none )
+            ( { model | requestStatus = res }, Cmd.none )
 
         NewUser (Err error) ->
-            ( { model | requestStatus = { msg = toString error } } |> Debug.log (toString error), Cmd.none )
+            ( { model | requestStatus = { msg = toString error } }, Cmd.none )
 
 
 
