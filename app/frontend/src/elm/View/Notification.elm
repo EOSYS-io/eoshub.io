@@ -1,22 +1,22 @@
-module View.Notification exposing (ErrorMessage, Message(..), view)
+module View.Notification exposing (Message(..), view)
 
 import Html exposing (Html, div, text, h1)
-import Html.Attributes exposing (style)
+import Html.Attributes exposing (class)
 import Translation exposing (Language, translate, I18n(Success))
 
 
 -- MESSAGE
 
 
-type alias ErrorMessage =
+type alias Detail =
     { code : Int
     , message : String
     }
 
 
 type Message
-    = Ok
-    | Error ErrorMessage
+    = Ok Detail
+    | Error Detail
     | None
 
 
@@ -27,16 +27,15 @@ type Message
 view : Message -> Language -> Html message
 view message language =
     let
-        ( message_, color ) =
+        ( message_, c ) =
             case message of
-                Ok ->
-                    ( translate language Success, "green" )
+                Ok _ ->
+                    ( translate language Success, class "view success" )
 
                 Error errorMessage ->
-                    ( toString errorMessage.code ++ "\n" ++ errorMessage.message, "red" )
+                    ( toString errorMessage.code ++ "\n" ++ errorMessage.message, class "view fail" )
 
                 _ ->
-                    ( "", "" )
+                    ( "", class "" )
     in
-        div [ style [ ( "color", color ) ] ]
-            [ h1 [] [ text message_ ] ]
+        div [] []
