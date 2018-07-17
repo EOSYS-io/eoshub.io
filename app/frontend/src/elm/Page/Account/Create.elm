@@ -1,4 +1,4 @@
-module Page.Account.Create exposing (Message(..), Model, initModel, update, view)
+module Page.Account.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul)
 import Html.Attributes exposing (placeholder)

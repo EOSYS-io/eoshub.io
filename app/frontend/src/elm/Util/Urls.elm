@@ -7,6 +7,8 @@ eoshub_host : Flags -> String
 eoshub_host flags =
     if flags.node_env == "development" then
         "http://localhost:3000"
+    else if flags.node_env == "test" then
+        "http://localhost:3000"
     else if flags.node_env == "alpha" then
         "http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com"
     else if flags.node_env == "production" then
