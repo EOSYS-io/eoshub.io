@@ -28,6 +28,7 @@
         box-sizing:border-box;
         height:300px;
         border-radius:4px;
+        transition:box-shadow 0.2s;
 
         &:hover {
           box-shadow: 0 28px 40px 0 rgba(0, 0, 0, 0.16);
@@ -42,16 +43,68 @@
             font-size:rem(20);
             color:#333;
         }
+
+        p {
+            font-size:rem(14);
+            line-height:1.6;
+            color:#999;
+        }
+    }
+
+    // bg image
+    .card {
+        background-position:right bottom;
+        background-color:transparent;
+        background-repeat:no-repeat;
+        background-size:400px;
+
+        height:100%;
+
+        &.transfer {
+            background-image:url('../image/bg-transfer.svg');
+        }
+
+        &.vote {
+            background-image:url('../image/bg-vote.svg');
+        }
+
+        &.ram_market {
+            background-image:url('../image/bg-ram-market.svg');
+        }
+
+        &.faq {
+            background-image:url('../image/bg-faq.svg');
+        }
+
+        &.proxy_vote {
+            background-image:url('../image/bg-proxy-vote.svg');
+        }
+
+        &.application {
+            background-image:url('../image/bg-dapp.svg');
+        }
+    }
+}
+
+.action.view.panel.transfer {
+    nav {
+        position:absolute;
+        right:64px;
+
+        font-size:rem(14);
+        a {
+            color:#333;
+            margin-left:24px;
+            
+            &.viewing {
+                font-weight:bold;
+            }
+        }
     }
 }
 
 .action.view.panel.transfer {
     background:#fff;
-
-    &:before,
-    &:after {
-        display:none;
-    }
 
     margin:48px 0 0 0;
     padding:64px;
@@ -60,11 +113,13 @@
     display:block;
     position:relative;
 
-    p.help.info {
-        position:absolute;
-        top:64px;
-        right:64px;
+    h3 {
+        font-weight:300;
+        font-size:rem(24);
+        color:#333;
+    }
 
+    p.help.info {
         a {
             background:url('../image/icon-info-mark.svg') left center no-repeat;
             background-size:16px 16px;
@@ -72,17 +127,6 @@
             font-size:rem(14);
             color:#737a8d;
         }
-    }
-
-    h3 {
-        font-weight:300;
-        font-size:rem(24);
-        color:#333;
-    }
-
-    p {
-        line-height:1.6;
-        color:#999;
     }
 
     .card {
