@@ -1,6 +1,8 @@
 module Test.Sidebar exposing (tests)
 
 import Expect
+import ExternalMessage
+import Navigation
 import Port
 import Sidebar exposing (Message(..), State(..), initModel, update)
 import Test exposing (..)
@@ -129,6 +131,15 @@ tests =
                         Expect.equal
                             ( { initModel | fold = False }, Cmd.none )
                             (update Unfold { initModel | fold = True })
+                , test "ChangeUrl" <|
+                    \() ->
+                        let
+                            url =
+                                "transfer"
+                        in
+                            Expect.equal
+                                ( initModel, Navigation.newUrl url )
+                                (update (ExternalMessage (ExternalMessage.ChangeUrl url)) initModel)
                 ]
             ]
         ]

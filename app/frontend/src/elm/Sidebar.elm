@@ -1,8 +1,10 @@
 module Sidebar exposing (..)
 
+import ExternalMessage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Navigation
 import Port
 import Translation exposing (Language(..), I18n(..), translate)
 import Util.WalletDecoder
@@ -64,6 +66,7 @@ type Message
     | UpdateScatterResponse ScatterResponse
     | UpdateState State
     | UpdateWalletStatus WalletResponse
+    | ExternalMessage ExternalMessage.Message
 
 
 
@@ -73,7 +76,11 @@ type Message
 view : Model -> List (Html Message)
 view { state, wallet, language, fold } =
     [ header []
-        [ h1 [] [ text "eoshub" ]
+        [ h1
+            [ style [ ( "cursor", "pointer" ) ]
+            , onClick (ExternalMessage (ExternalMessage.ChangeUrl "/"))
+            ]
+            [ text "eoshub" ]
         , button
             [ type_ "button"
             , id "lnbToggleButton"
@@ -288,6 +295,9 @@ update message model =
                             SignIn
             in
                 update (UpdateState newState) { model | wallet = newWallet }
+
+        ExternalMessage (ExternalMessage.ChangeUrl url) ->
+            ( model, Navigation.newUrl url )
 
 
 
