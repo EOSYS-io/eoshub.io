@@ -8,12 +8,12 @@ import Util.Flags exposing (Flags)
 
 
 type alias Model =
-    { flags : Flags }
+    {}
 
 
-initModel : Flags -> Model
-initModel flags =
-    { flags = flags }
+initModel : Model
+initModel =
+    {}
 
 
 

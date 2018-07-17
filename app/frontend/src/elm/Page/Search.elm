@@ -11,12 +11,12 @@ import Util.Flags exposing (Flags)
 
 
 type alias Model =
-    { result : String, flags : Flags }
+    { result : String }
 
 
-initModel : Flags -> Model
-initModel flags =
-    { result = "", flags = flags }
+initModel : Model
+initModel =
+    { result = "" }
 
 
 

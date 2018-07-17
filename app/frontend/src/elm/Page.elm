@@ -98,13 +98,13 @@ view language page =
 -- UPDATE
 
 
-update : Message -> Page -> ( Page, Cmd Message )
-update message page =
+update : Message -> Page -> Flags -> ( Page, Cmd Message )
+update message page flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    ConfirmEmail.update subMessage subModel
+                    ConfirmEmail.update subMessage subModel flags
             in
             ( newModel |> ConfirmEmailPage, Cmd.map ConfirmEmailMessage subCmd )
 
@@ -139,7 +139,7 @@ update message page =
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newModel, subCmd ) =
-                    Create.update subMessage subModel
+                    Create.update subMessage subModel flags
             in
             ( newModel |> CreatePage, Cmd.map CreateMessage subCmd )
 
@@ -177,35 +177,35 @@ update message page =
 -- Utility functions
 
 
-getPage : ( Route, Flags ) -> Page
-getPage ( route, flags ) =
+getPage : Route -> Page
+getPage route =
     case route of
         ConfirmEmailRoute ->
-            ConfirmEmailPage (ConfirmEmail.initModel flags)
+            ConfirmEmailPage ConfirmEmail.initModel
 
         EmailConfirmedRoute confirmToken ->
-            EmailConfirmedPage (EmailConfirmed.initModel ( flags, confirmToken ))
+            EmailConfirmedPage (EmailConfirmed.initModel confirmToken)
 
         EmailConfirmFailureRoute ->
-            EmailConfirmFailurePage (EmailConfirmFailure.initModel flags)
+            EmailConfirmFailurePage EmailConfirmFailure.initModel
 
         CreateKeysRoute ->
-            CreateKeysPage (CreateKeys.initModel flags)
+            CreateKeysPage CreateKeys.initModel
 
         CreatedRoute ->
-            CreatedPage (Created.initModel flags)
+            CreatedPage Created.initModel
 
         CreateRoute confirmToken pubkey ->
-            CreatePage (Create.initModel ( flags, confirmToken, pubkey ))
+            CreatePage (Create.initModel ( confirmToken, pubkey ))
 
         SearchRoute ->
-            SearchPage (Search.initModel flags)
+            SearchPage Search.initModel
 
         VotingRoute ->
-            VotingPage (Voting.initModel flags)
+            VotingPage Voting.initModel
 
         TransferRoute ->
-            TransferPage (Transfer.initModel flags)
+            TransferPage Transfer.initModel
 
         IndexRoute ->
             IndexPage

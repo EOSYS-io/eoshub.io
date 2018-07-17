@@ -15,12 +15,12 @@ import Util.Urls as Urls
 
 
 type alias Model =
-    { email : String, requestStatus : Response, flags : Flags }
+    { email : String, requestStatus : Response }
 
 
-initModel : Flags -> Model
-initModel flags =
-    { email = "", requestStatus = { msg = "" }, flags = flags }
+initModel : Model
+initModel =
+    { email = "", requestStatus = { msg = "" } }
 
 
 
@@ -33,14 +33,14 @@ type Message
     | NewUser (Result Http.Error Response)
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update msg model =
+update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update msg model flags =
     case msg of
         Email email ->
             ( { model | email = email }, Cmd.none )
 
         CreateUser ->
-            ( model, createUserRequest model )
+            ( model, createUserRequest model flags )
 
         NewUser (Ok res) ->
             ( { model | requestStatus = res }, Cmd.none )
@@ -82,11 +82,11 @@ createUserBodyParams model =
         |> Http.jsonBody
 
 
-postUsers : Model -> Http.Request Response
-postUsers model =
-    Http.post (Urls.usersApiUrl model.flags) (createUserBodyParams model) responseDecoder
+postUsers : Model -> Flags -> Http.Request Response
+postUsers model flags =
+    Http.post (Urls.usersApiUrl flags) (createUserBodyParams model) responseDecoder
 
 
-createUserRequest : Model -> Cmd Message
-createUserRequest model =
-    Http.send NewUser <| postUsers model
+createUserRequest : Model -> Flags -> Cmd Message
+createUserRequest model flags =
+    Http.send NewUser <| postUsers model flags

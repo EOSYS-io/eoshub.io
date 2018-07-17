@@ -2,7 +2,6 @@ module Page.Voting exposing (..)
 
 import Html exposing (Html, div, h1, input, text)
 import Translation exposing (Language)
-import Util.Flags exposing (Flags)
 
 
 -- MODEL
@@ -11,15 +10,13 @@ import Util.Flags exposing (Flags)
 type alias Model =
     { bp : String
     , account : String
-    , flags : Flags
     }
 
 
-initModel : Flags -> Model
-initModel flags =
+initModel : Model
+initModel =
     { bp = ""
     , account = ""
-    , flags = flags
     }
 
 

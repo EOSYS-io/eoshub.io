@@ -9,12 +9,12 @@ import Util.Flags exposing (Flags)
 
 
 type alias Model =
-    { flags : Flags, confirm_token : String }
+    { confirm_token : String }
 
 
-initModel : ( Flags, String ) -> Model
-initModel ( flags, confirm_token ) =
-    { flags = flags, confirm_token = confirm_token }
+initModel : String -> Model
+initModel confirm_token =
+    { confirm_token = confirm_token }
 
 
 

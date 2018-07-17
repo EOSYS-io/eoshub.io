@@ -6,20 +6,18 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Port
 import Translation exposing (Language)
-import Util.Flags exposing (Flags)
 
 
 -- MODEL
 
 
 type alias Model =
-    { transfer : TransferMessage, flags : Flags }
+    { transfer : TransferMessage }
 
 
-initModel : Flags -> Model
-initModel flags =
+initModel : Model
+initModel =
     { transfer = { from = "", to = "", quantity = "", memo = "" }
-    , flags = flags
     }
 
 

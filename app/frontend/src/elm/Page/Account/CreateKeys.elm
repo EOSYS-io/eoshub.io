@@ -2,19 +2,18 @@ module Page.Account.CreateKeys exposing (Message(..), Model, initModel, update, 
 
 import Html exposing (Html, button, div, h1, text)
 import Html.Events exposing (onClick)
-import Util.Flags exposing (Flags)
 
 
 -- MODEL
 
 
 type alias Model =
-    { flags : Flags }
+    {}
 
 
-initModel : Flags -> Model
-initModel flags =
-    { flags = flags }
+initModel : Model
+initModel =
+    {}
 
 
 

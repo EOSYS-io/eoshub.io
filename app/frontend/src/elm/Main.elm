@@ -39,7 +39,7 @@ init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     ( { header = Header.initModel
       , sidebar = Sidebar.initModel
-      , page = ( location |> parseLocation, flags ) |> getPage
+      , page = (location |> parseLocation) |> getPage
       , flags = flags
       }
     , Cmd.none
@@ -69,7 +69,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         OnLocationChange location ->
-            ( { model | page = ( location |> parseLocation, model.flags ) |> getPage }, Cmd.none )
+            ( { model | page = (location |> parseLocation) |> getPage }, Cmd.none )
 
         HeaderMessage headerMessage ->
             let
@@ -81,7 +81,7 @@ update message model =
         PageMessage pageMessage ->
             let
                 ( newPage, newCmd ) =
-                    Page.update pageMessage model.page
+                    Page.update pageMessage model.page model.flags
             in
             ( { model | page = newPage }, Cmd.map PageMessage newCmd )
 
