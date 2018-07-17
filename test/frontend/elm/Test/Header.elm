@@ -2,6 +2,7 @@ module Test.Header exposing (tests)
 
 import Expect
 import Header exposing (..)
+import Data.Account exposing (..)
 import Test exposing (..)
 import Json.Decode as JD
 
