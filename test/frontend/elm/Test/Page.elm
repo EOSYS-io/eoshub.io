@@ -18,14 +18,14 @@ tests =
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
-                \() -> Expect.equal IndexPage (getPage ( IndexRoute, flags ))
+                \() -> Expect.equal IndexPage (getPage IndexRoute)
             , test "VotingRoute" <|
-                \() -> Expect.equal (VotingPage (Voting.initModel flags)) (getPage ( VotingRoute, flags ))
+                \() -> Expect.equal (VotingPage Voting.initModel) (getPage VotingRoute)
             , test "TransferRoute" <|
-                \() -> Expect.equal (TransferPage (Transfer.initModel flags)) (getPage ( TransferRoute, flags ))
+                \() -> Expect.equal (TransferPage Transfer.initModel) (getPage TransferRoute)
             , test "SearchRoute" <|
-                \() -> Expect.equal (SearchPage (Search.initModel flags)) (getPage ( SearchRoute, flags ))
+                \() -> Expect.equal (SearchPage Search.initModel) (getPage SearchRoute)
             , test "NotFoundRoute" <|
-                \() -> Expect.equal NotFoundPage (getPage ( NotFoundRoute, flags ))
+                \() -> Expect.equal NotFoundPage (getPage NotFoundRoute)
             ]
         ]

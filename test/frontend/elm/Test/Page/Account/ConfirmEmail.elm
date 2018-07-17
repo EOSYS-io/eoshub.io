@@ -10,7 +10,6 @@ model : Model
 model =
     { email = "test@chain.partners"
     , requestStatus = { msg = "" }
-    , flags = { node_env = "test" }
     }
 
 
