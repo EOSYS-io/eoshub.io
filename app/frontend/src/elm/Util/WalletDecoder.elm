@@ -44,7 +44,7 @@ type alias Wallet =
 decodeScatterResponse : ScatterResponse -> View.Notification.Message
 decodeScatterResponse { code, type_, message } =
     if code == 200 then
-        View.Notification.Ok
+        View.Notification.Ok { code = code, message = type_ ++ "\n" ++ message }
     else
         View.Notification.Error { code = code, message = type_ ++ "\n" ++ message }
 

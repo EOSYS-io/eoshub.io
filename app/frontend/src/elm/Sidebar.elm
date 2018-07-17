@@ -9,14 +9,11 @@ import Port
 import Translation exposing (Language(..), I18n(..), translate)
 import Util.WalletDecoder
     exposing
-        ( ScatterResponse
-        , Wallet
+        ( Wallet
         , WalletResponse
         , WalletStatus(Authenticated, NotFound)
-        , decodeScatterResponse
         , decodeWalletResponse
         )
-import View.Notification
 
 
 -- MODEL
@@ -31,7 +28,6 @@ type State
 
 type alias Model =
     { language : Language
-    , notification : View.Notification.Message
     , wallet : Wallet
     , state : State
     , fold : Bool
@@ -41,7 +37,6 @@ type alias Model =
 initModel : Model
 initModel =
     { language = English
-    , notification = View.Notification.None
     , wallet =
         { status = NotFound
         , account = ""
@@ -63,9 +58,8 @@ type Message
     | InvalidateAccount
     | Unfold
     | UpdateLanguage Language
-    | UpdateScatterResponse ScatterResponse
-    | UpdateState State
     | UpdateWalletStatus WalletResponse
+    | UpdateState State
     | ExternalMessage ExternalMessage.Message
 
 
@@ -275,9 +269,6 @@ update message model =
         UpdateLanguage language ->
             ( { model | language = language }, Cmd.none )
 
-        UpdateScatterResponse resp ->
-            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
-
         UpdateState state ->
             ( { model | state = state }, Cmd.none )
 
@@ -306,7 +297,4 @@ update message model =
 
 subscriptions : Model -> Sub Message
 subscriptions _ =
-    Sub.batch
-        [ Port.receiveWalletStatus UpdateWalletStatus
-        , Port.receiveScatterResponse UpdateScatterResponse
-        ]
+    Port.receiveWalletStatus UpdateWalletStatus

@@ -1,15 +1,18 @@
-module Page exposing (Page(..), Message(..), getPage, update, view)
+module Page exposing (..)
 
 import ExternalMessage
 import Html exposing (Html)
-import Navigation
+import Navigation exposing (Location)
 import Page.Index as Index
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
-import Route exposing (Route(..))
+import Port
+import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
+import Util.WalletDecoder exposing (ScatterResponse, decodeScatterResponse)
+import View.Notification
 
 
 -- MODEL
@@ -23,6 +26,19 @@ type Page
     | NotFoundPage
 
 
+type alias Model =
+    { page : Page
+    , notification : View.Notification.Message
+    }
+
+
+initModel : Location -> Model
+initModel location =
+    { page = location |> getPage
+    , notification = View.Notification.None
+    }
+
+
 
 -- MESSAGE
 
@@ -32,14 +48,16 @@ type Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
     | IndexMessage ExternalMessage.Message
+    | UpdateScatterResponse ScatterResponse
+    | OnLocationChange Location
 
 
 
 -- VIEW
 
 
-view : Language -> Page -> Html Message
-view language page =
+view : Language -> Model -> Html Message
+view language { page } =
     case page of
         SearchPage subModel ->
             Html.map SearchMessage (Search.view language subModel)
@@ -61,57 +79,74 @@ view language page =
 -- UPDATE
 
 
-update : Message -> Page -> ( Page, Cmd Message )
-update message page =
+update : Message -> Model -> ( Model, Cmd Message )
+update message ({ page } as model) =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
-                newModel =
+                newPage =
                     Search.update subMessage subModel
             in
-                ( newModel |> SearchPage, Cmd.none )
+                ( { model | page = newPage |> SearchPage }, Cmd.none )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
-                ( newModel, subCmd ) =
+                ( newPage, subCmd ) =
                     (Transfer.update subMessage subModel)
             in
-                ( newModel |> TransferPage, Cmd.map TransferMessage subCmd )
+                ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
-                newModel =
+                newPage =
                     Voting.update subMessage subModel
             in
-                ( newModel |> VotingPage, Cmd.none )
+                ( { model | page = newPage |> VotingPage }, Cmd.none )
 
-        ( IndexMessage subMessage, _ ) ->
-            case subMessage of
-                ExternalMessage.ChangeUrl url ->
-                    ( page, Navigation.newUrl url )
+        ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateScatterResponse resp, _ ) ->
+            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
+
+        ( OnLocationChange location, _ ) ->
+            ( { model | page = location |> getPage }, Cmd.none )
 
         ( _, _ ) ->
-            ( page, Cmd.none )
+            ( model, Cmd.none )
+
+
+
+-- SUBSCRIPTIONS --
+
+
+subscriptions : Model -> Sub Message
+subscriptions _ =
+    Port.receiveScatterResponse UpdateScatterResponse
 
 
 
 -- Utility functions
 
 
-getPage : Route -> Page
-getPage route =
-    case route of
-        SearchRoute ->
-            SearchPage Search.initModel
+getPage : Location -> Page
+getPage location =
+    let
+        route =
+            location |> parseLocation
+    in
+        case route of
+            SearchRoute ->
+                SearchPage Search.initModel
 
-        VotingRoute ->
-            VotingPage Voting.initModel
+            VotingRoute ->
+                VotingPage Voting.initModel
 
-        TransferRoute ->
-            TransferPage Transfer.initModel
+            TransferRoute ->
+                TransferPage Transfer.initModel
 
-        IndexRoute ->
-            IndexPage
+            IndexRoute ->
+                IndexPage
 
-        _ ->
-            NotFoundPage
+            NotFoundRoute ->
+                NotFoundPage
