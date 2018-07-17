@@ -1,8 +1,10 @@
 module Sidebar exposing (..)
 
+import ExternalMessage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Navigation
 import Port
 import Translation exposing (Language(..), I18n(..), translate)
 import Util.WalletDecoder
@@ -64,6 +66,7 @@ type Message
     | UpdateScatterResponse ScatterResponse
     | UpdateState State
     | UpdateWalletStatus WalletResponse
+    | ExternalMessage ExternalMessage.Message
 
 
 
@@ -73,7 +76,11 @@ type Message
 view : Model -> List (Html Message)
 view { state, wallet, language, fold } =
     [ header []
-        [ h1 [] [ text "eoshub" ]
+        [ h1
+            [ style [ ( "cursor", "pointer" ) ]
+            , onClick (ExternalMessage (ExternalMessage.ChangeUrl "/"))
+            ]
+            [ text "eoshub" ]
         , button
             [ type_ "button"
             , id "lnbToggleButton"
@@ -86,7 +93,7 @@ view { state, wallet, language, fold } =
                     Fold
                 )
             ]
-            [ text "사이드바 영역 열기/닫기" ]
+            [ text (translate language OpenCloseSidebar) ]
         ]
     , case state of
         SignIn ->
@@ -102,13 +109,25 @@ view { state, wallet, language, fold } =
             loadingView language
     , nav []
         [ div [ class "sns_area" ]
-            [ a [ class "sns fb button" ] [ text "Go to Facebook" ]
-            , a [ class "sns twitter button" ] [ text "Go to Twitter" ]
-            , a [ class "sns telegram button" ] [ text "Go to Telegram" ]
+            [ a [ class "sns fb button" ] []
+            , a [ class "sns twitter button" ] []
+            , a [ class "sns telegram button" ] []
             ]
         , div [ class "lang_area" ]
-            [ button [ type_ "button", class "lang ko transparent button", attribute "data-lang" "ko", onClick (UpdateLanguage Korean) ] [ text "한글" ]
-            , button [ type_ "button", class "lang en transparent button", attribute "data-lang" "en", onClick (UpdateLanguage English) ] [ text "ENG" ]
+            [ button
+                [ type_ "button"
+                , class "lang ko transparent button"
+                , attribute "data-lang" "ko"
+                , onClick (UpdateLanguage Korean)
+                ]
+                [ text "한글" ]
+            , button
+                [ type_ "button"
+                , class "lang en transparent button"
+                , attribute "data-lang" "en"
+                , onClick (UpdateLanguage English)
+                ]
+                [ text "ENG" ]
             ]
         ]
     ]
@@ -117,9 +136,17 @@ view { state, wallet, language, fold } =
 signInView : Language -> Html Message
 signInView language =
     div [ class "dashboard logout" ]
-        [ h2 [] [ text "안녕하세요,", br [] [], text "이오스허브입니다." ]
+        [ h2 []
+            [ text (translate language Hello ++ ",")
+            , br [] []
+            , text (translate language WelcomeEosHub)
+            ]
         , div [ class "panel" ]
-            [ p [] [ text "이오스 계정이 있으시면 로그인을,", br [] [], text "이오스가 처음이라면 신규계정을 생성해주세요!" ]
+            [ p []
+                [ text (translate language IfYouHaveEos)
+                , br [] []
+                , text (translate language IfYouAreNew)
+                ]
             ]
         , div [ class "btn_area" ]
             [ a [ class "middle blue_white button", onClick (UpdateState PairWallet) ] [ text (translate language Login) ]
@@ -129,26 +156,38 @@ signInView language =
 
 
 pairWalletView : Language -> Html Message
-pairWalletView _ =
+pairWalletView language =
     div [ class "dashboard hello_world" ]
-        [ h2 [] [ text "이오스 허브와 연동이", br [] [], text "가능한 eos 지갑입니다." ]
+        [ h2 []
+            [ text (translate language AttachableWallet1)
+            , br [] []
+            , text (translate language AttachableWallet2)
+            ]
         , div [ class "panel" ]
-            [ p [] [ text "추후 업데이트를 통해 연동가능한", br [] [], text "지갑수를 늘려갈 예정이오니 조금만 기다려주세요!" ]
+            [ p []
+                [ text (translate language FurtherUpdate1)
+                , br [] []
+                , text (translate language FurtherUpdate2)
+                ]
             , p [ class "help info" ]
-                [ a [] [ text "지갑연동방법 알아보기" ]
+                [ a [] [ text (translate language HowToAttach) ]
                 ]
             ]
         , ul [ class "available_wallet_list" ]
             [ li []
                 [ text "Scatter"
-                , button [ type_ "button", onClick AuthenticateAccount ] [ text "연동하기" ]
+                , button
+                    [ type_ "button"
+                    , onClick AuthenticateAccount
+                    ]
+                    [ text (translate language Attach) ]
                 ]
             ]
         ]
 
 
 accountInfoView : Language -> Wallet -> Html Message
-accountInfoView _ { account, authority } =
+accountInfoView language { account, authority } =
     div [ class "dashboard logged" ]
         [ div [ class "user_status" ]
             [ h2 [] [ text (account ++ "@" ++ authority) ]
@@ -160,29 +199,41 @@ accountInfoView _ { account, authority } =
                     ]
                     [ text "option" ]
                 , div [ class "menu_list" ]
-                    [ a [] [ text "지갑 변경하기" ]
-                    , a [] [ text "내 계정보기" ]
-                    , a [ onClick InvalidateAccount ] [ text "로그아웃" ]
+                    [ a [] [ text (translate language ChangeWallet) ]
+                    , a [] [ text (translate language MyAccount) ]
+                    , a [ onClick InvalidateAccount ] [ text (translate language SignOut) ]
                     ]
                 ]
             ]
         , div [ class "panel" ]
-            [ h3 [] [ text "총 보유 수량", strong [] [ text "1820 EOS" ] ]
+            [ h3 []
+                [ text (translate language TotalAmount)
+                , strong [] [ text "1820 EOS" ]
+                ]
             , ul [ class "status" ]
-                [ li [] [ text "보관취소 토큰", strong [] [ text "30 EOS" ] ]
-                , li [] [ text "보관한 토큰", strong [] [ text "10 EOS" ] ]
+                [ li []
+                    [ text
+                        (translate language UnstakedAmount)
+                    , strong [] [ text "30 EOS" ]
+                    ]
+                , li []
+                    [ text
+                        (translate language StakedAmount)
+                    , strong [] [ text "10 EOS" ]
+                    ]
                 ]
             , div [ class "graph" ] [ span [ style [ ( "width", "50%" ) ], title "50%" ] [] ]
-            , p [ class "description" ] [ text "원할한 트랜잭션 사용이 가능합니다." ]
+            , p [ class "description" ] [ text (translate language FastTransactionPossible) ]
             ]
         , div [ class "btn_area" ]
-            [ a [ class "middle lightgray_white button manage" ] [ text "토큰 보관 관리하기" ]
+            [ a [ class "middle lightgray_white button manage" ]
+                [ text (translate language ManageStaking) ]
             ]
         , p [ class "help" ]
-            [ a [] [ text "토큰 보관이 뭔가요?" ]
+            [ a [] [ text (translate language WhatIsStaking) ]
             ]
         , p [ class "help" ]
-            [ a [ onClick InvalidateAccount ] [ text "로그아웃" ] ]
+            [ a [ onClick InvalidateAccount ] [ text (translate language SignOut) ] ]
         ]
 
 
@@ -244,6 +295,9 @@ update message model =
                             SignIn
             in
                 update (UpdateState newState) { model | wallet = newWallet }
+
+        ExternalMessage (ExternalMessage.ChangeUrl url) ->
+            ( model, Navigation.newUrl url )
 
 
 

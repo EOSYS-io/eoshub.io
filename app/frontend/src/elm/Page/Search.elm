@@ -3,6 +3,7 @@ module Page.Search exposing (Message(..), Model, initModel, update, view)
 import Html exposing (Html, button, div, input, p, text)
 import Html.Attributes exposing (placeholder)
 import Html.Events exposing (onClick)
+import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 
 
@@ -37,8 +38,8 @@ update message model =
 -- VIEW
 
 
-view : Model -> Html Message
-view { result } =
+view : Language -> Model -> Html Message
+view _ { result } =
     div []
         [ input [ placeholder "account / public key" ] []
         , button [ onClick Search ] [ text "검색" ]

@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Port
+import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 
 
@@ -42,8 +43,8 @@ type Message
 -- VIEW
 
 
-view : Model -> Html Message
-view { transfer } =
+view : Language -> Model -> Html Message
+view _ { transfer } =
     div []
         [ div []
             [ Html.form

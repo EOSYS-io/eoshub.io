@@ -16,6 +16,38 @@ type I18n
     = Success
     | Login
     | NewAccount
+    | OpenCloseSidebar
+    | Hello
+    | WelcomeEosHub
+    | IfYouHaveEos
+    | IfYouAreNew
+    | AttachableWallet1
+    | AttachableWallet2
+    | FurtherUpdate1
+    | FurtherUpdate2
+    | HowToAttach
+    | Attach
+    | ChangeWallet
+    | MyAccount
+    | SignOut
+    | TotalAmount
+    | StakedAmount
+    | UnstakedAmount
+    | FastTransactionPossible
+    | ManageStaking
+    | WhatIsStaking
+    | Transfer
+    | TransferDesc
+    | Vote
+    | VoteDesc
+    | RamMarket
+    | RamMarketDesc
+    | Application
+    | ApplicationDesc
+    | ProxyVote
+    | ProxyVoteDesc
+    | Faq
+    | FaqDesc
 
 
 translate : Language -> I18n -> String
@@ -47,4 +79,114 @@ getMessages i18n =
             { korean = "로그인", english = "Sign In" }
 
         NewAccount ->
-            { korean = "신규계정생성", english = "New account" }
+            { korean = "신규계정생성", english = "Create New" }
+
+        OpenCloseSidebar ->
+            { korean = "사이드바 영역 열기/닫기", english = "Open/Close sidebar" }
+
+        Hello ->
+            { korean = "안녕하세요", english = "Hello" }
+
+        WelcomeEosHub ->
+            { korean = "이오스 허브입니다", english = "Welcome to EOS Hub" }
+
+        IfYouHaveEos ->
+            { korean = "이오스 계정이 있으시면 로그인을,"
+            , english = "If you have an EOS account, sign in"
+            }
+
+        IfYouAreNew ->
+            { korean = "이오스가 처음이라면 신규계정을 생성해주세요!"
+            , english = "If you are a newbie, create a new account!"
+            }
+
+        AttachableWallet1 ->
+            { korean = "이오스 허브와 연동이"
+            , english = "Attachable wallets"
+            }
+
+        AttachableWallet2 ->
+            { korean = "가능한 EOS 지갑입니다", english = "for EOS Hub" }
+
+        FurtherUpdate1 ->
+            { korean = "추후 업데이트를 통해 연동가능한"
+            , english = "Wait for further updates to include"
+            }
+
+        FurtherUpdate2 ->
+            { korean = "지갑수를 늘려갈 예정이오니 조금만 기다려주세요!"
+            , english = "more wallets!"
+            }
+
+        HowToAttach ->
+            { korean = "지갑연동방법 알아보기", english = "How to attach" }
+
+        Attach ->
+            { korean = "연동하기", english = "Attach" }
+
+        ChangeWallet ->
+            { korean = "지갑 변경하기", english = "Change wallet" }
+
+        MyAccount ->
+            { korean = "내 계정 보기", english = "My Account" }
+
+        SignOut ->
+            { korean = "로그아웃", english = "Sign Out" }
+
+        TotalAmount ->
+            { korean = "총 보유 수량", english = "Total Amount" }
+
+        UnstakedAmount ->
+            { korean = "보관 취소 토큰", english = "Unstaked Amount" }
+
+        StakedAmount ->
+            { korean = "보관한 토큰", english = "Staked Amount" }
+
+        FastTransactionPossible ->
+            { korean = "원할한 트랜잭션 사용이 가능합니다"
+            , english = "Fast transactions possible"
+            }
+
+        ManageStaking ->
+            { korean = "보관 토큰 관리하기", english = "Manage staking" }
+
+        WhatIsStaking ->
+            { korean = "토큰 보관이 뭔가요?", english = "What is staking?" }
+
+        Transfer ->
+            { korean = "전송하기", english = "Transfer" }
+
+        TransferDesc ->
+            { korean = "여기서 토큰을 보내실 수 있어요", english = "Send tokens here" }
+
+        Vote ->
+            { korean = "투표하기", english = "Vote" }
+
+        VoteDesc ->
+            { korean = "홀더라면 투표를!", english = "Vote with your EOS" }
+
+        RamMarket ->
+            { korean = "램마켓", english = "Ram Market" }
+
+        RamMarketDesc ->
+            { korean = "램을 사고 팔 수 있어요", english = "Buy or sell RAM here" }
+
+        Application ->
+            { korean = "어플리케이션", english = "Application" }
+
+        ApplicationDesc ->
+            { korean = "이오스 기반의 다양한 서비스들을 만나보세요"
+            , english = "Meet interesting applications based on EOS"
+            }
+
+        ProxyVote ->
+            { korean = "대리투표", english = "Proxy Voting" }
+
+        ProxyVoteDesc ->
+            { korean = "맡겨 두시면 대신 투표 해드립니다", english = "Delegate your vote to a proxy" }
+
+        Faq ->
+            { korean = "FAQ", english = "FAQ" }
+
+        FaqDesc ->
+            { korean = "이오스에 대해 궁금하신 내용들을 정리했어요", english = "All you need to know about EOS Hub" }

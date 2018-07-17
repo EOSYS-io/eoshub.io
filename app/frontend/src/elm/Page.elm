@@ -1,17 +1,21 @@
 module Page exposing (Message(..), Page(..), getPage, update, view)
 
+import ExternalMessage
 import Html exposing (Html)
+import Navigation
 import Page.Account.ConfirmEmail as ConfirmEmail
 import Page.Account.Create as Create
 import Page.Account.CreateKeys as CreateKeys
 import Page.Account.Created as Created
 import Page.Account.EmailConfirmFailure as EmailConfirmFailure
 import Page.Account.EmailConfirmed as EmailConfirmed
+import Page.Index as Index
 import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
 import Route exposing (Route(..))
+import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 
 
@@ -46,14 +50,15 @@ type Message
     | SearchMessage Search.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
+    | IndexMessage ExternalMessage.Message
 
 
 
 -- VIEW
 
 
-view : Page -> Html Message
-view page =
+view : Language -> Page -> Html Message
+view language page =
     case page of
         ConfirmEmailPage subModel ->
             Html.map ConfirmEmailMessage (ConfirmEmail.view subModel)
@@ -74,16 +79,19 @@ view page =
             Html.map CreateMessage (Create.view subModel)
 
         SearchPage subModel ->
-            Html.map SearchMessage (Search.view subModel)
+            Html.map SearchMessage (Search.view language subModel)
 
         VotingPage subModel ->
-            Html.map VotingMessage (Voting.view subModel)
+            Html.map VotingMessage (Voting.view language subModel)
 
         TransferPage subModel ->
-            Html.map TransferMessage (Transfer.view subModel)
+            Html.map TransferMessage (Transfer.view language subModel)
+
+        IndexPage ->
+            Html.map IndexMessage (Index.view language)
 
         _ ->
-            NotFound.view
+            NotFound.view language
 
 
 
@@ -155,6 +163,11 @@ update message page =
                     Voting.update subMessage subModel
             in
             ( newModel |> VotingPage, Cmd.none )
+
+        ( IndexMessage subMessage, _ ) ->
+            case subMessage of
+                ExternalMessage.ChangeUrl url ->
+                    ( page, Navigation.newUrl url )
 
         ( _, _ ) ->
             ( page, Cmd.none )

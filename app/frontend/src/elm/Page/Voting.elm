@@ -1,6 +1,7 @@
 module Page.Voting exposing (..)
 
 import Html exposing (Html, div, h1, input, text)
+import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 
 
@@ -45,8 +46,8 @@ update message model =
 -- VIEW
 
 
-view : Model -> Html Message
-view { bp, account } =
+view : Language -> Model -> Html Message
+view _ { bp, account } =
     div []
         [ h1 [] [ text (bp ++ account) ]
         , input [] []

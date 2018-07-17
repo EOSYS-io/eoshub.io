@@ -1,0 +1,205 @@
+@charset 'UTF-8';
+.action.view.panel.search_result {
+    // var
+    $padding:64px;
+
+    background:#fff;
+
+    margin:48px 0 0 0;
+    padding:$padding;
+    text-align:left;
+
+    display:block;
+    position:relative;
+
+    h3 {
+        font-size: rem(24);
+        font-weight: 300;
+        color: #333333;
+
+        margin-top:64px;
+    }
+
+    // account summart
+    .account.summary {
+        display:flex;
+        justify-content:space-between;
+        padding-bottom:64px;
+
+        box-sizing:border-box;
+
+        // horizontal line
+        position:relative;
+
+        &:before {
+            content:'';
+            display:block;
+            height:1px;
+            position:absolute;
+            bottom:0;
+            left:-$padding;
+            right:-$padding;
+            background-color:#e8e8e8;
+        }
+
+        ul {
+            padding:0;
+            margin:0;
+            list-style-type:none;
+
+            display:flex;
+            align-items:center;
+        }
+
+        ul.summary,
+        ul.details {
+            height:48px;
+
+            li {
+                font-size:rem(14);
+                color:#999;
+
+                strong {
+                    margin-top:4px;
+                    color:#333;
+                    display:block;
+                }
+            }
+        }
+
+        ul.summary li {
+            margin-left:64px;
+
+            &:first-child {
+                margin-left:0;
+                border-left-width:0;
+
+                strong {
+                    max-width:11em;
+                    overflow:hidden;
+                    text-overflow:ellipsis;
+                    white-space:nowrap;
+                }
+            }
+
+            strong {
+                font-size:rem(24);
+            }
+        }
+
+        ul.details li {
+            border-left:1px solid #d8d8d8;
+            padding:0 2em;
+            text-align:center;
+
+            strong {
+                font-size:rem(18);
+            }
+
+            &:first-child {
+                padding-left:0;
+                border-left-width:0;
+            }
+
+            &:last-child {
+                padding-right:0;
+            }
+        }
+    }
+
+    // ressource
+    .resource {
+        padding-top:$padding/2;
+        display:flex;
+
+        > div {
+            padding:32px;
+
+            display:flex;
+            flex-direction:column;
+            justify-content:space-between;
+            flex:1;
+
+            border:1px solid #e8e8e8;
+
+            margin-left:12px;
+            height:196px;
+
+            &:first-child {
+                margin-left:0;
+            }
+        }
+
+        h4 {
+            color:#333;
+            font-weight:700;
+            display:flex;
+            align-items:center;
+            line-height:1.1;
+
+            strong {
+                flex:1;
+                text-align:right;
+                color:#333;
+                font-weight:400;
+            }
+        }
+
+        .graph {
+            $unit:8px;
+
+            border-radius:$unit;
+            height:$unit;
+            background-color:#f5f7f9;
+            position:relative;
+
+            span {
+                border-radius:inherit;
+                height:inherit;
+                display:block;
+                left:0;
+                top:0;
+                right:0;
+                bottom:0;
+            }
+
+            span[data-status='high'] {
+                background-color:#536dfe;
+            }
+
+            span[data-status='middle'] {
+                background-color:#f5cb23;
+            }
+
+            span[data-status='low'] {
+                background-color:#ff6b64;
+            }
+
+        }
+
+        p {
+            margin:0;
+        }
+    }
+
+    .transaction_history {
+        table {
+            margin:$padding/2 0 0 0;
+            border-bottom:1px solid #e4e4e4;
+        }
+
+        th,td {
+            border-top:1px solid #e4e4e4;
+            padding:20px 16px;
+            font-size:rem(14);
+        }
+        
+        th {
+            color:#000;
+        }
+
+        td {
+            color:#666;
+        }
+    }
+}

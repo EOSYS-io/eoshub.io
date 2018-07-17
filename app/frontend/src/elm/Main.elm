@@ -3,7 +3,6 @@ module Main exposing (..)
 import Header
 import Html
 import Html.Attributes exposing (class)
-import Message exposing (Message(..))
 import Navigation exposing (Location)
 import Page exposing (Page(..), getPage)
 import Route exposing (Route(..), parseLocation)
@@ -21,6 +20,16 @@ type alias Model =
     , flags : Flags
     }
 
+
+
+-- MESSAGE
+
+
+type Message
+    = OnLocationChange Location
+    | HeaderMessage Header.Message
+    | PageMessage Page.Message
+    | SidebarMessage Sidebar.Message
 
 
 -- INIT
@@ -47,7 +56,7 @@ view { header, sidebar, page } =
         [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
         , Html.div [ class "wrapper" ]
             [ Html.map HeaderMessage (Header.view header)
-            , Html.map PageMessage (Page.view page)
+            , Html.map PageMessage (Page.view sidebar.language page)
             ]
         ]
 
