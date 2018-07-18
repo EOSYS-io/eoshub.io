@@ -12,6 +12,7 @@
 
     display:block;
     position:relative;
+
     nav {
         position:absolute;
         right:64px;
@@ -34,7 +35,6 @@
         font-size:rem(24);
         color:#333;
     }
-
 
     .card {
         margin:23px auto;
@@ -149,67 +149,73 @@
         }
     }
 
-    .notification.panel {
-        position:absolute;
-        right:64px;
-        bottom:64px;
+}
+.notification.panel {
+    position:absolute;
+    top:calc(50% + 209px);
+    right:calc(64px + 40px);
 
-        // response
-        div {
-            width:406px;
-            height:96px;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
-            box-sizing:border-box;
-            display:flex;
-            flex-direction:column;
-            padding-left:40px;
-            justify-content:center;
-            position:relative;
+    // response
+    div {
+        width:406px;
+        height:96px;
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
+        box-sizing:border-box;
+        display:flex;
+        flex-direction:column;
+        padding-left:40px;
+        justify-content:center;
+        position:relative;
 
-            p {
-                margin:0;
-                color:#fff;
-            }
-
-            a {
-                font-size:rem(13);
-                color:#fff;
-            }
-
-            button.close {
-                position:absolute;
-                right:10px;
-                top:10px;
-                background:url('../image/icon-close-white-transparent.svg') center center no-repeat;
-                width:20px;
-                height:20px;
-
-                outline:0;
-                transition:transform 0.1s;
-
-                &:hover {
-                    transform:scale(1.1);
-                }
-            }
+        p {
+            margin:0;
+            color:#fff;
         }
 
-        .view.success {
-            background:url('../image/symbol-smile-white.svg') 285px 36px no-repeat #79c720;
-            background-size:81px;
+        a {
+            font-size:rem(13);
+            color:#fff;
         }
 
-        .view.fail {
-            background:url('../image/symbol-alert-white.svg') 285px 36px no-repeat #ff6b64;
-            background-size:81px;
-        }
+        button.close {
+            position:absolute;
+            right:10px;
+            top:10px;
+            background:url('../image/icon-close-white-transparent.svg') center center no-repeat;
+            width:20px;
+            height:20px;
 
-        // interaction
+            outline:0;
+            transition:transform 0.1s;
+
+            &:hover {
+                transform:scale(1.1);
+            }
+        }
+    }
+
+    .view.success {
+        background:url('../image/symbol-smile-white.svg') 285px 36px no-repeat #79c720;
+        background-size:81px;
+    }
+
+    .view.fail {
+        background:url('../image/symbol-alert-white.svg') 285px 36px no-repeat #ff6b64;
+        background-size:81px;
+    }
+
+    // interaction
+    z-index:-1;
+
+    div {
         transition:transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-
         opacity:0;
         transform:translateY(100%);
+    }
 
-        &.viewing {
+    &.viewing {
+        z-index:1;
+        div {
             opacity:1;
             transform:translateY(0);
         }
