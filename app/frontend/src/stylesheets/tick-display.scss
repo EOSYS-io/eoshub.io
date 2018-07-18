@@ -1,4 +1,5 @@
 @charset 'UTF-8';
+
 .wrapper section.tick_display {
     $padding:40px;
 
@@ -10,10 +11,15 @@
     // section :: search field
     $height:52px;
     form {
+        flex:0 1 432px;
         position:relative;
         width:432px;
         height:$height;
         font-size:rem(14);
+        background:#fff;
+
+        display:flex;
+        justify-content:space-between;
 
         input,button {
             box-sizing:border-box;
@@ -23,20 +29,21 @@
         input[type=search] {
             border-radius:4px;
             border:0;
-            padding:0;
-            width:inherit;
+
+            flex:1;
+
             height:inherit;
-            padding-left:56px;
-            background:url('../image/icon-search.svg') 20px center no-repeat #fff;
+            padding:0 28px 0 56px;
+            background:url('../image/icon-search.svg') 20px center no-repeat;
             background-size:24px 24px;
         }
 
         button.search.button {
-            position:absolute;
-            top:0;
-            bottom:0;
-            right:0;
-            padding-right:20px;
+            // position:absolute;
+            // top:0;
+            // bottom:0;
+            // right:0;
+            margin-right:20px;
             color:#333;
 
             &:hover {
@@ -48,6 +55,7 @@
 
     // price (ram...eos..)
     ul,li { 
+        flex:1 0 60%;
         margin:0;
         padding:0;
         list-style-type:none;
@@ -57,7 +65,8 @@
         overflow:hidden;
 
         li {
-            width:300px;
+            width:45%;
+            max-width:300px;
             height:$height;
             line-height:52px;
             float:right;
@@ -78,6 +87,7 @@
         // price panel decorate
         span:before {
             font-size:rem(8);
+            margin-left:1.2em;
         }
 
         span[data-before='lower']:before {

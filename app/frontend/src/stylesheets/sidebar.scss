@@ -51,6 +51,10 @@ $padding_bottom:36px;
         font-weight:300;
         line-height:1.4;
     }
+
+    &.hello_world h2 {
+        background:url('../image/symbol-smile.svg') right center no-repeat transparent;
+    }
 }
 
 
@@ -67,10 +71,6 @@ $padding_bottom:36px;
 
     .help.info {
         margin-top:21px;
-        padding-left:20px;
-        background-position:left center;
-        background-color:transparent;
-        background-repeat:no-repeat;
 
         a {
             color:#737a8d;
@@ -152,27 +152,6 @@ button.lang {
 .lang.en:lang(en) {
     font-weight:700;
 }
-
-
-// sidebar :: fold/unfold
-.sidebar {
-    transition:margin 0.2s linear;
-}
-
-.sidebar.fold {
-    margin-left:-300px;
-    // flex-basis:100px;
-    overflow:hidden;
-
-    * {
-        visibility:hidden;
-    }
-
-    button.folding.button {
-        visibility:visible;
-    }
-}
-
 
 
 // element :: available wallet for peristalsis
@@ -388,3 +367,27 @@ button.lang {
         color:#737a8d;
     }
 }
+
+
+// sidebar :: fold/unfold
+.sidebar {
+    transition:margin 0.2s linear, box-shadow 0.2s linear;;
+}
+
+.sidebar.fold {
+    margin-left:-300px;
+    overflow:hidden;
+    box-shadow: 2px 0 6px 0 rgba(0, 0, 0, 0.08);
+    
+
+    * {
+        visibility:hidden;
+    }
+
+    button.folding.button {
+        visibility:visible;
+    }
+}
+
+
+
