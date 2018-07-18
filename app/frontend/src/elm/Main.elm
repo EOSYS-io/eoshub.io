@@ -1,6 +1,5 @@
 module Main exposing (..)
 
-import Header
 import Html
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
@@ -13,8 +12,7 @@ import Util.Flags exposing (Flags)
 
 
 type alias Model =
-    { header : Header.Model
-    , sidebar : Sidebar.Model
+    { sidebar : Sidebar.Model
     , page : Page.Model
     , flags : Flags
     }
@@ -25,8 +23,7 @@ type alias Model =
 
 
 type Message
-    = HeaderMessage Header.Message
-    | PageMessage Page.Message
+    = PageMessage Page.Message
     | SidebarMessage Sidebar.Message
 
 
@@ -36,8 +33,7 @@ type Message
 
 init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
-    ( { header = Header.initModel
-      , sidebar = Sidebar.initModel
+    ( { sidebar = Sidebar.initModel
       , page = Page.initModel location
       , flags = flags
       }
@@ -50,13 +46,10 @@ init flags location =
 
 
 view : Model -> Html.Html Message
-view { header, sidebar, page } =
+view { sidebar, page } =
     Html.div [ class "container" ]
         [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
-        , Html.div [ class "wrapper" ]
-            [ Html.map HeaderMessage (Header.view header)
-            , Html.map PageMessage (Page.view sidebar.language page)
-            ]
+        , Html.map PageMessage (Page.view sidebar.language page)
         ]
 
 
@@ -67,26 +60,19 @@ view { header, sidebar, page } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        HeaderMessage headerMessage ->
-            let
-                ( newHeader, newCmd ) =
-                    Header.update headerMessage model.header
-            in
-            ( { model | header = newHeader }, Cmd.map HeaderMessage newCmd )
-
         PageMessage pageMessage ->
             let
                 ( newPage, newCmd ) =
                     Page.update pageMessage model.page model.flags
             in
-            ( { model | page = newPage }, Cmd.map PageMessage newCmd )
+                ( { model | page = newPage }, Cmd.map PageMessage newCmd )
 
         SidebarMessage sidebarMessage ->
             let
                 ( newSidebar, newCmd ) =
                     Sidebar.update sidebarMessage model.sidebar
             in
-            ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 
 
 
