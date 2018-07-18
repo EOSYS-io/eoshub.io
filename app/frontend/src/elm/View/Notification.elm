@@ -1,41 +1,104 @@
-module View.Notification exposing (Message(..), view)
+{- This module is a so-called viewModel -}
 
-import Html exposing (Html, div, text, h1)
-import Html.Attributes exposing (class)
-import Translation exposing (Language, translate, I18n(Success))
+
+module View.Notification
+    exposing
+        ( ErrorDetail
+        , Message(..)
+        , Model
+        , Content(..)
+        , initModel
+        , view
+        )
+
+import Html exposing (Html, div, text, p, a, button)
+import Html.Attributes exposing (class, type_, id)
+import Html.Events exposing (onClick)
+import Translation exposing (Language, translate, I18n(CheckDetail, CheckError, Close))
 
 
 -- MESSAGE
 
 
-type alias Detail =
-    { code : Int
-    , message : String
+type Message
+    = CloseNotification
+
+
+
+-- MODEL
+
+
+type alias ErrorDetail =
+    { message : I18n
+    , detail : String
     }
 
 
-type Message
-    = Ok Detail
-    | Error Detail
+type Content
+    = Ok (String -> I18n)
+    | Error ErrorDetail
     | None
+
+
+type alias Model =
+    { content : Content
+    , open : Bool
+    }
+
+
+initModel : Model
+initModel =
+    { content = None
+    , open = False
+    }
 
 
 
 -- VIEW
 
 
-view : Message -> Language -> Html message
-view message language =
+view : Model -> String -> Language -> Html Message
+view { content, open } i18nParam language =
     let
-        ( message_, c ) =
-            case message of
-                Ok _ ->
-                    ( translate language Success, class "view success" )
+        texts =
+            case content of
+                Ok messageGenerator ->
+                    ( translate language (i18nParam |> messageGenerator)
+                    , "view success"
+                    , translate language CheckDetail
+                    )
 
-                Error errorMessage ->
-                    ( toString errorMessage.code ++ "\n" ++ errorMessage.message, class "view fail" )
+                Error { message } ->
+                    ( translate language message
+                    , "view fail"
+                    , translate language CheckError
+                    )
 
                 _ ->
-                    ( "", class "" )
+                    ( "", "", "" )
+
+        viewing =
+            if open then
+                " viewing"
+            else
+                ""
     in
-        div [] []
+        div
+            [ id "notification"
+            , class ("notification panel" ++ viewing)
+            ]
+            [ messageBox texts language ]
+
+
+messageBox : ( String, String, String ) -> Language -> Html Message
+messageBox ( mainText, classText, detailText ) language =
+    div [ class classText ]
+        [ p [] [ text mainText ]
+        , a [] [ text detailText ]
+        , button
+            [ type_ "button"
+            , class "icon close button"
+            , onClick CloseNotification
+            ]
+            [ text (translate language Close) ]
+        ]

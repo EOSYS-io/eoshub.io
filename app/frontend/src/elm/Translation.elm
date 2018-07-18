@@ -48,6 +48,12 @@ type I18n
     | ProxyVoteDesc
     | Faq
     | FaqDesc
+    | TransferSucceeded String
+    | TransferFailed String
+    | UnknownError
+    | CheckDetail
+    | CheckError
+    | Close
 
 
 translate : Language -> I18n -> String
@@ -183,10 +189,36 @@ getMessages i18n =
             { korean = "대리투표", english = "Proxy Voting" }
 
         ProxyVoteDesc ->
-            { korean = "맡겨 두시면 대신 투표 해드립니다", english = "Delegate your vote to a proxy" }
+            { korean = "맡겨 두시면 대신 투표 해드립니다"
+            , english = "Delegate your vote to a proxy"
+            }
 
         Faq ->
             { korean = "FAQ", english = "FAQ" }
 
         FaqDesc ->
-            { korean = "이오스에 대해 궁금하신 내용들을 정리했어요", english = "All you need to know about EOS Hub" }
+            { korean = "이오스에 대해 궁금하신 내용들을 정리했어요"
+            , english = "All you need to know about EOS Hub"
+            }
+
+        TransferSucceeded receiver ->
+            { korean = receiver ++ "에게 전송완료!"
+            , english = "Successfully transferred to " ++ receiver ++ "!"
+            }
+
+        TransferFailed code ->
+            { korean = code ++ " 코드오류로 전송실패"
+            , english = "Failed with error code " ++ code
+            }
+
+        UnknownError ->
+            { korean = "알 수 없는 에러!", english = "Unknown Error!" }
+
+        CheckDetail ->
+            { korean = "+ 내역 보러가기", english = "+ Check details" }
+
+        CheckError ->
+            { korean = "+ 오류 확인하러가기", english = "+ Check error details" }
+
+        Close ->
+            { korean = "닫기", english = "Close" }
