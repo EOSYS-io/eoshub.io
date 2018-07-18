@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="400px" height="178px" viewBox="0 0 400 178" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="160px" height="126px" viewBox="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: Sketch 51 (57462) - http://www.bohemiancoding.com/sketch -->
     <title>img_dapp</title>
     <desc>Created with Sketch.</desc>
@@ -7,7 +7,7 @@
         <polygon id="path-1" points="1.73469388e-05 0.0609620991 33.937551 0.0609620991 33.937551 33.1904762 1.73469388e-05 33.1904762"></polygon>
     </defs>
     <g id="img_dapp" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="Group-2" transform="translate(232.000000, 44.000000)">
+        <g id="Group-2">
             <path d="M160,104.039225 C160,106.226898 158.190629,108 155.957195,108 L4.0428046,108 C1.80968397,108 0,106.226898 0,104.039225 L0,3.96138701 C0,1.77432661 1.80968397,0 4.0428046,0 L155.957195,0 C158.190316,0 160,1.77432661 160,3.96138701 L160,104.039225 Z" id="Shape" fill="#E2E5E7" fill-rule="nonzero"></path>
             <path d="M98.7786197,108 L80.5001574,108 L62.2213803,108 C62.2213803,108 61.4807103,120.375056 60,123 L80.5001574,123 L101,123 C99.5192897,120.374737 98.7786197,108 98.7786197,108 Z" id="Shape" fill="#D1D5D5" fill-rule="nonzero"></path>
             <path d="M104.315055,124.178571 C102.103774,123.856778 100.906794,123 100.906794,123 L80.5001567,123 L60.0932061,123 C60.0932061,123 58.8962256,123.857143 56.6849452,124.178571 C54.4742914,124.500364 53,124.713921 53,126 L80.5001567,126 L108,126 C107.999687,124.713921 106.525709,124.500364 104.315055,124.178571 Z" id="Shape" fill="#C6CBCB" fill-rule="nonzero"></path>
