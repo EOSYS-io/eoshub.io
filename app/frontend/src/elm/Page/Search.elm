@@ -1,9 +1,10 @@
 module Page.Search exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, div, input, button, text, p)
+import Html exposing (Html, button, div, input, p, text)
 import Html.Attributes exposing (placeholder)
 import Html.Events exposing (onClick)
 import Translation exposing (Language)
+import Util.Flags exposing (Flags)
 
 
 -- MODEL

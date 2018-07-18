@@ -1,11 +1,12 @@
 module Main exposing (..)
 
+import Header
 import Html
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
 import Page
 import Sidebar
-import Header
+import Util.Flags exposing (Flags)
 
 
 -- MODEL
@@ -15,6 +16,7 @@ type alias Model =
     { header : Header.Model
     , sidebar : Sidebar.Model
     , page : Page.Model
+    , flags : Flags
     }
 
 
@@ -32,11 +34,12 @@ type Message
 -- INIT
 
 
-init : Location -> ( Model, Cmd Message )
-init location =
+init : Flags -> Location -> ( Model, Cmd Message )
+init flags location =
     ( { header = Header.initModel
       , sidebar = Sidebar.initModel
       , page = Page.initModel location
+      , flags = flags
       }
     , Cmd.none
     )
@@ -69,21 +72,21 @@ update message model =
                 ( newHeader, newCmd ) =
                     Header.update headerMessage model.header
             in
-                ( { model | header = newHeader }, Cmd.map HeaderMessage newCmd )
+            ( { model | header = newHeader }, Cmd.map HeaderMessage newCmd )
 
         PageMessage pageMessage ->
             let
                 ( newPage, newCmd ) =
-                    Page.update pageMessage model.page
+                    Page.update pageMessage model.page model.flags
             in
-                ( { model | page = newPage }, Cmd.map PageMessage newCmd )
+            ( { model | page = newPage }, Cmd.map PageMessage newCmd )
 
         SidebarMessage sidebarMessage ->
             let
                 ( newSidebar, newCmd ) =
                     Sidebar.update sidebarMessage model.sidebar
             in
-                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+            ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 
 
 
@@ -102,9 +105,9 @@ subscriptions { sidebar, page } =
 -- MAIN
 
 
-main : Program Never Model Message
+main : Program Flags Model Message
 main =
-    Navigation.program (PageMessage << Page.OnLocationChange)
+    Navigation.programWithFlags (PageMessage << Page.OnLocationChange)
         { init = init
         , view = view
         , update = update

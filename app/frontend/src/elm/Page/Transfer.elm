@@ -107,7 +107,7 @@ update message ({ transfer } as model) =
                 cmd =
                     transfer |> Transfer |> encodeAction |> Port.pushAction
             in
-                ( model, cmd )
+            ( model, cmd )
 
         SetTransferMessageField field value ->
             ( setTransferMessageField field value model, Cmd.none )
@@ -118,16 +118,20 @@ update message ({ transfer } as model) =
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Model
-setTransferMessageField field value { transfer } =
+setTransferMessageField field value model =
+    let
+        transfer =
+            model.transfer
+    in
     case field of
         From ->
-            { transfer = { transfer | from = value } }
+            { model | transfer = { transfer | from = value } }
 
         To ->
-            { transfer = { transfer | to = value } }
+            { model | transfer = { transfer | to = value } }
 
         Quantity ->
-            { transfer = { transfer | quantity = value } }
+            { model | transfer = { transfer | quantity = value } }
 
         Memo ->
-            { transfer = { transfer | memo = value } }
+            { model | transfer = { transfer | memo = value } }

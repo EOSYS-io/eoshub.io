@@ -1,6 +1,6 @@
 module Page.Voting exposing (..)
 
-import Html exposing (Html, div, h1, text, input)
+import Html exposing (Html, div, h1, input, text)
 import Translation exposing (Language)
 
 

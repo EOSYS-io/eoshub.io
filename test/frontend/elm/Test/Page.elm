@@ -28,6 +28,10 @@ location =
 
 tests : Test
 tests =
+    let
+        flags =
+            { node_env = "test" }
+    in
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
@@ -56,9 +60,12 @@ tests =
                             , type_ = ""
                             , message = ""
                             }
+
+                        flags =
+                            { node_env = "test" }
                     in
-                        Expect.equal
-                            ( expectedModel, Cmd.none )
-                            (update (UpdateScatterResponse scatterResponse) model)
+                    Expect.equal
+                        ( expectedModel, Cmd.none )
+                        (update (UpdateScatterResponse scatterResponse) model flags)
             ]
         ]

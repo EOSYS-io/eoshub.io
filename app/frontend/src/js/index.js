@@ -44,7 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
-  const app = Elm.Main.embed(target);
+  const app = Elm.Main.embed(target, {
+    node_env: process.env.NODE_ENV
+  });
 
   app.ports.checkWalletStatus.subscribe(async () => {
     app.ports.receiveWalletStatus.send(createResponseStatus());

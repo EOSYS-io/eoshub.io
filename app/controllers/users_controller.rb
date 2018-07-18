@@ -1,28 +1,29 @@
-class UsersController < ApplicationController
+class UsersController < ApiController
   def create
-    @user = User.find_by(email: user_params[:email])
+    @user = User.find_by(email: params[:email])
     if @user.present?
-      if @user.email_confirmed?
-        render status: :bad_request, json: { msg: I18n.t('users.already_confirmed_email') }
+      unless @user.email_saved?
+        render json: { msg: I18n.t('users.already_confirmed_email') }, status: :bad_request and return
       end
     else
-      @user = User.new(email: user_params[:email])
+      @user = User.new(email: params[:email])
       unless @user.save
-        render status: :internal_server_error, json: { msg: I18n.t('user.failed_to_create_email_verification_log') }
+        render json: { msg: I18n.t('user.failed_to_create_email_verification_log') }, status: :internal_server_error and return
       end
     end
 
     UserMailer.email_confirmation(@user).deliver
-    render status: :ok, json: { msg: I18n.t('users.create_ok') }
+    render json: { msg: I18n.t('users.create_ok') }, status: :ok
   end
 
   def confirm_email
-    user = User.find_by(confirm_token: params[:id])
+    confirm_token = params[:id]
+    user = User.find_by(confirm_token: confirm_token)
     if user.present?
       user.email_confirmed!
-      render status: :ok, json: { msg: "Your email has been confirmed." }
+      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}"
     else
-      render status: :precondition_failed, json: { msg: 'Sorry. User does not exist' }
+      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}"
     end
   end
 
@@ -30,27 +31,23 @@ class UsersController < ApplicationController
     user = User.find_by(confirm_token: params[:id])
 
     if user.blank?
-      render status: :precondition_failed, json: { msg: 'User does not exist with this email' }
+      render json: { msg: 'User does not exist with this email' }, status: :precondition_failed
     elsif user.email_saved?
-      render status: :precondition_failed, json: { msg: 'Email is not confirmed' }
+      render json: { msg: 'Email is not confirmed' }, status: :precondition_failed
     elsif user.eos_account_created?
-      render status: :precondition_failed, json: { msg: 'EOS account already created with this email' }
+      render json: { msg: 'EOS account already created with this email' }, status: :precondition_failed
     else
-      return render status: :conflict, json: { msg: I18n.t('user.eos_account_already_exist') } if helpers.eos_account_exist?(params[:account_name])
+      if helpers.eos_account_exist?(params[:account_name])
+        render json: { msg: I18n.t('user.eos_account_already_exist') }, status: :conflict and return
+      end
 
       response = helpers.create_eos_account(params[:account_name], params[:pubkey])
       if response.code == 200
         user.eos_account_created!
-        render status: :ok, json: { msg: I18n.t('user.eos_account_created') }
+        render json: { msg: I18n.t('user.eos_account_created') }, status: :ok
       else
-        render status: response.code, json: response.body
+        render json: response.body, status: response.code
       end
     end
-  end
-
-  private
-
-  def user_params
-    params.require(:email)
   end
 end
