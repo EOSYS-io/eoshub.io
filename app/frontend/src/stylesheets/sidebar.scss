@@ -34,16 +34,48 @@ $padding_bottom:36px;
         top:$padding_top;
         right:$padding_left_right;
 
-        @include ir();
-        width:20px;
-        height:20px;
     }
 
-    button.folding.button {
-        background:url('../image/lnb_fold_button.svg') left top no-repeat transparent;
+}
+
+.sidebar {
+    header button.folding.button {
+        @include ir();
+
+        width:20px;
+        height:20px;
+        // background:url('../image/lnb_fold_button.svg') left top no-repeat transparent;
         background-size:cover;
+
+        border-radius:2px;
+        background-color:#536dfe;
+        transition:background 0.5s;
+
+        &:before {  
+            content:'';
+            position:absolute;
+            top:3px;
+            left:50%;
+            right:3px;
+            bottom:3px;
+            background:#fff;
+            border-radius:1px;
+
+            transition:all 0.2s;
+        }
+
+    }
+    // interaction
+    &.fold header button.folding {
+        background-color:#737a8d;
+
+        &:before {
+            left:3px;
+            right:50%;
+        }
     }
 }
+
 // dashboard summary
 .sidebar .dashboard {
     h2 {
