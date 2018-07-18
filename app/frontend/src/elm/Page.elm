@@ -126,63 +126,63 @@ update message ({ page } as model) flags =
                 ( newPage, subCmd ) =
                     ConfirmEmail.update subMessage subModel flags
             in
-            ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
+                ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
 
         ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
             let
-                newPage =
+                ( newPage, subCmd ) =
                     EmailConfirmed.update subMessage subModel
             in
-            ( { model | page = newPage |> EmailConfirmedPage }, Cmd.none )
+                ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
 
         ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
             let
                 newPage =
                     EmailConfirmFailure.update subMessage subModel
             in
-            ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
+                ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
 
         ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
             let
-                newPage =
+                ( newPage, subCmd ) =
                     CreateKeys.update subMessage subModel
             in
-            ( { model | page = newPage |> CreateKeysPage }, Cmd.none )
+                ( { model | page = newPage |> CreateKeysPage }, Cmd.map CreateKeysMessage subCmd )
 
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
                 newPage =
                     Created.update subMessage subModel
             in
-            ( { model | page = newPage |> CreatedPage }, Cmd.none )
+                ( { model | page = newPage |> CreatedPage }, Cmd.none )
 
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newPage, subCmd ) =
                     Create.update subMessage subModel flags
             in
-            ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
+                ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 newPage =
                     Search.update subMessage subModel
             in
-            ( { model | page = newPage |> SearchPage }, Cmd.none )
+                ( { model | page = newPage |> SearchPage }, Cmd.none )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
                 ( newPage, subCmd ) =
                     Transfer.update subMessage subModel
             in
-            ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
+                ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
                 newPage =
                     Voting.update subMessage subModel
             in
-            ( { model | page = newPage |> VotingPage }, Cmd.none )
+                ( { model | page = newPage |> VotingPage }, Cmd.none )
 
         ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
@@ -238,36 +238,36 @@ getPage location confirmToken =
         route =
             location |> parseLocation
     in
-    case route of
-        ConfirmEmailRoute ->
-            ConfirmEmailPage ConfirmEmail.initModel
+        case route of
+            ConfirmEmailRoute ->
+                ConfirmEmailPage ConfirmEmail.initModel
 
-        EmailConfirmedRoute confirmToken ->
-            EmailConfirmedPage (EmailConfirmed.initModel confirmToken)
+            EmailConfirmedRoute confirmToken ->
+                EmailConfirmedPage (EmailConfirmed.initModel confirmToken)
 
-        EmailConfirmFailureRoute ->
-            EmailConfirmFailurePage EmailConfirmFailure.initModel
+            EmailConfirmFailureRoute ->
+                EmailConfirmFailurePage EmailConfirmFailure.initModel
 
             CreateKeysRoute ->
                 CreateKeysPage (CreateKeys.initModel confirmToken)
 
-        CreatedRoute ->
-            CreatedPage Created.initModel
+            CreatedRoute ->
+                CreatedPage Created.initModel
 
             CreateRoute pubkey ->
                 CreatePage (Create.initModel ( confirmToken, pubkey ))
 
-        SearchRoute ->
-            SearchPage Search.initModel
+            SearchRoute ->
+                SearchPage Search.initModel
 
-        VotingRoute ->
-            VotingPage Voting.initModel
+            VotingRoute ->
+                VotingPage Voting.initModel
 
-        TransferRoute ->
-            TransferPage Transfer.initModel
+            TransferRoute ->
+                TransferPage Transfer.initModel
 
-        IndexRoute ->
-            IndexPage
+            IndexRoute ->
+                IndexPage
 
-        NotFoundRoute ->
-            NotFoundPage
+            NotFoundRoute ->
+                NotFoundPage
