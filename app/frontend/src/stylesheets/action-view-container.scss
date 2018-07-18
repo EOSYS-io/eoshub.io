@@ -29,15 +29,15 @@
         height:300px;
         border-radius:4px;
         transition:box-shadow 0.2s;
+        position:relative;
 
         &:hover {
           box-shadow: 0 28px 40px 0 rgba(0, 0, 0, 0.16);
+          z-index:2;
         }
     }
 
     .card {
-        height:auto;
-
         h3 {
             font-weight:300;
             font-size:rem(20);
@@ -53,254 +53,53 @@
 
     // bg image
     .card {
-        background-position:right bottom;
-        background-color:transparent;
-        background-repeat:no-repeat;
-        background-size:400px;
-
         height:100%;
 
-        &.transfer {
+        position:relative;
+
+        &:before {
+            display:block;
+            content:'';
+
+            position:absolute;
+            width:55%;
+            max-height:115px;
+            height:60%;
+            background:#600;
+            bottom:0;
+            right:0;
+
+            background-position:right bottom;
+            background-color:transparent;
+            background-repeat:no-repeat;
+            background-size:contain;
+
+        }
+        &.transfer:before {
             background-image:url('../image/bg-transfer.svg');
         }
 
-        &.vote {
+        &.vote:before {
             background-image:url('../image/bg-vote.svg');
         }
 
-        &.ram_market {
+        &.ram_market:before  {
             background-image:url('../image/bg-ram-market.svg');
         }
 
-        &.faq {
+        &.faq:before  {
             background-image:url('../image/bg-faq.svg');
         }
 
-        &.proxy_vote {
+        &.proxy_vote:before  {
             background-image:url('../image/bg-proxy-vote.svg');
+            width:90%;
+            height:90%;
+            max-height:150px;
         }
 
-        &.application {
+        &.application:before  {
             background-image:url('../image/bg-dapp.svg');
-        }
-    }
-}
-
-.action.view.panel.transfer {
-    nav {
-        position:absolute;
-        right:64px;
-
-        font-size:rem(14);
-        a {
-            color:#333;
-            margin-left:24px;
-            
-            &.viewing {
-                font-weight:bold;
-            }
-        }
-    }
-}
-
-.action.view.panel.transfer {
-    background:#fff;
-
-    margin:48px 0 0 0;
-    padding:64px;
-    text-align:left;
-
-    display:block;
-    position:relative;
-
-    h3 {
-        font-weight:300;
-        font-size:rem(24);
-        color:#333;
-    }
-
-    p.help.info {
-        a {
-            background:url('../image/icon-info-mark.svg') left center no-repeat;
-            background-size:16px 16px;
-            padding-left:20px;
-            font-size:rem(14);
-            color:#737a8d;
-        }
-    }
-
-    .card {
-        margin:23px auto;
-        width: 394px;
-        border-radius: 4px;
-        background-color: #536dfe;
-        color:#fff;
-        padding:56px 48px;
-
-        box-sizing:border-box;
-
-        h4 {
-            text-align:center;
-            font-weight:300;
-            font-size:rem(14);
-
-
-            strong {
-                margin-top:12px;
-                display:block;
-                font-weight:300;
-                font-size:rem(32);
-            }
-        }
-
-        ul,li {
-            list-style-type:none;
-            padding:0;
-            margin:0;
-
-            input {
-                display:block;
-                width:100%;
-                background:transparent;
-                border:0;
-                border-bottom:1px solid #fff;
-
-                font-size:rem(16);
-                height:40px;
-                padding:12px 0;
-
-                box-sizing:border-box;
-
-                &::placeholder {
-                    color:#fff;
-                }
-            }
-        }
-
-        li {
-            padding-left:32px;
-            margin-top:32px;
-
-            background-repeat:no-repeat;
-            background-color:transparent;
-            background-position:left 18px;
-
-            span {
-                margin-top:8px;
-                display:block;
-                color:#c3c3c3;
-                font-size:rem(13);
-            }
-
-            span.warning {
-                color:#ff6b64;
-
-                &:before {
-                    color:#fff;
-                    content:'+';
-                    display:inline-block;
-                    width:13px;
-                    height:13px;
-                    font-size:rem(5);
-                    text-align:center;
-                    line-height:13px;
-                    border-radius:100%;
-                    background:#ff6b64;
-                    margin-right:4px;
-                    transform:rotate(45deg);
-
-                }
-            }
-        }
-
-        li.account {
-            background-image:url('../image/icon-account.svg');
-        }
-
-        li.eos {
-            background-image:url('../image/icon-eos.svg');
-        }
-
-        li.memo {
-            background-image:url('../image/icon-memo.svg');
-        }
-    }
-
-    .btn_area button.middle {
-        margin-top:56px;
-        line-height:50px;
-        height:52px;
-        width:100%;
-        font-size:rem(14);
-
-        &:disabled {
-            color:#c3c3c3;
-        }
-    }
-
-    .notification.panel {
-        position:absolute;
-        right:64px;
-        bottom:64px;
-
-        // response
-        div {
-            width:406px;
-            height:96px;
-            box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.16);
-            box-sizing:border-box;
-            display:flex;
-            flex-direction:column;
-            padding-left:40px;
-            justify-content:center;
-            position:relative;
-
-            p {
-                margin:0;
-                color:#fff;
-            }
-
-            a {
-                font-size:rem(13);
-                color:#fff;
-            }
-
-            button.close {
-                position:absolute;
-                right:10px;
-                top:10px;
-                background:url('../image/icon-close-white-transparent.svg') center center no-repeat;
-                width:20px;
-                height:20px;
-
-                outline:0;
-                transition:transform 0.1s;
-
-                &:hover {
-                    transform:scale(1.1);
-                }
-            }
-        }
-
-        .view.success {
-            background:url('../image/symbol-smile-white.svg') 285px 36px no-repeat #79c720;
-            background-size:81px;
-        }
-
-        .view.fail {
-            background:url('../image/symbol-alert-white.svg') 285px 36px no-repeat #ff6b64;
-            background-size:81px;
-        }
-
-        // interaction
-        transition:transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-
-        opacity:0;
-        transform:translateY(100%);
-
-        &.viewing {
-            opacity:1;
-            transform:translateY(0);
         }
     }
 }

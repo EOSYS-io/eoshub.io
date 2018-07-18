@@ -96,21 +96,6 @@ tests =
                         Expect.equal
                             ( initModel, Port.invalidateAccount () )
                             (update InvalidateAccount initModel)
-                , test "UpdateScatterResponse" <|
-                    \() ->
-                        let
-                            expectedModel =
-                                { initModel | notification = View.Notification.Ok }
-
-                            scatterResponse =
-                                { code = 200
-                                , type_ = ""
-                                , message = ""
-                                }
-                        in
-                            Expect.equal
-                                ( expectedModel, Cmd.none )
-                                (update (UpdateScatterResponse scatterResponse) initModel)
                 , test "UpdateLanguage" <|
                     \() ->
                         Expect.equal

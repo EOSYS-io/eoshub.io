@@ -16,13 +16,18 @@
 // layout
 @import 'layout.scss';
 
+// common,superset
+@import 'common.scss';
+
 // sidebar
 @import 'sidebar.scss';
+
 
 // details
 @import 'tick-display.scss';
 @import 'action-view-container.scss';
 @import 'action-view-search.scss';
+@import 'action-view-transfer.scss';
 
 
 // extra. join process

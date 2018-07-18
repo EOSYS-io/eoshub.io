@@ -4,8 +4,7 @@ import Header
 import Html
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
-import Page exposing (Page(..), getPage)
-import Route exposing (Route(..), parseLocation)
+import Page
 import Sidebar
 import Util.Flags exposing (Flags)
 
@@ -16,7 +15,7 @@ import Util.Flags exposing (Flags)
 type alias Model =
     { header : Header.Model
     , sidebar : Sidebar.Model
-    , page : Page
+    , page : Page.Model
     , flags : Flags
     }
 
@@ -26,10 +25,10 @@ type alias Model =
 
 
 type Message
-    = OnLocationChange Location
-    | HeaderMessage Header.Message
+    = HeaderMessage Header.Message
     | PageMessage Page.Message
     | SidebarMessage Sidebar.Message
+
 
 
 -- INIT
@@ -39,7 +38,7 @@ init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     ( { header = Header.initModel
       , sidebar = Sidebar.initModel
-      , page = (location |> parseLocation) |> getPage
+      , page = Page.initModel location
       , flags = flags
       }
     , Cmd.none
@@ -68,9 +67,6 @@ view { header, sidebar, page } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        OnLocationChange location ->
-            ( { model | page = (location |> parseLocation) |> getPage }, Cmd.none )
-
         HeaderMessage headerMessage ->
             let
                 ( newHeader, newCmd ) =
@@ -98,8 +94,11 @@ update message model =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar } =
-    Sub.batch [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar) ]
+subscriptions { sidebar, page } =
+    Sub.batch
+        [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar)
+        , Sub.map PageMessage (Page.subscriptions page)
+        ]
 
 
 
@@ -108,7 +107,7 @@ subscriptions { sidebar } =
 
 main : Program Flags Model Message
 main =
-    Navigation.programWithFlags OnLocationChange
+    Navigation.programWithFlags (PageMessage << Page.OnLocationChange)
         { init = init
         , view = view
         , update = update

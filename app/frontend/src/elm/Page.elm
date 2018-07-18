@@ -1,8 +1,8 @@
-module Page exposing (Message(..), Page(..), getPage, update, view)
+module Page exposing (..)
 
 import ExternalMessage
 import Html exposing (Html)
-import Navigation
+import Navigation exposing (Location)
 import Page.Account.ConfirmEmail as ConfirmEmail
 import Page.Account.Create as Create
 import Page.Account.CreateKeys as CreateKeys
@@ -14,9 +14,12 @@ import Page.NotFound as NotFound
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
-import Route exposing (Route(..))
+import Port
+import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
+import Util.WalletDecoder exposing (ScatterResponse, decodeScatterResponse)
+import View.Notification
 
 
 -- MODEL
@@ -36,6 +39,19 @@ type Page
     | NotFoundPage
 
 
+type alias Model =
+    { page : Page
+    , notification : View.Notification.Message
+    }
+
+
+initModel : Location -> Model
+initModel location =
+    { page = location |> getPage
+    , notification = View.Notification.None
+    }
+
+
 
 -- MESSAGE
 
@@ -51,14 +67,16 @@ type Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
     | IndexMessage ExternalMessage.Message
+    | UpdateScatterResponse ScatterResponse
+    | OnLocationChange Location
 
 
 
 -- VIEW
 
 
-view : Language -> Page -> Html Message
-view language page =
+view : Language -> Model -> Html Message
+view language { page } =
     case page of
         ConfirmEmailPage subModel ->
             Html.map ConfirmEmailMessage (ConfirmEmail.view subModel)
@@ -98,87 +116,104 @@ view language page =
 -- UPDATE
 
 
-update : Message -> Page -> Flags -> ( Page, Cmd Message )
-update message page flags =
+update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update message ({ page } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
-                ( newModel, subCmd ) =
+                ( newPage, subCmd ) =
                     ConfirmEmail.update subMessage subModel flags
             in
-            ( newModel |> ConfirmEmailPage, Cmd.map ConfirmEmailMessage subCmd )
+            ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
 
         ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
             let
-                newModel =
+                newPage =
                     EmailConfirmed.update subMessage subModel
             in
-            ( newModel |> EmailConfirmedPage, Cmd.none )
+            ( { model | page = newPage |> EmailConfirmedPage }, Cmd.none )
 
         ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
             let
-                newModel =
+                newPage =
                     EmailConfirmFailure.update subMessage subModel
             in
-            ( newModel |> EmailConfirmFailurePage, Cmd.none )
+            ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
 
         ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
             let
-                newModel =
+                newPage =
                     CreateKeys.update subMessage subModel
             in
-            ( newModel |> CreateKeysPage, Cmd.none )
+            ( { model | page = newPage |> CreateKeysPage }, Cmd.none )
 
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
-                newModel =
+                newPage =
                     Created.update subMessage subModel
             in
-            ( newModel |> CreatedPage, Cmd.none )
+            ( { model | page = newPage |> CreatedPage }, Cmd.none )
 
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
-                ( newModel, subCmd ) =
+                ( newPage, subCmd ) =
                     Create.update subMessage subModel flags
             in
-            ( newModel |> CreatePage, Cmd.map CreateMessage subCmd )
+            ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
-                newModel =
+                newPage =
                     Search.update subMessage subModel
             in
-            ( newModel |> SearchPage, Cmd.none )
+            ( { model | page = newPage |> SearchPage }, Cmd.none )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
-                ( newModel, subCmd ) =
+                ( newPage, subCmd ) =
                     Transfer.update subMessage subModel
             in
-            ( newModel |> TransferPage, Cmd.map TransferMessage subCmd )
+            ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
-                newModel =
+                newPage =
                     Voting.update subMessage subModel
             in
-            ( newModel |> VotingPage, Cmd.none )
+            ( { model | page = newPage |> VotingPage }, Cmd.none )
 
-        ( IndexMessage subMessage, _ ) ->
-            case subMessage of
-                ExternalMessage.ChangeUrl url ->
-                    ( page, Navigation.newUrl url )
+        ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateScatterResponse resp, _ ) ->
+            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
+
+        ( OnLocationChange location, _ ) ->
+            ( { model | page = location |> getPage }, Cmd.none )
 
         ( _, _ ) ->
-            ( page, Cmd.none )
+            ( model, Cmd.none )
+
+
+
+-- SUBSCRIPTIONS --
+
+
+subscriptions : Model -> Sub Message
+subscriptions _ =
+    Port.receiveScatterResponse UpdateScatterResponse
 
 
 
 -- Utility functions
 
 
-getPage : Route -> Page
-getPage route =
+getPage : Location -> Page
+getPage location =
+    let
+        route =
+            location |> parseLocation
+    in
     case route of
         ConfirmEmailRoute ->
             ConfirmEmailPage ConfirmEmail.initModel
@@ -210,5 +245,5 @@ getPage route =
         IndexRoute ->
             IndexPage
 
-        _ ->
+        NotFoundRoute ->
             NotFoundPage
