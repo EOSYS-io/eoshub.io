@@ -42,13 +42,15 @@ type Page
 type alias Model =
     { page : Page
     , notification : View.Notification.Message
+    , confirmToken : String
     }
 
 
 initModel : Location -> Model
 initModel location =
-    { page = location |> getPage
+    { page = getPage location ""
     , notification = View.Notification.None
+    , confirmToken = ""
     }
 
 
@@ -189,27 +191,49 @@ update message ({ page } as model) flags =
             ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
 
         ( OnLocationChange location, _ ) ->
-            ( { model | page = location |> getPage }, Cmd.none )
+            case page of
+                EmailConfirmedPage subModel ->
+                    let
+                        createKeysModel =
+                            CreateKeys.initModel model.confirmToken
+
+                        ( newCreateKeysModel, subCmd ) =
+                            CreateKeys.update CreateKeys.GenerateKeys createKeysModel
+
+                        newPage =
+                            CreateKeysPage newCreateKeysModel
+                    in
+                        ( { model | page = newPage, confirmToken = subModel.confirmToken }, Cmd.map CreateKeysMessage subCmd )
+
+                _ ->
+                    let
+                        newPage =
+                            getPage location model.confirmToken
+                    in
+                        ( { model | page = newPage }, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
 
 
 
--- SUBSCRIPTIONS --
+-- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Message
-subscriptions _ =
-    Port.receiveScatterResponse UpdateScatterResponse
+subscriptions model =
+    Sub.batch
+        [ Sub.map CreateKeysMessage CreateKeys.subscriptions
+        , Port.receiveScatterResponse UpdateScatterResponse
+        ]
 
 
 
 -- Utility functions
 
 
-getPage : Location -> Page
-getPage location =
+getPage : Location -> String -> Page
+getPage location confirmToken =
     let
         route =
             location |> parseLocation
@@ -224,14 +248,14 @@ getPage location =
         EmailConfirmFailureRoute ->
             EmailConfirmFailurePage EmailConfirmFailure.initModel
 
-        CreateKeysRoute ->
-            CreateKeysPage CreateKeys.initModel
+            CreateKeysRoute ->
+                CreateKeysPage (CreateKeys.initModel confirmToken)
 
         CreatedRoute ->
             CreatedPage Created.initModel
 
-        CreateRoute confirmToken pubkey ->
-            CreatePage (Create.initModel ( confirmToken, pubkey ))
+            CreateRoute pubkey ->
+                CreatePage (Create.initModel ( confirmToken, pubkey ))
 
         SearchRoute ->
             SearchPage Search.initModel

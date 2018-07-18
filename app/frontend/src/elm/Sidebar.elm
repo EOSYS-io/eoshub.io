@@ -144,7 +144,7 @@ signInView language =
             ]
         , div [ class "btn_area" ]
             [ a [ class "middle blue_white button", onClick (UpdateState PairWallet) ] [ text (translate language Login) ]
-            , a [ class "middle white_blue button" ] [ text (translate language NewAccount) ]
+            , a [ class "middle white_blue button", onClick (ExternalMessage (ExternalMessage.ChangeUrl "/account/confirm_email")) ] [ text (translate language NewAccount) ]
             ]
         ]
 

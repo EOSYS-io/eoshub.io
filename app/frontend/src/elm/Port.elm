@@ -27,3 +27,17 @@ port pushAction : JE.Value -> Cmd message
 
 
 port receiveScatterResponse : ({ code : Int, type_ : String, message : String } -> message) -> Sub message
+
+
+
+-- EOS Key pair
+
+
+type alias KeyPair =
+    { privateKey : String, publicKey : String }
+
+
+port generateKeys : () -> Cmd message
+
+
+port receiveKeys : (KeyPair -> message) -> Sub message
