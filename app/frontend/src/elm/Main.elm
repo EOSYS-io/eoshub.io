@@ -49,7 +49,8 @@ view : Model -> Html.Html Message
 view { sidebar, page } =
     Html.div [ class "container" ]
         [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
-        , Html.map PageMessage (Page.view sidebar.language page)
+        , Html.div [ class "wrapper" ]
+            (List.map (Html.map PageMessage) (Page.view sidebar.language page))
         ]
 
 

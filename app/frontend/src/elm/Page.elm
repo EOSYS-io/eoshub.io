@@ -40,13 +40,13 @@ import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import Util.WalletDecoder exposing (ScatterResponse, decodeScatterResponse)
-import View.Notification
+import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import Http
 import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE
 import Regex exposing (regex, contains)
 import Data.Account exposing (Account, ResourceInEos, Resource, Refund, accountDecoder, keyAccountsDecoder)
+import View.Notification as Notification
 
 
 -- MODEL
@@ -68,7 +68,7 @@ type Page
 
 type alias Model =
     { page : Page
-    , notification : View.Notification.Message
+    , notification : Notification.Model
     , header : Header
     }
 
@@ -86,7 +86,7 @@ type alias Header =
 initModel : Location -> Model
 initModel location =
     { page = location |> getPage
-    , notification = View.Notification.None
+    , notification = Notification.initModel
     , header =
         { searchInput = ""
         , eosPrice = 0
@@ -145,12 +145,13 @@ type Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
     | IndexMessage ExternalMessage.Message
-    | UpdateScatterResponse ScatterResponse
     | InputSearch String
     | GetSearchResult String
     | OnFetchAccount (Result Http.Error Account)
     | OnFetchKeyAccounts (Result Http.Error (List String))
+    | UpdatePushActionResponse PushActionResponse
     | OnLocationChange Location
+    | NotificationMessage Notification.Message
 
 
 type Query
@@ -170,8 +171,8 @@ type alias PublicKeyQuery =
 -- VIEW
 
 
-view : Language -> Model -> Html Message
-view language { page, header } =
+view : Language -> Model -> List (Html Message)
+view language { page, header, notification } =
     let
         newContentHtml =
             case page of
@@ -207,32 +208,43 @@ view language { page, header } =
 
                 _ ->
                     NotFound.view language
+
+        notificationParameter =
+            case page of
+                TransferPage { transfer } ->
+                    transfer.to
+
+                _ ->
+                    ""
     in
-        Html.div [ class "wrapper" ]
-            [ div []
-                [ section [ class "tick_display" ]
-                    [ form [ class "search", disabled True ]
-                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (GetSearchResult (header.searchInput)) ]
-                            []
-                        , button [ class "search button", type_ "button", onClick (GetSearchResult (header.searchInput)) ]
-                            [ text "검색하기" ]
-                        ]
-                    , ul [ class "price" ]
-                        [ li []
-                            [ text "이오스 시세                           "
-                            , span [ attribute "data-before" "lower" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        , li []
-                            [ text "RAM 가격                            "
-                            , span [ attribute "data-before" "higher" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        ]
+        [ section [ class "tick_display" ]
+            [ form [ class "search", disabled True ]
+                [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (GetSearchResult header.searchInput) ]
+                    []
+                , button [ class "search button", type_ "button", onClick (GetSearchResult header.searchInput) ]
+                    [ text "검색하기" ]
+                ]
+            , ul [ class "price" ]
+                [ li []
+                    [ text "이오스 시세                           "
+                    , span [ attribute "data-before" "lower" ]
+                        [ text "1.000 EOS                           " ]
+                    ]
+                , li []
+                    [ text "RAM 가격                            "
+                    , span [ attribute "data-before" "higher" ]
+                        [ text "1.000 EOS                           " ]
                     ]
                 ]
-            , newContentHtml
             ]
+        , newContentHtml
+        , Html.map NotificationMessage
+            (Notification.view
+                notification
+                notificationParameter
+                language
+            )
+        ]
 
 
 onEnter : Message -> Attribute Message
@@ -252,7 +264,7 @@ onEnter msg =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, header } as model) flags =
+update message ({ page, notification, header } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -320,8 +332,15 @@ update message ({ page, header } as model) flags =
         ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
 
-        ( UpdateScatterResponse resp, _ ) ->
-            ( { model | notification = resp |> decodeScatterResponse }, Cmd.none )
+        ( UpdatePushActionResponse resp, _ ) ->
+            ( { model
+                | notification =
+                    { content = resp |> decodePushActionResponse
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
 
         ( OnLocationChange location, _ ) ->
             ( { model | page = location |> getPage }, Cmd.none )
@@ -384,6 +403,14 @@ update message ({ page, header } as model) flags =
         ( OnFetchKeyAccounts (Err error), _ ) ->
             ( { model | header = { header | errMessage = "invalid length" } }, Cmd.none )
 
+        ( NotificationMessage Notification.CloseNotification, _ ) ->
+            ( { model
+                | notification =
+                    { notification | open = False }
+              }
+            , Cmd.none
+            )
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
@@ -434,7 +461,7 @@ post url body decoder =
 
 subscriptions : Model -> Sub Message
 subscriptions _ =
-    Port.receiveScatterResponse UpdateScatterResponse
+    Port.receivePushActionResponse UpdatePushActionResponse
 
 
 
