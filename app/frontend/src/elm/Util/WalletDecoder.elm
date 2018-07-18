@@ -10,7 +10,7 @@ module Util.WalletDecoder
 
 import Dict exposing (Dict, fromList)
 import Translation exposing (I18n(TransferSucceeded, TransferFailed, UnknownError))
-import View.Notification
+import View.Notification as Notification
 
 
 -- This type should be expanded as Wallet Response.
@@ -54,7 +54,7 @@ actionFailMessages =
     fromList [ ( "transfer", TransferFailed ) ]
 
 
-decodePushActionResponse : PushActionResponse -> View.Notification.Content
+decodePushActionResponse : PushActionResponse -> Notification.Content
 decodePushActionResponse { code, type_, message, action } =
     case code of
         200 ->
@@ -64,11 +64,11 @@ decodePushActionResponse { code, type_, message, action } =
             in
                 case value of
                     Just messageFunction ->
-                        View.Notification.Ok messageFunction
+                        Notification.Ok messageFunction
 
                     -- This case should not happen!
                     Nothing ->
-                        View.Notification.Error
+                        Notification.Error
                             { message = UnknownError
                             , detail = ""
                             }
@@ -80,13 +80,13 @@ decodePushActionResponse { code, type_, message, action } =
             in
                 case value of
                     Just messageFunction ->
-                        View.Notification.Error
+                        Notification.Error
                             { message = messageFunction (toString code)
                             , detail = type_ ++ "\n" ++ message
                             }
 
                     Nothing ->
-                        View.Notification.Error
+                        Notification.Error
                             { message = UnknownError
                             , detail = ""
                             }

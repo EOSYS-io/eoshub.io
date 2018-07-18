@@ -1,6 +1,6 @@
 module Page.Transfer exposing (..)
 
-import Action exposing (Action(Transfer), TransferMessage, encodeAction)
+import Action exposing (Action(Transfer), TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -12,7 +12,7 @@ import Translation exposing (Language)
 
 
 type alias Model =
-    { transfer : TransferMessage }
+    { transfer : TransferParameters }
 
 
 initModel : Model
@@ -107,7 +107,7 @@ update message ({ transfer } as model) =
                 cmd =
                     transfer |> Transfer |> encodeAction |> Port.pushAction
             in
-            ( model, cmd )
+                ( model, cmd )
 
         SetTransferMessageField field value ->
             ( setTransferMessageField field value model, Cmd.none )
@@ -123,15 +123,15 @@ setTransferMessageField field value model =
         transfer =
             model.transfer
     in
-    case field of
-        From ->
-            { model | transfer = { transfer | from = value } }
+        case field of
+            From ->
+                { model | transfer = { transfer | from = value } }
 
-        To ->
-            { model | transfer = { transfer | to = value } }
+            To ->
+                { model | transfer = { transfer | to = value } }
 
-        Quantity ->
-            { model | transfer = { transfer | quantity = value } }
+            Quantity ->
+                { model | transfer = { transfer | quantity = value } }
 
-        Memo ->
-            { model | transfer = { transfer | memo = value } }
+            Memo ->
+                { model | transfer = { transfer | memo = value } }
