@@ -1,10 +1,10 @@
-module Action exposing (TransferMessage, Action(..), transferMessageToValue, encodeAction)
+module Action exposing (Action(..), TransferParameters, transferParametersToValue, encodeAction)
 
 import Json.Encode as JE
 import Round
 
 
-type alias TransferMessage =
+type alias TransferParameters =
     { from : String
     , to : String
     , quantity : String
@@ -13,11 +13,11 @@ type alias TransferMessage =
 
 
 type Action
-    = Transfer TransferMessage
+    = Transfer TransferParameters
 
 
-transferMessageToValue : TransferMessage -> JE.Value
-transferMessageToValue { from, to, quantity, memo } =
+transferParametersToValue : TransferParameters -> JE.Value
+transferParametersToValue { from, to, quantity, memo } =
     -- Introduce form validation.
     JE.object
         [ ( "account", JE.string "eosio.token" )
@@ -37,7 +37,7 @@ encodeAction : Action -> JE.Value
 encodeAction action =
     case action of
         Transfer message ->
-            transferMessageToValue message
+            transferParametersToValue message
 
 
 

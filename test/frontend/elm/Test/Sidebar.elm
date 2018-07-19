@@ -43,8 +43,8 @@ tests =
                             message =
                                 UpdateWalletStatus
                                     { status = "WALLET_STATUS_LOADED"
-                                    , account = "acc"
-                                    , authority = "auth"
+                                    , account = ""
+                                    , authority = ""
                                     }
 
                             expectedModel =

@@ -29,10 +29,10 @@ function createResponseStatus() {
   };
 }
 
-function createScatterReponse(code, type, msg) {
-  if (code === 200) return { code: 200, type_: '', message: '' };
+function createPushActionReponse(code, action, type, msg) {
   return {
     code,
+    action,
     type_: !type ? '' : type,
     message: !msg ? '' : msg,
   };
@@ -46,26 +46,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const app = Elm.Main.embed(target, {
-    node_env: process.env.NODE_ENV
+    node_env: process.env.NODE_ENV,
   });
 
   app.ports.checkWalletStatus.subscribe(async () => {
     app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
+  // TODO(heejae): After wallet auth success/error message popup is devised,
+  // deal with cases.
   app.ports.authenticateAccount.subscribe(async () => {
-    let response = createScatterReponse(200);
     try {
       await authenticateAccount();
     } catch (err) {
       if (err.isError && err.isError === true) {
         // Deal with scatter error.
-        const { code, type, message } = err;
-        response = createScatterReponse(code, type, message);
+        console.error(err);
       }
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
-    app.ports.receiveScatterResponse.send(response);
   });
 
   app.ports.invalidateAccount.subscribe(async () => {
@@ -74,15 +73,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       if (err.isError && err.isError === true) {
         // Deal with scatter error.
-        const { code, type, message } = err;
-        app.ports.receiveScatterResponse.send(createScatterReponse(code, type, message));
+        console.error(err);
       }
     }
     app.ports.receiveWalletStatus.send(createResponseStatus());
   });
 
   app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
-    let response = createScatterReponse(200);
+    let response = createPushActionReponse(200, action);
     try {
       const { eosjsClient } = getScatter();
       const contract = await eosjsClient.contract(account);
@@ -91,10 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (err.isError && err.isError === true) {
         // Deal with scatter error.
         const { code, type, message } = err;
-        response = createScatterReponse(code, type, message);
+        response = createPushActionReponse(code, action, type, message);
       }
     }
-    app.ports.receiveScatterResponse.send(response);
+    app.ports.receivePushActionResponse.send(response);
   });
 
   app.ports.generateKeys.subscribe(async () => {

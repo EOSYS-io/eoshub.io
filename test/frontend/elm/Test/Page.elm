@@ -13,6 +13,7 @@ import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
 import Test exposing (..)
+import Translation exposing (I18n(TransferSucceeded))
 import View.Notification
 import Data.Account exposing (..)
 import Json.Decode as JD
@@ -37,6 +38,9 @@ location =
 tests : Test
 tests =
     let
+        flags =
+            { node_env = "test" }
+
         confirmToken =
             "test"
     in
@@ -71,27 +75,59 @@ tests =
                     \() -> Expect.equal NotFoundPage (getPage location confirmToken)
                 ]
             , describe "update"
-                [ test "UpdateScatterResponse" <|
+                [ test "UpdatePushActionResponse" <|
                     \() ->
                         let
-                            model =
+                            ({ notification } as model) =
                                 initModel location
 
                             expectedModel =
-                                { model | notification = View.Notification.Ok { code = 200, message = "\n" } }
+                                { model
+                                    | notification =
+                                        { notification
+                                            | content = View.Notification.Ok TransferSucceeded
+                                            , open = True
+                                        }
+                                }
 
-                            scatterResponse =
+                            pushActionResponse =
                                 { code = 200
                                 , type_ = ""
                                 , message = ""
+                                , action = "transfer"
                                 }
-
-                            flags =
-                                { node_env = "test" }
                         in
                             Expect.equal
                                 ( expectedModel, Cmd.none )
-                                (update (UpdateScatterResponse scatterResponse) model flags)
+                                (update (UpdatePushActionResponse pushActionResponse) model flags)
+                , test "CloseNotification" <|
+                    \() ->
+                        let
+                            ({ notification } as model) =
+                                initModel location
+
+                            openedModel =
+                                { model
+                                    | notification =
+                                        { notification
+                                            | open = True
+                                        }
+                                }
+
+                            expectedModel =
+                                { openedModel
+                                    | notification =
+                                        { notification
+                                            | open = False
+                                        }
+                                }
+                        in
+                            Expect.equal ( expectedModel, Cmd.none )
+                                (update
+                                    (NotificationMessage View.Notification.CloseNotification)
+                                    openedModel
+                                    flags
+                                )
                 ]
             , describe
                 "getFullPath"
