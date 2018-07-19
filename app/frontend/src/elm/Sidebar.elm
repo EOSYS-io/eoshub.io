@@ -168,7 +168,7 @@ pairWalletView language =
                 ]
             ]
         , ul [ class "available_wallet_list" ]
-            [ li []
+            [ li [ class "scatter" ]
                 [ text "Scatter"
                 , button
                     [ type_ "button"
