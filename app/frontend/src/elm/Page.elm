@@ -270,7 +270,7 @@ onEnter msg =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header } as model) flags =
+update message ({ page, notification, header, confirmToken } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -351,7 +351,7 @@ update message ({ page, notification, header } as model) flags =
         ( OnLocationChange location, _ ) ->
             let
                 (newPage, cmd) =
-                    getPage location model.confirmToken
+                    getPage location confirmToken
             in
                 
                 ( { model | page = newPage }, cmd )
