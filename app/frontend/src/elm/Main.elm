@@ -81,10 +81,10 @@ update message model =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
+subscriptions { sidebar, page } =
     Sub.batch
-        [ Sub.map SidebarMessage (Sidebar.subscriptions model.sidebar)
-        , Sub.map PageMessage (Page.subscriptions model.page)
+        [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar)
+        , Sub.map PageMessage (Page.subscriptions page)
         ]
 
 
