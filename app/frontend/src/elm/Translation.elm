@@ -54,6 +54,14 @@ type I18n
     | CheckDetail
     | CheckError
     | Close
+    | TransferInfo1
+    | TransferInfo2
+    | TransferHelp
+    | TransferableAmount
+    | CheckAccountName
+    | ReceiverAccountName
+    | OverTransferableAmount
+    | Memo
 
 
 translate : Language -> I18n -> String
@@ -222,3 +230,31 @@ getMessages i18n =
 
         Close ->
             { korean = "닫기", english = "Close" }
+
+        TransferInfo1 ->
+            { korean = "총 보유수량과 전송가능한 수량은"
+            , english = "Total amount and transferable amount can be "
+            }
+
+        TransferInfo2 ->
+            { korean = "보관 취소중인 수량에 따라 다를 수 있습니다."
+            , english = "different depending on unstaking amounts"
+            }
+
+        TransferHelp ->
+            { korean = "전송이 혹시 처음이신가요?", english = "Need help?" }
+
+        TransferableAmount ->
+            { korean = "전송 가능한 수량", english = "Transferable amount" }
+
+        CheckAccountName ->
+            { korean = "알맞는 계정인지 확인해 주세요.", english = "Please check the account name" }
+
+        ReceiverAccountName ->
+            { korean = "받는 계정", english = "Receiver's Account Name" }
+
+        OverTransferableAmount ->
+            { korean = "전송 가능한 수량보다 많아요!", english = "Over transferable amount!" }
+
+        Memo ->
+            { korean = "메모하기", english = "Memo" }
