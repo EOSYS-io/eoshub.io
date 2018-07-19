@@ -86,7 +86,11 @@ type alias Header =
 
 initModel : Location -> Model
 initModel location =
-    { page = getPage location ""
+    let
+        (page, cmd) =
+            getPage location ""
+    in
+    { page = page
     , notification = Notification.initModel
     , confirmToken = ""
     , header =
@@ -345,26 +349,12 @@ update message ({ page, notification, header } as model) flags =
             )
 
         ( OnLocationChange location, _ ) ->
-            case page of
-                EmailConfirmedPage subModel ->
-                    let
-                        createKeysModel =
-                            CreateKeys.initModel model.confirmToken
-
-                        ( newCreateKeysModel, subCmd ) =
-                            CreateKeys.update CreateKeys.GenerateKeys createKeysModel
-
-                        newPage =
-                            CreateKeysPage newCreateKeysModel
-                    in
-                        ( { model | page = newPage, confirmToken = subModel.confirmToken }, Cmd.map CreateKeysMessage subCmd )
-
-                _ ->
-                    let
-                        newPage =
-                            getPage location model.confirmToken
-                    in
-                        ( { model | page = newPage }, Cmd.none )
+            let
+                (newPage, cmd) =
+                    getPage location model.confirmToken
+            in
+                
+                ( { model | page = newPage }, cmd )
 
         ( InputSearch value, _ ) ->
             ( { model | header = { header | searchInput = value } }, Cmd.none )
@@ -492,7 +482,7 @@ subscriptions model =
 -- Utility functions
 
 
-getPage : Location -> String -> Page
+getPage : Location -> String -> (Page, Cmd Message)
 getPage location confirmToken =
     let
         route =
@@ -500,34 +490,46 @@ getPage location confirmToken =
     in
         case route of
             ConfirmEmailRoute ->
-                ConfirmEmailPage ConfirmEmail.initModel
+                (ConfirmEmailPage ConfirmEmail.initModel, Cmd.none)
 
             EmailConfirmedRoute confirmToken ->
-                EmailConfirmedPage (EmailConfirmed.initModel confirmToken)
+                (EmailConfirmedPage (EmailConfirmed.initModel confirmToken), Cmd.none)
 
             EmailConfirmFailureRoute ->
-                EmailConfirmFailurePage EmailConfirmFailure.initModel
+                (EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none)
 
             CreateKeysRoute ->
-                CreateKeysPage (CreateKeys.initModel confirmToken)
+                let
+                    createKeysModel =
+                        CreateKeys.initModel confirmToken
+
+                    ( newCreateKeysModel, subCmd ) =
+                        CreateKeys.update CreateKeys.GenerateKeys createKeysModel
+
+                    newPage =
+                        CreateKeysPage newCreateKeysModel
+
+                    cmd = Cmd.map CreateKeysMessage subCmd
+                in
+                    (newPage, cmd)
 
             CreatedRoute ->
-                CreatedPage Created.initModel
+                (CreatedPage Created.initModel, Cmd.none)
 
             CreateRoute pubkey ->
-                CreatePage (Create.initModel confirmToken pubkey)
+                (CreatePage (Create.initModel confirmToken pubkey), Cmd.none)
 
             SearchRoute ->
-                SearchPage Search.initModel
+                (SearchPage Search.initModel, Cmd.none)
 
             VotingRoute ->
-                VotingPage Voting.initModel
+                (VotingPage Voting.initModel, Cmd.none)
 
             TransferRoute ->
-                TransferPage Transfer.initModel
+                (TransferPage Transfer.initModel, Cmd.none)
 
             IndexRoute ->
-                IndexPage
+                (IndexPage, Cmd.none)
 
             NotFoundRoute ->
-                NotFoundPage
+                (NotFoundPage, Cmd.none)
