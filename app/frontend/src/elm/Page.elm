@@ -492,8 +492,8 @@ getPage location confirmToken =
             ConfirmEmailRoute ->
                 (ConfirmEmailPage ConfirmEmail.initModel, Cmd.none)
 
-            EmailConfirmedRoute confirmToken ->
-                (EmailConfirmedPage (EmailConfirmed.initModel confirmToken), Cmd.none)
+            EmailConfirmedRoute confirmToken email ->
+                (EmailConfirmedPage (EmailConfirmed.initModel confirmToken email), Cmd.none)
 
             EmailConfirmFailureRoute ->
                 (EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none)

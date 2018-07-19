@@ -1,13 +1,13 @@
 module Route exposing (Route(..), matchRoute, parseLocation)
 
 import Navigation exposing (Location)
-import UrlParser exposing ((</>), Parser, map, oneOf, parsePath, s, string, top)
+import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, string, top, stringParam)
 
 
 type Route
     = IndexRoute
     | ConfirmEmailRoute
-    | EmailConfirmedRoute String
+    | EmailConfirmedRoute String (Maybe String)
     | EmailConfirmFailureRoute
     | CreateKeysRoute
     | CreatedRoute
@@ -23,7 +23,7 @@ matchRoute =
     oneOf
         [ map IndexRoute top
         , map ConfirmEmailRoute (s "account" </> s "confirm_email")
-        , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string)
+        , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string <?> stringParam "email")
         , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
         , map CreateKeysRoute (s "account" </> s "create_keys")
         , map CreatedRoute (s "account" </> s "created")
