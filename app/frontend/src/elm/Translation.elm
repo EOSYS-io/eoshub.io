@@ -62,6 +62,8 @@ type I18n
     | ReceiverAccountName
     | OverTransferableAmount
     | Memo
+    | MemoTooLong
+    | MemoNotMandatory
 
 
 translate : Language -> I18n -> String
@@ -258,3 +260,9 @@ getMessages i18n =
 
         Memo ->
             { korean = "메모하기", english = "Memo" }
+
+        MemoTooLong ->
+            { korean = "256 바이트 이상은 불가능합니다.", english = "Memo is too long!" }
+
+        MemoNotMandatory ->
+            { korean = "필수는 아니에요 :)", english = "Optional :)" }
