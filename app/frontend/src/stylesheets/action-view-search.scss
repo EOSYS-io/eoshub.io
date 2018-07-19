@@ -174,7 +174,6 @@
             span[data-status='low'] {
                 background-color:#ff6b64;
             }
-
         }
 
         p {
@@ -183,8 +182,12 @@
     }
 
     .transaction_history {
+
+        .dropdown_list.area {
+            margin:47px 0 25px;
+        }
+
         table {
-            margin:$padding/2 0 0 0;
             border-bottom:1px solid #e4e4e4;
         }
 
@@ -195,11 +198,25 @@
         }
         
         th {
-            color:#000;
+            font-weight:normal;
+            color:#333;
         }
 
         td {
-            color:#666;
+            color:#999;
         }
     }
+
+    .btn_area {
+        margin-top:40px;
+    }
+
+    button.load.button {
+        height:52px;
+        line-height:50px;
+        font-size:rem(14);
+        min-width:160px;
+        padding:0 20px;
+    }
+
 }

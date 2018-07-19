@@ -5,9 +5,11 @@ a.button,
 input[type='submit'] {
     // reset
     cursor:pointer;
-    border-width:0;
+    border-width:1px;
     border-style:solid;
     border-color:transparent;
+
+    box-sizing:border-box;
 
     font-family:inherit;
     background:transparent;
@@ -72,7 +74,12 @@ a.button {
             background-position:center left;
         }
 
+        &.add:before {
+            content:'+';
+            margin-right:0.4em;
+        }
     }
+
 }
 
 // image icon only
@@ -101,6 +108,9 @@ input[type='submit'] {
 // --------------------------------------------------------------------------------
 
 .btn_area {
+    &.center {
+        text-align:center;
+    }
 }
 
 

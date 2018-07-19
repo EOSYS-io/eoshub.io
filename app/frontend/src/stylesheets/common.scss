@@ -8,3 +8,87 @@ p.help.info {
         color:#737a8d;
     }
 }
+
+
+
+
+// custom dropdown_list area
+
+.dropdown_list {
+    display:inline-block;
+    position:relative;   
+
+    div.wrapper {
+        position:absolute;
+        top:100%;
+        z-index:2;
+        left:0;
+        right:0;
+        background-color:#fff;
+
+        button {
+            width:100%;
+            border-top:0;
+        }
+    }
+
+    button {
+        font-size:rem(14);
+
+        background-color:#fff;
+        height:40px;
+        line-height:40px - 2px;
+        display:block;
+
+        white-space:nowrap;
+
+        padding:0 16px;
+
+        border-width:1px;
+        border-style:solid;
+
+        text-align:center;
+        border-radius:0;
+
+        color:#999;
+        transition:color 0.3s, background-color 0.3s;
+        &:hover {
+            color:darken(#999,70%);
+            background:darken(#f7f7f7,1%);
+        }
+    }
+
+    // primary button
+    button[role="listitem"]  {
+        border-color:#d8d8d8;
+
+        &[aria-level] {
+            background:url('../image/icon-dropdown.svg') calc(100% - 16px) calc(50%) no-repeat;
+            background-size:20px 20px;
+
+            padding-right:64px;
+            border-color:#737a8d;
+            border-radius:2px;
+            color:#737a8d;
+        }
+    }
+
+    // response interaction
+    div.wrapper {
+        transition:all 0.3s;
+        max-height:0;
+        overflow:hidden;
+    }
+
+    &.expand {
+        button[aria-level] {
+            background-position-y:calc(50% + 1px);
+        }
+
+        div.wrapper {
+            transition:all 0.3s;
+            max-height:150px;
+
+        }
+    }
+}
