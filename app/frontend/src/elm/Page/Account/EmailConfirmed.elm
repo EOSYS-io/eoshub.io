@@ -2,19 +2,19 @@ module Page.Account.EmailConfirmed exposing (Message(..), Model, initModel, upda
 
 import Html exposing (Html, button, div, input, li, p, text, ul)
 import Html.Events exposing (onClick, onInput)
-import Util.Flags exposing (Flags)
+import Navigation
 
 
 -- MODEL
 
 
 type alias Model =
-    { confirm_token : String }
+    { confirmToken : String }
 
 
 initModel : String -> Model
-initModel confirm_token =
-    { confirm_token = confirm_token }
+initModel confirmToken =
+    { confirmToken = confirmToken }
 
 
 
@@ -25,11 +25,11 @@ type Message
     = Next
 
 
-update : Message -> Model -> Model
+update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
         Next ->
-            model
+            ( model, Navigation.newUrl "/account/create_keys/" )
 
 
 

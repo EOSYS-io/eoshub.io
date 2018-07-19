@@ -15,12 +15,12 @@ import Util.Urls as Urls
 
 
 type alias Model =
-    { accountName : String, requestStatus : Response, confirmToken : String, pubkey : String }
+    { accountName : String, requestStatus : Response, pubkey : String }
 
 
-initModel : ( String, String ) -> Model
-initModel ( confirmToken, pubkey ) =
-    { accountName = "", requestStatus = { msg = "" }, confirmToken = confirmToken, pubkey = pubkey }
+initModel : String -> Model
+initModel pubkey =
+    { accountName = "", requestStatus = { msg = "" }, pubkey = pubkey }
 
 
 
@@ -33,20 +33,20 @@ type Message
     | NewUser (Result Http.Error Response)
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update msg model flags =
+update : Message -> Model -> Flags -> String -> ( Model, Cmd Message )
+update msg model flags confirmToken =
     case msg of
         AccountName accountName ->
             ( { model | accountName = accountName }, Cmd.none )
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags )
+            ( model, createEosAccountRequest model flags confirmToken )
 
         NewUser (Ok res) ->
-            ( { model | requestStatus = res } |> Debug.log (toString res), Cmd.none )
+            ( { model | requestStatus = res }, Cmd.none )
 
         NewUser (Err error) ->
-            ( { model | requestStatus = { msg = toString error } } |> Debug.log (toString error), Cmd.none )
+            ( { model | requestStatus = { msg = toString error } }, Cmd.none )
 
 
 
@@ -85,18 +85,18 @@ createEosAccountBodyParams model =
         |> Http.jsonBody
 
 
-postCreateEosAccount : Model -> Flags -> Http.Request Response
-postCreateEosAccount model flags =
+postCreateEosAccount : Model -> Flags -> String -> Http.Request Response
+postCreateEosAccount model flags confirmToken =
     let
         url =
-            Urls.createEosAccountUrl ( flags, model.confirmToken )
+            Urls.createEosAccountUrl ( flags, confirmToken )
 
         params =
             createEosAccountBodyParams model
     in
-    Http.post url params responseDecoder
+        Http.post url params responseDecoder
 
 
-createEosAccountRequest : Model -> Flags -> Cmd Message
-createEosAccountRequest model flags =
-    Http.send NewUser <| postCreateEosAccount model flags
+createEosAccountRequest : Model -> Flags -> String -> Cmd Message
+createEosAccountRequest model flags confirmToken =
+    Http.send NewUser <| postCreateEosAccount model flags confirmToken

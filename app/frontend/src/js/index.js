@@ -3,6 +3,7 @@ import 'babel-polyfill';
 import '../stylesheets/style.scss';
 
 import eos from 'eosjs';
+import ecc from 'eosjs-ecc';
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
 import {
@@ -92,6 +93,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     app.ports.receivePushActionResponse.send(response);
+  });
+
+  app.ports.generateKeys.subscribe(async () => {
+    // Create a new random private key
+    let privateWif
+    ecc.PrivateKey.randomKey().then(privateKey => {
+      privateWif = privateKey.toWif()
+      // Convert to a public key
+      var pubkey = ecc.PrivateKey.fromString(privateWif).toPublic().toString()
+
+      var keys = { privateKey: privateWif, publicKey: pubkey }
+      app.ports.receiveKeys.send(keys);
+    })
   });
 
   updateElm(app);
