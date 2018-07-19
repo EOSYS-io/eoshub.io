@@ -270,7 +270,7 @@ onEnter msg =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update : Message -> Model -> Flags -> Wallet -> ( Model, Cmd Message )
 update message ({ page, notification, header, confirmToken } as model) flags { account } =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->

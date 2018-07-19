@@ -9,7 +9,11 @@ import Test exposing (..)
 
 model : Model
 model =
-    { transfer =
+    { accountValidation = EmptyAccount
+    , quantityValidation = EmptyQuantity
+    , memoValidation = ValidMemo
+    , isFormValid = False
+    , transfer =
         { from = "from"
         , to = "to"
         , quantity = "300"
@@ -51,15 +55,32 @@ tests =
              in
                 [ test "To" <|
                     \() ->
-                        Expect.equal { model | transfer = { transfer | to = "newTo" } }
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | to = "newTo" }
+                                , accountValidation = InvalidAccount
+                                , quantityValidation = ValidQuantity
+                            }
                             (setTransferMessageField To "newTo" model)
                 , test "Quantity" <|
                     \() ->
-                        Expect.equal { model | transfer = { transfer | quantity = "301" } }
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | quantity = "301" }
+                                , accountValidation = ValidAccount
+                                , quantityValidation = ValidQuantity
+                                , isFormValid = True
+                            }
                             (setTransferMessageField Quantity "301" model)
                 , test "Memo" <|
                     \() ->
-                        Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | memo = "newMemo" }
+                                , accountValidation = ValidAccount
+                                , quantityValidation = ValidQuantity
+                                , isFormValid = True
+                            }
                             (setTransferMessageField Memo "newMemo" model)
                 ]
             )
