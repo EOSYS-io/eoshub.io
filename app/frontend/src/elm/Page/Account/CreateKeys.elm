@@ -11,12 +11,16 @@ import Port exposing (KeyPair)
 
 
 type alias Model =
-    { keys : KeyPair }
+    { keys : KeyPair
+    , nextEnabled : Bool
+    , confirmToken : String }
 
 
-initModel : Model
-initModel =
-    { keys = { privateKey = "", publicKey = "" } }
+initModel : String -> Model
+initModel confirmToken =
+    { keys = { privateKey = "", publicKey = "" } 
+    , nextEnabled = False
+    , confirmToken = confirmToken }
 
 
 
@@ -30,11 +34,11 @@ type Message
     | Copy
 
 
-update : Message -> Model -> String -> ( Model, Cmd Message )
-update msg model confirmToken =
+update : Message -> Model -> ( Model, Cmd Message )
+update msg model =
     case msg of
         Next ->
-            ( model, Navigation.newUrl ("/account/create/" ++ confirmToken ++ "/" ++ model.keys.publicKey) )
+            ( model, Navigation.newUrl ("/account/create/" ++ model.confirmToken ++ "/" ++ model.keys.publicKey) )
 
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -43,7 +47,7 @@ update msg model confirmToken =
             ( { model | keys = keyPair }, Cmd.none )
 
         Copy ->
-            (model, Port.copy ())
+            ( { model | nextEnabled = True }, Port.copy ())
 
 
 -- VIEW
@@ -84,7 +88,11 @@ view model =
                 [ text "한번에 복사하기" ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle white_blue button", attribute "disabled" "", id "next", type_ "button", onClick Next ]
+            [ button [ class "middle white_blue button", attribute (if model.nextEnabled
+                        then
+                            "enabled"
+                        else
+                            "disabled") "", id "next", type_ "button", onClick Next ]
                 [ text "다음" ]
             ]
         ]

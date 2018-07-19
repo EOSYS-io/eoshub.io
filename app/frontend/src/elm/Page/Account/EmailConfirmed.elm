@@ -43,7 +43,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
         Next ->
-            ( model, Navigation.newUrl "/account/create_keys/" )
+            ( model, Navigation.newUrl ("/account/create_keys/"++model.confirmToken) )
 
 
 
