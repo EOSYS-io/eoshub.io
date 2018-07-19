@@ -44,7 +44,6 @@ $padding_bottom:36px;
 
         width:20px;
         height:20px;
-        // background:url('../image/lnb_fold_button.svg') left top no-repeat transparent;
         background-size:cover;
 
         border-radius:2px;
@@ -212,6 +211,11 @@ button.lang {
         &:first-letter {
             text-transform:uppercase;
         }
+    }
+
+    li.scatter {
+        background:url('../image/bi-scatter@2x.png') left center no-repeat transparent;
+        background-size:40px 40px;
     }
 
     button {
