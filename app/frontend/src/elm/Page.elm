@@ -296,7 +296,7 @@ update message ({ page, notification, header, confirmToken } as model) flags =
         ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    CreateKeys.update subMessage subModel
+                    CreateKeys.update subMessage subModel confirmToken
             in
                 ( { model | page = newPage |> CreateKeysPage }, Cmd.map CreateKeysMessage subCmd )
 
@@ -310,7 +310,7 @@ update message ({ page, notification, header, confirmToken } as model) flags =
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags
+                    Create.update subMessage subModel flags confirmToken
             in
                 ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
@@ -501,10 +501,10 @@ getPage location confirmToken =
             CreateKeysRoute ->
                 let
                     createKeysModel =
-                        CreateKeys.initModel confirmToken
+                        CreateKeys.initModel
 
                     ( newCreateKeysModel, subCmd ) =
-                        CreateKeys.update CreateKeys.GenerateKeys createKeysModel
+                        CreateKeys.update CreateKeys.GenerateKeys createKeysModel confirmToken
 
                     newPage =
                         CreateKeysPage newCreateKeysModel
@@ -517,7 +517,7 @@ getPage location confirmToken =
                 (CreatedPage Created.initModel, Cmd.none)
 
             CreateRoute pubkey ->
-                (CreatePage (Create.initModel confirmToken pubkey), Cmd.none)
+                (CreatePage (Create.initModel pubkey), Cmd.none)
 
             SearchRoute ->
                 (SearchPage Search.initModel, Cmd.none)

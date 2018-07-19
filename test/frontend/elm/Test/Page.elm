@@ -57,10 +57,10 @@ tests =
                 , test "CreateKeysRoute" <|
                     \() ->
                         let
-                            createKeysModel = CreateKeys.initModel confirmToken
+                            createKeysModel = CreateKeys.initModel
                             
                             ( newCreateKeysModel, subCmd ) =
-                                CreateKeys.update CreateKeys.GenerateKeys createKeysModel
+                                CreateKeys.update CreateKeys.GenerateKeys createKeysModel confirmToken
 
                             expectedPage =
                                 CreateKeysPage newCreateKeysModel
@@ -76,7 +76,7 @@ tests =
                             pubkey =
                                 "testpubkey"
                         in
-                            Expect.equal (CreatePage (Create.initModel confirmToken pubkey), Cmd.none) (getPage { location | pathname = "/account/create/" ++ pubkey } confirmToken)
+                            Expect.equal (CreatePage (Create.initModel pubkey), Cmd.none) (getPage { location | pathname = "/account/create/" ++ pubkey } confirmToken)
                 , test "VotingRoute" <|
                     \() -> Expect.equal (VotingPage Voting.initModel, Cmd.none) (getPage { location | pathname = "/voting" } confirmToken)
                 , test "TransferRoute" <|

@@ -10,16 +10,12 @@ import Port exposing (KeyPair)
 
 
 type alias Model =
-    { confirmToken : String
-    , keys : KeyPair
-    }
+    { keys : KeyPair }
 
 
-initModel : String -> Model
-initModel confirmToken =
-    { confirmToken = confirmToken
-    , keys = { privateKey = "", publicKey = "" }
-    }
+initModel : Model
+initModel =
+    { keys = { privateKey = "", publicKey = "" } }
 
 
 
@@ -32,11 +28,11 @@ type Message
     | UpdateKeys KeyPair
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update msg model =
+update : Message -> Model -> String -> ( Model, Cmd Message )
+update msg model confirmToken =
     case msg of
         Next ->
-            ( model, Navigation.newUrl ("/account/create/" ++ model.confirmToken ++ "/" ++ model.keys.publicKey) )
+            ( model, Navigation.newUrl ("/account/create/" ++ confirmToken ++ "/" ++ model.keys.publicKey) )
 
         GenerateKeys ->
             ( model, Port.generateKeys () )
