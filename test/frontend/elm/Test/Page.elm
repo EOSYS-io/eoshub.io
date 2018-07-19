@@ -14,6 +14,7 @@ import Page.Transfer as Transfer
 import Page.Voting as Voting
 import Test exposing (..)
 import Translation exposing (I18n(TransferSucceeded))
+import Util.WalletDecoder exposing (WalletStatus(Authenticated))
 import View.Notification
 import Data.Account exposing (..)
 import Json.Decode as JD
@@ -43,6 +44,12 @@ tests =
 
         confirmToken =
             "test"
+
+        wallet =
+            { status = Authenticated
+            , account = "account"
+            , authority = "active"
+            }
     in
         describe "Page module"
             [ describe "getPage"
@@ -111,7 +118,7 @@ tests =
                         in
                             Expect.equal
                                 ( expectedModel, Cmd.none )
-                                (update (UpdatePushActionResponse pushActionResponse) model flags)
+                                (update (UpdatePushActionResponse pushActionResponse) model flags wallet)
                 , test "CloseNotification" <|
                     \() ->
                         let
@@ -139,6 +146,7 @@ tests =
                                     (NotificationMessage View.Notification.CloseNotification)
                                     openedModel
                                     flags
+                                    wallet
                                 )
                 ]
             , describe

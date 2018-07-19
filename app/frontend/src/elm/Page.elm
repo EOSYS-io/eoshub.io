@@ -46,6 +46,7 @@ import Json.Decode as JD exposing (Decoder)
 import Json.Encode as JE
 import Regex exposing (regex, contains)
 import Data.Account exposing (Account, ResourceInEos, Resource, Refund, accountDecoder, keyAccountsDecoder)
+import Util.WalletDecoder exposing (Wallet)
 import View.Notification as Notification
 
 
@@ -270,7 +271,7 @@ onEnter msg =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, confirmToken } as model) flags =
+update message ({ page, notification, header, confirmToken } as model) flags { account } =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -324,7 +325,7 @@ update message ({ page, notification, header, confirmToken } as model) flags =
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Transfer.update subMessage subModel
+                    Transfer.update subMessage subModel account
             in
                 ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
@@ -362,7 +363,7 @@ update message ({ page, notification, header, confirmToken } as model) flags =
         ( GetSearchResult query, _ ) ->
             let
                 parsedQuery =
-                    (parseQuery query)
+                    parseQuery query
 
                 newCmd =
                     case parsedQuery of
