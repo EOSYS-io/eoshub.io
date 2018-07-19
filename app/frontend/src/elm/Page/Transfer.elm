@@ -6,6 +6,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Navigation
 import Port
+import Regex exposing (regex, contains)
+import String.UTF8 as UTF8
 import Translation exposing (Language, translate, I18n(..))
 
 
@@ -13,12 +15,38 @@ import Translation exposing (Language, translate, I18n(..))
 
 
 type alias Model =
-    { transfer : TransferParameters }
+    { transfer : TransferParameters
+    , accountValidation : AccountStatus
+    , quantityValidation : QuantityStatus
+    , memoValidation : MemoStatus
+    , isFormValid : Bool
+    }
+
+
+type AccountStatus
+    = EmptyAccount
+    | ValidAccount
+    | InvalidAccount
+
+
+type QuantityStatus
+    = EmptyQuantity
+    | InvalidQuantity
+    | ValidQuantity
+
+
+type MemoStatus
+    = MemoTooLong
+    | ValidMemo
 
 
 initModel : Model
 initModel =
     { transfer = { from = "", to = "", quantity = "", memo = "" }
+    , accountValidation = EmptyAccount
+    , quantityValidation = EmptyQuantity
+    , memoValidation = ValidMemo
+    , isFormValid = False
     }
 
 
@@ -36,6 +64,7 @@ type Message
     = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
     | ChangeUrl String
+    | SetFormValidation Bool
 
 
 
@@ -46,7 +75,7 @@ type Message
 
 
 view : Language -> Model -> Html Message
-view language { transfer } =
+view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } =
     section [ class "action view panel transfer" ]
         [ nav []
             [ a
@@ -85,6 +114,25 @@ view language { transfer } =
         , let
             { to, quantity, memo } =
                 transfer
+
+            accountWarning =
+                if accountValidation == InvalidAccount then
+                    span [] [ text (translate language CheckAccountName) ]
+                else
+                    span [] []
+
+            quantityWarning =
+                if quantityValidation == InvalidQuantity then
+                    span [ class "warning" ]
+                        [ text (translate language OverTransferableAmount) ]
+                else
+                    span [] []
+
+            memoWarning =
+                if memoValidation == MemoTooLong then
+                    span [] [ text (translate language Translation.MemoTooLong) ]
+                else
+                    span [] [ text (translate language MemoNotMandatory) ]
           in
             div
                 [ class "card" ]
@@ -106,7 +154,7 @@ view language { transfer } =
                                 , value to
                                 ]
                                 []
-                            , span [] [ text (translate language CheckAccountName) ]
+                            , accountWarning
                             ]
                         , li [ class "eos" ]
                             [ input
@@ -118,8 +166,7 @@ view language { transfer } =
                                 , value quantity
                                 ]
                                 []
-                            , span [ class "warning" ]
-                                [ text (translate language OverTransferableAmount) ]
+                            , quantityWarning
                             ]
                         , li [ class "memo" ]
                             [ input
@@ -131,7 +178,7 @@ view language { transfer } =
                                 , value memo
                                 ]
                                 []
-                            , span [] [ text (translate language OverTransferableAmount) ]
+                            , memoWarning
                             ]
                         ]
                     , div
@@ -141,6 +188,7 @@ view language { transfer } =
                             , id "send"
                             , class "middle blue_white"
                             , onClick SubmitAction
+                            , disabled (not isFormValid)
                             ]
                             [ text (translate language Transfer) ]
                         ]
@@ -169,23 +217,80 @@ update message ({ transfer } as model) account =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        SetFormValidation validity ->
+            ( { model | isFormValid = validity }, Cmd.none )
+
 
 
 -- Utility functions.
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Model
-setTransferMessageField field value model =
+setTransferMessageField field value ({ transfer } as model) =
+    case field of
+        To ->
+            validate { model | transfer = { transfer | to = value } }
+
+        Quantity ->
+            validate { model | transfer = { transfer | quantity = value } }
+
+        Memo ->
+            validate { model | transfer = { transfer | memo = value } }
+
+
+
+-- TODO(heejae): Add tests.
+
+
+validate : Model -> Model
+validate ({ transfer } as model) =
     let
-        transfer =
-            model.transfer
+        { to, quantity, memo } =
+            transfer
+
+        accountValidation =
+            if to == "" then
+                EmptyAccount
+            else if contains (regex "^[a-z\\.1-5]{1,12}$") to then
+                ValidAccount
+            else
+                InvalidAccount
+
+        -- Change the limit to user's balance.
+        quantityValidation =
+            if quantity == "" then
+                EmptyQuantity
+            else
+                let
+                    maybeQuantity =
+                        String.toFloat quantity
+                in
+                    case maybeQuantity of
+                        Ok quantity ->
+                            if quantity == 0 then
+                                EmptyQuantity
+                            else if quantity > 1000000000 || quantity < 0 then
+                                InvalidQuantity
+                            else
+                                ValidQuantity
+
+                        _ ->
+                            InvalidQuantity
+
+        memoValidation =
+            if UTF8.length memo > 256 then
+                MemoTooLong
+            else
+                ValidMemo
+
+        isFormValid =
+            (accountValidation == ValidAccount)
+                && (quantityValidation == ValidQuantity)
+                && (memoValidation == ValidMemo)
     in
-        case field of
-            To ->
-                { model | transfer = { transfer | to = value } }
-
-            Quantity ->
-                { model | transfer = { transfer | quantity = value } }
-
-            Memo ->
-                { model | transfer = { transfer | memo = value } }
+        { model
+            | accountValidation = accountValidation
+            , quantityValidation = quantityValidation
+            , memoValidation = memoValidation
+            , isFormValid = isFormValid
+        }
