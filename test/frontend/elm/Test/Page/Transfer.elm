@@ -35,8 +35,8 @@ submitActionTest =
                   )
                 ]
     in
-    test "SubmitAction" <|
-        \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model)
+        test "SubmitAction" <|
+            \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from")
 
 
 tests : Test
@@ -49,22 +49,18 @@ tests =
                 { transfer } =
                     model
              in
-             [ test "From" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | from = "newFrom" } }
-                        (setTransferMessageField From "newFrom" model)
-             , test "To" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | to = "newTo" } }
-                        (setTransferMessageField To "newTo" model)
-             , test "Quantity" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | quantity = "301" } }
-                        (setTransferMessageField Quantity "301" model)
-             , test "Memo" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
-                        (setTransferMessageField Memo "newMemo" model)
-             ]
+                [ test "To" <|
+                    \() ->
+                        Expect.equal { model | transfer = { transfer | to = "newTo" } }
+                            (setTransferMessageField To "newTo" model)
+                , test "Quantity" <|
+                    \() ->
+                        Expect.equal { model | transfer = { transfer | quantity = "301" } }
+                            (setTransferMessageField Quantity "301" model)
+                , test "Memo" <|
+                    \() ->
+                        Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
+                            (setTransferMessageField Memo "newMemo" model)
+                ]
             )
         ]

@@ -27,8 +27,7 @@ initModel =
 
 
 type TransferMessageFormField
-    = From
-    | To
+    = To
     | Quantity
     | Memo
 
@@ -83,66 +82,70 @@ view language { transfer } =
         , p [ class "help info" ]
             [ a [ style [ ( "cursor", "pointer" ) ] ] [ text (translate language TransferHelp) ]
             ]
-        , div
-            [ class "card" ]
-            [ h4 []
-                [ text (translate language TransferableAmount)
-                , br [] []
-                , strong [] [ text "120 EOS" ]
-                ]
-            , Html.form
-                []
-                [ ul []
-                    [ li [ class "account" ]
-                        [ input
-                            [ id "rcvAccount"
-                            , type_ "text"
-                            , style [ ( "color", "white" ) ]
-                            , placeholder (translate language ReceiverAccountName)
-                            , onInput <| SetTransferMessageField To
-                            , value transfer.to
+        , let
+            { to, quantity, memo } =
+                transfer
+          in
+            div
+                [ class "card" ]
+                [ h4 []
+                    [ text (translate language TransferableAmount)
+                    , br [] []
+                    , strong [] [ text "120 EOS" ]
+                    ]
+                , Html.form
+                    []
+                    [ ul []
+                        [ li [ class "account" ]
+                            [ input
+                                [ id "rcvAccount"
+                                , type_ "text"
+                                , style [ ( "color", "white" ) ]
+                                , placeholder (translate language ReceiverAccountName)
+                                , onInput <| SetTransferMessageField To
+                                , value to
+                                ]
+                                []
+                            , span [] [ text (translate language CheckAccountName) ]
                             ]
-                            []
-                        , span [] [ text (translate language CheckAccountName) ]
+                        , li [ class "eos" ]
+                            [ input
+                                [ id "eos"
+                                , type_ "number"
+                                , style [ ( "color", "white" ) ]
+                                , placeholder "0.0000"
+                                , onInput <| SetTransferMessageField Quantity
+                                , value quantity
+                                ]
+                                []
+                            , span [ class "warning" ]
+                                [ text (translate language OverTransferableAmount) ]
+                            ]
+                        , li [ class "memo" ]
+                            [ input
+                                [ id "memo"
+                                , type_ "text"
+                                , style [ ( "color", "white" ) ]
+                                , placeholder (translate language Translation.Memo)
+                                , onInput <| SetTransferMessageField Memo
+                                , value memo
+                                ]
+                                []
+                            , span [] [ text (translate language OverTransferableAmount) ]
+                            ]
                         ]
-                    , li [ class "eos" ]
-                        [ input
-                            [ id "eos"
-                            , type_ "number"
-                            , style [ ( "color", "white" ) ]
-                            , placeholder "0.0000"
-                            , onInput <| SetTransferMessageField Quantity
-                            , value transfer.quantity
+                    , div
+                        [ class "btn_area" ]
+                        [ button
+                            [ type_ "button"
+                            , id "send"
+                            , class "middle blue_white"
+                            , onClick SubmitAction
                             ]
-                            []
-                        , span [ class "warning" ]
-                            [ text (translate language OverTransferableAmount) ]
-                        ]
-                    , li [ class "memo" ]
-                        [ input
-                            [ id "memo"
-                            , type_ "text"
-                            , style [ ( "color", "white" ) ]
-                            , placeholder (translate language Translation.Memo)
-                            , onInput <| SetTransferMessageField Memo
-                            , value transfer.memo
-                            ]
-                            []
-                        , span [] [ text (translate language OverTransferableAmount) ]
+                            [ text (translate language Transfer) ]
                         ]
                     ]
-                , div
-                    [ class "btn_area" ]
-                    [ button
-                        [ type_ "button"
-                        , id "send"
-                        , class "middle blue_white"
-                        , onClick SubmitAction
-                        ]
-                        [ text (translate language Transfer) ]
-                    ]
                 ]
-            ]
         ]
 
 
@@ -150,13 +153,13 @@ view language { transfer } =
 -- UPDATE
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update message ({ transfer } as model) =
+update : Message -> Model -> String -> ( Model, Cmd Message )
+update message ({ transfer } as model) account =
     case message of
         SubmitAction ->
             let
                 cmd =
-                    transfer |> Action.Transfer |> encodeAction |> Port.pushAction
+                    { transfer | from = account } |> Action.Transfer |> encodeAction |> Port.pushAction
             in
                 ( model, cmd )
 
@@ -178,9 +181,6 @@ setTransferMessageField field value model =
             model.transfer
     in
         case field of
-            From ->
-                { model | transfer = { transfer | from = value } }
-
             To ->
                 { model | transfer = { transfer | to = value } }
 
