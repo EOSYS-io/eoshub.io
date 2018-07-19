@@ -3,6 +3,12 @@ module Test.Page exposing (..)
 import Expect
 import Navigation exposing (Location)
 import Page exposing (..)
+import Page.Account.ConfirmEmail as ConfirmEmail
+import Page.Account.Create as Create
+import Page.Account.CreateKeys as CreateKeys
+import Page.Account.Created as Created
+import Page.Account.EmailConfirmFailure as EmailConfirmFailure
+import Page.Account.EmailConfirmed as EmailConfirmed
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
@@ -38,6 +44,23 @@ tests =
             [ describe "getPage"
                 [ test "IndexRoute" <|
                     \() -> Expect.equal IndexPage (getPage { location | pathname = "/" } confirmToken)
+                , test "ConfirmEmailRoute" <|
+                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel) (getPage { location | pathname = "/account/confirm_email" } confirmToken)
+                , test "EmailConfirmedRoute" <|
+                    \() -> Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel confirmToken)) (getPage { location | pathname = "/account/email_confirmed/test" } confirmToken)
+                , test "EmailConfirmFailureRoute" <|
+                    \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel) (getPage { location | pathname = "/account/email_confirm_failure" } confirmToken)
+                , test "CreateKeysRoute" <|
+                    \() -> Expect.equal (CreateKeysPage (CreateKeys.initModel confirmToken)) (getPage { location | pathname = "/account/create_keys" } confirmToken)
+                , test "CreatedRoute" <|
+                    \() -> Expect.equal (CreatedPage Created.initModel) (getPage { location | pathname = "/account/created" } confirmToken)
+                , test "CreateRoute" <|
+                    \() ->
+                        let
+                            pubkey =
+                                "testpubkey"
+                        in
+                            Expect.equal (CreatePage (Create.initModel confirmToken pubkey)) (getPage { location | pathname = "/account/create/" ++ pubkey } confirmToken)
                 , test "VotingRoute" <|
                     \() -> Expect.equal (VotingPage Voting.initModel) (getPage { location | pathname = "/voting" } confirmToken)
                 , test "TransferRoute" <|

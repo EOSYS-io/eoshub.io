@@ -18,8 +18,8 @@ type alias Model =
     { accountName : String, requestStatus : Response, confirmToken : String, pubkey : String }
 
 
-initModel : ( String, String ) -> Model
-initModel ( confirmToken, pubkey ) =
+initModel : String -> String -> Model
+initModel confirmToken pubkey =
     { accountName = "", requestStatus = { msg = "" }, confirmToken = confirmToken, pubkey = pubkey }
 
 
@@ -94,7 +94,7 @@ postCreateEosAccount model flags =
         params =
             createEosAccountBodyParams model
     in
-    Http.post url params responseDecoder
+        Http.post url params responseDecoder
 
 
 createEosAccountRequest : Model -> Flags -> Cmd Message

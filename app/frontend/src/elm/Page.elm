@@ -488,7 +488,7 @@ getPage location confirmToken =
                 CreatedPage Created.initModel
 
             CreateRoute pubkey ->
-                CreatePage (Create.initModel ( confirmToken, pubkey ))
+                CreatePage (Create.initModel confirmToken pubkey)
 
             SearchRoute ->
                 SearchPage Search.initModel
