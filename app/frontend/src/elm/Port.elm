@@ -42,3 +42,9 @@ port generateKeys : () -> Cmd message
 
 
 port receiveKeys : (KeyPair -> message) -> Sub message
+
+
+-- Clipboard
+
+
+port copy : () -> Cmd message
