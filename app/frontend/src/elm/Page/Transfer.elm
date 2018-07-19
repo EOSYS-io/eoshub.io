@@ -1,11 +1,12 @@
 module Page.Transfer exposing (..)
 
-import Action exposing (Action(Transfer), TransferParameters, encodeAction)
+import Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Navigation
 import Port
-import Translation exposing (Language)
+import Translation exposing (Language, translate, I18n(..))
 
 
 -- MODEL
@@ -35,61 +36,111 @@ type TransferMessageFormField
 type Message
     = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
+    | ChangeUrl String
 
 
 
 -- VIEW
+-- Note(heejae): Current url change logic is so messy.
+-- Refactor url change logic using Navigation.urlUpdate.
+-- See details of this approach from https://github.com/sircharleswatson/elm-navigation-example
 
 
 view : Language -> Model -> Html Message
-view _ { transfer } =
-    div []
-        [ div []
-            [ Html.form
-                [ onSubmit SubmitAction ]
-                [ label []
-                    [ text "From"
-                    , input
-                        [ type_ "text"
-                        , placeholder "From"
-                        , onInput <| SetTransferMessageField From
-                        , value transfer.from
+view language { transfer } =
+    section [ class "action view panel transfer" ]
+        [ nav []
+            [ a
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick (ChangeUrl "/transfer")
+                , class "viewing"
+                ]
+                [ text (translate language Translation.Transfer) ]
+            , a
+                [ style [ ( "cursor", "pointer" ) ] ]
+                [ text (translate language RamMarket) ]
+            , a
+                [ style [ ( "cursor", "pointer" ) ] ]
+                [ text (translate language Application) ]
+            , a
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick (ChangeUrl "/voting")
+                ]
+                [ text (translate language Vote) ]
+            , a
+                [ style [ ( "cursor", "pointer" ) ] ]
+                [ text (translate language ProxyVote) ]
+            , a
+                [ style [ ( "cursor", "pointer" ) ] ]
+                [ text (translate language Faq) ]
+            ]
+        , h3 [] [ text (translate language Transfer) ]
+        , p []
+            [ text (translate language TransferInfo1)
+            , br [] []
+            , text (translate language TransferInfo2)
+            ]
+        , p [ class "help info" ]
+            [ a [ style [ ( "cursor", "pointer" ) ] ] [ text (translate language TransferHelp) ]
+            ]
+        , div
+            [ class "card" ]
+            [ h4 []
+                [ text (translate language TransferableAmount)
+                , br [] []
+                , strong [] [ text "120 EOS" ]
+                ]
+            , Html.form
+                []
+                [ ul []
+                    [ li [ class "account" ]
+                        [ input
+                            [ id "rcvAccount"
+                            , type_ "text"
+                            , style [ ( "color", "white" ) ]
+                            , placeholder (translate language ReceiverAccountName)
+                            , onInput <| SetTransferMessageField To
+                            , value transfer.to
+                            ]
+                            []
+                        , span [] [ text (translate language CheckAccountName) ]
                         ]
-                        []
-                    ]
-                , label []
-                    [ text "To"
-                    , input
-                        [ type_ "text"
-                        , placeholder "To"
-                        , onInput <| SetTransferMessageField To
-                        , value transfer.to
+                    , li [ class "eos" ]
+                        [ input
+                            [ id "eos"
+                            , type_ "number"
+                            , style [ ( "color", "white" ) ]
+                            , placeholder "0.0000"
+                            , onInput <| SetTransferMessageField Quantity
+                            , value transfer.quantity
+                            ]
+                            []
+                        , span [ class "warning" ]
+                            [ text (translate language OverTransferableAmount) ]
                         ]
-                        []
-                    ]
-                , label []
-                    [ text "Quantity"
-                    , input
-                        [ type_ "text"
-                        , placeholder "EOS"
-                        , onInput <| SetTransferMessageField Quantity
-                        , value transfer.quantity
+                    , li [ class "memo" ]
+                        [ input
+                            [ id "memo"
+                            , type_ "text"
+                            , style [ ( "color", "white" ) ]
+                            , placeholder (translate language Translation.Memo)
+                            , onInput <| SetTransferMessageField Memo
+                            , value transfer.memo
+                            ]
+                            []
+                        , span [] [ text (translate language OverTransferableAmount) ]
                         ]
-                        []
                     ]
-                , label []
-                    [ text "Memo"
-                    , input
-                        [ type_ "text"
-                        , placeholder "Memo"
-                        , onInput <| SetTransferMessageField Memo
-                        , value transfer.memo
+                , div
+                    [ class "btn_area" ]
+                    [ button
+                        [ type_ "button"
+                        , id "send"
+                        , class "middle blue_white"
+                        , onClick SubmitAction
                         ]
-                        []
+                        [ text (translate language Transfer) ]
                     ]
-                , button
-                    []
-                    [ text "Submit" ]
                 ]
             ]
         ]
@@ -105,12 +156,15 @@ update message ({ transfer } as model) =
         SubmitAction ->
             let
                 cmd =
-                    transfer |> Transfer |> encodeAction |> Port.pushAction
+                    transfer |> Action.Transfer |> encodeAction |> Port.pushAction
             in
                 ( model, cmd )
 
         SetTransferMessageField field value ->
             ( setTransferMessageField field value model, Cmd.none )
+
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
 
 
 
