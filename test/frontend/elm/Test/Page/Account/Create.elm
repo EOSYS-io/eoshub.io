@@ -10,7 +10,6 @@ model : Model
 model =
     { accountName = "testtesttest"
     , requestStatus = { msg = "" }
-    , confirmToken = "test"
     , pubkey = "12o9347512f1oh923"
     }
 
