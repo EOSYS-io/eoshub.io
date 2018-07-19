@@ -9,9 +9,11 @@ import Test exposing (..)
 model : Model
 model =
     { email = "test@chain.partners"
+    , validationMsg = "Please enter an email address."
+    , sendEnable = False
     , requestStatus = { msg = "" }
+    , requestSuccess = False
     }
-
 
 tests : Test
 tests =
