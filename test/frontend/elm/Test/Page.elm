@@ -31,21 +31,21 @@ location =
 tests : Test
 tests =
     let
-        flags =
-            { node_env = "test" }
+        confirmToken =
+            "test"
     in
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
-                \() -> Expect.equal IndexPage (getPage { location | pathname = "/" })
+                \() -> Expect.equal IndexPage (getPage { location | pathname = "/" } confirmToken)
             , test "VotingRoute" <|
-                \() -> Expect.equal (VotingPage Voting.initModel) (getPage { location | pathname = "/voting" })
+                \() -> Expect.equal (VotingPage Voting.initModel) (getPage { location | pathname = "/voting" } confirmToken)
             , test "TransferRoute" <|
-                \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" })
+                \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" } confirmToken)
             , test "SearchRoute" <|
-                \() -> Expect.equal (SearchPage Search.initModel) (getPage { location | pathname = "/search" })
+                \() -> Expect.equal (SearchPage Search.initModel) (getPage { location | pathname = "/search" } confirmToken)
             , test "NotFoundRoute" <|
-                \() -> Expect.equal NotFoundPage (getPage location)
+                \() -> Expect.equal NotFoundPage (getPage location confirmToken)
             ]
         , describe "update"
             [ test "UpdateScatterResponse" <|
