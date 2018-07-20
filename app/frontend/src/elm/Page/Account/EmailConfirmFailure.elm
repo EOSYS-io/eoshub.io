@@ -1,7 +1,7 @@
 module Page.Account.EmailConfirmFailure exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, div, h1, text)
-import Util.Flags exposing (Flags)
+import Html.Attributes exposing (class)
 
 
 -- MODEL
@@ -37,5 +37,5 @@ update msg model =
 
 view : Model -> Html Message
 view model =
-    div []
+    div [ class "container join" ]
         [ h1 [] [ text "인증 실패" ] ]

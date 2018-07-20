@@ -11,7 +11,10 @@ model =
     { accountName = "testtesttest"
     , requestStatus = { msg = "" }
     , pubkey = "12o9347512f1oh923"
-    }
+    , validation = False
+    , validationMsg = ""
+    , requestSuccess = False
+    , confirmToken = "test" }
 
 
 tests : Test

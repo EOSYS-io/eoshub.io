@@ -108,6 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
     })
   });
 
+  app.ports.copy.subscribe(async () => {
+    console.log('copy');
+    document.querySelector('#key').select();
+    document.execCommand('copy');
+  });
+
   updateElm(app);
 });
 

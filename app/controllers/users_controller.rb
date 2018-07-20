@@ -21,7 +21,7 @@ class UsersController < ApiController
     user = User.find_by(confirm_token: confirm_token)
     if user.present?
       user.email_confirmed!
-      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}"
+      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}?email=#{user.email}"
     else
       redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}"
     end

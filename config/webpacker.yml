@@ -3,12 +3,12 @@
 default: &default
   source_path: app/frontend/src
   source_entry_path: js
-  public_output_path: js
+  public_output_path: assets/packs
   cache_path: tmp/cache/webpacker
 
   # Additional paths webpack should lookup modules
   # ['app/assets', 'engine/foo/app/assets']
-  resolved_paths: []
+  resolved_paths: ['vendor/assets/elm']
 
   # Reload manifest.json on all requests so we reload latest compiled packs
   cache_manifest: false
