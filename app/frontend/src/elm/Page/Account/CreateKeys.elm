@@ -66,10 +66,7 @@ view model =
             ]
         , article [ attribute "data-step" "3" ]
             [ h1 []
-                [ img [ alt "", src "./image/symbol-alert.svg" ]
-                    []
-                , text "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!    "
-                ]
+                [ text "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!    " ]
             , p []
                 [ text "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!" ]
             , dl [ class "keybox" ]

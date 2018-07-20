@@ -88,10 +88,7 @@ view model =
             ]
         , article [ attribute "data-step" "1" ]
             [ h1 []
-                [ img [ alt "", src "./image/symbol-smile.svg" ]
-                    []
-                , text "새로운 계정을 만들기 위해 이메일을 인증하세요!    "
-                ]
+                [ text "새로운 계정을 만들기 위해 이메일을 인증하세요!    " ]
             , p []
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
             , form [ action "" ]

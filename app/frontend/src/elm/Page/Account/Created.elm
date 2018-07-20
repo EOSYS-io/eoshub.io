@@ -57,8 +57,6 @@ view model =
                 ]
             , p []
                 [ text "이제 홈에서 로그인하실 수 있어요!" ]
-            , img [ alt "", class "finished icon", src "./image/group-18.svg" ]
-                []
             ]
         , div [ class "btn_area" ]
             [ a [ class "middle button blue_white", onClick Home ]
