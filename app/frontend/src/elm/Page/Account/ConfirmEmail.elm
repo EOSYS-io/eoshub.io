@@ -19,18 +19,20 @@ import Array.Hamt as Array exposing (Array)
 type alias Model =
     { email : String
     , validationMsg : String
-    , sendEnable : Bool
     , requestStatus : Response
-    , requestSuccess : Bool }
+    , requested : Bool
+    , emailValid : Bool
+    , inputValid : String }
 
 
 initModel : Model
 initModel =
     { email = ""
     , validationMsg = "Please enter an email address."
-    , sendEnable = False
     , requestStatus = { msg = "" }
-    , requestSuccess = False }
+    , requested = False
+    , emailValid = False
+    , inputValid = "invalid" }
 
 
 
@@ -48,24 +50,25 @@ update msg model flags =
     case msg of
         ValidateEmail email ->
             let
-                ( validateMsg, sendEnable ) =
-                    case Array.get 0 (Array.fromList (validation model)) of
-                        Nothing ->
-                            ( "", True )
+                newModel =
+                    { model | email = email }
 
-                        Just msg ->
-                            ( msg, False )
+                ( validationMsg, emailValid ) =
+                    validation newModel
+
+                inputValid =
+                    if emailValid then "valid" else "invalid"
             in
-                ( { model | email = email, validationMsg = validateMsg, sendEnable = sendEnable }, Cmd.none )
+                ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
 
         CreateUser ->
-            ( { model | sendEnable = False }, createUserRequest model flags )
+            ( { model | requested = True }, createUserRequest model flags )
 
         NewUser (Ok res) ->
-            ( { model | validationMsg = "이메일을 확인해주세요!", requestStatus = res, requestSuccess = True, sendEnable = True }, Cmd.none )
+            ( { model | validationMsg = "이메일을 확인해주세요!", requestStatus = res, inputValid = "valid" }, Cmd.none )
 
         NewUser (Err error) ->
-            ( { model | validationMsg = "이미 존재하는 이메일입니다.", requestStatus = { msg = toString error }, requestSuccess = False, sendEnable = True }, Cmd.none )
+            ( { model | validationMsg = "이미 존재하는 이메일입니다.", requested = False, requestStatus = { msg = toString error }, inputValid = "invalid" }, Cmd.none )
 
 
 
@@ -93,14 +96,14 @@ view model =
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
             , form [ action "" ]
                 [ text "        "
-                , input [ placeholder "example@email.com", attribute "required" "", type_ "email", attribute (if model.requestSuccess then "valid" else "invalid") "", onInput ValidateEmail ]
+                , input [ placeholder "example@email.com", attribute "required" "", type_ "email", attribute model.inputValid "", onInput ValidateEmail ]
                     []
                 , span [ class "validate" ]
                     [ text model.validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle white_blue send_email button", attribute (if model.sendEnable then
+            [ button [ class "middle white_blue send_email button", attribute (if not model.requested && model.emailValid then
                             "enabled"
                         else
                             "disabled"
@@ -113,7 +116,6 @@ view model =
                 [ text "로그인하기" ]
             ]
         ]
-
 
 
 -- HTTP
@@ -153,12 +155,17 @@ modelValidator : Validator String Model
 modelValidator =
     Validate.all
         [ Validate.firstError
-            [ ifBlank .email "Please enter an email address."
-            , ifInvalidEmail .email (\_ -> "Please enter a valid email address.")
+            [ ifBlank .email "이메일을 입력해주세요."
+            , ifInvalidEmail .email (\_ -> "잘못된 이메일 주소입니다.")
             ]
         ]
 
 
-validation : Model -> List String
+validation : Model -> ( String, Bool )
 validation model =
-    validate modelValidator model
+    case Array.get 0 (Array.fromList (validate modelValidator model)) of
+        Nothing ->
+            ( "올바른 이메일 주소입니다.", True )
+
+        Just msg ->
+            ( msg, False )
