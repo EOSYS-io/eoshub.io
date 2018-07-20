@@ -136,45 +136,21 @@
             display:flex;
             align-items:center;
             line-height:1.1;
+            font-size:rem(14);
 
             strong {
                 flex:1;
                 text-align:right;
-                color:#333;
+                color:#666;
                 font-weight:400;
             }
         }
 
-        .graph {
-            $unit:8px;
-
-            border-radius:$unit;
-            height:$unit;
-            background-color:#f5f7f9;
-            position:relative;
-
-            span {
-                border-radius:inherit;
-                height:inherit;
-                display:block;
-                left:0;
-                top:0;
-                right:0;
-                bottom:0;
-            }
-
-            span[data-status='high'] {
-                background-color:#536dfe;
-            }
-
-            span[data-status='middle'] {
-                background-color:#f5cb23;
-            }
-
-            span[data-status='low'] {
-                background-color:#ff6b64;
-            }
+        p {
+            font-size:rem(14);
+            color:#999;
         }
+
 
         p {
             margin:0;
