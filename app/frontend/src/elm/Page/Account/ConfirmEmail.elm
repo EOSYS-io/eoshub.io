@@ -104,7 +104,7 @@ view model =
                             "enabled"
                         else
                             "disabled"
-                        ) "", type_ "button" ]
+                        ) "", type_ "button", onClick CreateUser ]
                 [ text "링크 보내기" ]
             ]
         , p [ class "exist_account" ]
