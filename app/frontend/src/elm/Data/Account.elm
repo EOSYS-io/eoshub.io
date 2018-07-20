@@ -1,19 +1,20 @@
 module Data.Account exposing (..)
 
-import Json.Decode as JD exposing (Decoder)
+import Json.Decode as JD exposing (Decoder, at)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 
 
 type alias Account =
     { account_name : String
     , core_liquid_balance : String
+    , voter_info : VoterInfo
     , ram_quota : Int
     , ram_usage : Int
     , net_limit : Resource
     , cpu_limit : Resource
     , total_resources : ResourceInEos
-    , self_delegated_bandwidth : Maybe ResourceInEos
-    , refund_request : Maybe Refund
+    , self_delegated_bandwidth : ResourceInEos
+    , refund_request : Refund
     }
 
 
@@ -39,11 +40,21 @@ type alias Refund =
     }
 
 
+type alias VoterInfo =
+    { staked : Int
+    }
+
+
 accountDecoder : JD.Decoder Account
 accountDecoder =
     decode Account
         |> required "account_name" JD.string
         |> optional "core_liquid_balance" JD.string "0 EOS"
+        |> optional "voter_info"
+            (decode VoterInfo
+                |> required "staked" JD.int
+            )
+            (VoterInfo 0)
         |> required "ram_quota" JD.int
         |> required "ram_usage" JD.int
         |> required "net_limit"
@@ -64,23 +75,21 @@ accountDecoder =
                 |> required "cpu_weight" JD.string
                 |> required "ram_bytes" (JD.nullable JD.int)
             )
-        |> required "self_delegated_bandwidth"
-            (JD.nullable
-                (decode ResourceInEos
-                    |> required "net_weight" JD.string
-                    |> required "cpu_weight" JD.string
-                    |> optional "ram_bytes" (JD.nullable JD.int) Nothing
-                )
+        |> optional "self_delegated_bandwidth"
+            (decode ResourceInEos
+                |> required "net_weight" JD.string
+                |> required "cpu_weight" JD.string
+                |> optional "ram_bytes" (JD.nullable JD.int) Nothing
             )
-        |> required "refund_request"
-            (JD.nullable
-                (decode Refund
-                    |> required "owner" JD.string
-                    |> required "request_time" JD.string
-                    |> required "net_amount" JD.string
-                    |> required "cpu_amount" JD.string
-                )
+            (ResourceInEos "0 EOS" "0 EOS" Nothing)
+        |> optional "refund_request"
+            (decode Refund
+                |> required "owner" JD.string
+                |> required "request_time" JD.string
+                |> required "net_amount" JD.string
+                |> required "cpu_amount" JD.string
             )
+            (Refund "" "" "0 EOS" "0 EOS")
 
 
 keyAccountsDecoder : JD.Decoder (List String)
