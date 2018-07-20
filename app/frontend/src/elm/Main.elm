@@ -49,13 +49,38 @@ init flags location =
 -- VIEW
 
 
+accountView : Sidebar.Model -> Page.Model -> Html.Html Message
+accountView sidebar page =
+    Html.div []
+        (List.map (Html.map PageMessage) (Page.view sidebar.language page))
+
 view : Model -> Html.Html Message
 view { sidebar, page } =
-    Html.div [ class "container" ]
-        [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
-        , Html.div [ class "wrapper" ]
-            (List.map (Html.map PageMessage) (Page.view sidebar.language page))
-        ]
+    case page.page of
+        Page.ConfirmEmailPage subModel ->
+            accountView sidebar page
+
+        Page.EmailConfirmedPage subModel ->
+            accountView sidebar page
+
+        Page.EmailConfirmFailurePage subModel ->
+            accountView sidebar page
+
+        Page.CreateKeysPage subModel ->
+            accountView sidebar page
+
+        Page.CreatedPage subModel ->
+            accountView sidebar page
+
+        Page.CreatePage subModel ->
+            accountView sidebar page
+
+        _ ->
+            Html.div [ class "container" ]
+                [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
+                , Html.div [ class "wrapper" ]
+                    (List.map (Html.map PageMessage) (Page.view sidebar.language page))
+                ]
 
 
 

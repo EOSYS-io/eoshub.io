@@ -94,10 +94,7 @@ view model =
             ]
         , article [ attribute "data-step" "4" ]
             [ h1 []
-                [ img [ alt "", src "./image/symbol-smile.svg" ]
-                    []
-                , text "원하는 계정의 이름을 입력해주세요!    "
-                ]
+                [ text "원하는 계정의 이름을 입력해주세요!    " ]
             , p []
                 [ text "계정명은 1~5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다!"
                 , br []

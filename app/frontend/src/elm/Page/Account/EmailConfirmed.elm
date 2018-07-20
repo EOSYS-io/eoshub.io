@@ -63,10 +63,7 @@ view model =
             ]
         , article [ attribute "data-step" "2" ]
             [ h1 []
-                [ img [ alt "", src "./image/symbol-complete.svg" ]
-                    []
-                , text "이메일 인증완료!    "
-                ]
+                [ text "이메일 인증완료!    " ]
             , p []
                 [ text "다음으로 넘어가주세요" ]
             , h2 []
