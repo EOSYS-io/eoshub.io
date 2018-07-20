@@ -42,49 +42,53 @@ tests =
             { node_env = "test" }
 
         confirmToken =
-            "test"
+            "testToken"
     in
         describe "Page module"
             [ describe "getPage"
                 [ test "IndexRoute" <|
-                    \() -> Expect.equal (IndexPage, Cmd.none) (getPage { location | pathname = "/" } confirmToken)
+                    \() -> Expect.equal (IndexPage, Cmd.none) (getPage { location | pathname = "/" })
                 , test "ConfirmEmailRoute" <|
-                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel, Cmd.none) (getPage { location | pathname = "/account/confirm_email" } confirmToken)
+                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel, Cmd.none) (getPage { location | pathname = "/account/confirm_email" })
                 , test "EmailConfirmedRoute" <|
-                    \() -> Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel confirmToken), Cmd.none) (getPage { location | pathname = "/account/email_confirmed/test" } confirmToken)
+                    \() ->
+                    let
+                        email = Just "test@chain.partners"
+                    in
+                        Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel confirmToken email), Cmd.none) (getPage { location | pathname = "/account/email_confirmed/testToken", search = "?email=test@chain.partners" })
                 , test "EmailConfirmFailureRoute" <|
-                    \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none) (getPage { location | pathname = "/account/email_confirm_failure" } confirmToken)
+                    \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none) (getPage { location | pathname = "/account/email_confirm_failure" })
                 , test "CreateKeysRoute" <|
                     \() ->
                         let
-                            createKeysModel = CreateKeys.initModel
+                            createKeysModel = CreateKeys.initModel confirmToken
                             
                             ( newCreateKeysModel, subCmd ) =
-                                CreateKeys.update CreateKeys.GenerateKeys createKeysModel confirmToken
+                                CreateKeys.update CreateKeys.GenerateKeys createKeysModel
 
                             expectedPage =
                                 CreateKeysPage newCreateKeysModel
 
                             expectedCmd = Cmd.map CreateKeysMessage subCmd
                         in
-                            Expect.equal (expectedPage, expectedCmd) (getPage { location | pathname = "/account/create_keys" } confirmToken)
+                            Expect.equal (expectedPage, expectedCmd) (getPage { location | pathname = "/account/create_keys/testToken" })
                 , test "CreatedRoute" <|
-                    \() -> Expect.equal (CreatedPage Created.initModel, Cmd.none) (getPage { location | pathname = "/account/created" } confirmToken)
+                    \() -> Expect.equal (CreatedPage Created.initModel, Cmd.none) (getPage { location | pathname = "/account/created" })
                 , test "CreateRoute" <|
                     \() ->
                         let
                             pubkey =
                                 "testpubkey"
                         in
-                            Expect.equal (CreatePage (Create.initModel pubkey), Cmd.none) (getPage { location | pathname = "/account/create/" ++ pubkey } confirmToken)
+                            Expect.equal (CreatePage (Create.initModel confirmToken pubkey), Cmd.none) (getPage { location | pathname = "/account/create/testToken/testpubkey" })
                 , test "VotingRoute" <|
-                    \() -> Expect.equal (VotingPage Voting.initModel, Cmd.none) (getPage { location | pathname = "/voting" } confirmToken)
+                    \() -> Expect.equal (VotingPage Voting.initModel, Cmd.none) (getPage { location | pathname = "/voting" })
                 , test "TransferRoute" <|
-                    \() -> Expect.equal (TransferPage Transfer.initModel, Cmd.none) (getPage { location | pathname = "/transfer" } confirmToken)
+                    \() -> Expect.equal (TransferPage Transfer.initModel, Cmd.none) (getPage { location | pathname = "/transfer" })
                 , test "SearchRoute" <|
-                    \() -> Expect.equal (SearchPage Search.initModel, Cmd.none) (getPage { location | pathname = "/search" } confirmToken)
+                    \() -> Expect.equal (SearchPage Search.initModel, Cmd.none) (getPage { location | pathname = "/search" })
                 , test "NotFoundRoute" <|
-                    \() -> Expect.equal (NotFoundPage, Cmd.none) (getPage location confirmToken)
+                    \() -> Expect.equal (NotFoundPage, Cmd.none) (getPage location)
                 ]
             , describe "update"
                 [ test "UpdatePushActionResponse" <|
