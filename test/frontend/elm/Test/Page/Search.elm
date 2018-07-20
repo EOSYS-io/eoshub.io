@@ -1,7 +1,6 @@
 module Test.Page.Search exposing (..)
 
 import Expect
-import Page.Search exposing (..)
 import Test exposing (..)
 import Data.Account exposing (..)
 import Json.Decode as JD
@@ -69,3 +68,7 @@ tests =
                             Expect.equal (Ok expectedAccountsList) (JD.decodeString keyAccountsDecoder keyAccountsJson)
                 ]
             ]
+
+
+
+-- TODO(boseok): getTotalAmount getUnstakingAmount getResource larimerToEos eosFloatToString eosStringToFloat

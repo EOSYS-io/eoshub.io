@@ -452,15 +452,17 @@ getResource resourceFlag used available max =
         color =
             case max of
                 0 ->
-                    "low"
+                    "hell"
 
                 _ ->
                     if (toFloat (available * 100) / toFloat max) < 25 then
-                        "low"
+                        "hell"
                     else if ((toFloat (available * 100) / toFloat max) >= 25 && (toFloat (available * 100) / toFloat max) < 50) then
-                        "middle"
+                        "bad"
+                    else if ((toFloat (available * 100) / toFloat max) >= 50 && (toFloat (available * 100) / toFloat max) < 75) then
+                        "good"
                     else
-                        "high"
+                        "fine"
     in
         ( totalString, avaliablePercent, color )
 
