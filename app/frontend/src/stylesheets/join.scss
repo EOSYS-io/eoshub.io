@@ -94,17 +94,39 @@
         margin:0 -200px;
         line-height:1.5;
 
-        img {
-            width:63px;
-            display:block;
-            margin:120px auto 40px;;
-        }
-        
         &.finished {
             margin-top:120px;
         }
+
+        &:before {
+            display:block;
+            width:63px;
+            margin:120px auto 40px;;
+        }
     }
 
+    &[data-step="1"] h1:before,
+    &[data-step="4"] h1:before {
+        content:url('../image/symbol-smile.svg');
+    }
+
+    &[data-step="2"] h1:before {
+        content:url('../image/symbol-complete.svg');
+    }
+
+    &[data-step="3"] h1:before {
+        content:url('../image/symbol-alert.svg');
+    }
+
+    &[data-step="5"]:after {
+        content:url('../image/group-18.svg');
+        width:350px;
+        display:block;
+        margin:65px auto;
+    }
+}
+
+.container.join article {
     h1 + p {
         font-size:rem(14);
         text-align:center;
@@ -286,11 +308,6 @@
     }
 }
 
-
-img.finished.icon {
-    display:block;
-    margin:65px auto;
-}
 
 //extra case
 article {
