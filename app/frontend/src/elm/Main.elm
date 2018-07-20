@@ -33,12 +33,16 @@ type Message
 
 init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
-    ( { sidebar = Sidebar.initModel
-      , page = Page.initModel location
-      , flags = flags
-      }
-    , Cmd.none
-    )
+    let
+        ( page, cmd ) =
+            Page.initModel location
+    in
+        ( { sidebar = Sidebar.initModel
+          , page = page
+          , flags = flags
+          }
+        , Cmd.map PageMessage cmd
+        )
 
 
 

@@ -12,7 +12,8 @@ type Route
     | CreateKeysRoute String
     | CreatedRoute
     | CreateRoute String String
-    | SearchRoute
+    | SearchRoute (Maybe String)
+    | SearchKeyRoute (Maybe String)
     | VotingRoute
     | TransferRoute
     | NotFoundRoute
@@ -28,7 +29,8 @@ matchRoute =
         , map CreateKeysRoute (s "account" </> s "create_keys" </> string)
         , map CreatedRoute (s "account" </> s "created")
         , map CreateRoute (s "account" </> s "create" </> string </> string)
-        , map SearchRoute (s "search")
+        , map SearchRoute (s "search" <?> stringParam "query")
+        , map SearchKeyRoute (s "searchkey" <?> stringParam "query")
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")
         ]

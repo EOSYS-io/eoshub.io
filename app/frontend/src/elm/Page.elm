@@ -34,19 +34,16 @@ import Page.Account.EmailConfirmed as EmailConfirmed
 import Page.Index as Index
 import Page.NotFound as NotFound
 import Page.Search as Search
+import Page.SearchKey as SearchKey
 import Page.Transfer as Transfer
 import Page.Voting as Voting
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
-import Http
+import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import Json.Decode as JD exposing (Decoder)
-import Json.Encode as JE
 import Regex exposing (regex, contains)
-import Data.Account exposing (Account, ResourceInEos, Resource, Refund, accountDecoder, keyAccountsDecoder)
-import Util.WalletDecoder exposing (Wallet)
 import View.Notification as Notification
 
 
@@ -61,7 +58,8 @@ type Page
     | CreatedPage Created.Model
     | CreateKeysPage CreateKeys.Model
     | CreatePage Create.Model
-    | SearchPage Account
+    | SearchPage Search.Model
+    | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
     | VotingPage Voting.Model
     | NotFoundPage
@@ -78,61 +76,27 @@ type alias Header =
     { searchInput : String
     , eosPrice : Int
     , ramPrice : Int
-    , keyAccounts : List String
-    , account : Account
     , errMessage : String
     }
 
 
-initModel : Location -> Model
+initModel : Location -> ( Model, Cmd Message )
 initModel location =
     let
-        (page, cmd) =
+        ( page, cmd ) =
             getPage location
     in
-    { page = page
-    , notification = Notification.initModel
-    , header =
-        { searchInput = ""
-        , eosPrice = 0
-        , ramPrice = 0
-        , keyAccounts = []
-        , account =
-            { account_name = ""
-            , core_liquid_balance = "0 EOS"
-            , ram_quota = 0
-            , ram_usage = 0
-            , net_limit =
-                { used = 0, available = 0, max = 0 }
-            , cpu_limit =
-                { used = 0, available = 0, max = 0 }
-            , total_resources =
-                { net_weight = "0 EOS"
-                , cpu_weight = "0 EOS"
-                , ram_bytes = Just 0
+        ( { page = page
+          , notification = Notification.initModel
+          , header =
+                { searchInput = ""
+                , eosPrice = 0
+                , ramPrice = 0
+                , errMessage = ""
                 }
-            , self_delegated_bandwidth =
-                Just
-                    { net_weight = "0 EOS"
-                    , cpu_weight = "0 EOS"
-                    , ram_bytes = Nothing
-                    }
-            , refund_request =
-                Just
-                    { owner = ""
-                    , request_time = ""
-                    , net_amount = ""
-                    , cpu_amount = ""
-                    }
-            }
-        , errMessage = ""
-        }
-    }
-
-
-apiUrl : String
-apiUrl =
-    "https://rpc.eosys.io"
+          }
+        , cmd
+        )
 
 
 
@@ -147,14 +111,13 @@ type Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
     | SearchMessage Search.Message
+    | SearchKeyMessage SearchKey.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
     | IndexMessage ExternalMessage.Message
     | InputSearch String
-    | GetSearchResult String
-    | OnFetchAccount (Result Http.Error Account)
-    | OnFetchKeyAccounts (Result Http.Error (List String))
     | UpdatePushActionResponse PushActionResponse
+    | CheckSearchQuery String
     | OnLocationChange Location
     | NotificationMessage Notification.Message
 
@@ -224,9 +187,9 @@ view language { page, header, notification } =
     in
         [ section [ class "tick_display" ]
             [ form [ class "search", disabled True ]
-                [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (GetSearchResult header.searchInput) ]
+                [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (CheckSearchQuery header.searchInput) ]
                     []
-                , button [ class "search button", type_ "button", onClick (GetSearchResult header.searchInput) ]
+                , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
                     [ text "검색하기" ]
                 ]
             , ul [ class "price" ]
@@ -315,10 +278,10 @@ update message ({ page, notification, header } as model) flags { account } =
 
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
-                newPage =
+                ( newPage, subCmd ) =
                     Search.update subMessage subModel
             in
-                ( { model | page = newPage |> SearchPage }, Cmd.none )
+                ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
@@ -349,16 +312,15 @@ update message ({ page, notification, header } as model) flags { account } =
 
         ( OnLocationChange location, _ ) ->
             let
-                (newPage, cmd) =
+                ( newPage, cmd ) =
                     getPage location
             in
-                
                 ( { model | page = newPage }, cmd )
 
         ( InputSearch value, _ ) ->
             ( { model | header = { header | searchInput = value } }, Cmd.none )
 
-        ( GetSearchResult query, _ ) ->
+        ( CheckSearchQuery query, _ ) ->
             let
                 parsedQuery =
                     parseQuery query
@@ -366,52 +328,15 @@ update message ({ page, notification, header } as model) flags { account } =
                 newCmd =
                     case parsedQuery of
                         Ok AccountQuery ->
-                            let
-                                body =
-                                    JE.object
-                                        [ ( "account_name", JE.string query ) ]
-                                        |> Http.jsonBody
-                            in
-                                post (getFullPath "/v1/chain/get_account") body accountDecoder |> (Http.send OnFetchAccount)
+                            Navigation.newUrl ("/search?query=" ++ query)
 
                         Ok PublicKeyQuery ->
-                            let
-                                body =
-                                    JE.object
-                                        [ ( "public_key", JE.string query ) ]
-                                        |> Http.jsonBody
-                            in
-                                post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder |> (Http.send OnFetchKeyAccounts)
+                            Navigation.newUrl ("/searchkey?query=" ++ query)
 
                         Err _ ->
                             Cmd.none
             in
                 ( model, newCmd )
-
-        ( OnFetchAccount (Ok data), _ ) ->
-            let
-                newPage =
-                    SearchPage data
-            in
-                ( { model
-                    | header = { header | account = data, errMessage = "success" }
-                    , page = newPage
-                  }
-                , Navigation.newUrl "/search"
-                )
-
-        ( OnFetchAccount (Err error), _ ) ->
-            ( { model | header = { header | errMessage = "invalid length" } }, Cmd.none )
-
-        ( OnFetchKeyAccounts (Ok data), _ ) ->
-            ( { model
-                | header = { header | keyAccounts = data, errMessage = "success" }
-              }
-            , Cmd.none
-            )
-
-        ( OnFetchKeyAccounts (Err error), _ ) ->
-            ( { model | header = { header | errMessage = "invalid length" } }, Cmd.none )
 
         ( NotificationMessage Notification.CloseNotification, _ ) ->
             ( { model
@@ -423,11 +348,6 @@ update message ({ page, notification, header } as model) flags { account } =
 
         ( _, _ ) ->
             ( model, Cmd.none )
-
-
-getFullPath : String -> String
-getFullPath path =
-    apiUrl ++ path
 
 
 parseQuery : String -> Result String Query
@@ -452,19 +372,6 @@ isPublicKey query =
     contains (regex "^EOS[\\w]{50}$") query
 
 
-post : String -> Http.Body -> Decoder a -> Http.Request a
-post url body decoder =
-    Http.request
-        { method = "POST"
-        , headers = []
-        , url = url
-        , body = body
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-
-
 
 -- SUBSCRIPTIONS
 
@@ -481,7 +388,7 @@ subscriptions model =
 -- Utility functions
 
 
-getPage : Location -> (Page, Cmd Message)
+getPage : Location -> ( Page, Cmd Message )
 getPage location =
     let
         route =
@@ -489,13 +396,13 @@ getPage location =
     in
         case route of
             ConfirmEmailRoute ->
-                (ConfirmEmailPage ConfirmEmail.initModel, Cmd.none)
+                ( ConfirmEmailPage ConfirmEmail.initModel, Cmd.none )
 
             EmailConfirmedRoute confirmToken email ->
-                (EmailConfirmedPage (EmailConfirmed.initModel confirmToken email), Cmd.none)
+                ( EmailConfirmedPage (EmailConfirmed.initModel confirmToken email), Cmd.none )
 
             EmailConfirmFailureRoute ->
-                (EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none)
+                ( EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none )
 
             CreateKeysRoute confirmToken ->
                 let
@@ -508,27 +415,49 @@ getPage location =
                     newPage =
                         CreateKeysPage newCreateKeysModel
 
-                    cmd = Cmd.map CreateKeysMessage subCmd
+                    cmd =
+                        Cmd.map CreateKeysMessage subCmd
                 in
-                    (newPage, cmd)
+                    ( newPage, cmd )
 
             CreatedRoute ->
-                (CreatedPage Created.initModel, Cmd.none)
+                ( CreatedPage Created.initModel, Cmd.none )
 
             CreateRoute confirmToken pubkey ->
-                (CreatePage (Create.initModel confirmToken pubkey), Cmd.none)
+                ( CreatePage (Create.initModel confirmToken pubkey), Cmd.none )
 
-            SearchRoute ->
-                (SearchPage Search.initModel, Cmd.none)
+            SearchRoute query ->
+                let
+                    initCmd =
+                        case query of
+                            Just str ->
+                                Search.initCmd str
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    ( SearchPage Search.initModel, Cmd.map SearchMessage initCmd )
+
+            SearchKeyRoute query ->
+                let
+                    initCmd =
+                        case query of
+                            Just str ->
+                                SearchKey.initCmd str
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    ( SearchKeyPage SearchKey.initModel, Cmd.none )
 
             VotingRoute ->
-                (VotingPage Voting.initModel, Cmd.none)
+                ( VotingPage Voting.initModel, Cmd.none )
 
             TransferRoute ->
-                (TransferPage Transfer.initModel, Cmd.none)
+                ( TransferPage Transfer.initModel, Cmd.none )
 
             IndexRoute ->
-                (IndexPage, Cmd.none)
+                ( IndexPage, Cmd.none )
 
             NotFoundRoute ->
-                (NotFoundPage, Cmd.none)
+                ( NotFoundPage, Cmd.none )
