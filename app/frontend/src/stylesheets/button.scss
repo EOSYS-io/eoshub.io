@@ -5,7 +5,6 @@ a.button,
 input[type='submit'] {
     // reset
     cursor:pointer;
-    border-width:1px;
     border-style:solid;
     border-color:transparent;
 
@@ -28,8 +27,6 @@ input[type='submit'] {
     &:first-letter {
         text-transform:uppercase;
     }
-
-
 }
 
 // colorset :: foreground_background
