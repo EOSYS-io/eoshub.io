@@ -59,19 +59,19 @@ view { sidebar, page } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message model =
+update message ({ page, flags, sidebar } as model) =
     case message of
         PageMessage pageMessage ->
             let
                 ( newPage, newCmd ) =
-                    Page.update pageMessage model.page model.flags
+                    Page.update pageMessage page flags sidebar.wallet
             in
                 ( { model | page = newPage }, Cmd.map PageMessage newCmd )
 
         SidebarMessage sidebarMessage ->
             let
                 ( newSidebar, newCmd ) =
-                    Sidebar.update sidebarMessage model.sidebar
+                    Sidebar.update sidebarMessage sidebar
             in
                 ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 

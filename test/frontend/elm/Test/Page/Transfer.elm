@@ -9,7 +9,11 @@ import Test exposing (..)
 
 model : Model
 model =
-    { transfer =
+    { accountValidation = EmptyAccount
+    , quantityValidation = EmptyQuantity
+    , memoValidation = ValidMemo
+    , isFormValid = False
+    , transfer =
         { from = "from"
         , to = "to"
         , quantity = "300"
@@ -35,8 +39,8 @@ submitActionTest =
                   )
                 ]
     in
-    test "SubmitAction" <|
-        \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model)
+        test "SubmitAction" <|
+            \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from")
 
 
 tests : Test
@@ -49,22 +53,35 @@ tests =
                 { transfer } =
                     model
              in
-             [ test "From" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | from = "newFrom" } }
-                        (setTransferMessageField From "newFrom" model)
-             , test "To" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | to = "newTo" } }
-                        (setTransferMessageField To "newTo" model)
-             , test "Quantity" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | quantity = "301" } }
-                        (setTransferMessageField Quantity "301" model)
-             , test "Memo" <|
-                \() ->
-                    Expect.equal { model | transfer = { transfer | memo = "newMemo" } }
-                        (setTransferMessageField Memo "newMemo" model)
-             ]
+                [ test "To" <|
+                    \() ->
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | to = "newTo" }
+                                , accountValidation = InvalidAccount
+                                , quantityValidation = ValidQuantity
+                            }
+                            (setTransferMessageField To "newTo" model)
+                , test "Quantity" <|
+                    \() ->
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | quantity = "301" }
+                                , accountValidation = ValidAccount
+                                , quantityValidation = ValidQuantity
+                                , isFormValid = True
+                            }
+                            (setTransferMessageField Quantity "301" model)
+                , test "Memo" <|
+                    \() ->
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | memo = "newMemo" }
+                                , accountValidation = ValidAccount
+                                , quantityValidation = ValidQuantity
+                                , isFormValid = True
+                            }
+                            (setTransferMessageField Memo "newMemo" model)
+                ]
             )
         ]
