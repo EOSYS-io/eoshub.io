@@ -55,7 +55,7 @@ update msg model =
 
 view : Model -> Html Message
 view model =
-    div []
+    div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
                 [ text "인증하기" ]
