@@ -48,15 +48,18 @@ update msg model flags =
     case msg of
         ValidateEmail email ->
             let
+                newModel =
+                    { model | email = email }
+
                 ( validateMsg, sendEnable ) =
-                    case Array.get 0 (Array.fromList (validation model)) of
+                    case Array.get 0 (Array.fromList (validation newModel)) of
                         Nothing ->
                             ( "", True )
 
                         Just msg ->
                             ( msg, False )
             in
-                ( { model | email = email, validationMsg = validateMsg, sendEnable = sendEnable }, Cmd.none )
+                ( { newModel | validationMsg = validateMsg, sendEnable = sendEnable }, Cmd.none )
 
         CreateUser ->
             ( { model | sendEnable = False }, createUserRequest model flags )
