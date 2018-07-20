@@ -53,15 +53,19 @@ update msg model flags =
     case msg of
         ValidateAccountName accountName ->
             let
-                ( validateMsg, validate ) =
-                    case Array.get 0 (Array.fromList (validation model)) of
-                        Nothing ->
-                            ( "", True )
+                newModel =
+                    { model | accountName = accountName }
 
-                        Just msg ->
-                            ( msg, False )
+                accountNameLength =
+                    String.length newModel.accountName
+
+                ( validateMsg, validate ) =
+                    if accountNameLength == 12 then
+                        ( "가능한 ID에요", True )
+                    else
+                        ( "불가능한 ID에요", False )
             in
-                ( { model | accountName = accountName, validation = validate, validationMsg = validateMsg }, Cmd.none )
+                ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
             ( model, createEosAccountRequest model flags model.confirmToken )
@@ -160,36 +164,3 @@ postCreateEosAccount model flags confirmToken =
 createEosAccountRequest : Model -> Flags -> String -> Cmd Message
 createEosAccountRequest model flags confirmToken =
     Http.send NewUser <| postCreateEosAccount model flags confirmToken
-
-
--- VALIDATION
-
-
--- modelValidator : Validator String Model
--- modelValidator =
---     Validate.all
---         [ Validate.firstError
---             [ ifBlank .email "Please enter an email address."
---             , ifInvalidEmail .email (\_ -> "Please enter a valid email address.")
---             ]
---         ]
-
-
-modelValidator : Validator String Model
-modelValidator =
-    fromErrors modelToErrors
-
-modelToErrors : Model -> List String
-modelToErrors model =
-    let
-        accountNameLength =
-            String.length model.accountName
-    in
-    if accountNameLength == 13 then
-        []
-    else
-        [ "불가능한 ID에요"]
-
-validation : Model -> List String
-validation model =
-    validate modelValidator model
