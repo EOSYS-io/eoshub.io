@@ -92,3 +92,64 @@ p.help.info {
         }
     }
 }
+
+
+// common : graph
+.graph {
+    $unit:8px;
+    position:relative;
+    min-height:$unit;
+    font-size:rem(14);
+    color:#999;
+    padding-bottom:$unit * 2.5;
+
+    // bg
+    &:before {
+        content:'';
+        height:$unit;
+        border-radius:$unit;
+        background-color:#f5f7f9;
+        display:block;
+        width:100%;
+        position:absolute;
+        bottom:0;
+    }
+
+    // fg
+    span {
+        height:$unit;
+        border-radius:$unit;
+        display:block;
+        position:absolute;
+        bottom:0;
+
+        font-size:rem(14);
+        color:#666;
+
+
+        transition:width 1s, background 0.5s;
+
+        &.loading {
+            width:0 !important;
+            background:transparent !important;
+        }
+    }
+
+    span[data-status='fine'] {
+        background-color:#536dfe;
+    }
+
+    span[data-status='good'] {
+        background-color:#79c720;
+    }
+
+    span[data-status='bad'] {
+        background-color:#f5cb23;
+    }
+
+    span[data-status='hell'] {
+        background-color:#ff6b64;
+    }
+}
+
+
