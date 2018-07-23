@@ -1,4 +1,4 @@
-module Route exposing (Route(..), matchRoute, parseLocation)
+module Route exposing (..)
 
 import Navigation exposing (Location)
 import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, string, top, stringParam)
@@ -44,3 +44,16 @@ parseLocation location =
 
         Nothing ->
             NotFoundRoute
+
+
+type PageGroupRoute
+    = DefaultPageGroupRoute
+    | AccountPageGroupRoute
+
+
+getPageGroupRoute : Location -> PageGroupRoute
+getPageGroupRoute location =
+    if String.startsWith "/account/" location.pathname then
+        AccountPageGroupRoute
+    else
+        DefaultPageGroupRoute
