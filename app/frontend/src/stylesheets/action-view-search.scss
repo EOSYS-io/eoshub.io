@@ -1,4 +1,5 @@
 @charset 'UTF-8';
+.action.view.panel.public_key,
 .action.view.panel.search_result {
     // var
     $padding:64px;
@@ -195,4 +196,46 @@
         padding:0 20px;
     }
 
+}
+
+// extra case :: just one element yet
+.action.view.panel.public_key .account.summary ul.summary li:first-child strong {
+    max-width:none;
+}
+
+
+// public key
+.action.view.panel.public_key .list {
+    margin:32px -12px -12px -12px;
+    overflow:hidden;
+    .card {
+        float:left;
+        margin:12px;
+        max-width:424px;
+        min-width:352px;
+        height:196px;
+        position:relative;
+        padding:30px 33px;
+
+        box-sizing:border-box;
+
+        border:1px solid #e8e8e8;
+
+        h4 {
+            font-size:rem(32);
+            font-weight:300px;
+            color:#666;
+            position:absolute;
+            bottom:30px;
+            left:33px;
+        }
+
+        a {
+            position:absolute;
+            right:33px;
+            top:30px;
+            font-size:rem(14);
+            color:#536dfe;
+        }
+    }
 }
