@@ -1,6 +1,5 @@
 module AccountPageGroup exposing (..)
 
-import ExternalMessage
 import Html
     exposing
         ( Html
@@ -83,7 +82,6 @@ type Message
     | CreateKeysMessage CreateKeys.Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
-    | IndexMessage ExternalMessage.Message
     | OnLocationChange Location
     | NotificationMessage Notification.Message
 
