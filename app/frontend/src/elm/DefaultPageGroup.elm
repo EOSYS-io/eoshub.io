@@ -75,14 +75,15 @@ initModel location =
             getPage location
     in
         { page = page
-          , notification = Notification.initModel
-          , header =
-                { searchInput = ""
-                , eosPrice = 0
-                , ramPrice = 0
-                , errMessage = ""
-                }
-          }
+        , notification = Notification.initModel
+        , header =
+            { searchInput = ""
+            , eosPrice = 0
+            , ramPrice = 0
+            , errMessage = ""
+            }
+        }
+
 
 
 -- MESSAGE
@@ -114,14 +115,14 @@ type alias PublicKeyQuery =
     String
 
 
-initCmd : Location -> Page -> Cmd Message
-initCmd location page =
+initCmd : Location -> Cmd Message
+initCmd location =
     let
         route =
             location |> parseLocation
     in
-        case ( route, page ) of
-            ( SearchRoute query, SearchPage subModel ) ->
+        case route of
+            SearchRoute query ->
                 let
                     subInitCmd =
                         case query of
@@ -135,6 +136,7 @@ initCmd location page =
 
             _ ->
                 Cmd.none
+
 
 
 -- VIEW
@@ -214,8 +216,8 @@ onEnter msg =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> Wallet -> ( Model, Cmd Message )
-update message ({ page, notification, header } as model) flags { account } =
+update : Message -> Model -> Wallet -> ( Model, Cmd Message )
+update message ({ page, notification, header } as model) { account } =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -257,7 +259,7 @@ update message ({ page, notification, header } as model) flags { account } =
                     getPage location
 
                 cmd =
-                    initCmd location newPage
+                    initCmd location
             in
                 ( { model | page = newPage }, cmd )
 

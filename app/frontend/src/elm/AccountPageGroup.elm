@@ -27,7 +27,6 @@ import Page.NotFound as NotFound
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import Json.Decode as JD exposing (Decoder)
 import View.Notification as Notification
 
@@ -48,18 +47,31 @@ type Page
 type alias Model =
     { page : Page
     , notification : Notification.Model
+    , confirmToken : String
     }
 
 
 initModel : Location -> Model
 initModel location =
     let
+        route =
+            location |> parseLocation
+
         page =
-            getPage location
+            getPage route
     in
-        { page = page
-        , notification = Notification.initModel
-        }
+        case route of
+            EmailConfirmedRoute confirmToken email ->
+                { page = page
+                , notification = Notification.initModel
+                , confirmToken = confirmToken
+                }
+
+            _ ->
+                { page = page
+                , notification = Notification.initModel
+                , confirmToken = ""
+                }
 
 
 
@@ -78,13 +90,13 @@ type Message
     | NotificationMessage Notification.Message
 
 
-initCmd : Page -> Cmd Message
-initCmd page =
+initCmd : Model -> Cmd Message
+initCmd { page, confirmToken } =
     case page of
         CreateKeysPage subModel ->
             let
-                ( _ , subCmd ) =
-                    CreateKeys.update CreateKeys.GenerateKeys subModel
+                ( _, subCmd ) =
+                    CreateKeys.update CreateKeys.GenerateKeys subModel |> Debug.log confirmToken
 
                 cmd =
                     Cmd.map CreateKeysMessage subCmd
@@ -93,6 +105,7 @@ initCmd page =
 
         _ ->
             Cmd.none
+
 
 
 -- VIEW
@@ -155,8 +168,8 @@ onEnter msg =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> Wallet -> ( Model, Cmd Message )
-update message ({ page, notification } as model) flags { account } =
+update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update message ({ page, notification, confirmToken } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -168,7 +181,7 @@ update message ({ page, notification } as model) flags { account } =
         ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    EmailConfirmed.update subMessage subModel
+                    EmailConfirmed.update subMessage subModel confirmToken
             in
                 ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
 
@@ -196,19 +209,30 @@ update message ({ page, notification } as model) flags { account } =
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags
+                    Create.update subMessage subModel flags confirmToken
             in
                 ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
         ( OnLocationChange location, _ ) ->
             let
+                route =
+                    location |> parseLocation
+
                 newPage =
-                    getPage location
+                    getPage route
+
+                newModel =
+                    { model | page = newPage }
 
                 cmd =
-                    initCmd newPage
+                    initCmd newModel
             in
-                ( { model | page = newPage }, cmd )
+                case route of
+                    EmailConfirmedRoute confirmToken email ->
+                        ( { newModel | confirmToken = confirmToken }, cmd )
+
+                    _ ->
+                        ( newModel, cmd )
 
         ( NotificationMessage Notification.CloseNotification, _ ) ->
             ( { model
@@ -220,6 +244,7 @@ update message ({ page, notification } as model) flags { account } =
 
         ( _, _ ) ->
             ( model, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -235,34 +260,30 @@ subscriptions model =
 -- Utility functions
 
 
-getPage : Location -> Page
-getPage location =
-    let
-        route =
-            location |> parseLocation
-    in
-        case route of
-            ConfirmEmailRoute ->
-                ConfirmEmailPage ConfirmEmail.initModel
+getPage : Route -> Page
+getPage route =
+    case route of
+        ConfirmEmailRoute ->
+            ConfirmEmailPage ConfirmEmail.initModel
 
-            EmailConfirmedRoute confirmToken email ->
-                EmailConfirmedPage (EmailConfirmed.initModel confirmToken email)
+        EmailConfirmedRoute confirmToken email ->
+            EmailConfirmedPage (EmailConfirmed.initModel email)
 
-            EmailConfirmFailureRoute ->
-                EmailConfirmFailurePage EmailConfirmFailure.initModel
+        EmailConfirmFailureRoute ->
+            EmailConfirmFailurePage EmailConfirmFailure.initModel
 
-            CreateKeysRoute confirmToken ->
-                let
-                    createKeysModel =
-                        CreateKeys.initModel confirmToken
-                in
-                    CreateKeysPage createKeysModel
+        CreateKeysRoute ->
+            let
+                createKeysModel =
+                    CreateKeys.initModel
+            in
+                CreateKeysPage createKeysModel
 
-            CreatedRoute ->
-                CreatedPage Created.initModel
+        CreatedRoute ->
+            CreatedPage Created.initModel
 
-            CreateRoute confirmToken pubkey ->
-                CreatePage (Create.initModel confirmToken pubkey)
+        CreateRoute pubkey ->
+            CreatePage (Create.initModel pubkey)
 
-            _ ->
-                NotFoundPage
+        _ ->
+            NotFoundPage

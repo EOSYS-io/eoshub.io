@@ -8,6 +8,8 @@ import AccountPageGroup
 import Sidebar
 import Util.Flags exposing (Flags)
 import Route exposing (getPageGroupRoute)
+import Dict exposing (Dict)
+import Util.WalletDecoder exposing (Wallet)
 
 
 -- MODEL
@@ -20,9 +22,11 @@ type PageGroup
 
 type alias Model =
     { sidebar : Sidebar.Model
-    , pageGroup : PageGroup
+    , currentPageGroup : PageGroup
     , flags : Flags
+    , pageGroups : Dict String PageGroup
     }
+
 
 
 -- MESSAGE
@@ -42,12 +46,13 @@ type Message
 init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     let
-        ( pageGroup, cmd ) =
-            getPageGroup location
+        ( newPageGroup, cmd, newPageGroups ) =
+            initPageGroup location
     in
         ( { sidebar = Sidebar.initModel
-          , pageGroup = pageGroup
+          , currentPageGroup = newPageGroup
           , flags = flags
+          , pageGroups = newPageGroups
           }
         , cmd
         )
@@ -58,8 +63,8 @@ init flags location =
 
 
 view : Model -> Html.Html Message
-view { sidebar, pageGroup } =
-    case pageGroup of
+view { sidebar, currentPageGroup } =
+    case currentPageGroup of
         DefaultPageGroup subModel ->
             Html.div [ class "container" ]
                 [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
@@ -72,31 +77,32 @@ view { sidebar, pageGroup } =
                 (List.map (Html.map AccountPageGroupMessage) (AccountPageGroup.view sidebar.language subModel))
 
 
+
 -- UPDATE
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ pageGroup, flags, sidebar } as model) =
-    case ( message, pageGroup ) of
+update message ({ currentPageGroup, flags, sidebar, pageGroups } as model) =
+    case ( message, currentPageGroup ) of
         ( DefaultPageGroupMessage defaultPageGroupMessage, DefaultPageGroup subModel ) ->
             let
                 ( newPageGroupModel, newCmd ) =
-                    DefaultPageGroup.update defaultPageGroupMessage subModel flags sidebar.wallet
+                    DefaultPageGroup.update defaultPageGroupMessage subModel sidebar.wallet
 
                 newPageGroup =
                     DefaultPageGroup newPageGroupModel
             in
-                ( { model | pageGroup = newPageGroup }, Cmd.map DefaultPageGroupMessage newCmd )
+                ( { model | currentPageGroup = newPageGroup }, Cmd.map DefaultPageGroupMessage newCmd )
 
         ( AccountPageGroupMessage accountPageGroupMessage, AccountPageGroup subModel ) ->
             let
                 ( newPageGroupModel, newCmd ) =
-                    AccountPageGroup.update accountPageGroupMessage subModel flags sidebar.wallet
+                    AccountPageGroup.update accountPageGroupMessage subModel flags
 
                 newPageGroup =
                     AccountPageGroup newPageGroupModel
             in
-                ( { model | pageGroup = newPageGroup }, Cmd.map AccountPageGroupMessage newCmd )
+                ( { model | currentPageGroup = newPageGroup }, Cmd.map AccountPageGroupMessage newCmd )
 
         ( SidebarMessage sidebarMessage, _ ) ->
             let
@@ -107,10 +113,10 @@ update message ({ pageGroup, flags, sidebar } as model) =
 
         ( OnLocationChange location, _ ) ->
             let
-                (newPageGroup, cmd) =
-                    getPageGroup location
+                ( newPageGroup, cmd, newPageGroups ) =
+                    updatePageGroup pageGroups location flags sidebar.wallet
             in
-                ( { model | pageGroup = newPageGroup }, cmd )
+                ( { model | currentPageGroup = newPageGroup }, cmd )
 
         ( _, _ ) ->
             ( model, Cmd.none )
@@ -121,8 +127,8 @@ update message ({ pageGroup, flags, sidebar } as model) =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar, pageGroup } =
-    case pageGroup of
+subscriptions { sidebar, currentPageGroup } =
+    case currentPageGroup of
         DefaultPageGroup subModel ->
             Sub.batch
                 [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar) ]
@@ -130,6 +136,7 @@ subscriptions { sidebar, pageGroup } =
         AccountPageGroup subModel ->
             Sub.batch
                 [ Sub.map AccountPageGroupMessage (AccountPageGroup.subscriptions subModel) ]
+
 
 
 -- MAIN
@@ -145,32 +152,89 @@ main =
         }
 
 
+
 -- UTILS
 
 
-getPageGroup : Location -> ( PageGroup, Cmd Message )
-getPageGroup location =
+initPageGroup : Location -> ( PageGroup, Cmd Message, Dict String PageGroup )
+initPageGroup location =
     let
         pageGroupRoute =
             getPageGroupRoute location
     in
-    case pageGroupRoute of
-        Route.DefaultPageGroupRoute ->
-            let
-                pageGroupModel =
-                    DefaultPageGroup.initModel location
+        case pageGroupRoute of
+            Route.DefaultPageGroupRoute ->
+                let
+                    pageGroupModel =
+                        DefaultPageGroup.initModel location
 
-                pageGroupCmd =
-                    DefaultPageGroup.initCmd location pageGroupModel.page
-            in
-            ( DefaultPageGroup pageGroupModel, Cmd.map DefaultPageGroupMessage pageGroupCmd )
-        
-        Route.AccountPageGroupRoute ->
-            let
-                pageGroupModel =
-                    AccountPageGroup.initModel location
+                    pageGroup =
+                        DefaultPageGroup pageGroupModel
 
-                pageGroupCmd =
-                    AccountPageGroup.initCmd pageGroupModel.page
-            in
-            ( AccountPageGroup pageGroupModel, Cmd.map AccountPageGroupMessage pageGroupCmd )
+                    pageGroupCmd =
+                        Cmd.map DefaultPageGroupMessage (DefaultPageGroup.initCmd location)
+                in
+                    ( pageGroup, pageGroupCmd, Dict.insert "DefaultPageGroup" pageGroup Dict.empty )
+
+            Route.AccountPageGroupRoute ->
+                let
+                    pageGroupModel =
+                        AccountPageGroup.initModel location
+
+                    pageGroup =
+                        AccountPageGroup pageGroupModel
+
+                    pageGroupCmd =
+                        Cmd.map AccountPageGroupMessage (AccountPageGroup.initCmd pageGroupModel)
+                in
+                    ( pageGroup, pageGroupCmd, Dict.insert "AccountPageGroup" pageGroup Dict.empty )
+
+
+updatePageGroup : Dict String PageGroup -> Location -> Flags -> Wallet -> ( PageGroup, Cmd Message, Dict String PageGroup )
+updatePageGroup pageGroups location flags wallet =
+    let
+        pageGroupRoute =
+            getPageGroupRoute location
+    in
+        case pageGroupRoute of
+            Route.DefaultPageGroupRoute ->
+                let
+                    maybePageGroup =
+                        Dict.get "DefaultPageGroupModel" pageGroups
+
+                    pageGroupModel =
+                        case maybePageGroup of
+                            Just (DefaultPageGroup subModel) ->
+                                subModel
+
+                            _ ->
+                                DefaultPageGroup.initModel location
+
+                    ( newPageGroupModel, newCmd ) =
+                        DefaultPageGroup.update (DefaultPageGroup.OnLocationChange location) pageGroupModel wallet
+
+                    pageGroup =
+                        DefaultPageGroup newPageGroupModel
+                in
+                    ( pageGroup, Cmd.map DefaultPageGroupMessage newCmd, Dict.insert "DefaultPageGroup" pageGroup pageGroups )
+
+            Route.AccountPageGroupRoute ->
+                let
+                    maybePageGroup =
+                        Dict.get "AccountPageGroup" pageGroups
+
+                    pageGroupModel =
+                        case maybePageGroup of
+                            Just (AccountPageGroup subModel) ->
+                                subModel
+
+                            _ ->
+                                AccountPageGroup.initModel location
+
+                    ( newPageGroupModel, newCmd ) =
+                        AccountPageGroup.update (AccountPageGroup.OnLocationChange location) pageGroupModel flags
+
+                    pageGroup =
+                        AccountPageGroup newPageGroupModel
+                in
+                    ( pageGroup, Cmd.map AccountPageGroupMessage newCmd, Dict.insert "AccountPageGroup" pageGroup pageGroups )

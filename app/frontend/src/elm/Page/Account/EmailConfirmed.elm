@@ -10,15 +10,13 @@ import Navigation
 
 
 type alias Model =
-    { confirmToken : String
-    , email: String
-    }
+    { email : String }
 
 
-initModel : String -> Maybe String -> Model
-initModel confirmToken maybeEmail =
+initModel : Maybe String -> Model
+initModel maybeEmail =
     let
-        email = 
+        email =
             case maybeEmail of
                 Nothing ->
                     ""
@@ -26,9 +24,7 @@ initModel confirmToken maybeEmail =
                 Just emailAddr ->
                     emailAddr
     in
-        { confirmToken = confirmToken
-        , email = email
-        }
+        { email = email }
 
 
 
@@ -39,11 +35,11 @@ type Message
     = Next
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update msg model =
+update : Message -> Model -> String -> ( Model, Cmd Message )
+update msg model confirmToken =
     case msg of
         Next ->
-            ( model, Navigation.newUrl ("/account/create_keys/"++model.confirmToken) )
+            ( model, Navigation.newUrl ("/account/create_keys") )
 
 
 
