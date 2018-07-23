@@ -15,7 +15,6 @@ import Html
         , button
         , text
         )
-import Html.Events exposing (on, onInput, onClick, keyCode)
 import Navigation exposing (Location)
 import Page.Account.ConfirmEmail as ConfirmEmail
 import Page.Account.Create as Create
@@ -27,7 +26,6 @@ import Page.NotFound as NotFound
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import Json.Decode as JD exposing (Decoder)
 import View.Notification as Notification
 
 
@@ -150,18 +148,6 @@ view language { page, notification } =
                 language
             )
         ]
-
-
-onEnter : Message -> Attribute Message
-onEnter msg =
-    let
-        isEnter code =
-            if code == 13 then
-                JD.succeed msg
-            else
-                JD.fail "not ENTER"
-    in
-        on "keydown" (JD.andThen isEnter keyCode)
 
 
 
