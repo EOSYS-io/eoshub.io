@@ -14,7 +14,7 @@ model =
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
-    , confirmToken = "test" }
+    }
 
 
 tests : Test
@@ -25,7 +25,7 @@ tests =
                 expectedJson =
                     "{\"account_name\":\"" ++ model.accountName ++ "\",\"pubkey\":\"" ++ model.pubkey ++ "\"}"
               in
-              test "createEosAccountBodyParams" <|
-                \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createEosAccountBodyParams model)
+                test "createEosAccountBodyParams" <|
+                    \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createEosAccountBodyParams model)
             ]
         ]

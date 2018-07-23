@@ -10,7 +10,8 @@ import Page.Account.Created as Created
 import Page.Account.EmailConfirmFailure as EmailConfirmFailure
 import Page.Account.EmailConfirmed as EmailConfirmed
 import Test exposing (..)
-import Util.WalletDecoder exposing (WalletStatus(Authenticated))
+import Route
+import View.Notification as Notification
 
 
 location : Location
@@ -37,31 +38,25 @@ tests =
 
         confirmToken =
             "testToken"
-
-        wallet =
-            { status = Authenticated
-            , account = "account"
-            , authority = "active"
-            }
     in
         describe "Page module"
             [ describe "getPage"
                 [ test "ConfirmEmailRoute" <|
-                    \() -> Expect.equal ( ConfirmEmailPage ConfirmEmail.initModel ) (getPage { location | pathname = "/account/confirm_email" })
+                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel) (getPage Route.ConfirmEmailRoute)
                 , test "EmailConfirmedRoute" <|
                     \() ->
                         let
                             email =
                                 Just "test@chain.partners"
                         in
-                            Expect.equal ( EmailConfirmedPage (EmailConfirmed.initModel confirmToken email) ) (getPage { location | pathname = "/account/email_confirmed/testToken", search = "?email=test@chain.partners" })
+                            Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel email)) (getPage (Route.EmailConfirmedRoute confirmToken email))
                 , test "EmailConfirmFailureRoute" <|
-                    \() -> Expect.equal ( EmailConfirmFailurePage EmailConfirmFailure.initModel ) (getPage { location | pathname = "/account/email_confirm_failure" })
+                    \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel) (getPage Route.EmailConfirmFailureRoute)
                 , test "CreateKeysRoute" <|
                     \() ->
                         let
                             createKeysModel =
-                                CreateKeys.initModel confirmToken
+                                CreateKeys.initModel
 
                             ( newCreateKeysModel, subCmd ) =
                                 CreateKeys.update CreateKeys.GenerateKeys createKeysModel
@@ -69,25 +64,25 @@ tests =
                             expectedPage =
                                 CreateKeysPage newCreateKeysModel
                         in
-                            Expect.equal expectedPage (getPage { location | pathname = "/account/create_keys/testToken" })
+                            Expect.equal expectedPage (getPage Route.CreateKeysRoute)
                 , test "CreatedRoute" <|
-                    \() -> Expect.equal ( CreatedPage Created.initModel ) (getPage { location | pathname = "/account/created" })
+                    \() -> Expect.equal (CreatedPage Created.initModel) (getPage Route.CreatedRoute)
                 , test "CreateRoute" <|
                     \() ->
                         let
                             pubkey =
                                 "testpubkey"
                         in
-                            Expect.equal ( CreatePage (Create.initModel confirmToken pubkey) ) (getPage { location | pathname = "/account/create/testToken/testpubkey" })
+                            Expect.equal (CreatePage (Create.initModel pubkey)) (getPage (Route.CreateRoute pubkey))
                 , test "NotFoundRoute" <|
-                    \() -> Expect.equal NotFoundPage (getPage location)
+                    \() -> Expect.equal NotFoundPage (getPage Route.NotFoundRoute)
                 ]
             , describe "initCmd"
                 [ test "CreateKeysRoute" <|
                     \() ->
                         let
                             createKeysModel =
-                                CreateKeys.initModel confirmToken
+                                CreateKeys.initModel
 
                             ( newCreateKeysModel, subCmd ) =
                                 CreateKeys.update CreateKeys.GenerateKeys createKeysModel
@@ -97,8 +92,13 @@ tests =
 
                             expectedCmd =
                                 Cmd.map CreateKeysMessage subCmd
+
+                            model =
+                                { page = expectedPage
+                                , confirmToken = confirmToken
+                                , notification = Notification.initModel
+                                }
                         in
-                            Expect.equal expectedCmd (initCmd expectedPage)
+                            Expect.equal expectedCmd (initCmd model)
                 ]
             ]
-

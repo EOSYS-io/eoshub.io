@@ -31,12 +31,6 @@ location =
 tests : Test
 tests =
     let
-        flags =
-            { node_env = "test" }
-
-        confirmToken =
-            "testToken"
-
         wallet =
             { status = Authenticated
             , account = "account"
@@ -48,9 +42,9 @@ tests =
                 [ test "IndexRoute" <|
                     \() -> Expect.equal IndexPage (getPage { location | pathname = "/" })
                 , test "VotingRoute" <|
-                    \() -> Expect.equal ( VotingPage Voting.initModel ) (getPage { location | pathname = "/voting" })
+                    \() -> Expect.equal (VotingPage Voting.initModel) (getPage { location | pathname = "/voting" })
                 , test "TransferRoute" <|
-                    \() -> Expect.equal ( TransferPage Transfer.initModel ) (getPage { location | pathname = "/transfer" })
+                    \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" })
                 , test "SearchRoute" <|
                     \() ->
                         Expect.equal (SearchPage Search.initModel) (getPage { location | pathname = "/search", search = "?query=123412341234" })
@@ -61,7 +55,7 @@ tests =
                 [ test "UpdatePushActionResponse" <|
                     \() ->
                         let
-                            ( { notification } as model ) =
+                            ({ notification } as model) =
                                 initModel location
 
                             expectedModel =
@@ -82,11 +76,11 @@ tests =
                         in
                             Expect.equal
                                 ( expectedModel, Cmd.none )
-                                (update (UpdatePushActionResponse pushActionResponse) model flags wallet)
+                                (update (UpdatePushActionResponse pushActionResponse) model wallet)
                 , test "CloseNotification" <|
                     \() ->
                         let
-                            ( { notification } as model ) =
+                            ({ notification } as model) =
                                 initModel location
 
                             openedModel =
@@ -109,7 +103,6 @@ tests =
                                 (update
                                     (NotificationMessage View.Notification.CloseNotification)
                                     openedModel
-                                    flags
                                     wallet
                                 )
                 ]
