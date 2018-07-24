@@ -70,10 +70,11 @@ type Message
 view : Model -> List (Html Message)
 view { state, wallet, language, fold } =
     [ header []
-        [ h1 []
-            [ a [ href "/" ]
-                [ text "eoshub" ]
+        [ h1
+            [ style [ ( "cursor", "pointer" ) ]
+            , onClick (ExternalMessage (ExternalMessage.ChangeUrl "/"))
             ]
+            [ text "eoshub" ]
         , button
             [ type_ "button"
             , id "lnbToggleButton"
