@@ -24,7 +24,8 @@ type alias Model =
     , validation : Bool
     , validationMsg : String
     , requestSuccess : Bool
-    , confirmToken : String }
+    , confirmToken : String
+    }
 
 
 initModel : String -> String -> Model
@@ -35,7 +36,8 @@ initModel confirmToken pubkey =
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
-    , confirmToken = confirmToken }
+    , confirmToken = confirmToken
+    }
 
 
 
@@ -102,22 +104,38 @@ view model =
                 , text "ex) eoshuby12345"
                 ]
             , form []
-                [ input [ class "account_name", placeholder "계정이름은 반드시 12글자로 입력해주세요", attribute "required" "", attribute (if model.validation then
+                [ input
+                    [ class "account_name"
+                    , placeholder "계정이름은 반드시 12글자로 입력해주세요"
+                    , attribute "required" ""
+                    , attribute
+                        (if model.validation then
                             "valid"
-                        else
+                         else
                             "invalid"
-                        ) "", type_ "text", onInput ValidateAccountName ]
+                        )
+                        ""
+                    , type_ "text"
+                    , onInput ValidateAccountName
+                    ]
                     []
                 , span []
                     [ text model.requestStatus.msg ]
                 ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle blue_white button", attribute (if model.validation && not model.requestSuccess then
-                            "enabled"
-                        else
-                            "disabled"
-                        ) "", type_ "button", onClick CreateEosAccount ]
+            [ button
+                [ class "middle blue_white button"
+                , attribute
+                    (if model.validation && not model.requestSuccess then
+                        "enabled"
+                     else
+                        "disabled"
+                    )
+                    ""
+                , type_ "button"
+                , onClick CreateEosAccount
+                ]
                 [ text "다음" ]
             ]
         ]
