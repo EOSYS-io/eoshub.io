@@ -105,16 +105,11 @@ tests =
                         Expect.equal
                             ( { initModel | state = PairWallet }, Cmd.none )
                             (update (UpdateState PairWallet) initModel)
-                , test "Fold" <|
+                , test "FoldOrUnfold" <|
                     \() ->
                         Expect.equal
                             ( { initModel | fold = True }, Cmd.none )
-                            (update Fold initModel)
-                , test "Unfold" <|
-                    \() ->
-                        Expect.equal
-                            ( { initModel | fold = False }, Cmd.none )
-                            (update Unfold { initModel | fold = True })
+                            (update FoldOrUnfold initModel)
                 , test "ChangeUrl" <|
                     \() ->
                         let
@@ -124,6 +119,18 @@ tests =
                             Expect.equal
                                 ( initModel, Navigation.newUrl url )
                                 (update (ChangeUrl url) initModel)
+                , test "SetConfigPanel" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | configPanelOpen = True }, Cmd.none )
+                            (update (SetConfigPanel False) initModel)
+                , test "AndThen" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | configPanelOpen = True, fold = True }
+                            , Cmd.batch [ Cmd.none, Cmd.none ]
+                            )
+                            (update (AndThen FoldOrUnfold (SetConfigPanel False)) initModel)
                 ]
             ]
         ]
