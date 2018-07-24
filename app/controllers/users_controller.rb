@@ -45,6 +45,8 @@ class UsersController < ApiController
       if response.code == 200
         user.eos_account_created!
         render json: { msg: I18n.t('users.eos_account_created') }, status: :ok
+      elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
+        render json: { msg: I18n.t('users.eos_node_connection_failed') }, status: response.code
       else
         render json: response.body, status: response.code
       end
