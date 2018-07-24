@@ -5,3 +5,6 @@ en:
     failed_to_create_email_verification_log: 'Failed to create an email verification log'
     eos_account_already_exist: 'The account already exists in the EOS block chain'
     eos_account_created: "Welcome to the EOS! \"%{account_name}\" has been created."
+    eos_account_creation_failure_no_such_email: 'User does not exist with this email'
+    eos_account_creation_failure_email_not_confirmed: 'Email is not confirmed'
+    eos_account_creation_failure_already_created: 'EOS account already created with this email'
