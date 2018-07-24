@@ -1,6 +1,5 @@
 module Page exposing (..)
 
-import ExternalMessage
 import Html
     exposing
         ( Html
@@ -114,7 +113,7 @@ type Message
     | SearchKeyMessage SearchKey.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
-    | IndexMessage ExternalMessage.Message
+    | IndexMessage Index.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
@@ -297,7 +296,7 @@ update message ({ page, notification, header } as model) flags { account } =
             in
                 ( { model | page = newPage |> VotingPage }, Cmd.none )
 
-        ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
+        ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
 
         ( UpdatePushActionResponse resp, _ ) ->
