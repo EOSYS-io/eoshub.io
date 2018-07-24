@@ -38,13 +38,13 @@ class UsersController < ApiController
       render json: { msg: I18n.t('users.eos_account_creation_failure_already_created') }, status: :precondition_failed
     else
       if helpers.eos_account_exist?(params[:account_name])
-        render json: { msg: I18n.t('user.eos_account_already_exist') }, status: :conflict and return
+        render json: { msg: I18n.t('users.eos_account_already_exist') }, status: :conflict and return
       end
 
       response = helpers.create_eos_account(params[:account_name], params[:pubkey])
       if response.code == 200
         user.eos_account_created!
-        render json: { msg: I18n.t('user.eos_account_created') }, status: :ok
+        render json: { msg: I18n.t('users.eos_account_created') }, status: :ok
       else
         render json: response.body, status: response.code
       end
