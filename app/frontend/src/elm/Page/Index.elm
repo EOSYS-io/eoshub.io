@@ -1,21 +1,28 @@
-module Page.Index exposing (view)
+module Page.Index exposing (Message(ChangeUrl), view)
 
-import ExternalMessage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
 
 
+-- MESSAGE --
+
+
+type Message
+    = ChangeUrl String
+
+
+
 -- VIEW --
 
 
-view : Language -> Html ExternalMessage.Message
+view : Language -> Html Message
 view language =
     section [ class "action view panel" ]
         [ a
             [ style [ ( "cursor", "pointer" ) ]
-            , onClick (ExternalMessage.ChangeUrl "/transfer")
+            , onClick (ChangeUrl "/transfer")
             ]
             [ div [ class "card transfer" ]
                 [ h3 [] [ text (translate language Transfer) ]
@@ -36,7 +43,7 @@ view language =
             ]
         , a
             [ style [ ( "cursor", "pointer" ) ]
-            , onClick (ExternalMessage.ChangeUrl "/voting")
+            , onClick (ChangeUrl "/voting")
             ]
             [ div [ class "card vote" ]
                 [ h3 [] [ text (translate language Vote) ]

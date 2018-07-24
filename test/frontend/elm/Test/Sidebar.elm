@@ -1,7 +1,6 @@
 module Test.Sidebar exposing (tests)
 
 import Expect
-import ExternalMessage
 import Navigation
 import Port
 import Sidebar exposing (Message(..), State(..), initModel, update)
@@ -124,7 +123,7 @@ tests =
                         in
                             Expect.equal
                                 ( initModel, Navigation.newUrl url )
-                                (update (ExternalMessage (ExternalMessage.ChangeUrl url)) initModel)
+                                (update (ChangeUrl url) initModel)
                 ]
             ]
         ]

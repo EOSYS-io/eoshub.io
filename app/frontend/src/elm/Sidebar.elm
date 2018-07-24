@@ -1,6 +1,5 @@
 module Sidebar exposing (..)
 
-import ExternalMessage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -60,8 +59,7 @@ type Message
     | UpdateLanguage Language
     | UpdateWalletStatus WalletResponse
     | UpdateState State
-    | ExternalMessage ExternalMessage.Message
-
+    | ChangeUrl String
 
 
 -- VIEW
@@ -143,7 +141,7 @@ signInView language =
             ]
         , div [ class "btn_area" ]
             [ a [ class "middle blue_white button", onClick (UpdateState PairWallet) ] [ text (translate language Login) ]
-            , a [ class "middle white_blue button", onClick (ExternalMessage (ExternalMessage.ChangeUrl "/account/confirm_email")) ] [ text (translate language NewAccount) ]
+            , a [ class "middle white_blue button", onClick (ChangeUrl "/account/confirm_email") ] [ text (translate language NewAccount) ]
             ]
         ]
 
@@ -286,7 +284,7 @@ update message model =
             in
                 update (UpdateState newState) { model | wallet = newWallet }
 
-        ExternalMessage (ExternalMessage.ChangeUrl url) ->
+        ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
 
