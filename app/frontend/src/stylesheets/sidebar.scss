@@ -21,12 +21,18 @@ $padding_bottom:36px;
 
 .sidebar header {
     h1 {
-        @include ir();
         width:91px;
         height:20px;
-        
-        background:url('../image/ci_eoshub.png') center center no-repeat transparent;
-        background-size:cover;
+
+        a { 
+            @include ir();
+
+            display:block;
+            width:inherit;
+            height:inherit;
+            background:url('../image/ci_eoshub.png') center center no-repeat transparent;
+            background-size:cover;
+        }
     }
 
     h1 + button {
@@ -35,7 +41,6 @@ $padding_bottom:36px;
         right:$padding_left_right;
 
     }
-
 }
 
 .sidebar {
