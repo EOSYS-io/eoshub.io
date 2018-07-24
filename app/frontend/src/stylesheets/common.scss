@@ -52,6 +52,9 @@ p.help.info {
 
         color:#999;
         transition:color 0.3s, background-color 0.3s;
+
+        outline:0;
+
         &:hover {
             color:darken(#999,70%);
             background:darken(#f7f7f7,1%);
