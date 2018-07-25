@@ -23,19 +23,17 @@ type alias Model =
     , validation : Bool
     , validationMsg : String
     , requestSuccess : Bool
-    , confirmToken : String
     }
 
 
-initModel : String -> String -> Model
-initModel confirmToken pubkey =
+initModel : String -> Model
+initModel pubkey =
     { accountName = ""
     , requestStatus = { msg = "" }
     , pubkey = pubkey
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
-    , confirmToken = confirmToken
     }
 
 
@@ -49,8 +47,8 @@ type Message
     | NewUser (Result Http.Error Response)
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update msg model flags =
+update : Message -> Model -> Flags -> String -> ( Model, Cmd Message )
+update msg model flags confirmToken =
     case msg of
         ValidateAccountName accountName ->
             let
@@ -66,7 +64,7 @@ update msg model flags =
                 ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags model.confirmToken )
+            ( model, createEosAccountRequest model flags confirmToken )
 
         NewUser (Ok res) ->
             ( { model | requestStatus = res, requestSuccess = True }, Navigation.newUrl ("/account/created") )

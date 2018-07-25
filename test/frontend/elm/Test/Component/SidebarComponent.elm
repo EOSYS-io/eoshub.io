@@ -1,13 +1,12 @@
-module Test.Sidebar exposing (tests)
+module Test.Component.SidebarComponent exposing (tests)
 
 import Expect
 import Navigation
 import Port
-import Sidebar exposing (Message(..), State(..), initModel, update)
+import Component.SidebarComponent exposing (Message(..), State(..), initModel, update)
 import Test exposing (..)
 import Translation exposing (Language(Korean))
 import Util.WalletDecoder exposing (WalletStatus(..))
-import View.Notification
 
 
 tests : Test

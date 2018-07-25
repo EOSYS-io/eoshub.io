@@ -1,4 +1,4 @@
-module Route exposing (Route(..), matchRoute, parseLocation)
+module Route exposing (..)
 
 import Navigation exposing (Location)
 import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, string, top, stringParam)
@@ -9,9 +9,9 @@ type Route
     | ConfirmEmailRoute
     | EmailConfirmedRoute String (Maybe String)
     | EmailConfirmFailureRoute
-    | CreateKeysRoute String
+    | CreateKeysRoute
     | CreatedRoute
-    | CreateRoute String String
+    | CreateRoute String
     | SearchRoute (Maybe String)
     | SearchKeyRoute (Maybe String)
     | VotingRoute
@@ -26,9 +26,9 @@ matchRoute =
         , map ConfirmEmailRoute (s "account" </> s "confirm_email")
         , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string <?> stringParam "email")
         , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
-        , map CreateKeysRoute (s "account" </> s "create_keys" </> string)
+        , map CreateKeysRoute (s "account" </> s "create_keys")
         , map CreatedRoute (s "account" </> s "created")
-        , map CreateRoute (s "account" </> s "create" </> string </> string)
+        , map CreateRoute (s "account" </> s "create" </> string)
         , map SearchRoute (s "search" <?> stringParam "query")
         , map SearchKeyRoute (s "searchkey" <?> stringParam "query")
         , map VotingRoute (s "voting")
@@ -44,3 +44,16 @@ parseLocation location =
 
         Nothing ->
             NotFoundRoute
+
+
+type ComponentRoute
+    = MainComponentRoute
+    | AccountComponentRoute
+
+
+getComponentRoute : Location -> ComponentRoute
+getComponentRoute location =
+    if String.startsWith "/account/" location.pathname then
+        AccountComponentRoute
+    else
+        MainComponentRoute

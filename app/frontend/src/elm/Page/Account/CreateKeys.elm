@@ -13,14 +13,14 @@ import Port exposing (KeyPair)
 type alias Model =
     { keys : KeyPair
     , nextEnabled : Bool
-    , confirmToken : String }
+    }
 
 
-initModel : String -> Model
-initModel confirmToken =
-    { keys = { privateKey = "", publicKey = "" } 
+initModel : Model
+initModel =
+    { keys = { privateKey = "", publicKey = "" }
     , nextEnabled = False
-    , confirmToken = confirmToken }
+    }
 
 
 
@@ -38,7 +38,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
         Next ->
-            ( model, Navigation.newUrl ("/account/create/" ++ model.confirmToken ++ "/" ++ model.keys.publicKey) )
+            ( model, Navigation.newUrl ("/account/create/" ++ model.keys.publicKey) )
 
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -47,7 +47,8 @@ update msg model =
             ( { model | keys = keyPair }, Cmd.none )
 
         Copy ->
-            ( { model | nextEnabled = True }, Port.copy ())
+            ( { model | nextEnabled = True }, Port.copy () )
+
 
 
 -- VIEW
@@ -80,16 +81,24 @@ view model =
                     [ text model.keys.privateKey ]
                 ]
             , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
-                [ text ("PublicKey:"++model.keys.publicKey++"\nPrivateKey:"++model.keys.privateKey) ]
+                [ text ("PublicKey:" ++ model.keys.publicKey ++ "\nPrivateKey:" ++ model.keys.privateKey) ]
             , button [ class "button middle copy blue_white", id "copy", type_ "button", onClick Copy ]
                 [ text "한번에 복사하기" ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle white_blue button", attribute (if model.nextEnabled
-                        then
-                            "enabled"
-                        else
-                            "disabled") "", id "next", type_ "button", onClick Next ]
+            [ button
+                [ class "middle white_blue button"
+                , attribute
+                    (if model.nextEnabled then
+                        "enabled"
+                     else
+                        "disabled"
+                    )
+                    ""
+                , id "next"
+                , type_ "button"
+                , onClick Next
+                ]
                 [ text "다음" ]
             ]
         ]

@@ -1,4 +1,4 @@
-module Page exposing (..)
+module Component.MainComponent exposing (..)
 
 import Html
     exposing
@@ -24,12 +24,6 @@ import Html.Attributes
         )
 import Html.Events exposing (on, onInput, onClick, keyCode)
 import Navigation exposing (Location)
-import Page.Account.ConfirmEmail as ConfirmEmail
-import Page.Account.Create as Create
-import Page.Account.CreateKeys as CreateKeys
-import Page.Account.Created as Created
-import Page.Account.EmailConfirmFailure as EmailConfirmFailure
-import Page.Account.EmailConfirmed as EmailConfirmed
 import Page.Index as Index
 import Page.NotFound as NotFound
 import Page.Search as Search
@@ -51,12 +45,6 @@ import Util.Validation exposing (isAccount, isPublicKey)
 
 type Page
     = IndexPage
-    | ConfirmEmailPage ConfirmEmail.Model
-    | EmailConfirmedPage EmailConfirmed.Model
-    | EmailConfirmFailurePage EmailConfirmFailure.Model
-    | CreatedPage Created.Model
-    | CreateKeysPage CreateKeys.Model
-    | CreatePage Create.Model
     | SearchPage Search.Model
     | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
@@ -79,23 +67,21 @@ type alias Header =
     }
 
 
-initModel : Location -> ( Model, Cmd Message )
+initModel : Location -> Model
 initModel location =
     let
-        ( page, cmd ) =
+        page =
             getPage location
     in
-        ( { page = page
-          , notification = Notification.initModel
-          , header =
-                { searchInput = ""
-                , eosPrice = 0
-                , ramPrice = 0
-                , errMessage = ""
-                }
-          }
-        , cmd
-        )
+        { page = page
+        , notification = Notification.initModel
+        , header =
+            { searchInput = ""
+            , eosPrice = 0
+            , ramPrice = 0
+            , errMessage = ""
+            }
+        }
 
 
 
@@ -103,13 +89,7 @@ initModel location =
 
 
 type Message
-    = ConfirmEmailMessage ConfirmEmail.Message
-    | EmailConfirmedMessage EmailConfirmed.Message
-    | EmailConfirmFailureMessage EmailConfirmFailure.Message
-    | CreateKeysMessage CreateKeys.Message
-    | CreatedMessage Created.Message
-    | CreateMessage Create.Message
-    | SearchMessage Search.Message
+    = SearchMessage Search.Message
     | SearchKeyMessage SearchKey.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
@@ -134,6 +114,29 @@ type alias PublicKeyQuery =
     String
 
 
+initCmd : Location -> Cmd Message
+initCmd location =
+    let
+        route =
+            location |> parseLocation
+    in
+        case route of
+            SearchRoute query ->
+                let
+                    subInitCmd =
+                        case query of
+                            Just str ->
+                                Search.initCmd str
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    Cmd.map SearchMessage subInitCmd
+
+            _ ->
+                Cmd.none
+
+
 
 -- VIEW
 
@@ -143,24 +146,6 @@ view language { page, header, notification } =
     let
         newContentHtml =
             case page of
-                ConfirmEmailPage subModel ->
-                    Html.map ConfirmEmailMessage (ConfirmEmail.view subModel)
-
-                EmailConfirmedPage subModel ->
-                    Html.map EmailConfirmedMessage (EmailConfirmed.view subModel)
-
-                EmailConfirmFailurePage subModel ->
-                    Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel)
-
-                CreateKeysPage subModel ->
-                    Html.map CreateKeysMessage (CreateKeys.view subModel)
-
-                CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel)
-
-                CreatePage subModel ->
-                    Html.map CreateMessage (Create.view subModel)
-
                 SearchPage subModel ->
                     Html.map SearchMessage (Search.view language subModel)
 
@@ -230,51 +215,9 @@ onEnter msg =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> Wallet -> ( Model, Cmd Message )
-update message ({ page, notification, header } as model) flags { account } =
+update : Message -> Model -> Wallet -> ( Model, Cmd Message )
+update message ({ page, notification, header } as model) { account } =
     case ( message, page ) of
-        ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    ConfirmEmail.update subMessage subModel flags
-            in
-                ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
-
-        ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    EmailConfirmed.update subMessage subModel
-            in
-                ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
-
-        ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
-            let
-                newPage =
-                    EmailConfirmFailure.update subMessage subModel
-            in
-                ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
-
-        ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    CreateKeys.update subMessage subModel
-            in
-                ( { model | page = newPage |> CreateKeysPage }, Cmd.map CreateKeysMessage subCmd )
-
-        ( CreatedMessage subMessage, CreatedPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    Created.update subMessage subModel
-            in
-                ( { model | page = newPage |> CreatedPage }, Cmd.map CreatedMessage subCmd )
-
-        ( CreateMessage subMessage, CreatePage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags
-            in
-                ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
-
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 ( newPage, subCmd ) =
@@ -311,8 +254,11 @@ update message ({ page, notification, header } as model) flags { account } =
 
         ( OnLocationChange location, _ ) ->
             let
-                ( newPage, cmd ) =
+                newPage =
                     getPage location
+
+                cmd =
+                    initCmd location
             in
                 ( { model | page = newPage }, cmd )
 
@@ -368,85 +314,37 @@ parseQuery query =
 subscriptions : Model -> Sub Message
 subscriptions model =
     Sub.batch
-        [ Sub.map CreateKeysMessage CreateKeys.subscriptions
-        , Port.receivePushActionResponse UpdatePushActionResponse
-        ]
+        [ Port.receivePushActionResponse UpdatePushActionResponse ]
 
 
 
 -- Utility functions
 
 
-getPage : Location -> ( Page, Cmd Message )
+getPage : Location -> Page
 getPage location =
     let
         route =
             location |> parseLocation
     in
         case route of
-            ConfirmEmailRoute ->
-                ( ConfirmEmailPage ConfirmEmail.initModel, Cmd.none )
-
-            EmailConfirmedRoute confirmToken email ->
-                ( EmailConfirmedPage (EmailConfirmed.initModel confirmToken email), Cmd.none )
-
-            EmailConfirmFailureRoute ->
-                ( EmailConfirmFailurePage EmailConfirmFailure.initModel, Cmd.none )
-
-            CreateKeysRoute confirmToken ->
-                let
-                    createKeysModel =
-                        CreateKeys.initModel confirmToken
-
-                    ( newCreateKeysModel, subCmd ) =
-                        CreateKeys.update CreateKeys.GenerateKeys createKeysModel
-
-                    newPage =
-                        CreateKeysPage newCreateKeysModel
-
-                    cmd =
-                        Cmd.map CreateKeysMessage subCmd
-                in
-                    ( newPage, cmd )
-
-            CreatedRoute ->
-                ( CreatedPage Created.initModel, Cmd.none )
-
-            CreateRoute confirmToken pubkey ->
-                ( CreatePage (Create.initModel confirmToken pubkey), Cmd.none )
-
             SearchRoute query ->
-                let
-                    initCmd =
-                        case query of
-                            Just str ->
-                                Search.initCmd str
-
-                            Nothing ->
-                                Cmd.none
-                in
-                    ( SearchPage Search.initModel, Cmd.map SearchMessage initCmd )
+                SearchPage Search.initModel
 
             SearchKeyRoute query ->
-                let
-                    initCmd =
-                        case query of
-                            Just str ->
-                                SearchKey.initCmd str
-
-                            Nothing ->
-                                Cmd.none
-                in
-                    ( SearchKeyPage SearchKey.initModel, Cmd.none )
+                SearchKeyPage SearchKey.initModel
 
             VotingRoute ->
-                ( VotingPage Voting.initModel, Cmd.none )
+                VotingPage Voting.initModel
 
             TransferRoute ->
-                ( TransferPage Transfer.initModel, Cmd.none )
+                TransferPage Transfer.initModel
 
             IndexRoute ->
-                ( IndexPage, Cmd.none )
+                IndexPage
 
             NotFoundRoute ->
-                ( NotFoundPage, Cmd.none )
+                NotFoundPage
+
+            _ ->
+                NotFoundPage

@@ -1,4 +1,4 @@
-module Sidebar exposing (..)
+module Component.SidebarComponent exposing (..)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
