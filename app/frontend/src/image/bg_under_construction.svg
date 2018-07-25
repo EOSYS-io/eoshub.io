@@ -31,49 +31,72 @@
 
         @keyframes tougue {
             0% {
-                transform: translate(-30%,5%) rotate(-58deg);
+                transform:translate(0%,0%) rotate(0deg)
             }
 
             2% {
-                transform:translate(-22%,3%) rotate(-41deg)
+                transform:translate(-4%,0.5%) rotate(-10deg)
             }
 
             4% {
                 transform:translate(-14%,1.5%) rotate(-29deg)
             }
 
+            6% {
+                transform:translate(-22%,3%) rotate(-41deg)
+            }
+
             8% {
-                transform:translate(-4%,0.5%) rotate(-10deg)
+                transform: translate(-30%,5%) rotate(-58deg);
             }
 
             10% {
+                transform:translate(-22%,3%) rotate(-41deg)
+            }
+
+            12% {
+                transform:translate(-14%,1.5%) rotate(-29deg)
+            }
+
+            14% {
+                transform:translate(-4%,0.5%) rotate(-10deg)
+            }
+
+            16% {
                 transform:translate(0%,0%) rotate(0deg)
             }
 
-            20% {
+            30% {
                 transform:translate(0%,0%) rotate(0deg)
             }
 
-            25% {
-                transform:translate(0%,10%) rotate(0deg)
+            32% {
+                transform:translate(0%,0.7%) rotate(0deg)
+            }
+
+            35% {
+                transform:translate(0%,0%) rotate(0deg)
             }
 
             100% {
-                transform:translate(0%,10%) rotate(0deg)
+                transform:translate(0%,0%) rotate(0deg)
             }
-
         } 
 
-        .tougue {
+        #tougue {
+            display:none;
+        }
+        
+        #tougue:target {
+            display:initial;
             transform-origin: center center;
-            transform:translate(0%,10%) rotate(0deg);
-            animation: tougue 5s linear infinite;
+            transform:translate(0%,0%) rotate(0deg);
+            animation: tougue 2.5s linear;
+            animation-delay:0.5s;
 
             /* transform: translate(-30%,7%) rotate(-58deg);   //start */
-
-
-            background:#600;
         }
+
         </style>
     </defs>
     <title>bg under construction</title>
@@ -82,7 +105,7 @@
             <path class="cls-1" d="M195.82,232.43l.42-.62c24.34-26.79,38.41-58,34.46-95.47a113.91,113.91,0,0,0-19.14-52.1v-51l-33.5,18.35a115.37,115.37,0,0,0-124.85,0L19.75,33.21v51h0A115.14,115.14,0,0,0,0,148.88,78.09,78.09,0,0,0,.57,160a115.67,115.67,0,0,0,60.34,90.76c32,18.55,68.3,22.73,142.43,16.23C182.6,255.28,193.46,236.11,195.82,232.43Z"/>
             <path class="cls-2" d="M163.49,110.13a6.5,6.5,0,1,0-6.5-6.5A6.5,6.5,0,0,0,163.49,110.13Z"/>
             <path class="cls-2" d="M27.37,110.13a6.5,6.5,0,1,0-6.5-6.5A6.49,6.49,0,0,0,27.37,110.13Z"/>
-            <g class="tougue" stroke="#f00" stroke-width="1">
+            <g id="tougue" class="tougue" stroke="#f00" stroke-width="1">
                 <path class="cls-3" d="M136.33,114.73c-8.14-3.67-18.33,1.29-22.75,11.08l13.17,5.95,5.65-11.57a1.23,1.23,0,1,1,2.21,1.07L129,132.77l14.07,6.35C147.49,129.33,144.47,118.41,136.33,114.73Z"/>
                 <path class="cls-4" d="M134,119.62a1.24,1.24,0,0,0-1.64.57l-5.65,11.57,2.24,1,5.62-11.51A1.24,1.24,0,0,0,134,119.62Z"/>
             </g>
