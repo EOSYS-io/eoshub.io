@@ -1,25 +1,8 @@
 module Test.Util.Validation exposing (..)
 
 import Expect
-import Navigation exposing (Location)
 import Util.Validation exposing (..)
 import Test exposing (..)
-
-
-location : Location
-location =
-    { href = ""
-    , host = ""
-    , hostname = ""
-    , protocol = ""
-    , origin = ""
-    , port_ = ""
-    , pathname = "/none"
-    , search = ""
-    , hash = ""
-    , username = ""
-    , password = ""
-    }
 
 
 tests : Test
