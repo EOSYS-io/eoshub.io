@@ -202,14 +202,12 @@ accountInfoView language { account, authority } configPanelOpen =
             [ div [ class "user_status" ]
                 [ h2 [] [ text (account ++ "@" ++ authority) ]
                 , div
-                    [ configPanelClass
-                    , onMouseLeave (SetConfigPanel False)
-                    ]
+                    [ configPanelClass ]
                     [ button
                         [ type_ "button"
                         , class "icon gear button"
                         , attribute "wai-aria" "hidden"
-                        , onClick (SetConfigPanel True)
+                        , onClick (SetConfigPanel (not configPanelOpen))
                         ]
                         [ text "option" ]
                     , div [ class "menu_list" ]
