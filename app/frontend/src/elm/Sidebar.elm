@@ -1,6 +1,5 @@
 module Sidebar exposing (..)
 
-import ExternalMessage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -31,6 +30,7 @@ type alias Model =
     , wallet : Wallet
     , state : State
     , fold : Bool
+    , configPanelOpen : Bool
     }
 
 
@@ -44,6 +44,7 @@ initModel =
         }
     , state = Loading
     , fold = False
+    , configPanelOpen = False
     }
 
 
@@ -54,13 +55,14 @@ initModel =
 type Message
     = AuthenticateAccount
     | CheckWalletStatus
-    | Fold
+    | ToggleSidebar
     | InvalidateAccount
-    | Unfold
     | UpdateLanguage Language
     | UpdateWalletStatus WalletResponse
     | UpdateState State
-    | ExternalMessage ExternalMessage.Message
+    | ChangeUrl String
+    | OpenConfigPanel Bool
+    | AndThen Message Message
 
 
 
@@ -68,23 +70,19 @@ type Message
 
 
 view : Model -> List (Html Message)
-view { state, wallet, language, fold } =
+view { state, wallet, language, fold, configPanelOpen } =
     [ header []
-        [ h1 []
-            [ a [ href "/" ]
-                [ text "eoshub" ]
+        [ h1
+            [ style [ ( "cursor", "pointer" ) ]
+            , onClick (ChangeUrl "/")
             ]
+            [ text "eoshub" ]
         , button
             [ type_ "button"
             , id "lnbToggleButton"
             , class "folding button"
             , attribute "aria-hidden" "true"
-            , onClick
-                (if fold then
-                    Unfold
-                 else
-                    Fold
-                )
+            , onClick ToggleSidebar
             ]
             [ text (translate language OpenCloseSidebar) ]
         ]
@@ -96,7 +94,7 @@ view { state, wallet, language, fold } =
             pairWalletView language
 
         AccountInfo ->
-            accountInfoView language wallet
+            accountInfoView language wallet configPanelOpen
 
         Loading ->
             loadingView language
@@ -142,8 +140,16 @@ signInView language =
                 ]
             ]
         , div [ class "btn_area" ]
-            [ a [ class "middle blue_white button", onClick (UpdateState PairWallet) ] [ text (translate language Login) ]
-            , a [ class "middle white_blue button", onClick (ExternalMessage (ExternalMessage.ChangeUrl "/account/confirm_email")) ] [ text (translate language NewAccount) ]
+            [ a
+                [ class "middle blue_white button"
+                , onClick (UpdateState PairWallet)
+                ]
+                [ text (translate language Login) ]
+            , a
+                [ class "middle white_blue button"
+                , onClick (ChangeUrl "/account/confirm_email")
+                ]
+                [ text (translate language NewAccount) ]
             ]
         ]
 
@@ -179,55 +185,78 @@ pairWalletView language =
         ]
 
 
-accountInfoView : Language -> Wallet -> Html Message
-accountInfoView language { account, authority } =
-    div [ class "dashboard logged" ]
-        [ div [ class "user_status" ]
-            [ h2 [] [ text (account ++ "@" ++ authority) ]
-            , div [ class "config_panel" ]
-                [ button
-                    [ type_ "button"
-                    , class "icon gear button"
-                    , attribute "wai-aria" "hidden"
-                    ]
-                    [ text "option" ]
-                , div [ class "menu_list" ]
-                    [ a [] [ text (translate language ChangeWallet) ]
-                    , a [] [ text (translate language MyAccount) ]
-                    , a [ onClick InvalidateAccount ] [ text (translate language SignOut) ]
+accountInfoView : Language -> Wallet -> Bool -> Html Message
+accountInfoView language { account, authority } configPanelOpen =
+    let
+        configPanelClass =
+            class
+                ("config_panel"
+                    ++ (if configPanelOpen then
+                            " expand"
+                        else
+                            ""
+                       )
+                )
+    in
+        div [ class "dashboard logged" ]
+            [ div [ class "user_status" ]
+                [ h2 [] [ text (account ++ "@" ++ authority) ]
+                , div
+                    [ configPanelClass ]
+                    [ button
+                        [ type_ "button"
+                        , class "icon gear button"
+                        , attribute "wai-aria" "hidden"
+                        , onClick (OpenConfigPanel (not configPanelOpen))
+                        ]
+                        [ text "option" ]
+                    , div [ class "menu_list" ]
+                        [ a
+                            [ style [ ( "cursor", "pointer" ) ]
+                            , onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
+                            ]
+                            [ text (translate language ChangeWallet) ]
+                        , a
+                            [ style [ ( "cursor", "pointer" ) ]
+                            , onClick (AndThen (OpenConfigPanel False) (ChangeUrl ("search?query=" ++ account)))
+                            ]
+                            [ text (translate language MyAccount) ]
+                        , a
+                            [ style [ ( "cursor", "pointer" ) ]
+                            , onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
+                            ]
+                            [ text (translate language SignOut) ]
+                        ]
                     ]
                 ]
-            ]
-        , div [ class "panel" ]
-            [ h3 []
-                [ text (translate language TotalAmount)
-                , strong [] [ text "1820 EOS" ]
-                ]
-            , ul [ class "status" ]
-                [ li []
-                    [ text
-                        (translate language UnstakedAmount)
-                    , strong [] [ text "30 EOS" ]
+            , div [ class "panel" ]
+                [ h3 []
+                    [ text (translate language TotalAmount)
+                    , strong [] [ text "1820 EOS" ]
                     ]
-                , li []
-                    [ text
-                        (translate language StakedAmount)
-                    , strong [] [ text "10 EOS" ]
+                , ul [ class "status" ]
+                    [ li []
+                        [ text
+                            (translate language UnstakedAmount)
+                        , strong [] [ text "30 EOS" ]
+                        ]
+                    , li []
+                        [ text
+                            (translate language StakedAmount)
+                        , strong [] [ text "10 EOS" ]
+                        ]
                     ]
+                , div [ class "graph" ] [ span [ style [ ( "width", "50%" ) ], title "50%" ] [] ]
+                , p [ class "description" ] [ text (translate language FastTransactionPossible) ]
                 ]
-            , div [ class "graph" ] [ span [ style [ ( "width", "50%" ) ], title "50%" ] [] ]
-            , p [ class "description" ] [ text (translate language FastTransactionPossible) ]
+            , div [ class "btn_area" ]
+                [ a [ class "middle lightgray_white button manage" ]
+                    [ text (translate language ManageStaking) ]
+                ]
+            , p [ class "help" ]
+                [ a [] [ text (translate language WhatIsStaking) ]
+                ]
             ]
-        , div [ class "btn_area" ]
-            [ a [ class "middle lightgray_white button manage" ]
-                [ text (translate language ManageStaking) ]
-            ]
-        , p [ class "help" ]
-            [ a [] [ text (translate language WhatIsStaking) ]
-            ]
-        , p [ class "help" ]
-            [ a [ onClick InvalidateAccount ] [ text (translate language SignOut) ] ]
-        ]
 
 
 loadingView : Language -> Html Message
@@ -248,7 +277,7 @@ foldClass folded =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message model =
+update message ({ configPanelOpen, fold } as model) =
     case message of
         AuthenticateAccount ->
             ( model, Port.authenticateAccount () )
@@ -256,14 +285,11 @@ update message model =
         CheckWalletStatus ->
             ( model, Port.checkWalletStatus () )
 
-        Fold ->
-            ( { model | fold = True }, Cmd.none )
+        ToggleSidebar ->
+            ( { model | fold = not fold }, Cmd.none )
 
         InvalidateAccount ->
             ( model, Port.invalidateAccount () )
-
-        Unfold ->
-            ( { model | fold = False }, Cmd.none )
 
         UpdateLanguage language ->
             ( { model | language = language }, Cmd.none )
@@ -286,8 +312,21 @@ update message model =
             in
                 update (UpdateState newState) { model | wallet = newWallet }
 
-        ExternalMessage (ExternalMessage.ChangeUrl url) ->
+        ChangeUrl url ->
             ( model, Navigation.newUrl url )
+
+        OpenConfigPanel bool ->
+            ( { model | configPanelOpen = not configPanelOpen }, Cmd.none )
+
+        AndThen firstMessage secondMessage ->
+            let
+                ( firstModel, firstCmd ) =
+                    update firstMessage model
+
+                ( secondModel, secondCmd ) =
+                    update secondMessage firstModel
+            in
+                ( secondModel, Cmd.batch [ firstCmd, secondCmd ] )
 
 
 

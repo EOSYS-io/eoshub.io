@@ -52,6 +52,9 @@ p.help.info {
 
         color:#999;
         transition:color 0.3s, background-color 0.3s;
+
+        outline:0;
+
         &:hover {
             color:darken(#999,70%);
             background:darken(#f7f7f7,1%);
@@ -153,3 +156,95 @@ p.help.info {
 }
 
 
+
+// notificaiton.under_construction
+.notificaiton.under_construction {
+
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    z-index:-1;
+
+    &.hidden {
+        display:none;
+    }
+
+    &.viewing {
+        z-index:4;
+        bottom:0;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .panel {
+        position:absolute;
+        top:50%;
+        left:50%;
+        transform:translate(-50%,-50%) scale(0.8);
+        opacity:0;
+        width: 572px;
+        height: 320px;
+        border-radius: 4px;
+        background-image:url('../image/bg_under_construction.svg'); 
+        background-position:286px 62px; 
+        background-repeat:no-repeat;
+        background-size:55% auto;
+        background-color: #536dfe;
+        box-shadow: 0 28px 40px 0 rgba(0, 0, 0, 0.2);
+
+        box-sizing:border-box;
+
+        color:#fff;
+        padding:48px;
+
+        transition:transform 0.2s ease-out, opacity 0.2s ease-in;
+        
+
+        h2 {
+            font-size:rem(32);
+            line-height:1.4;
+            font-weight:300;
+        }
+
+        p {
+            font-size:rem(14);
+            line-height:1.5;
+            font-weight:300;
+        }
+    }
+
+    &.viewing .panel {
+        transform:translate(-50%,-50%) scale(1);
+        opacity:1;
+    }
+
+    button.close.button {
+        @include ir();
+
+        position:absolute;
+        width:25px;
+        height:25px;
+
+        right:20px;
+        top:20px;
+
+        transform:rotate(45deg);
+        outline:none;
+
+        &:before,
+        &:after {
+            content:'';
+            display:block;
+            height:1px;
+            background:#fff;
+            position:absolute;
+            left:0;
+            right:0;
+            top:calc(50% - 1px);
+        }
+
+        &:before {
+            transform:rotate(90deg);
+        }
+    }
+} 

@@ -3,7 +3,8 @@ module UsersHelper
     response = Typhoeus::Request.new(
       Rails.configuration.urls['eos_wallet_node_host']+Rails.configuration.urls['eos_account_url'],
       method: :get,
-      params: { name: account_name }
+      params: { name: account_name },
+      timeout: 5
     ).run
 
     response.code == 200
@@ -14,7 +15,8 @@ module UsersHelper
       Rails.configuration.urls['eos_wallet_node_host']+Rails.configuration.urls['eos_account_url'],
       method: :post,
       headers: {'Content-Type'=> "application/json"},
-      body: JSON.generate({account_name: account_name, pubkey: pubkey})
+      body: JSON.generate({account_name: account_name, pubkey: pubkey}),
+      timeout: 5
     ).run
 
     response

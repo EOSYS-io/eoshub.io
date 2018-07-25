@@ -1,6 +1,5 @@
 module DefaultPageGroup exposing (..)
 
-import ExternalMessage
 import Html
     exposing
         ( Html
@@ -37,8 +36,8 @@ import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import Json.Decode as JD exposing (Decoder)
-import Regex exposing (regex, contains)
 import View.Notification as Notification
+import Util.Validation exposing (isAccount, isPublicKey)
 
 
 -- MODEL
@@ -94,7 +93,7 @@ type Message
     | SearchKeyMessage SearchKey.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
-    | IndexMessage ExternalMessage.Message
+    | IndexMessage Index.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
@@ -240,7 +239,7 @@ update message ({ page, notification, header } as model) { account } =
             in
                 ( { model | page = newPage |> VotingPage }, Cmd.none )
 
-        ( IndexMessage (ExternalMessage.ChangeUrl url), _ ) ->
+        ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
 
         ( UpdatePushActionResponse resp, _ ) ->
@@ -306,16 +305,6 @@ parseQuery query =
         Ok PublicKeyQuery
     else
         Err "invalid input"
-
-
-isAccount : String -> Bool
-isAccount query =
-    contains (regex "^[a-z.1-5]{1,12}$") query
-
-
-isPublicKey : String -> Bool
-isPublicKey query =
-    contains (regex "^EOS[\\w]{50}$") query
 
 
 

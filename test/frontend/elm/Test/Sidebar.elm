@@ -1,7 +1,6 @@
 module Test.Sidebar exposing (tests)
 
 import Expect
-import ExternalMessage
 import Navigation
 import Port
 import Sidebar exposing (Message(..), State(..), initModel, update)
@@ -106,16 +105,11 @@ tests =
                         Expect.equal
                             ( { initModel | state = PairWallet }, Cmd.none )
                             (update (UpdateState PairWallet) initModel)
-                , test "Fold" <|
+                , test "ToggleSidebar" <|
                     \() ->
                         Expect.equal
                             ( { initModel | fold = True }, Cmd.none )
-                            (update Fold initModel)
-                , test "Unfold" <|
-                    \() ->
-                        Expect.equal
-                            ( { initModel | fold = False }, Cmd.none )
-                            (update Unfold { initModel | fold = True })
+                            (update ToggleSidebar initModel)
                 , test "ChangeUrl" <|
                     \() ->
                         let
@@ -124,7 +118,19 @@ tests =
                         in
                             Expect.equal
                                 ( initModel, Navigation.newUrl url )
-                                (update (ExternalMessage (ExternalMessage.ChangeUrl url)) initModel)
+                                (update (ChangeUrl url) initModel)
+                , test "SetConfigPanel" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | configPanelOpen = True }, Cmd.none )
+                            (update (OpenConfigPanel False) initModel)
+                , test "AndThen" <|
+                    \() ->
+                        Expect.equal
+                            ( { initModel | configPanelOpen = True, fold = True }
+                            , Cmd.batch [ Cmd.none, Cmd.none ]
+                            )
+                            (update (AndThen ToggleSidebar (OpenConfigPanel False)) initModel)
                 ]
             ]
         ]
