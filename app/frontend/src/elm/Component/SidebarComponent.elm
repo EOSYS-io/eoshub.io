@@ -119,6 +119,13 @@ view { state, wallet, language, fold, configPanelOpen } =
                 , onClick (UpdateLanguage English)
                 ]
                 [ text "ENG" ]
+            , button
+                [ type_ "button"
+                , class "lang en transparent button"
+                , attribute "data-lang" "cn"
+                , onClick (UpdateLanguage Chinese)
+                ]
+                [ text "中文" ]
             ]
         ]
     ]
