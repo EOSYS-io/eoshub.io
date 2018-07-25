@@ -1,7 +1,7 @@
 module Test.Translation exposing (tests)
 
 import Expect
-import Translation exposing (Language(Korean, English), I18n(Success), translate, getMessages)
+import Translation exposing (Language(Korean, English, Chinese), I18n(Hello), translate, getMessages)
 import Test exposing (..)
 
 
@@ -12,15 +12,18 @@ tests =
             [ test "Success" <|
                 \() ->
                     Expect.equal
-                        { korean = "성공!"
-                        , english = "Success!"
+                        { korean = "안녕하세요"
+                        , english = "Hello"
+                        , chinese = "您好!"
                         }
-                        (getMessages Success)
+                        (getMessages Hello)
             ]
         , describe "translate"
             [ test "korean" <|
-                \() -> Expect.equal "성공!" (translate Korean Success)
+                \() -> Expect.equal "안녕하세요" (translate Korean Hello)
             , test "english" <|
-                \() -> Expect.equal "Success!" (translate English Success)
+                \() -> Expect.equal "Hello" (translate English Hello)
+            , test "chinese" <|
+                \() -> Expect.equal "您好!" (translate Chinese Hello)
             ]
         ]
