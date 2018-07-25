@@ -8,7 +8,6 @@ import Component.AccountComponent as AccountComponent
 import Component.SidebarComponent as SidebarComponent
 import Util.Flags exposing (Flags)
 import Route exposing (getComponentRoute)
-import Dict exposing (Dict)
 import Util.WalletDecoder exposing (Wallet)
 
 
