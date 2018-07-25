@@ -24,7 +24,6 @@ type alias Model =
     { sidebarComponent : SidebarComponent.Model
     , currentComponent : Component
     , flags : Flags
-    , components : Dict String Component
     }
 
 
@@ -46,13 +45,12 @@ type Message
 init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     let
-        ( newComponent, cmd, newComponents ) =
+        ( newComponent, cmd ) =
             initComponent location
     in
         ( { sidebarComponent = SidebarComponent.initModel
           , currentComponent = newComponent
           , flags = flags
-          , components = newComponents
           }
         , cmd
         )
@@ -82,7 +80,7 @@ view { sidebarComponent, currentComponent } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ currentComponent, flags, sidebarComponent, components } as model) =
+update message ({ currentComponent, flags, sidebarComponent } as model) =
     case ( message, currentComponent ) of
         ( MainComponentMessage mainComponentMessage, MainComponent subModel ) ->
             let
@@ -113,8 +111,8 @@ update message ({ currentComponent, flags, sidebarComponent, components } as mod
 
         ( OnLocationChange location, _ ) ->
             let
-                ( newComponent, cmd, newComponents ) =
-                    updateComponent components location flags sidebarComponent.wallet
+                ( newComponent, cmd ) =
+                    updateComponent currentComponent location flags sidebarComponent.wallet
             in
                 ( { model | currentComponent = newComponent }, cmd )
 
@@ -156,7 +154,7 @@ main =
 -- UTILS
 
 
-initComponent : Location -> ( Component, Cmd Message, Dict String Component )
+initComponent : Location -> ( Component, Cmd Message )
 initComponent location =
     let
         componentRoute =
@@ -168,30 +166,24 @@ initComponent location =
                     componentModel =
                         MainComponent.initModel location
 
-                    component =
-                        MainComponent componentModel
-
                     componentCmd =
-                        Cmd.map MainComponentMessage (MainComponent.initCmd location)
+                        MainComponent.initCmd location
                 in
-                    ( component, componentCmd, Dict.insert "MainComponent" component Dict.empty )
+                    ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
 
             Route.AccountComponentRoute ->
                 let
                     componentModel =
                         AccountComponent.initModel location
 
-                    component =
-                        AccountComponent componentModel
-
                     componentCmd =
-                        Cmd.map AccountComponentMessage (AccountComponent.initCmd componentModel)
+                        AccountComponent.initCmd componentModel
                 in
-                    ( component, componentCmd, Dict.insert "AccountComponent" component Dict.empty )
+                    ( AccountComponent componentModel, Cmd.map AccountComponentMessage componentCmd )
 
 
-updateComponent : Dict String Component -> Location -> Flags -> Wallet -> ( Component, Cmd Message, Dict String Component )
-updateComponent components location flags wallet =
+updateComponent : Component -> Location -> Flags -> Wallet -> ( Component, Cmd Message )
+updateComponent currentComponent location flags wallet =
     let
         componentRoute =
             getComponentRoute location
@@ -199,42 +191,30 @@ updateComponent components location flags wallet =
         case componentRoute of
             Route.MainComponentRoute ->
                 let
-                    maybeComponent =
-                        Dict.get "MainComponentModel" components
-
                     componentModel =
-                        case maybeComponent of
-                            Just (MainComponent subModel) ->
+                        case currentComponent of
+                            MainComponent subModel ->
                                 subModel
 
                             _ ->
                                 MainComponent.initModel location
 
-                    ( newComponentModel, newCmd ) =
+                    ( newComponentModel, componentCmd ) =
                         MainComponent.update (MainComponent.OnLocationChange location) componentModel wallet
-
-                    component =
-                        MainComponent newComponentModel
                 in
-                    ( component, Cmd.map MainComponentMessage newCmd, Dict.insert "MainComponent" component components )
+                    ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
 
             Route.AccountComponentRoute ->
                 let
-                    maybeComponent =
-                        Dict.get "AccountComponent" components
-
                     componentModel =
-                        case maybeComponent of
-                            Just (AccountComponent subModel) ->
+                        case currentComponent of
+                            AccountComponent subModel ->
                                 subModel
 
                             _ ->
                                 AccountComponent.initModel location
 
-                    ( newComponentModel, newCmd ) =
+                    ( newComponentModel, componentCmd ) =
                         AccountComponent.update (AccountComponent.OnLocationChange location) componentModel flags
-
-                    component =
-                        AccountComponent newComponentModel
                 in
-                    ( component, Cmd.map AccountComponentMessage newCmd, Dict.insert "AccountComponent" component components )
+                    ( AccountComponent newComponentModel, Cmd.map AccountComponentMessage componentCmd )
