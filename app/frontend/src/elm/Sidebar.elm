@@ -55,13 +55,13 @@ initModel =
 type Message
     = AuthenticateAccount
     | CheckWalletStatus
-    | FoldOrUnfold
+    | ToggleSidebar
     | InvalidateAccount
     | UpdateLanguage Language
     | UpdateWalletStatus WalletResponse
     | UpdateState State
     | ChangeUrl String
-    | SetConfigPanel Bool
+    | OpenConfigPanel Bool
     | AndThen Message Message
 
 
@@ -82,7 +82,7 @@ view { state, wallet, language, fold, configPanelOpen } =
             , id "lnbToggleButton"
             , class "folding button"
             , attribute "aria-hidden" "true"
-            , onClick FoldOrUnfold
+            , onClick ToggleSidebar
             ]
             [ text (translate language OpenCloseSidebar) ]
         ]
@@ -207,23 +207,23 @@ accountInfoView language { account, authority } configPanelOpen =
                         [ type_ "button"
                         , class "icon gear button"
                         , attribute "wai-aria" "hidden"
-                        , onClick (SetConfigPanel (not configPanelOpen))
+                        , onClick (OpenConfigPanel (not configPanelOpen))
                         ]
                         [ text "option" ]
                     , div [ class "menu_list" ]
                         [ a
                             [ style [ ( "cursor", "pointer" ) ]
-                            , onClick (AndThen (SetConfigPanel False) (UpdateState PairWallet))
+                            , onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
                             ]
                             [ text (translate language ChangeWallet) ]
                         , a
                             [ style [ ( "cursor", "pointer" ) ]
-                            , onClick (AndThen (SetConfigPanel False) (ChangeUrl ("search?query=" ++ account)))
+                            , onClick (AndThen (OpenConfigPanel False) (ChangeUrl ("search?query=" ++ account)))
                             ]
                             [ text (translate language MyAccount) ]
                         , a
                             [ style [ ( "cursor", "pointer" ) ]
-                            , onClick (AndThen (SetConfigPanel False) InvalidateAccount)
+                            , onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
                             ]
                             [ text (translate language SignOut) ]
                         ]
@@ -285,7 +285,7 @@ update message ({ configPanelOpen, fold } as model) =
         CheckWalletStatus ->
             ( model, Port.checkWalletStatus () )
 
-        FoldOrUnfold ->
+        ToggleSidebar ->
             ( { model | fold = not fold }, Cmd.none )
 
         InvalidateAccount ->
@@ -315,7 +315,7 @@ update message ({ configPanelOpen, fold } as model) =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
-        SetConfigPanel bool ->
+        OpenConfigPanel bool ->
             ( { model | configPanelOpen = not configPanelOpen }, Cmd.none )
 
         AndThen firstMessage secondMessage ->
