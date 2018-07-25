@@ -55,18 +55,6 @@ tests =
                         in
                             Expect.equal (Ok expectedAccount) (JD.decodeString accountDecoder accountJson)
                 ]
-            , describe "keyAccountsDecoder"
-                [ test "Accounts List parsing" <|
-                    \() ->
-                        let
-                            keyAccountsJson =
-                                "{\"account_names\":[\"eosswedenorg\"]}"
-
-                            expectedAccountsList =
-                                [ "eosswedenorg" ]
-                        in
-                            Expect.equal (Ok expectedAccountsList) (JD.decodeString keyAccountsDecoder keyAccountsJson)
-                ]
             ]
 
 

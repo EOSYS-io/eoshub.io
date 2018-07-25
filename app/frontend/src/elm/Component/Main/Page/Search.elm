@@ -117,27 +117,6 @@ type Message
 update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
-        -- GetSearchResult query ->
-        --     let
-        --         newCmd =
-        --             let
-        --                 body =
-        --                     JE.object
-        --                         [ ( "account_name", JE.string query ) ]
-        --                         |> Http.jsonBody
-        --             in
-        --                 post (getFullPath "/v1/chain/get_account") body accountDecoder |> (Http.send OnFetchAccount)
-        -- TODO(boseok): Move to searchkey page
-        --         -- Ok PublicKeyQuery ->
-        --         --     let
-        --         --         body =
-        --         --             JE.object
-        --         --                 [ ( "public_key", JE.string query ) ]
-        --         --                 |> Http.jsonBody
-        --         --     in
-        --         --         post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder |> (Http.send OnFetchKeyAccounts)
-        --     in
-        --         ( model, newCmd )
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
 
@@ -358,6 +337,30 @@ view language { account } =
             ]
 
 
+larimerToEos : Int -> Float
+larimerToEos valInt =
+    (toFloat valInt) * 0.0001
+
+
+eosFloatToString : Float -> String
+eosFloatToString valFloat =
+    (Round.round 4 valFloat) ++ " EOS"
+
+
+eosStringToFloat : String -> Float
+eosStringToFloat str =
+    let
+        result =
+            String.toFloat (replace All (regex " EOS") (\_ -> "") str)
+    in
+        case result of
+            Ok val ->
+                val
+
+            Err _ ->
+                0
+
+
 
 -- Total Amount = core_liquid_balance + (staked * 0.0001) + (unstaking_net_amount + unstaking_cpu_amount)
 
@@ -383,10 +386,10 @@ getUnstakingAmount unstaking_net_amount unstaking_cpu_amount =
 
 
 getResource : String -> Int -> Int -> Int -> ( String, String, String )
-getResource resourceFlag used available max =
+getResource resourceType used available max =
     let
         totalString =
-            case resourceFlag of
+            case resourceType of
                 "net" ->
                     -- Bytes
                     if max < 1024 then
@@ -410,13 +413,13 @@ getResource resourceFlag used available max =
                         (toString max) ++ " ms"
                         -- sec
                     else if (max >= 1000) && (max < (1000 * 60)) then
-                        (Round.round 4 (toFloat max / 1000)) ++ " sec"
+                        (Round.round 4 (toFloat max / 1000)) ++ " s"
                         -- min
                     else if (max >= 1000 * 60) && (max < (1000 * 60 * 60)) then
                         (Round.round 4 (toFloat max / (1000 * 60))) ++ " min"
                         -- hour
                     else if (max >= 1000 * 60 * 60) && (max < (1000 * 60 * 60 * 24)) then
-                        (Round.round 4 (toFloat max / (1000 * 60 * 60))) ++ " min"
+                        (Round.round 4 (toFloat max / (1000 * 60 * 60))) ++ " hour"
                         -- day
                     else
                         (Round.round 4 (toFloat max / (1000 * 60 * 60 * 24))) ++ " day"
@@ -465,27 +468,3 @@ getResource resourceFlag used available max =
                         "fine"
     in
         ( totalString, avaliablePercent, color )
-
-
-larimerToEos : Int -> Float
-larimerToEos valInt =
-    (toFloat valInt) * 0.0001
-
-
-eosFloatToString : Float -> String
-eosFloatToString valFloat =
-    (Round.round 4 valFloat) ++ " EOS"
-
-
-eosStringToFloat : String -> Float
-eosStringToFloat str =
-    let
-        result =
-            String.toFloat (replace All (regex " EOS") (\_ -> "") str)
-    in
-        case result of
-            Ok val ->
-                val
-
-            Err _ ->
-                0
