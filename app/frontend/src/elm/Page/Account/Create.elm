@@ -1,7 +1,7 @@
 module Page.Account.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, h1, img, text, br, form, article, span)
-import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_)
+import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_, style)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, string)
@@ -9,9 +9,8 @@ import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
-import Validate exposing (Validator, validate, fromErrors)
-import Array.Hamt as Array exposing (Array)
 import Navigation
+import Util.Validation exposing (checkAccountName)
 
 
 -- MODEL
@@ -24,7 +23,8 @@ type alias Model =
     , validation : Bool
     , validationMsg : String
     , requestSuccess : Bool
-    , confirmToken : String }
+    , confirmToken : String
+    }
 
 
 initModel : String -> String -> Model
@@ -35,7 +35,8 @@ initModel confirmToken pubkey =
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
-    , confirmToken = confirmToken }
+    , confirmToken = confirmToken
+    }
 
 
 
@@ -56,11 +57,8 @@ update msg model flags =
                 newModel =
                     { model | accountName = accountName }
 
-                accountNameLength =
-                    String.length newModel.accountName
-
                 ( validateMsg, validate ) =
-                    if accountNameLength == 12 then
+                    if checkAccountName accountName then
                         ( "가능한 ID에요", True )
                     else
                         ( "불가능한 ID에요", False )
@@ -74,7 +72,15 @@ update msg model flags =
             ( { model | requestStatus = res, requestSuccess = True }, Navigation.newUrl ("/account/created") )
 
         NewUser (Err error) ->
-            ( { model | requestStatus = { msg = toString error }, requestSuccess = False }, Cmd.none )
+            case error of
+                Http.BadStatus response ->
+                    ( { model | requestStatus = { msg = toString response.body }, requestSuccess = False }, Cmd.none )
+
+                Http.BadPayload debugMsg response ->
+                    ( { model | requestStatus = { msg = ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }, requestSuccess = False }, Cmd.none )
+
+                _ ->
+                    ( { model | requestStatus = { msg = toString error }, requestSuccess = False }, Cmd.none )
 
 
 
@@ -102,22 +108,47 @@ view model =
                 , text "ex) eoshuby12345"
                 ]
             , form []
-                [ input [ class "account_name", placeholder "계정이름은 반드시 12글자로 입력해주세요", attribute "required" "", attribute (if model.validation then
+                [ input
+                    [ class "account_name"
+                    , placeholder "계정이름은 반드시 12글자로 입력해주세요"
+                    , attribute "required" ""
+                    , attribute
+                        (if model.validation then
                             "valid"
-                        else
+                         else
                             "invalid"
-                        ) "", type_ "text", onInput ValidateAccountName ]
+                        )
+                        ""
+                    , type_ "text"
+                    , onInput ValidateAccountName
+                    ]
                     []
-                , span []
-                    [ text model.requestStatus.msg ]
+                , span
+                    [ style
+                        [ ( "visibility"
+                          , if String.isEmpty model.accountName then
+                                "hidden"
+                            else
+                                "visible"
+                          )
+                        ]
+                    ]
+                    [ text model.validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle blue_white button", attribute (if model.validation && not model.requestSuccess then
-                            "enabled"
-                        else
-                            "disabled"
-                        ) "", type_ "button", onClick CreateEosAccount ]
+            [ button
+                [ class "middle blue_white button"
+                , attribute
+                    (if model.validation && not model.requestSuccess then
+                        "enabled"
+                     else
+                        "disabled"
+                    )
+                    ""
+                , type_ "button"
+                , onClick CreateEosAccount
+                ]
                 [ text "다음" ]
             ]
         ]

@@ -31,20 +31,22 @@ class UsersController < ApiController
     user = User.find_by(confirm_token: params[:id])
 
     if user.blank?
-      render json: { msg: 'User does not exist with this email' }, status: :precondition_failed
+      render json: { msg: I18n.t('users.eos_account_creation_failure_no_such_email') }, status: :precondition_failed
     elsif user.email_saved?
-      render json: { msg: 'Email is not confirmed' }, status: :precondition_failed
+      render json: { msg: I18n.t('users.eos_account_creation_failure_email_not_confirmed') }, status: :precondition_failed
     elsif user.eos_account_created?
-      render json: { msg: 'EOS account already created with this email' }, status: :precondition_failed
+      render json: { msg: I18n.t('users.eos_account_creation_failure_already_created') }, status: :precondition_failed
     else
       if helpers.eos_account_exist?(params[:account_name])
-        render json: { msg: I18n.t('user.eos_account_already_exist') }, status: :conflict and return
+        render json: { msg: I18n.t('users.eos_account_already_exist') }, status: :conflict and return
       end
 
       response = helpers.create_eos_account(params[:account_name], params[:pubkey])
       if response.code == 200
         user.eos_account_created!
-        render json: { msg: I18n.t('user.eos_account_created') }, status: :ok
+        render json: { msg: I18n.t('users.eos_account_created') }, status: :ok
+      elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
+        render json: { msg: I18n.t('users.eos_node_connection_failed') }, status: response.code
       else
         render json: response.body, status: response.code
       end

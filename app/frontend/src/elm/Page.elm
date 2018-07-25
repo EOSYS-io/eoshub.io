@@ -42,8 +42,8 @@ import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import Json.Decode as JD exposing (Decoder)
-import Regex exposing (regex, contains)
 import View.Notification as Notification
+import Util.Validation exposing (isAccount, isPublicKey)
 
 
 -- MODEL
@@ -359,16 +359,6 @@ parseQuery query =
         Ok PublicKeyQuery
     else
         Err "invalid input"
-
-
-isAccount : String -> Bool
-isAccount query =
-    contains (regex "^[a-z.1-5]{1,12}$") query
-
-
-isPublicKey : String -> Bool
-isPublicKey query =
-    contains (regex "^EOS[\\w]{50}$") query
 
 
 
