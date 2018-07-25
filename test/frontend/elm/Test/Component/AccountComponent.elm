@@ -1,8 +1,8 @@
-module Test.AccountPageGroup exposing (..)
+module Test.Component.AccountComponent exposing (..)
 
 import Expect
 import Navigation exposing (Location)
-import AccountPageGroup exposing (..)
+import Component.AccountComponent exposing (..)
 import Page.Account.ConfirmEmail as ConfirmEmail
 import Page.Account.Create as Create
 import Page.Account.CreateKeys as CreateKeys

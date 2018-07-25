@@ -46,14 +46,14 @@ parseLocation location =
             NotFoundRoute
 
 
-type PageGroupRoute
-    = DefaultPageGroupRoute
-    | AccountPageGroupRoute
+type ComponentRoute
+    = MainComponentRoute
+    | AccountComponentRoute
 
 
-getPageGroupRoute : Location -> PageGroupRoute
-getPageGroupRoute location =
+getComponentRoute : Location -> ComponentRoute
+getComponentRoute location =
     if String.startsWith "/account/" location.pathname then
-        AccountPageGroupRoute
+        AccountComponentRoute
     else
-        DefaultPageGroupRoute
+        MainComponentRoute

@@ -3,11 +3,11 @@ module Main exposing (..)
 import Html
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
-import DefaultPageGroup
-import AccountPageGroup
-import Sidebar
+import Component.MainComponent as MainComponent
+import Component.AccountComponent as AccountComponent
+import Component.SidebarComponent as SidebarComponent
 import Util.Flags exposing (Flags)
-import Route exposing (getPageGroupRoute)
+import Route exposing (getComponentRoute)
 import Dict exposing (Dict)
 import Util.WalletDecoder exposing (Wallet)
 
@@ -15,16 +15,16 @@ import Util.WalletDecoder exposing (Wallet)
 -- MODEL
 
 
-type PageGroup
-    = DefaultPageGroup DefaultPageGroup.Model
-    | AccountPageGroup AccountPageGroup.Model
+type Component
+    = MainComponent MainComponent.Model
+    | AccountComponent AccountComponent.Model
 
 
 type alias Model =
-    { sidebar : Sidebar.Model
-    , currentPageGroup : PageGroup
+    { sidebarComponent : SidebarComponent.Model
+    , currentComponent : Component
     , flags : Flags
-    , pageGroups : Dict String PageGroup
+    , components : Dict String Component
     }
 
 
@@ -33,9 +33,9 @@ type alias Model =
 
 
 type Message
-    = DefaultPageGroupMessage DefaultPageGroup.Message
-    | AccountPageGroupMessage AccountPageGroup.Message
-    | SidebarMessage Sidebar.Message
+    = MainComponentMessage MainComponent.Message
+    | AccountComponentMessage AccountComponent.Message
+    | SidebarComponentMessage SidebarComponent.Message
     | OnLocationChange Location
 
 
@@ -46,13 +46,13 @@ type Message
 init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     let
-        ( newPageGroup, cmd, newPageGroups ) =
-            initPageGroup location
+        ( newComponent, cmd, newComponents ) =
+            initComponent location
     in
-        ( { sidebar = Sidebar.initModel
-          , currentPageGroup = newPageGroup
+        ( { sidebarComponent = SidebarComponent.initModel
+          , currentComponent = newComponent
           , flags = flags
-          , pageGroups = newPageGroups
+          , components = newComponents
           }
         , cmd
         )
@@ -63,18 +63,18 @@ init flags location =
 
 
 view : Model -> Html.Html Message
-view { sidebar, currentPageGroup } =
-    case currentPageGroup of
-        DefaultPageGroup subModel ->
+view { sidebarComponent, currentComponent } =
+    case currentComponent of
+        MainComponent subModel ->
             Html.div [ class "container" ]
-                [ Html.map SidebarMessage (Html.div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
+                [ Html.map SidebarComponentMessage (Html.div [ SidebarComponent.foldClass sidebarComponent.fold ] (SidebarComponent.view sidebarComponent))
                 , Html.div [ class "wrapper" ]
-                    (List.map (Html.map DefaultPageGroupMessage) (DefaultPageGroup.view sidebar.language subModel))
+                    (List.map (Html.map MainComponentMessage) (MainComponent.view sidebarComponent.language subModel))
                 ]
 
-        AccountPageGroup subModel ->
+        AccountComponent subModel ->
             Html.div []
-                (List.map (Html.map AccountPageGroupMessage) (AccountPageGroup.view sidebar.language subModel))
+                (List.map (Html.map AccountComponentMessage) (AccountComponent.view sidebarComponent.language subModel))
 
 
 
@@ -82,41 +82,41 @@ view { sidebar, currentPageGroup } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ currentPageGroup, flags, sidebar, pageGroups } as model) =
-    case ( message, currentPageGroup ) of
-        ( DefaultPageGroupMessage defaultPageGroupMessage, DefaultPageGroup subModel ) ->
+update message ({ currentComponent, flags, sidebarComponent, components } as model) =
+    case ( message, currentComponent ) of
+        ( MainComponentMessage mainComponentMessage, MainComponent subModel ) ->
             let
-                ( newPageGroupModel, newCmd ) =
-                    DefaultPageGroup.update defaultPageGroupMessage subModel sidebar.wallet
+                ( newComponentModel, newCmd ) =
+                    MainComponent.update mainComponentMessage subModel sidebarComponent.wallet
 
-                newPageGroup =
-                    DefaultPageGroup newPageGroupModel
+                newComponent =
+                    MainComponent newComponentModel
             in
-                ( { model | currentPageGroup = newPageGroup }, Cmd.map DefaultPageGroupMessage newCmd )
+                ( { model | currentComponent = newComponent }, Cmd.map MainComponentMessage newCmd )
 
-        ( AccountPageGroupMessage accountPageGroupMessage, AccountPageGroup subModel ) ->
+        ( AccountComponentMessage accountComponentMessage, AccountComponent subModel ) ->
             let
-                ( newPageGroupModel, newCmd ) =
-                    AccountPageGroup.update accountPageGroupMessage subModel flags
+                ( newComponentModel, newCmd ) =
+                    AccountComponent.update accountComponentMessage subModel flags
 
-                newPageGroup =
-                    AccountPageGroup newPageGroupModel
+                newComponent =
+                    AccountComponent newComponentModel
             in
-                ( { model | currentPageGroup = newPageGroup }, Cmd.map AccountPageGroupMessage newCmd )
+                ( { model | currentComponent = newComponent }, Cmd.map AccountComponentMessage newCmd )
 
-        ( SidebarMessage sidebarMessage, _ ) ->
+        ( SidebarComponentMessage sidebarComponentMessage, _ ) ->
             let
-                ( newSidebar, newCmd ) =
-                    Sidebar.update sidebarMessage sidebar
+                ( newSidebarComponent, newCmd ) =
+                    SidebarComponent.update sidebarComponentMessage sidebarComponent
             in
-                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+                ( { model | sidebarComponent = newSidebarComponent }, Cmd.map SidebarComponentMessage newCmd )
 
         ( OnLocationChange location, _ ) ->
             let
-                ( newPageGroup, cmd, newPageGroups ) =
-                    updatePageGroup pageGroups location flags sidebar.wallet
+                ( newComponent, cmd, newComponents ) =
+                    updateComponent components location flags sidebarComponent.wallet
             in
-                ( { model | currentPageGroup = newPageGroup }, cmd )
+                ( { model | currentComponent = newComponent }, cmd )
 
         ( _, _ ) ->
             ( model, Cmd.none )
@@ -127,15 +127,15 @@ update message ({ currentPageGroup, flags, sidebar, pageGroups } as model) =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar, currentPageGroup } =
-    case currentPageGroup of
-        DefaultPageGroup subModel ->
+subscriptions { sidebarComponent, currentComponent } =
+    case currentComponent of
+        MainComponent subModel ->
             Sub.batch
-                [ Sub.map SidebarMessage (Sidebar.subscriptions sidebar) ]
+                [ Sub.map SidebarComponentMessage (SidebarComponent.subscriptions sidebarComponent) ]
 
-        AccountPageGroup subModel ->
+        AccountComponent subModel ->
             Sub.batch
-                [ Sub.map AccountPageGroupMessage (AccountPageGroup.subscriptions subModel) ]
+                [ Sub.map AccountComponentMessage (AccountComponent.subscriptions subModel) ]
 
 
 
@@ -156,85 +156,85 @@ main =
 -- UTILS
 
 
-initPageGroup : Location -> ( PageGroup, Cmd Message, Dict String PageGroup )
-initPageGroup location =
+initComponent : Location -> ( Component, Cmd Message, Dict String Component )
+initComponent location =
     let
-        pageGroupRoute =
-            getPageGroupRoute location
+        componentRoute =
+            getComponentRoute location
     in
-        case pageGroupRoute of
-            Route.DefaultPageGroupRoute ->
+        case componentRoute of
+            Route.MainComponentRoute ->
                 let
-                    pageGroupModel =
-                        DefaultPageGroup.initModel location
+                    componentModel =
+                        MainComponent.initModel location
 
-                    pageGroup =
-                        DefaultPageGroup pageGroupModel
+                    component =
+                        MainComponent componentModel
 
-                    pageGroupCmd =
-                        Cmd.map DefaultPageGroupMessage (DefaultPageGroup.initCmd location)
+                    componentCmd =
+                        Cmd.map MainComponentMessage (MainComponent.initCmd location)
                 in
-                    ( pageGroup, pageGroupCmd, Dict.insert "DefaultPageGroup" pageGroup Dict.empty )
+                    ( component, componentCmd, Dict.insert "MainComponent" component Dict.empty )
 
-            Route.AccountPageGroupRoute ->
+            Route.AccountComponentRoute ->
                 let
-                    pageGroupModel =
-                        AccountPageGroup.initModel location
+                    componentModel =
+                        AccountComponent.initModel location
 
-                    pageGroup =
-                        AccountPageGroup pageGroupModel
+                    component =
+                        AccountComponent componentModel
 
-                    pageGroupCmd =
-                        Cmd.map AccountPageGroupMessage (AccountPageGroup.initCmd pageGroupModel)
+                    componentCmd =
+                        Cmd.map AccountComponentMessage (AccountComponent.initCmd componentModel)
                 in
-                    ( pageGroup, pageGroupCmd, Dict.insert "AccountPageGroup" pageGroup Dict.empty )
+                    ( component, componentCmd, Dict.insert "AccountComponent" component Dict.empty )
 
 
-updatePageGroup : Dict String PageGroup -> Location -> Flags -> Wallet -> ( PageGroup, Cmd Message, Dict String PageGroup )
-updatePageGroup pageGroups location flags wallet =
+updateComponent : Dict String Component -> Location -> Flags -> Wallet -> ( Component, Cmd Message, Dict String Component )
+updateComponent components location flags wallet =
     let
-        pageGroupRoute =
-            getPageGroupRoute location
+        componentRoute =
+            getComponentRoute location
     in
-        case pageGroupRoute of
-            Route.DefaultPageGroupRoute ->
+        case componentRoute of
+            Route.MainComponentRoute ->
                 let
-                    maybePageGroup =
-                        Dict.get "DefaultPageGroupModel" pageGroups
+                    maybeComponent =
+                        Dict.get "MainComponentModel" components
 
-                    pageGroupModel =
-                        case maybePageGroup of
-                            Just (DefaultPageGroup subModel) ->
+                    componentModel =
+                        case maybeComponent of
+                            Just (MainComponent subModel) ->
                                 subModel
 
                             _ ->
-                                DefaultPageGroup.initModel location
+                                MainComponent.initModel location
 
-                    ( newPageGroupModel, newCmd ) =
-                        DefaultPageGroup.update (DefaultPageGroup.OnLocationChange location) pageGroupModel wallet
+                    ( newComponentModel, newCmd ) =
+                        MainComponent.update (MainComponent.OnLocationChange location) componentModel wallet
 
-                    pageGroup =
-                        DefaultPageGroup newPageGroupModel
+                    component =
+                        MainComponent newComponentModel
                 in
-                    ( pageGroup, Cmd.map DefaultPageGroupMessage newCmd, Dict.insert "DefaultPageGroup" pageGroup pageGroups )
+                    ( component, Cmd.map MainComponentMessage newCmd, Dict.insert "MainComponent" component components )
 
-            Route.AccountPageGroupRoute ->
+            Route.AccountComponentRoute ->
                 let
-                    maybePageGroup =
-                        Dict.get "AccountPageGroup" pageGroups
+                    maybeComponent =
+                        Dict.get "AccountComponent" components
 
-                    pageGroupModel =
-                        case maybePageGroup of
-                            Just (AccountPageGroup subModel) ->
+                    componentModel =
+                        case maybeComponent of
+                            Just (AccountComponent subModel) ->
                                 subModel
 
                             _ ->
-                                AccountPageGroup.initModel location
+                                AccountComponent.initModel location
 
-                    ( newPageGroupModel, newCmd ) =
-                        AccountPageGroup.update (AccountPageGroup.OnLocationChange location) pageGroupModel flags
+                    ( newComponentModel, newCmd ) =
+                        AccountComponent.update (AccountComponent.OnLocationChange location) componentModel flags
 
-                    pageGroup =
-                        AccountPageGroup newPageGroupModel
+                    component =
+                        AccountComponent newComponentModel
                 in
-                    ( pageGroup, Cmd.map AccountPageGroupMessage newCmd, Dict.insert "AccountPageGroup" pageGroup pageGroups )
+                    ( component, Cmd.map AccountComponentMessage newCmd, Dict.insert "AccountComponent" component components )

@@ -1,4 +1,4 @@
-module DefaultPageGroup exposing (..)
+module Component.MainComponent exposing (..)
 
 import Html
     exposing

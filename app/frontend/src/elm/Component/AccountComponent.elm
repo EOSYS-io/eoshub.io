@@ -1,4 +1,4 @@
-module AccountPageGroup exposing (..)
+module Component.AccountComponent exposing (..)
 
 import Html
     exposing
@@ -92,7 +92,7 @@ initCmd { page, confirmToken } =
         CreateKeysPage subModel ->
             let
                 ( _, subCmd ) =
-                    CreateKeys.update CreateKeys.GenerateKeys subModel |> Debug.log confirmToken
+                    CreateKeys.update CreateKeys.GenerateKeys subModel
 
                 cmd =
                     Cmd.map CreateKeysMessage subCmd

@@ -1,8 +1,8 @@
-module Test.DefaultPageGroup exposing (..)
+module Test.Component.MainComponent exposing (..)
 
 import Expect
 import Navigation exposing (Location)
-import DefaultPageGroup exposing (..)
+import Component.MainComponent exposing (..)
 import Page.Search as Search
 import Page.Transfer as Transfer
 import Page.Voting as Voting
