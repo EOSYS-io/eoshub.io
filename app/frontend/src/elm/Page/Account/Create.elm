@@ -1,7 +1,7 @@
 module Page.Account.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, h1, img, text, br, form, article, span)
-import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_)
+import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_, style)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, string)
@@ -9,9 +9,8 @@ import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
-import Validate exposing (Validator, validate, fromErrors)
-import Array.Hamt as Array exposing (Array)
 import Navigation
+import Util.Validation exposing (checkAccountName)
 
 
 -- MODEL
@@ -58,11 +57,8 @@ update msg model flags =
                 newModel =
                     { model | accountName = accountName }
 
-                accountNameLength =
-                    String.length newModel.accountName
-
                 ( validateMsg, validate ) =
-                    if accountNameLength == 12 then
+                    if checkAccountName accountName then
                         ( "가능한 ID에요", True )
                     else
                         ( "불가능한 ID에요", False )
@@ -119,8 +115,17 @@ view model =
                     , onInput ValidateAccountName
                     ]
                     []
-                , span []
-                    [ text model.requestStatus.msg ]
+                , span
+                    [ style
+                        [ ( "visibility"
+                          , if String.isEmpty model.accountName then
+                                "hidden"
+                            else
+                                "visible"
+                          )
+                        ]
+                    ]
+                    [ text model.validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
