@@ -105,11 +105,11 @@ tests =
                         Expect.equal
                             ( { initModel | state = PairWallet }, Cmd.none )
                             (update (UpdateState PairWallet) initModel)
-                , test "FoldOrUnfold" <|
+                , test "ToggleSidebar" <|
                     \() ->
                         Expect.equal
                             ( { initModel | fold = True }, Cmd.none )
-                            (update FoldOrUnfold initModel)
+                            (update ToggleSidebar initModel)
                 , test "ChangeUrl" <|
                     \() ->
                         let
@@ -123,14 +123,14 @@ tests =
                     \() ->
                         Expect.equal
                             ( { initModel | configPanelOpen = True }, Cmd.none )
-                            (update (SetConfigPanel False) initModel)
+                            (update (OpenConfigPanel False) initModel)
                 , test "AndThen" <|
                     \() ->
                         Expect.equal
                             ( { initModel | configPanelOpen = True, fold = True }
                             , Cmd.batch [ Cmd.none, Cmd.none ]
                             )
-                            (update (AndThen FoldOrUnfold (SetConfigPanel False)) initModel)
+                            (update (AndThen ToggleSidebar (OpenConfigPanel False)) initModel)
                 ]
             ]
         ]
