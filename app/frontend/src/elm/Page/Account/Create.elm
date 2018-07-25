@@ -72,7 +72,15 @@ update msg model flags =
             ( { model | requestStatus = res, requestSuccess = True }, Navigation.newUrl ("/account/created") )
 
         NewUser (Err error) ->
-            ( { model | requestStatus = { msg = toString error }, requestSuccess = False }, Cmd.none )
+            case error of
+                Http.BadStatus response ->
+                    ( { model | requestStatus = { msg = toString response.body }, requestSuccess = False }, Cmd.none )
+
+                Http.BadPayload debugMsg response ->
+                    ( { model | requestStatus = { msg = ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }, requestSuccess = False }, Cmd.none )
+
+                _ ->
+                    ( { model | requestStatus = { msg = toString error }, requestSuccess = False }, Cmd.none )
 
 
 
