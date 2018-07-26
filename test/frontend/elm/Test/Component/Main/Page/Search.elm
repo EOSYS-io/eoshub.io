@@ -1,9 +1,10 @@
 module Test.Component.Main.Page.Search exposing (..)
 
-import Expect
-import Test exposing (..)
 import Data.Account exposing (..)
+import Expect
 import Json.Decode as JD
+import Component.Main.Page.Search exposing (..)
+import Test exposing (..)
 
 
 tests : Test
@@ -55,8 +56,468 @@ tests =
                         in
                             Expect.equal (Ok expectedAccount) (JD.decodeString accountDecoder accountJson)
                 ]
+            , describe "larimerToEos"
+                [ test "10000 larimer == 1.0 EOS" <|
+                    \() ->
+                        Expect.equal 1.0 (larimerToEos 10000)
+                ]
+            , describe "eosFloatToString"
+                [ test "0.1 -> \"0.1000 EOS\"" <|
+                    \() ->
+                        Expect.equal "0.1000 EOS" (eosFloatToString 0.1)
+                ]
+            , describe "eosStringToFloat"
+                [ test "\"0.1 EOS\" -> 0.1" <|
+                    \() ->
+                        Expect.equal 0.1 (eosStringToFloat "0.1 EOS")
+                ]
+            , describe "getTotalAmount"
+                [ test "arguments \"9159.2669 EOS\" 28348132 \"2.0000 EOS\" \"2.0000 EOS\"" <|
+                    \() ->
+                        Expect.equal "11998.0801 EOS" (getTotalAmount "9159.2669 EOS" 28348132 "2.0000 EOS" "2.0000 EOS")
+                ]
+            , describe "getUnstakingAmount"
+                [ test "arguments \"2.0002 EOS\" \"3.0003 EOS\"" <|
+                    \() ->
+                        Expect.equal "5.0005 EOS" (getUnstakingAmount "2.0002 EOS" "3.0003 EOS")
+                ]
+            , describe "getResource"
+                [ test "net max < 1024, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "0.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                1000
+
+                            available =
+                                0
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net max < 1024, 0% < percentage < 25% " <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "20.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                800
+
+                            available =
+                                200
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net max < 1024, 25% <= percentage < 50%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "40.00%", "bad" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                600
+
+                            available =
+                                400
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net max < 1024, 50% <= percentage < 75%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "70.00%", "good" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                300
+
+                            available =
+                                700
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net max < 1024, 75% <= percentage < 100%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "90.00%", "fine" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                100
+
+                            available =
+                                900
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net 1KB <= max < 1MB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 KB", "0.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                1024
+
+                            available =
+                                0
+
+                            max =
+                                1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net 1MB <= max < 1GB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 MB", "0.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net 1GB <= max < 1TB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 GB", "0.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                1024 * 1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "net max >= 1TB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 TB", "0.00%", "hell" )
+
+                            resourceType =
+                                "net"
+
+                            used =
+                                1024 * 1024 * 1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024 * 1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "cpu,  max < 1 s, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "430 ms", "0.00%", "hell" )
+
+                            resourceType =
+                                "cpu"
+
+                            used =
+                                430
+
+                            available =
+                                0
+
+                            max =
+                                430
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "cpu, 1 s <= max < 1 min, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "4.3000 s", "0.00%", "hell" )
+
+                            resourceType =
+                                "cpu"
+
+                            used =
+                                4300
+
+                            available =
+                                0
+
+                            max =
+                                4300
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "cpu, 1 min <= max < 1 hour, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "7.1667 min", "0.00%", "hell" )
+
+                            resourceType =
+                                "cpu"
+
+                            used =
+                                430000
+
+                            available =
+                                0
+
+                            max =
+                                430000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "cpu, 1 hour <= max < 1 day, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.1944 hour", "0.00%", "hell" )
+
+                            resourceType =
+                                "cpu"
+
+                            used =
+                                4300000
+
+                            available =
+                                0
+
+                            max =
+                                4300000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "cpu, max >= 1 day, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "4.9769 day", "0.00%", "hell" )
+
+                            resourceType =
+                                "cpu"
+
+                            used =
+                                430000000
+
+                            available =
+                                0
+
+                            max =
+                                430000000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max < 1024, percentage = 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "0.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                1000
+
+                            available =
+                                0
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max < 1024, 0% < percentage < 25% " <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "20.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                800
+
+                            available =
+                                200
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max < 1024, 25% <= percentage < 50%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "40.00%", "bad" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                600
+
+                            available =
+                                400
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max < 1024, 50% <= percentage < 75%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "70.00%", "good" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                300
+
+                            available =
+                                700
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max < 1024, 75% <= percentage < 100%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1000 bytes", "90.00%", "fine" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                100
+
+                            available =
+                                900
+
+                            max =
+                                1000
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram 1KB <= max < 1MB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 KB", "0.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                1024
+
+                            available =
+                                0
+
+                            max =
+                                1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram 1MB <= max < 1GB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 MB", "0.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram 1GB <= max < 1TB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 GB", "0.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                1024 * 1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                , test "ram max >= 1TB, 0%" <|
+                    \() ->
+                        let
+                            expected =
+                                ( "1.0000 TB", "0.00%", "hell" )
+
+                            resourceType =
+                                "ram"
+
+                            used =
+                                1024 * 1024 * 1024 * 1024
+
+                            available =
+                                0
+
+                            max =
+                                1024 * 1024 * 1024 * 1024
+                        in
+                            Expect.equal expected (getResource resourceType used available max)
+                ]
             ]
-
-
-
--- TODO(boseok): getTotalAmount getUnstakingAmount getResource larimerToEos eosFloatToString eosStringToFloat

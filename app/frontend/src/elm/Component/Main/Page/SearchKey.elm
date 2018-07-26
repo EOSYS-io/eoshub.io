@@ -99,8 +99,6 @@ viewAccountCard index account =
             [ text <| "계정 " ++ (toString (index + 1)) ]
         , h4 []
             [ text account ]
-
-        -- TODO(boseok): better to use update message
         , a [ onClick (ChangeUrl ("/search?query=" ++ account)) ]
             [ text "자세히 보기" ]
         ]
