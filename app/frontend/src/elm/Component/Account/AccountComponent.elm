@@ -22,9 +22,11 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
 import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Component.Main.Page.NotFound as NotFound
+import Translation exposing (Language)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
+import View.Notification as Notification
 
 
 -- MODEL
@@ -43,6 +45,8 @@ type Page
 type alias Model =
     { page : Page
     , confirmToken : String
+    , language : Language
+    , notification : Notification.Model
     }
 
 
@@ -59,11 +63,15 @@ initModel location =
             EmailConfirmedRoute confirmToken email ->
                 { page = page
                 , confirmToken = confirmToken
+                , language = Translation.Korean
+                , notification = Notification.initModel
                 }
 
             _ ->
                 { page = page
                 , confirmToken = ""
+                , language = Translation.Korean
+                , notification = Notification.initModel
                 }
 
 
@@ -79,6 +87,7 @@ type Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
     | OnLocationChange Location
+    | NotificationMessage Notification.Message
 
 
 initCmd : Model -> Cmd Message
@@ -103,7 +112,7 @@ initCmd { page, confirmToken } =
 
 
 view : Model -> Html Message
-view { page } =
+view { language, page, notification } =
     let
         newContentHtml =
             case page of
@@ -126,9 +135,12 @@ view { page } =
                     Html.map CreateMessage (Create.view subModel)
 
                 _ ->
-                    NotFound.view Translation.Korean
+                    NotFound.view language
     in
-        div [] [ newContentHtml ]
+        div []
+            [ newContentHtml
+            , Html.map NotificationMessage (Notification.view notification "" language)
+            ]
 
 
 

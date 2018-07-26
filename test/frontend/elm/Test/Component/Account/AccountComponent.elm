@@ -10,6 +10,8 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
 import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Test exposing (..)
+import Translation
+import View.Notification as Notification
 import Route
 
 
@@ -95,6 +97,8 @@ tests =
                             model =
                                 { page = expectedPage
                                 , confirmToken = confirmToken
+                                , language = Translation.Korean
+                                , notification = Notification.initModel
                                 }
                         in
                             Expect.equal expectedCmd (initCmd model)
