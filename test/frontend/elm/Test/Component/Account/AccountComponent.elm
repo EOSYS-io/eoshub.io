@@ -1,17 +1,16 @@
-module Test.Component.AccountComponent exposing (..)
+module Test.Component.Account.AccountComponent exposing (..)
 
 import Expect
 import Navigation exposing (Location)
-import Component.AccountComponent exposing (..)
-import Page.Account.ConfirmEmail as ConfirmEmail
-import Page.Account.Create as Create
-import Page.Account.CreateKeys as CreateKeys
-import Page.Account.Created as Created
-import Page.Account.EmailConfirmFailure as EmailConfirmFailure
-import Page.Account.EmailConfirmed as EmailConfirmed
+import Component.Account.AccountComponent exposing (..)
+import Component.Account.Page.ConfirmEmail as ConfirmEmail
+import Component.Account.Page.Create as Create
+import Component.Account.Page.CreateKeys as CreateKeys
+import Component.Account.Page.Created as Created
+import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
+import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Test exposing (..)
 import Route
-import View.Notification as Notification
 
 
 location : Location
@@ -96,7 +95,6 @@ tests =
                             model =
                                 { page = expectedPage
                                 , confirmToken = confirmToken
-                                , notification = Notification.initModel
                                 }
                         in
                             Expect.equal expectedCmd (initCmd model)

@@ -1,8 +1,8 @@
-module Test.Page.Account.Create exposing (..)
+module Test.Component.Account.Page.Create exposing (..)
 
 import Expect
 import Http
-import Page.Account.Create exposing (..)
+import Component.Account.Page.Create exposing (..)
 import Test exposing (..)
 
 

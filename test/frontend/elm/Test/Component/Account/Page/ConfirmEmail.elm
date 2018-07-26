@@ -1,8 +1,8 @@
-module Test.Page.Account.ConfirmEmail exposing (..)
+module Test.Component.Account.Page.ConfirmEmail exposing (..)
 
 import Expect
 import Http
-import Page.Account.ConfirmEmail exposing (..)
+import Component.Account.Page.ConfirmEmail exposing (..)
 import Test exposing (..)
 
 
@@ -13,7 +13,9 @@ model =
     , requestStatus = { msg = "" }
     , requested = False
     , emailValid = False
-    , inputValid = "invalid" }
+    , inputValid = "invalid"
+    }
+
 
 tests : Test
 tests =
@@ -23,7 +25,7 @@ tests =
                 expectedJson =
                     "{\"email\":\"" ++ model.email ++ "\"}"
               in
-              test "createUserBodyParams" <|
-                \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createUserBodyParams model)
+                test "createUserBodyParams" <|
+                    \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createUserBodyParams model)
             ]
         ]

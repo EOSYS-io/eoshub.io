@@ -1,11 +1,11 @@
-module Test.Component.MainComponent exposing (..)
+module Test.Component.Main.MainComponent exposing (..)
 
 import Expect
 import Navigation exposing (Location)
-import Component.MainComponent exposing (..)
-import Page.Search as Search
-import Page.Transfer as Transfer
-import Page.Voting as Voting
+import Component.Main.MainComponent exposing (..)
+import Component.Main.Page.Search as Search
+import Component.Main.Page.Transfer as Transfer
+import Component.Main.Page.Voting as Voting
 import Test exposing (..)
 import Translation exposing (I18n(TransferSucceeded))
 import Util.WalletDecoder exposing (WalletStatus(Authenticated))
@@ -76,7 +76,7 @@ tests =
                         in
                             Expect.equal
                                 ( expectedModel, Cmd.none )
-                                (update (UpdatePushActionResponse pushActionResponse) model wallet)
+                                (update (UpdatePushActionResponse pushActionResponse) model)
                 , test "CloseNotification" <|
                     \() ->
                         let
@@ -103,7 +103,6 @@ tests =
                                 (update
                                     (NotificationMessage View.Notification.CloseNotification)
                                     openedModel
-                                    wallet
                                 )
                 ]
             , describe "parseQuery"
