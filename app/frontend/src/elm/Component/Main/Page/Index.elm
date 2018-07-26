@@ -1,4 +1,4 @@
-module Page.Index exposing (Message(ChangeUrl), view)
+module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

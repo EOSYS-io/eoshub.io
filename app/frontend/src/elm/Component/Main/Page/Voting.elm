@@ -1,4 +1,4 @@
-module Page.Voting exposing (..)
+module Component.Main.Page.Voting exposing (..)
 
 import Html exposing (Html, div, h1, input, text)
 import Translation exposing (Language)

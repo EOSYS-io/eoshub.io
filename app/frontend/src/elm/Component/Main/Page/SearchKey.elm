@@ -1,4 +1,4 @@
-module Page.SearchKey exposing (..)
+module Component.Main.Page.SearchKey exposing (..)
 
 import Html exposing (Html, div)
 import Http

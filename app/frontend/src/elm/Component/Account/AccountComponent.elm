@@ -1,4 +1,4 @@
-module Component.AccountComponent exposing (..)
+module Component.Account.AccountComponent exposing (..)
 
 import Html
     exposing
@@ -15,17 +15,16 @@ import Html
         , text
         )
 import Navigation exposing (Location)
-import Page.Account.ConfirmEmail as ConfirmEmail
-import Page.Account.Create as Create
-import Page.Account.CreateKeys as CreateKeys
-import Page.Account.Created as Created
-import Page.Account.EmailConfirmFailure as EmailConfirmFailure
-import Page.Account.EmailConfirmed as EmailConfirmed
-import Page.NotFound as NotFound
+import Component.Account.Page.ConfirmEmail as ConfirmEmail
+import Component.Account.Page.Create as Create
+import Component.Account.Page.CreateKeys as CreateKeys
+import Component.Account.Page.Created as Created
+import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
+import Component.Account.Page.EmailConfirmed as EmailConfirmed
+import Component.Main.Page.NotFound as NotFound
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import View.Notification as Notification
 
 
 -- MODEL
@@ -43,7 +42,6 @@ type Page
 
 type alias Model =
     { page : Page
-    , notification : Notification.Model
     , confirmToken : String
     }
 
@@ -60,13 +58,11 @@ initModel location =
         case route of
             EmailConfirmedRoute confirmToken email ->
                 { page = page
-                , notification = Notification.initModel
                 , confirmToken = confirmToken
                 }
 
             _ ->
                 { page = page
-                , notification = Notification.initModel
                 , confirmToken = ""
                 }
 
@@ -83,7 +79,6 @@ type Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
     | OnLocationChange Location
-    | NotificationMessage Notification.Message
 
 
 initCmd : Model -> Cmd Message
@@ -107,8 +102,8 @@ initCmd { page, confirmToken } =
 -- VIEW
 
 
-view : Language -> Model -> List (Html Message)
-view language { page, notification } =
+view : Model -> Html Message
+view { page } =
     let
         newContentHtml =
             case page of
@@ -131,21 +126,9 @@ view language { page, notification } =
                     Html.map CreateMessage (Create.view subModel)
 
                 _ ->
-                    NotFound.view language
-
-        notificationParameter =
-            case page of
-                _ ->
-                    ""
+                    NotFound.view Translation.Korean
     in
-        [ newContentHtml
-        , Html.map NotificationMessage
-            (Notification.view
-                notification
-                notificationParameter
-                language
-            )
-        ]
+        div [] [ newContentHtml ]
 
 
 
@@ -153,7 +136,7 @@ view language { page, notification } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, confirmToken } as model) flags =
+update message ({ page, confirmToken } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -217,14 +200,6 @@ update message ({ page, notification, confirmToken } as model) flags =
 
                     _ ->
                         ( newModel, cmd )
-
-        ( NotificationMessage Notification.CloseNotification, _ ) ->
-            ( { model
-                | notification =
-                    { notification | open = False }
-              }
-            , Cmd.none
-            )
 
         ( _, _ ) ->
             ( model, Cmd.none )

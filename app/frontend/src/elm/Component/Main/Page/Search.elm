@@ -1,4 +1,4 @@
-module Page.Search exposing (..)
+module Component.Main.Page.Search exposing (..)
 
 import Html
     exposing

@@ -1,4 +1,4 @@
-module Page.Account.CreateKeys exposing (Message(..), Model, initModel, subscriptions, update, view)
+module Component.Account.Page.CreateKeys exposing (Message(..), Model, initModel, subscriptions, update, view)
 
 import Html exposing (Html, button, div, h1, p, text, ol, li, article, img, dl, dt, dd, textarea, node)
 import Html.Attributes exposing (class, attribute, alt, src, id, type_)

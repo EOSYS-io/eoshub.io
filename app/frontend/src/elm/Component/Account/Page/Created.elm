@@ -1,4 +1,4 @@
-module Page.Account.Created exposing (Message(..), Model, initModel, update, view)
+module Component.Account.Page.Created exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, button, div, h1, text, ol, li, h1, br, p, article, img, a)
 import Html.Attributes exposing (class, attribute, alt, src, href)
@@ -30,7 +30,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
         Home ->
-            ( model, Navigation.newUrl("/") )
+            ( model, Navigation.newUrl ("/") )
 
 
 

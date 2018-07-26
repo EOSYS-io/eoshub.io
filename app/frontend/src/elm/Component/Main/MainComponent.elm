@@ -1,4 +1,4 @@
-module Component.MainComponent exposing (..)
+module Component.Main.MainComponent exposing (..)
 
 import Html
     exposing
@@ -24,16 +24,16 @@ import Html.Attributes
         )
 import Html.Events exposing (on, onInput, onClick, keyCode)
 import Navigation exposing (Location)
-import Page.Index as Index
-import Page.NotFound as NotFound
-import Page.Search as Search
-import Page.SearchKey as SearchKey
-import Page.Transfer as Transfer
-import Page.Voting as Voting
+import Component.Main.Page.Index as Index
+import Component.Main.Page.NotFound as NotFound
+import Component.Main.Page.Search as Search
+import Component.Main.Page.SearchKey as SearchKey
+import Component.Main.Page.Transfer as Transfer
+import Component.Main.Page.Voting as Voting
+import Component.Main.Sidebar as Sidebar
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
-import Util.Flags exposing (Flags)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import Json.Decode as JD exposing (Decoder)
 import View.Notification as Notification
@@ -56,6 +56,7 @@ type alias Model =
     { page : Page
     , notification : Notification.Model
     , header : Header
+    , sidebar : Sidebar.Model
     }
 
 
@@ -81,6 +82,7 @@ initModel location =
             , ramPrice = 0
             , errMessage = ""
             }
+        , sidebar = Sidebar.initModel
         }
 
 
@@ -99,6 +101,7 @@ type Message
     | CheckSearchQuery String
     | OnLocationChange Location
     | NotificationMessage Notification.Message
+    | SidebarMessage Sidebar.Message
 
 
 type Query
@@ -141,25 +144,25 @@ initCmd location =
 -- VIEW
 
 
-view : Language -> Model -> List (Html Message)
-view language { page, header, notification } =
+view : Model -> Html Message
+view { page, header, notification, sidebar } =
     let
         newContentHtml =
             case page of
                 SearchPage subModel ->
-                    Html.map SearchMessage (Search.view language subModel)
+                    Html.map SearchMessage (Search.view sidebar.language subModel)
 
                 VotingPage subModel ->
-                    Html.map VotingMessage (Voting.view language subModel)
+                    Html.map VotingMessage (Voting.view sidebar.language subModel)
 
                 TransferPage subModel ->
-                    Html.map TransferMessage (Transfer.view language subModel)
+                    Html.map TransferMessage (Transfer.view sidebar.language subModel)
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view language)
+                    Html.map IndexMessage (Index.view sidebar.language)
 
                 _ ->
-                    NotFound.view language
+                    NotFound.view sidebar.language
 
         notificationParameter =
             case page of
@@ -169,34 +172,38 @@ view language { page, header, notification } =
                 _ ->
                     ""
     in
-        [ section [ class "tick_display" ]
-            [ form [ class "search", disabled True ]
-                [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (CheckSearchQuery header.searchInput) ]
-                    []
-                , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
-                    [ text "검색하기" ]
-                ]
-            , ul [ class "price" ]
-                [ li []
-                    [ text "이오스 시세                           "
-                    , span [ attribute "data-before" "lower" ]
-                        [ text "1.000 EOS                           " ]
+        div [ class "container" ]
+            [ Html.map SidebarMessage (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
+            , div [ class "wrapper" ]
+                [ section [ class "tick_display" ]
+                    [ form [ class "search", disabled True ]
+                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (CheckSearchQuery header.searchInput) ]
+                            []
+                        , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
+                            [ text "검색하기" ]
+                        ]
+                    , ul [ class "price" ]
+                        [ li []
+                            [ text "이오스 시세                           "
+                            , span [ attribute "data-before" "lower" ]
+                                [ text "1.000 EOS                           " ]
+                            ]
+                        , li []
+                            [ text "RAM 가격                            "
+                            , span [ attribute "data-before" "higher" ]
+                                [ text "1.000 EOS                           " ]
+                            ]
+                        ]
                     ]
-                , li []
-                    [ text "RAM 가격                            "
-                    , span [ attribute "data-before" "higher" ]
-                        [ text "1.000 EOS                           " ]
-                    ]
+                , newContentHtml
+                , Html.map NotificationMessage
+                    (Notification.view
+                        notification
+                        notificationParameter
+                        sidebar.language
+                    )
                 ]
             ]
-        , newContentHtml
-        , Html.map NotificationMessage
-            (Notification.view
-                notification
-                notificationParameter
-                language
-            )
-        ]
 
 
 onEnter : Message -> Attribute Message
@@ -215,8 +222,8 @@ onEnter msg =
 -- UPDATE
 
 
-update : Message -> Model -> Wallet -> ( Model, Cmd Message )
-update message ({ page, notification, header } as model) { account } =
+update : Message -> Model -> ( Model, Cmd Message )
+update message ({ page, notification, header, sidebar } as model) =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -228,7 +235,7 @@ update message ({ page, notification, header } as model) { account } =
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Transfer.update subMessage subModel account
+                    Transfer.update subMessage subModel sidebar.wallet.account
             in
                 ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
@@ -291,6 +298,13 @@ update message ({ page, notification, header } as model) { account } =
             , Cmd.none
             )
 
+        ( SidebarMessage sidebarMessage, _ ) ->
+            let
+                ( newSidebar, newCmd ) =
+                    Sidebar.update sidebarMessage sidebar
+            in
+                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
@@ -312,9 +326,11 @@ parseQuery query =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
+subscriptions { sidebar } =
     Sub.batch
-        [ Port.receivePushActionResponse UpdatePushActionResponse ]
+        [ Port.receivePushActionResponse UpdatePushActionResponse
+        , Sub.map SidebarMessage (Sidebar.subscriptions sidebar)
+        ]
 
 
 
