@@ -65,6 +65,7 @@ type Message
     | SubmitAction
     | ChangeUrl String
     | SetFormValidation Bool
+    | OpenUnderConstruction
 
 
 
@@ -72,6 +73,7 @@ type Message
 -- Note(heejae): Current url change logic is so messy.
 -- Refactor url change logic using Navigation.urlUpdate.
 -- See details of this approach from https://github.com/sircharleswatson/elm-navigation-example
+-- TODO(heejae): Consider making nav as a separate component.
 
 
 view : Language -> Model -> Html Message
@@ -85,21 +87,29 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                 ]
                 [ text (translate language Translation.Transfer) ]
             , a
-                [ style [ ( "cursor", "pointer" ) ] ]
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick OpenUnderConstruction
+                ]
                 [ text (translate language RamMarket) ]
             , a
-                [ style [ ( "cursor", "pointer" ) ] ]
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick OpenUnderConstruction
+                ]
                 [ text (translate language Application) ]
             , a
                 [ style [ ( "cursor", "pointer" ) ]
-                , onClick (ChangeUrl "/voting")
+                , onClick OpenUnderConstruction
                 ]
                 [ text (translate language Vote) ]
             , a
-                [ style [ ( "cursor", "pointer" ) ] ]
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick OpenUnderConstruction
+                ]
                 [ text (translate language ProxyVote) ]
             , a
-                [ style [ ( "cursor", "pointer" ) ] ]
+                [ style [ ( "cursor", "pointer" ) ]
+                , onClick OpenUnderConstruction
+                ]
                 [ text (translate language Faq) ]
             ]
         , h3 [] [ text (translate language Transfer) ]
@@ -219,6 +229,9 @@ update message ({ transfer } as model) account =
 
         SetFormValidation validity ->
             ( { model | isFormValid = validity }, Cmd.none )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 
