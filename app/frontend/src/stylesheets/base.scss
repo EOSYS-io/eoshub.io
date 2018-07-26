@@ -60,7 +60,9 @@ h1,h2,h3,h4,h5,h6 {
 
 
 // anchor
-a { }
+a {
+    cursor:pointer;
+}
 
 a:link {
     text-decoration:none;
