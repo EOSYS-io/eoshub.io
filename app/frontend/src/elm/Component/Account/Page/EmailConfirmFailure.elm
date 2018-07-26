@@ -1,4 +1,4 @@
-module Page.Account.EmailConfirmFailure exposing (Message(..), Model, initModel, update, view)
+module Component.Account.Page.EmailConfirmFailure exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)

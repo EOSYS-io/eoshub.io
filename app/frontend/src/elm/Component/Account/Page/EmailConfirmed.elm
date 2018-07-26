@@ -1,4 +1,4 @@
-module Page.Account.EmailConfirmed exposing (Message(..), Model, initModel, update, view)
+module Component.Account.Page.EmailConfirmed exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1, img, h2)
 import Html.Attributes exposing (class, attribute, alt, src, type_)

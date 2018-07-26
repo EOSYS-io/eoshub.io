@@ -1,4 +1,4 @@
-module Page.Transfer exposing (..)
+module Component.Main.Page.Transfer exposing (..)
 
 import Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)

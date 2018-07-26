@@ -1,4 +1,4 @@
-module Page.Account.ConfirmEmail exposing (Message(..), Model, createUserBodyParams, initModel, update, view)
+module Component.Account.Page.ConfirmEmail exposing (Message(..), Model, createUserBodyParams, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1, img, a, form, span, node)
 import Html.Attributes exposing (placeholder, class, alt, src, action, href, attribute, type_, rel)
@@ -22,7 +22,8 @@ type alias Model =
     , requestStatus : Response
     , requested : Bool
     , emailValid : Bool
-    , inputValid : String }
+    , inputValid : String
+    }
 
 
 initModel : Model
@@ -32,7 +33,8 @@ initModel =
     , requestStatus = { msg = "" }
     , requested = False
     , emailValid = False
-    , inputValid = "invalid" }
+    , inputValid = "invalid"
+    }
 
 
 
@@ -57,7 +59,10 @@ update msg model flags =
                     validation newModel
 
                 inputValid =
-                    if emailValid then "valid" else "invalid"
+                    if emailValid then
+                        "valid"
+                    else
+                        "invalid"
             in
                 ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
 
@@ -100,11 +105,18 @@ view model =
                 ]
             ]
         , div [ class "btn_area" ]
-            [ button [ class "middle white_blue send_email button", attribute (if not model.requested && model.emailValid then
-                            "enabled"
-                        else
-                            "disabled"
-                        ) "", type_ "button", onClick CreateUser ]
+            [ button
+                [ class "middle white_blue send_email button"
+                , attribute
+                    (if not model.requested && model.emailValid then
+                        "enabled"
+                     else
+                        "disabled"
+                    )
+                    ""
+                , type_ "button"
+                , onClick CreateUser
+                ]
                 [ text "링크 보내기" ]
             ]
         , p [ class "exist_account" ]
@@ -113,6 +125,7 @@ view model =
                 [ text "로그인하기" ]
             ]
         ]
+
 
 
 -- HTTP

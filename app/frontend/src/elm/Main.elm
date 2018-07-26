@@ -1,14 +1,11 @@
 module Main exposing (..)
 
 import Html
-import Html.Attributes exposing (class)
 import Navigation exposing (Location)
-import Component.MainComponent as MainComponent
-import Component.AccountComponent as AccountComponent
-import Component.SidebarComponent as SidebarComponent
+import Component.Main.MainComponent as MainComponent
+import Component.Account.AccountComponent as AccountComponent
 import Util.Flags exposing (Flags)
 import Route exposing (getComponentRoute)
-import Util.WalletDecoder exposing (Wallet)
 
 
 -- MODEL
@@ -20,8 +17,7 @@ type Component
 
 
 type alias Model =
-    { sidebarComponent : SidebarComponent.Model
-    , currentComponent : Component
+    { currentComponent : Component
     , flags : Flags
     }
 
@@ -33,7 +29,6 @@ type alias Model =
 type Message
     = MainComponentMessage MainComponent.Message
     | AccountComponentMessage AccountComponent.Message
-    | SidebarComponentMessage SidebarComponent.Message
     | OnLocationChange Location
 
 
@@ -47,8 +42,7 @@ init flags location =
         ( newComponent, cmd ) =
             initComponent location
     in
-        ( { sidebarComponent = SidebarComponent.initModel
-          , currentComponent = newComponent
+        ( { currentComponent = newComponent
           , flags = flags
           }
         , cmd
@@ -60,18 +54,13 @@ init flags location =
 
 
 view : Model -> Html.Html Message
-view { sidebarComponent, currentComponent } =
+view { currentComponent } =
     case currentComponent of
         MainComponent subModel ->
-            Html.div [ class "container" ]
-                [ Html.map SidebarComponentMessage (Html.div [ SidebarComponent.foldClass sidebarComponent.fold ] (SidebarComponent.view sidebarComponent))
-                , Html.div [ class "wrapper" ]
-                    (List.map (Html.map MainComponentMessage) (MainComponent.view sidebarComponent.language subModel))
-                ]
+            Html.map MainComponentMessage (MainComponent.view subModel)
 
         AccountComponent subModel ->
-            Html.div []
-                (List.map (Html.map AccountComponentMessage) (AccountComponent.view sidebarComponent.language subModel))
+            Html.map AccountComponentMessage (AccountComponent.view subModel)
 
 
 
@@ -79,12 +68,12 @@ view { sidebarComponent, currentComponent } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ currentComponent, flags, sidebarComponent } as model) =
+update message ({ currentComponent, flags } as model) =
     case ( message, currentComponent ) of
         ( MainComponentMessage mainComponentMessage, MainComponent subModel ) ->
             let
                 ( newComponentModel, newCmd ) =
-                    MainComponent.update mainComponentMessage subModel sidebarComponent.wallet
+                    MainComponent.update mainComponentMessage subModel
 
                 newComponent =
                     MainComponent newComponentModel
@@ -101,17 +90,10 @@ update message ({ currentComponent, flags, sidebarComponent } as model) =
             in
                 ( { model | currentComponent = newComponent }, Cmd.map AccountComponentMessage newCmd )
 
-        ( SidebarComponentMessage sidebarComponentMessage, _ ) ->
-            let
-                ( newSidebarComponent, newCmd ) =
-                    SidebarComponent.update sidebarComponentMessage sidebarComponent
-            in
-                ( { model | sidebarComponent = newSidebarComponent }, Cmd.map SidebarComponentMessage newCmd )
-
         ( OnLocationChange location, _ ) ->
             let
                 ( newComponent, cmd ) =
-                    updateComponent currentComponent location flags sidebarComponent.wallet
+                    updateComponent currentComponent location flags
             in
                 ( { model | currentComponent = newComponent }, cmd )
 
@@ -124,11 +106,11 @@ update message ({ currentComponent, flags, sidebarComponent } as model) =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebarComponent, currentComponent } =
+subscriptions { currentComponent } =
     case currentComponent of
         MainComponent subModel ->
             Sub.batch
-                [ Sub.map SidebarComponentMessage (SidebarComponent.subscriptions sidebarComponent) ]
+                [ Sub.map MainComponentMessage (MainComponent.subscriptions subModel) ]
 
         AccountComponent subModel ->
             Sub.batch
@@ -181,8 +163,8 @@ initComponent location =
                     ( AccountComponent componentModel, Cmd.map AccountComponentMessage componentCmd )
 
 
-updateComponent : Component -> Location -> Flags -> Wallet -> ( Component, Cmd Message )
-updateComponent currentComponent location flags wallet =
+updateComponent : Component -> Location -> Flags -> ( Component, Cmd Message )
+updateComponent currentComponent location flags =
     let
         componentRoute =
             getComponentRoute location
@@ -199,7 +181,7 @@ updateComponent currentComponent location flags wallet =
                                 MainComponent.initModel location
 
                     ( newComponentModel, componentCmd ) =
-                        MainComponent.update (MainComponent.OnLocationChange location) componentModel wallet
+                        MainComponent.update (MainComponent.OnLocationChange location) componentModel
                 in
                     ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
 
