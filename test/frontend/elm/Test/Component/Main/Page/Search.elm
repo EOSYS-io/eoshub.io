@@ -1,4 +1,4 @@
-module Test.Page.Search exposing (..)
+module Test.Component.Main.Page.Search exposing (..)
 
 import Expect
 import Test exposing (..)

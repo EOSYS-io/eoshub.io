@@ -1,8 +1,8 @@
-module Test.Page.Transfer exposing (..)
+module Test.Component.Main.Page.Transfer exposing (..)
 
 import Expect
 import Json.Encode as JE
-import Page.Transfer exposing (..)
+import Component.Main.Page.Transfer exposing (..)
 import Port
 import Test exposing (..)
 
