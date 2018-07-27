@@ -139,6 +139,18 @@ initCmd location =
                 in
                     Cmd.map SearchMessage subInitCmd
 
+            SearchKeyRoute query ->
+                let
+                    subInitCmd =
+                        case query of
+                            Just str ->
+                                SearchKey.initCmd str
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    Cmd.map SearchKeyMessage subInitCmd
+
             _ ->
                 Cmd.none
 
@@ -154,6 +166,9 @@ view { page, header, notification, sidebar, showUnderConstruction } =
             case page of
                 SearchPage subModel ->
                     Html.map SearchMessage (Search.view sidebar.language subModel)
+
+                SearchKeyPage subModel ->
+                    Html.map SearchKeyMessage (SearchKey.view sidebar.language subModel)
 
                 VotingPage subModel ->
                     Html.map VotingMessage (Voting.view sidebar.language subModel)
@@ -269,6 +284,13 @@ update message ({ page, notification, header, sidebar } as model) =
 
         ( TransferMessage Transfer.OpenUnderConstruction, _ ) ->
             ( { model | showUnderConstruction = True }, Cmd.none )
+
+        ( SearchKeyMessage subMessage, SearchKeyPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    SearchKey.update subMessage subModel
+            in
+                ( { model | page = newPage |> SearchKeyPage }, Cmd.map SearchKeyMessage subCmd )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
@@ -389,10 +411,22 @@ getPage location =
     in
         case route of
             SearchRoute query ->
-                SearchPage Search.initModel
+                case query of
+                    Just str ->
+                        SearchPage Search.initModel
+
+                    Nothing ->
+                        -- it needs no result page. it shows NotFoundPage temporarily
+                        NotFoundPage
 
             SearchKeyRoute query ->
-                SearchKeyPage SearchKey.initModel
+                case query of
+                    Just str ->
+                        SearchKeyPage (SearchKey.initModel str)
+
+                    Nothing ->
+                        -- it needs no result page. it shows NotFoundPage temporarily
+                        NotFoundPage
 
             VotingRoute ->
                 VotingPage Voting.initModel
