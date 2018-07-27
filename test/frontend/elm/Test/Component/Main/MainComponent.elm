@@ -70,7 +70,11 @@ tests =
                                 { model
                                     | notification =
                                         { notification
-                                            | content = View.Notification.Ok { message = (TransferSucceeded notificationParameter), detail = CheckDetail }
+                                            | content =
+                                                View.Notification.Ok
+                                                    { message = (TransferSucceeded notificationParameter)
+                                                    , detail = CheckDetail
+                                                    }
                                             , open = True
                                         }
                                 }

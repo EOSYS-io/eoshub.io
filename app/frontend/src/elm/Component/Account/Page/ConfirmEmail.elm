@@ -148,7 +148,13 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
             , form [ action "" ]
                 [ text "        "
-                , input [ placeholder "example@email.com", attribute "required" "", type_ "email", attribute inputValid "", onInput ValidateEmail ]
+                , input
+                    [ placeholder "example@email.com"
+                    , attribute "required" ""
+                    , type_ "email"
+                    , attribute inputValid ""
+                    , onInput ValidateEmail
+                    ]
                     []
                 , span [ class "validate" ]
                     [ text validationMsg ]
