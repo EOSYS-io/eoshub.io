@@ -36,10 +36,11 @@ import Html.Attributes
 import Translation exposing (I18n(..), Language, translate)
 import Http
 import Util.HttpRequest exposing (..)
-import Json.Encode as JE
+import Json.Encode as Encode
 import Data.Action exposing (Action)
 import Data.Account exposing (Account, ResourceInEos, Resource, Refund, accountDecoder, keyAccountsDecoder)
-import Regex exposing (..)
+import Util.Formatter exposing (larimerToEos, eosFloatToString, eosStringToFloat, unitConverterRound4, percentageConverter)
+import Util.Constant exposing (second, minute, hour, day, kilo, mega, giga, tera)
 import Round
 
 
@@ -92,11 +93,12 @@ initCmd query =
         newCmd =
             let
                 body =
-                    JE.object
-                        [ ( "account_name", JE.string query ) ]
+                    Encode.object
+                        [ ( "account_name", Encode.string query ) ]
                         |> Http.jsonBody
             in
-                post (getFullPath "/v1/chain/get_account") body accountDecoder |> (Http.send OnFetchAccount)
+                post (getFullPath "/v1/chain/get_account") body accountDecoder
+                    |> (Http.send OnFetchAccount)
     in
         newCmd
 
@@ -337,30 +339,6 @@ view language { account } =
             ]
 
 
-larimerToEos : Int -> Float
-larimerToEos valInt =
-    (toFloat valInt) * 0.0001
-
-
-eosFloatToString : Float -> String
-eosFloatToString valFloat =
-    (Round.round 4 valFloat) ++ " EOS"
-
-
-eosStringToFloat : String -> Float
-eosStringToFloat str =
-    let
-        result =
-            String.toFloat (replace All (regex " EOS") (\_ -> "") str)
-    in
-        case result of
-            Ok val ->
-                val
-
-            Err _ ->
-                0
-
-
 
 -- Total Amount = core_liquid_balance + (staked * 0.0001) + (unstaking_net_amount + unstaking_cpu_amount)
 
@@ -392,54 +370,54 @@ getResource resourceType used available max =
             case resourceType of
                 "net" ->
                     -- Bytes
-                    if max < 1024 then
+                    if max < kilo then
                         (toString max) ++ " bytes"
                         -- KB
-                    else if (max >= 1024) && (max < (1024 * 1024)) then
-                        (Round.round 4 (toFloat max / 1024)) ++ " KB"
+                    else if (max >= kilo) && (max < mega) then
+                        unitConverterRound4 max kilo ++ " KB"
                         -- MB
-                    else if (max >= 1024 * 1024) && (max < (1024 * 1024 * 1024)) then
-                        (Round.round 4 (toFloat max / (1024 * 1024))) ++ " MB"
+                    else if (max >= mega) && (max < giga) then
+                        unitConverterRound4 max mega ++ " MB"
                         -- GB
-                    else if (max >= 1024 * 1024 * 1024) && (max < (1024 * 1024 * 1024 * 1024)) then
-                        (Round.round 4 (toFloat max / (1024 * 1024 * 1024))) ++ " GB"
+                    else if (max >= giga) && (max < tera) then
+                        unitConverterRound4 max giga ++ " GB"
                         -- TB
                     else
-                        (Round.round 4 (toFloat max / (1024 * 1024 * 1024 * 1024))) ++ " TB"
+                        unitConverterRound4 max tera ++ " TB"
 
                 "cpu" ->
                     -- ms
-                    if max < 1000 then
+                    if max < second then
                         (toString max) ++ " ms"
-                        -- sec
-                    else if (max >= 1000) && (max < (1000 * 60)) then
-                        (Round.round 4 (toFloat max / 1000)) ++ " s"
-                        -- min
-                    else if (max >= 1000 * 60) && (max < (1000 * 60 * 60)) then
-                        (Round.round 4 (toFloat max / (1000 * 60))) ++ " min"
+                        -- second
+                    else if (max >= second) && (max < minute) then
+                        unitConverterRound4 max second ++ " s"
+                        -- minute
+                    else if (max >= minute) && (max < hour) then
+                        unitConverterRound4 max minute ++ " min"
                         -- hour
-                    else if (max >= 1000 * 60 * 60) && (max < (1000 * 60 * 60 * 24)) then
-                        (Round.round 4 (toFloat max / (1000 * 60 * 60))) ++ " hour"
+                    else if (max >= hour) && (max < day) then
+                        unitConverterRound4 max hour ++ " hour"
                         -- day
                     else
-                        (Round.round 4 (toFloat max / (1000 * 60 * 60 * 24))) ++ " day"
+                        unitConverterRound4 max day ++ " day"
 
                 "ram" ->
                     -- Bytes
                     if max < 1024 then
                         (toString max) ++ " bytes"
                         -- KB
-                    else if (max >= 1024) && (max < (1024 * 1024)) then
-                        (Round.round 4 (toFloat max / 1024)) ++ " KB"
+                    else if (max >= kilo) && (max < mega) then
+                        unitConverterRound4 max kilo ++ " KB"
                         -- MB
-                    else if (max >= 1024 * 1024) && (max < (1024 * 1024 * 1024)) then
-                        (Round.round 4 (toFloat max / (1024 * 1024))) ++ " MB"
+                    else if (max >= mega) && (max < giga) then
+                        unitConverterRound4 max mega ++ " MB"
                         -- GB
-                    else if (max >= 1024 * 1024 * 1024) && (max < (1024 * 1024 * 1024 * 1024)) then
-                        (Round.round 4 (toFloat max / (1024 * 1024 * 1024))) ++ " GB"
+                    else if (max >= giga) && (max < tera) then
+                        unitConverterRound4 max giga ++ " GB"
                         -- TB
                     else
-                        (Round.round 4 (toFloat max / (1024 * 1024 * 1024 * 1024))) ++ " TB"
+                        unitConverterRound4 max tera ++ " TB"
 
                 _ ->
                     ""
@@ -450,7 +428,7 @@ getResource resourceType used available max =
                     "0%"
 
                 _ ->
-                    ((toFloat (available * 100) / toFloat max) |> Round.round 2) ++ "%"
+                    (percentageConverter available max |> Round.round 2) ++ "%"
 
         color =
             case max of
@@ -458,13 +436,17 @@ getResource resourceType used available max =
                     "hell"
 
                 _ ->
-                    if (toFloat (available * 100) / toFloat max) < 25 then
-                        "hell"
-                    else if ((toFloat (available * 100) / toFloat max) >= 25 && (toFloat (available * 100) / toFloat max) < 50) then
-                        "bad"
-                    else if ((toFloat (available * 100) / toFloat max) >= 50 && (toFloat (available * 100) / toFloat max) < 75) then
-                        "good"
-                    else
-                        "fine"
+                    let
+                        percentage =
+                            percentageConverter available max
+                    in
+                        if percentage < 25 then
+                            "hell"
+                        else if (percentage >= 25 && percentage < 50) then
+                            "bad"
+                        else if (percentage >= 50 && percentage < 75) then
+                            "good"
+                        else
+                            "fine"
     in
         ( totalString, avaliablePercent, color )

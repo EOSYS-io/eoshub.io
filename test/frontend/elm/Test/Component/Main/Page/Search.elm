@@ -34,7 +34,9 @@ tests =
                                     (ResourceInEos "0 EOS" "0 EOS" Nothing)
                                     (Refund "" "" "0 EOS" "0 EOS")
                         in
-                            Expect.equal (Ok expectedAccount) (JD.decodeString accountDecoder accountJson)
+                            Expect.equal
+                                (Ok expectedAccount)
+                                (JD.decodeString accountDecoder accountJson)
                 , test "Account parsing (core_liquid_balance field exists)" <|
                     \() ->
                         let
@@ -54,27 +56,16 @@ tests =
                                     (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" Nothing)
                                     (Refund "" "" "0 EOS" "0 EOS")
                         in
-                            Expect.equal (Ok expectedAccount) (JD.decodeString accountDecoder accountJson)
-                ]
-            , describe "larimerToEos"
-                [ test "10000 larimer == 1.0 EOS" <|
-                    \() ->
-                        Expect.equal 1.0 (larimerToEos 10000)
-                ]
-            , describe "eosFloatToString"
-                [ test "0.1 -> \"0.1000 EOS\"" <|
-                    \() ->
-                        Expect.equal "0.1000 EOS" (eosFloatToString 0.1)
-                ]
-            , describe "eosStringToFloat"
-                [ test "\"0.1 EOS\" -> 0.1" <|
-                    \() ->
-                        Expect.equal 0.1 (eosStringToFloat "0.1 EOS")
+                            Expect.equal
+                                (Ok expectedAccount)
+                                (JD.decodeString accountDecoder accountJson)
                 ]
             , describe "getTotalAmount"
                 [ test "arguments \"9159.2669 EOS\" 28348132 \"2.0000 EOS\" \"2.0000 EOS\"" <|
                     \() ->
-                        Expect.equal "11998.0801 EOS" (getTotalAmount "9159.2669 EOS" 28348132 "2.0000 EOS" "2.0000 EOS")
+                        Expect.equal
+                            "11998.0801 EOS"
+                            (getTotalAmount "9159.2669 EOS" 28348132 "2.0000 EOS" "2.0000 EOS")
                 ]
             , describe "getUnstakingAmount"
                 [ test "arguments \"2.0002 EOS\" \"3.0003 EOS\"" <|

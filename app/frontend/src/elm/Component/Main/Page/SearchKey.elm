@@ -37,7 +37,8 @@ initCmd query =
                         [ ( "public_key", JE.string query ) ]
                         |> Http.jsonBody
             in
-                post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder |> (Http.send OnFetchKeyAccounts)
+                post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder
+                    |> (Http.send OnFetchKeyAccounts)
     in
         newCmd
 
