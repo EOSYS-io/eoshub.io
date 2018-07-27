@@ -14,7 +14,7 @@ module View.Notification
 import Html exposing (Html, div, text, p, a, button)
 import Html.Attributes exposing (class, type_, id)
 import Html.Events exposing (onClick)
-import Translation exposing (Language, translate, I18n(CheckDetail, CheckError, Close))
+import Translation exposing (Language, translate, I18n(Close))
 
 
 -- MESSAGE
@@ -28,14 +28,20 @@ type Message
 -- MODEL
 
 
+type alias OkDetail =
+    { message : I18n
+    , detail : I18n
+    }
+
+
 type alias ErrorDetail =
     { message : I18n
-    , detail : String
+    , detail : I18n
     }
 
 
 type Content
-    = Ok (String -> I18n)
+    = Ok OkDetail
     | Error ErrorDetail
     | None
 
@@ -57,21 +63,21 @@ initModel =
 -- VIEW
 
 
-view : Model -> String -> Language -> Html Message
-view { content, open } i18nParam language =
+view : Model -> Language -> Html Message
+view { content, open } language =
     let
         texts =
             case content of
-                Ok messageGenerator ->
-                    ( translate language (i18nParam |> messageGenerator)
+                Ok { message, detail } ->
+                    ( translate language message
                     , "view success"
-                    , translate language CheckDetail
+                    , translate language detail
                     )
 
-                Error { message } ->
+                Error { message, detail } ->
                     ( translate language message
                     , "view fail"
-                    , translate language CheckError
+                    , translate language detail
                     )
 
                 _ ->
@@ -94,7 +100,10 @@ messageBox : ( String, String, String ) -> Language -> Html Message
 messageBox ( mainText, classText, detailText ) language =
     div [ class classText ]
         [ p [] [ text mainText ]
-        , a [] [ text detailText ]
+        , if not (String.isEmpty detailText) then
+            a [] [ text detailText ]
+          else
+            a [] []
         , button
             [ type_ "button"
             , class "icon close button"

@@ -11,6 +11,8 @@ import Util.Flags exposing (Flags)
 import Util.Urls as Urls
 import Validate exposing (Validator, ifInvalidEmail, ifBlank, validate)
 import Array.Hamt as Array exposing (Array)
+import View.Notification as Notification
+import Translation exposing (Language, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
 
 
 -- MODEL
@@ -19,10 +21,10 @@ import Array.Hamt as Array exposing (Array)
 type alias Model =
     { email : String
     , validationMsg : String
-    , requestStatus : Response
     , requested : Bool
     , emailValid : Bool
     , inputValid : String
+    , notification : Notification.Model
     }
 
 
@@ -30,10 +32,10 @@ initModel : Model
 initModel =
     { email = ""
     , validationMsg = "Please enter an email address."
-    , requestStatus = { msg = "" }
     , requested = False
     , emailValid = False
     , inputValid = "invalid"
+    , notification = Notification.initModel
     }
 
 
@@ -45,10 +47,11 @@ type Message
     = ValidateEmail String
     | CreateUser
     | NewUser (Result Http.Error Response)
+    | NotificationMessage Notification.Message
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update msg model flags =
+update msg ({ notification } as model) flags =
     case msg of
         ValidateEmail email ->
             let
@@ -70,18 +73,65 @@ update msg model flags =
             ( { model | requested = True }, createUserRequest model flags )
 
         NewUser (Ok res) ->
-            ( { model | validationMsg = "이메일을 확인해주세요!", requestStatus = res, inputValid = "valid" }, Cmd.none )
+            ( { model
+                | notification =
+                    { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
 
         NewUser (Err error) ->
-            ( { model | validationMsg = "이미 존재하는 이메일입니다.", requested = False, requestStatus = { msg = toString error }, inputValid = "invalid" }, Cmd.none )
+            case error of
+                Http.BadStatus response ->
+                    ( { model
+                        | requested = False
+                        , notification =
+                            { content = Notification.Error { message = AlreadyExistEmail, detail = EmptyMessage }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                Http.BadPayload debugMsg response ->
+                    ( { model
+                        | requested = False
+                        , notification =
+                            { content = Notification.Error { message = AlreadyExistEmail, detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( { model
+                        | requested = False
+                        , notification =
+                            { content = Notification.Error { message = AlreadyExistEmail, detail = DebugMessage (toString error) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+        NotificationMessage Notification.CloseNotification ->
+            ( { model
+                | notification =
+                    { notification | open = False }
+              }
+            , Cmd.none
+            )
 
 
 
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view { validationMsg, requested, emailValid, inputValid, notification } language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "ing" ]
@@ -98,17 +148,17 @@ view model =
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
             , form [ action "" ]
                 [ text "        "
-                , input [ placeholder "example@email.com", attribute "required" "", type_ "email", attribute model.inputValid "", onInput ValidateEmail ]
+                , input [ placeholder "example@email.com", attribute "required" "", type_ "email", attribute inputValid "", onInput ValidateEmail ]
                     []
                 , span [ class "validate" ]
-                    [ text model.validationMsg ]
+                    [ text validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
             [ button
                 [ class "middle white_blue send_email button"
                 , attribute
-                    (if not model.requested && model.emailValid then
+                    (if not requested && emailValid then
                         "enabled"
                      else
                         "disabled"
@@ -124,6 +174,7 @@ view model =
             , a [ href "#" ]
                 [ text "로그인하기" ]
             ]
+        , Html.map NotificationMessage (Notification.view notification language)
         ]
 
 

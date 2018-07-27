@@ -167,14 +167,6 @@ view { page, header, notification, sidebar, showUnderConstruction } =
                 _ ->
                     NotFound.view sidebar.language
 
-        notificationParameter =
-            case page of
-                TransferPage { transfer } ->
-                    transfer.to
-
-                _ ->
-                    ""
-
         underConstructionView =
             div
                 [ id "underConstruction"
@@ -233,7 +225,6 @@ view { page, header, notification, sidebar, showUnderConstruction } =
                 , Html.map NotificationMessage
                     (Notification.view
                         notification
-                        notificationParameter
                         sidebar.language
                     )
                 , underConstructionView
@@ -291,14 +282,23 @@ update message ({ page, notification, header, sidebar } as model) =
             ( { model | showUnderConstruction = True }, Cmd.none )
 
         ( UpdatePushActionResponse resp, _ ) ->
-            ( { model
-                | notification =
-                    { content = resp |> decodePushActionResponse
-                    , open = True
-                    }
-              }
-            , Cmd.none
-            )
+            let
+                notificationParameter =
+                    case page of
+                        TransferPage { transfer } ->
+                            transfer.to
+
+                        _ ->
+                            ""
+            in
+                ( { model
+                    | notification =
+                        { content = decodePushActionResponse resp notificationParameter
+                        , open = True
+                        }
+                  }
+                , Cmd.none
+                )
 
         ( OnLocationChange location, _ ) ->
             let

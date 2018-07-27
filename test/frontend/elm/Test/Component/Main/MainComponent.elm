@@ -7,7 +7,7 @@ import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Voting as Voting
 import Test exposing (..)
-import Translation exposing (I18n(TransferSucceeded))
+import Translation exposing (I18n(TransferSucceeded, CheckDetail))
 import Util.WalletDecoder exposing (WalletStatus(Authenticated))
 import View.Notification
 
@@ -55,14 +55,22 @@ tests =
                 [ test "UpdatePushActionResponse" <|
                     \() ->
                         let
-                            ({ notification } as model) =
-                                initModel location
+                            ({ notification, page } as model) =
+                                initModel { location | pathname = "/transfer" }
+
+                            notificationParameter =
+                                case page of
+                                    TransferPage { transfer } ->
+                                        transfer.to
+
+                                    _ ->
+                                        ""
 
                             expectedModel =
                                 { model
                                     | notification =
                                         { notification
-                                            | content = View.Notification.Ok TransferSucceeded
+                                            | content = View.Notification.Ok { message = (TransferSucceeded notificationParameter), detail = CheckDetail }
                                             , open = True
                                         }
                                 }

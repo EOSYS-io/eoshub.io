@@ -11,6 +11,8 @@ import Util.Flags exposing (Flags)
 import Util.Urls as Urls
 import Navigation
 import Util.Validation exposing (checkAccountName)
+import View.Notification as Notification
+import Translation exposing (Language, I18n(EmptyMessage, DebugMessage, AccountCreationFailure))
 
 
 -- MODEL
@@ -18,22 +20,22 @@ import Util.Validation exposing (checkAccountName)
 
 type alias Model =
     { accountName : String
-    , requestStatus : Response
     , pubkey : String
     , validation : Bool
     , validationMsg : String
     , requestSuccess : Bool
+    , notification : Notification.Model
     }
 
 
 initModel : String -> Model
 initModel pubkey =
     { accountName = ""
-    , requestStatus = { msg = "" }
     , pubkey = pubkey
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
+    , notification = Notification.initModel
     }
 
 
@@ -45,10 +47,11 @@ type Message
     = ValidateAccountName String
     | CreateEosAccount
     | NewUser (Result Http.Error Response)
+    | NotificationMessage Notification.Message
 
 
 update : Message -> Model -> Flags -> String -> ( Model, Cmd Message )
-update msg model flags confirmToken =
+update msg ({ notification } as model) flags confirmToken =
     case msg of
         ValidateAccountName accountName ->
             let
@@ -67,26 +70,58 @@ update msg model flags confirmToken =
             ( model, createEosAccountRequest model flags confirmToken )
 
         NewUser (Ok res) ->
-            ( { model | requestStatus = res, requestSuccess = True }, Navigation.newUrl ("/account/created") )
+            ( { model | requestSuccess = True }, Navigation.newUrl ("/account/created") )
 
         NewUser (Err error) ->
             case error of
                 Http.BadStatus response ->
-                    ( { model | requestStatus = { msg = toString response.body }, requestSuccess = False }, Cmd.none )
+                    ( { model
+                        | requestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = EmptyMessage }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
 
                 Http.BadPayload debugMsg response ->
-                    ( { model | requestStatus = { msg = ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }, requestSuccess = False }, Cmd.none )
+                    ( { model
+                        | requestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
 
                 _ ->
-                    ( { model | requestStatus = { msg = toString error }, requestSuccess = False }, Cmd.none )
+                    ( { model
+                        | requestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage (toString error) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+        NotificationMessage Notification.CloseNotification ->
+            ( { model
+                | notification =
+                    { notification | open = False }
+              }
+            , Cmd.none
+            )
 
 
 
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view { validation, accountName, validationMsg, requestSuccess, notification } language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
@@ -111,7 +146,7 @@ view model =
                     , placeholder "계정이름은 반드시 12글자로 입력해주세요"
                     , attribute "required" ""
                     , attribute
-                        (if model.validation then
+                        (if validation then
                             "valid"
                          else
                             "invalid"
@@ -124,21 +159,21 @@ view model =
                 , span
                     [ style
                         [ ( "visibility"
-                          , if String.isEmpty model.accountName then
+                          , if String.isEmpty accountName then
                                 "hidden"
                             else
                                 "visible"
                           )
                         ]
                     ]
-                    [ text model.validationMsg ]
+                    [ text validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
             [ button
                 [ class "middle blue_white button"
                 , attribute
-                    (if model.validation && not model.requestSuccess then
+                    (if validation && not requestSuccess then
                         "enabled"
                      else
                         "disabled"
@@ -149,6 +184,7 @@ view model =
                 ]
                 [ text "다음" ]
             ]
+        , Html.map NotificationMessage (Notification.view notification language)
         ]
 
 

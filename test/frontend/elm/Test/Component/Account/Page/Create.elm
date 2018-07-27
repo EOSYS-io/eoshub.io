@@ -4,16 +4,17 @@ import Expect
 import Http
 import Component.Account.Page.Create exposing (..)
 import Test exposing (..)
+import View.Notification as Notification
 
 
 model : Model
 model =
     { accountName = "testtesttest"
-    , requestStatus = { msg = "" }
     , pubkey = "12o9347512f1oh923"
     , validation = False
     , validationMsg = ""
     , requestSuccess = False
+    , notification = Notification.initModel
     }
 
 

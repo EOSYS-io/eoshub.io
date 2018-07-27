@@ -4,16 +4,17 @@ import Expect
 import Http
 import Component.Account.Page.ConfirmEmail exposing (..)
 import Test exposing (..)
+import View.Notification as Notification
 
 
 model : Model
 model =
     { email = "test@chain.partners"
     , validationMsg = "Please enter an email address."
-    , requestStatus = { msg = "" }
     , requested = False
     , emailValid = False
     , inputValid = "invalid"
+    , notification = Notification.initModel
     }
 
 

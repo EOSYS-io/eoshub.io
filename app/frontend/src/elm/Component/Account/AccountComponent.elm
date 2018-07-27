@@ -26,7 +26,6 @@ import Translation exposing (Language)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import View.Notification as Notification
 
 
 -- MODEL
@@ -46,7 +45,6 @@ type alias Model =
     { page : Page
     , confirmToken : String
     , language : Language
-    , notification : Notification.Model
     }
 
 
@@ -64,14 +62,12 @@ initModel location =
                 { page = page
                 , confirmToken = confirmToken
                 , language = Translation.Korean
-                , notification = Notification.initModel
                 }
 
             _ ->
                 { page = page
                 , confirmToken = ""
                 , language = Translation.Korean
-                , notification = Notification.initModel
                 }
 
 
@@ -87,7 +83,6 @@ type Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
     | OnLocationChange Location
-    | NotificationMessage Notification.Message
 
 
 initCmd : Model -> Cmd Message
@@ -112,12 +107,12 @@ initCmd { page, confirmToken } =
 
 
 view : Model -> Html Message
-view { language, page, notification } =
+view { language, page } =
     let
         newContentHtml =
             case page of
                 ConfirmEmailPage subModel ->
-                    Html.map ConfirmEmailMessage (ConfirmEmail.view subModel)
+                    Html.map ConfirmEmailMessage (ConfirmEmail.view subModel language)
 
                 EmailConfirmedPage subModel ->
                     Html.map EmailConfirmedMessage (EmailConfirmed.view subModel)
@@ -132,15 +127,12 @@ view { language, page, notification } =
                     Html.map CreatedMessage (Created.view subModel)
 
                 CreatePage subModel ->
-                    Html.map CreateMessage (Create.view subModel)
+                    Html.map CreateMessage (Create.view subModel language)
 
                 _ ->
                     NotFound.view language
     in
-        div []
-            [ newContentHtml
-            , Html.map NotificationMessage (Notification.view notification "" language)
-            ]
+        newContentHtml
 
 
 
