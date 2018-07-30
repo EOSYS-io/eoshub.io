@@ -2,7 +2,7 @@ module Component.Account.Page.ConfirmEmail exposing (Message(..), Model, createU
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1, img, a, form, span, node)
 import Html.Attributes exposing (placeholder, class, alt, src, action, href, attribute, type_, rel)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -146,9 +146,8 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
                 [ text "새로운 계정을 만들기 위해 이메일을 인증하세요!    " ]
             , p []
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
-            , form [ action "" ]
-                [ text "        "
-                , input
+            , form [ onSubmit CreateUser ]
+                [ input
                     [ placeholder "example@email.com"
                     , attribute "required" ""
                     , type_ "email"

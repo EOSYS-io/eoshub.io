@@ -1,8 +1,8 @@
 module Component.Account.Page.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
 import Html exposing (Html, button, div, input, li, p, text, ul, ol, h1, img, text, br, form, article, span)
-import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_, style)
-import Html.Events exposing (onClick, onInput)
+import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_, style, action)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -140,7 +140,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                     []
                 , text "ex) eoshuby12345"
                 ]
-            , form []
+            , form [ onSubmit CreateEosAccount ]
                 [ input
                     [ class "account_name"
                     , placeholder "계정이름은 반드시 12글자로 입력해주세요"
