@@ -99,15 +99,33 @@ view { content, open } language =
 messageBox : ( String, String, String ) -> Language -> Html Message
 messageBox ( mainText, classText, detailText ) language =
     div [ class classText ]
-        [ p [] [ text mainText ]
-        , if not (String.isEmpty detailText) then
-            a [] [ text detailText ]
-          else
-            a [] []
-        , button
-            [ type_ "button"
-            , class "icon close button"
-            , onClick CloseNotification
+        (if String.isEmpty detailText then
+            [ messageBoxMainText mainText
+            , messageBoxButton language
             ]
-            [ text (translate language Close) ]
+         else
+            [ messageBoxMainText mainText
+            , messageBoxDetailText detailText
+            , messageBoxButton language
+            ]
+        )
+
+
+messageBoxMainText : String -> Html Message
+messageBoxMainText mainText =
+    p [] [ text mainText ]
+
+
+messageBoxDetailText : String -> Html Message
+messageBoxDetailText detailText =
+    a [] [ text detailText ]
+
+
+messageBoxButton : Language -> Html Message
+messageBoxButton language =
+    button
+        [ type_ "button"
+        , class "icon close button"
+        , onClick CloseNotification
         ]
+        [ text (translate language Close) ]
