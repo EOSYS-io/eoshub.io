@@ -1,9 +1,9 @@
-module Test.Component.Main.Page.Search exposing (..)
+module Test.Data.Account exposing (..)
 
 import Data.Account exposing (..)
 import Expect
 import Json.Decode as JD
-import Component.Main.Page.Search exposing (..)
+import Data.Account exposing (..)
 import Test exposing (..)
 
 
