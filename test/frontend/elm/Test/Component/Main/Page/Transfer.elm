@@ -40,7 +40,7 @@ submitActionTest =
                 ]
     in
         test "SubmitAction" <|
-            \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from")
+            \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from" 300.0)
 
 
 tests : Test
@@ -61,17 +61,27 @@ tests =
                                 , accountValidation = InvalidAccount
                                 , quantityValidation = ValidQuantity
                             }
-                            (setTransferMessageField To "newTo" model)
-                , test "Quantity" <|
+                            (setTransferMessageField To "newTo" model 300.0)
+                , test "Quantity is valid" <|
                     \() ->
                         Expect.equal
                             { model
-                                | transfer = { transfer | quantity = "301" }
+                                | transfer = { transfer | quantity = "0.1" }
                                 , accountValidation = ValidAccount
                                 , quantityValidation = ValidQuantity
                                 , isFormValid = True
                             }
-                            (setTransferMessageField Quantity "301" model)
+                            (setTransferMessageField Quantity "0.1" model 300.0)
+                , test "Quantity is invalid" <|
+                    \() ->
+                        Expect.equal
+                            { model
+                                | transfer = { transfer | quantity = "0.1" }
+                                , accountValidation = ValidAccount
+                                , quantityValidation = InvalidQuantity
+                                , isFormValid = False
+                            }
+                            (setTransferMessageField Quantity "0.1" model 0.0)
                 , test "Memo" <|
                     \() ->
                         Expect.equal
@@ -81,7 +91,7 @@ tests =
                                 , quantityValidation = ValidQuantity
                                 , isFormValid = True
                             }
-                            (setTransferMessageField Memo "newMemo" model)
+                            (setTransferMessageField Memo "newMemo" model 300.0)
                 ]
             )
         ]
