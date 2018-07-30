@@ -15,7 +15,9 @@ type alias Messages =
 
 
 type I18n
-    = Login
+    = EmptyMessage
+    | DebugMessage String
+    | Login
     | NewAccount
     | OpenCloseSidebar
     | Hello
@@ -69,6 +71,9 @@ type I18n
     | UnderConstruction2
     | UnderConstructionDesc1
     | UnderConstructionDesc2
+    | ConfirmEmailSent
+    | AlreadyExistEmail
+    | AccountCreationFailure
 
 
 translate : Language -> I18n -> String
@@ -96,6 +101,18 @@ translate language i18n =
 getMessages : I18n -> Messages
 getMessages i18n =
     case i18n of
+        EmptyMessage ->
+            { korean = ""
+            , english = ""
+            , chinese = ""
+            }
+
+        DebugMessage error ->
+            { korean = error
+            , english = error
+            , chinese = error
+            }
+
         Login ->
             { korean = "로그인"
             , english = "Sign In"
@@ -418,4 +435,22 @@ getMessages i18n =
             { korean = "조금만 기다려주세요!"
             , english = "We appreciate your patience!"
             , chinese = "请各位尽情等待!"
+            }
+
+        ConfirmEmailSent ->
+            { korean = "이메일을 확인해주세요!"
+            , english = "Please check your email!"
+            , chinese = "请检查您的电子邮件！"
+            }
+
+        AlreadyExistEmail ->
+            { korean = "이미 존재하는 이메일입니다."
+            , english = "This email already exists"
+            , chinese = "此电子邮件已存在"
+            }
+
+        AccountCreationFailure ->
+            { korean = "EOS 계정 생성에 실패했습니다."
+            , english = "Failed to create EOS account"
+            , chinese = "无法创建EOS帐户"
             }

@@ -98,7 +98,6 @@ tests =
                                 { page = expectedPage
                                 , confirmToken = confirmToken
                                 , language = Translation.Korean
-                                , notification = Notification.initModel
                                 }
                         in
                             Expect.equal expectedCmd (initCmd model)

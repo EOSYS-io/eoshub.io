@@ -9,7 +9,7 @@ module Util.WalletDecoder
         )
 
 import Dict exposing (Dict, fromList)
-import Translation exposing (I18n(TransferSucceeded, TransferFailed, UnknownError))
+import Translation exposing (I18n(EmptyMessage, DebugMessage, TransferSucceeded, TransferFailed, UnknownError, CheckDetail, CheckError))
 import View.Notification as Notification
 
 
@@ -54,8 +54,8 @@ actionFailMessages =
     fromList [ ( "transfer", TransferFailed ) ]
 
 
-decodePushActionResponse : PushActionResponse -> Notification.Content
-decodePushActionResponse { code, type_, message, action } =
+decodePushActionResponse : PushActionResponse -> String -> Notification.Content
+decodePushActionResponse { code, type_, message, action } i18nParam =
     case code of
         200 ->
             let
@@ -64,13 +64,16 @@ decodePushActionResponse { code, type_, message, action } =
             in
                 case value of
                     Just messageFunction ->
-                        Notification.Ok messageFunction
+                        Notification.Ok
+                            { message = i18nParam |> messageFunction
+                            , detail = CheckDetail
+                            }
 
                     -- This case should not happen!
                     Nothing ->
                         Notification.Error
                             { message = UnknownError
-                            , detail = ""
+                            , detail = CheckError
                             }
 
         _ ->
@@ -82,13 +85,13 @@ decodePushActionResponse { code, type_, message, action } =
                     Just messageFunction ->
                         Notification.Error
                             { message = messageFunction (toString code)
-                            , detail = type_ ++ "\n" ++ message
+                            , detail = DebugMessage (type_ ++ "\n" ++ message)
                             }
 
                     Nothing ->
                         Notification.Error
                             { message = UnknownError
-                            , detail = ""
+                            , detail = CheckError
                             }
 
 
