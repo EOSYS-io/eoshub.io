@@ -1,17 +1,33 @@
 module Component.Main.Sidebar exposing (..)
 
+import Data.Account
+    exposing
+        ( Account
+        , defaultAccount
+        , accountDecoder
+        , getTotalAmount
+        , getUnstakingAmount
+        )
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Http
+import Json.Encode as Encode
 import Navigation
 import Port
 import Translation exposing (Language(..), I18n(..), translate)
+import Util.HttpRequest exposing (getFullPath, post)
 import Util.WalletDecoder
     exposing
         ( Wallet
         , WalletResponse
         , WalletStatus(Authenticated, NotFound)
         , decodeWalletResponse
+        )
+import Util.Formatter
+    exposing
+        ( larimerToEos
+        , eosFloatToString
         )
 
 
@@ -31,6 +47,7 @@ type alias Model =
     , state : State
     , fold : Bool
     , configPanelOpen : Bool
+    , account : Account
     }
 
 
@@ -45,6 +62,7 @@ initModel =
     , state = Loading
     , fold = False
     , configPanelOpen = False
+    , account = defaultAccount
     }
 
 
@@ -63,6 +81,7 @@ type Message
     | ChangeUrl String
     | OpenConfigPanel Bool
     | AndThen Message Message
+    | OnFetchAccount (Result Http.Error Account)
 
 
 
@@ -70,7 +89,7 @@ type Message
 
 
 view : Model -> List (Html Message)
-view { state, wallet, language, fold, configPanelOpen } =
+view ({ state, language } as model) =
     [ header []
         [ h1
             [ style [ ( "cursor", "pointer" ) ]
@@ -94,7 +113,7 @@ view { state, wallet, language, fold, configPanelOpen } =
             pairWalletView language
 
         AccountInfo ->
-            accountInfoView language wallet configPanelOpen
+            accountInfoView model
 
         Loading ->
             loadingView language
@@ -192,9 +211,25 @@ pairWalletView language =
         ]
 
 
-accountInfoView : Language -> Wallet -> Bool -> Html Message
-accountInfoView language { account, authority } configPanelOpen =
+accountInfoView : Model -> Html Message
+accountInfoView { language, wallet, configPanelOpen, account } =
     let
+        { core_liquid_balance, voter_info, refund_request } =
+            account
+
+        totalAmount =
+            getTotalAmount
+                core_liquid_balance
+                voter_info.staked
+                refund_request.net_amount
+                refund_request.cpu_amount
+
+        unstakingAmount =
+            getUnstakingAmount refund_request.net_amount refund_request.cpu_amount
+
+        stakedAmount =
+            eosFloatToString (larimerToEos voter_info.staked)
+
         configPanelClass =
             class
                 ("config_panel"
@@ -207,7 +242,7 @@ accountInfoView language { account, authority } configPanelOpen =
     in
         div [ class "dashboard logged" ]
             [ div [ class "user_status" ]
-                [ h2 [] [ text (account ++ "@" ++ authority) ]
+                [ h2 [] [ text (wallet.account ++ "@" ++ wallet.authority) ]
                 , div
                     [ configPanelClass ]
                     [ button
@@ -225,7 +260,10 @@ accountInfoView language { account, authority } configPanelOpen =
                             [ text (translate language ChangeWallet) ]
                         , a
                             [ style [ ( "cursor", "pointer" ) ]
-                            , onClick (AndThen (OpenConfigPanel False) (ChangeUrl ("search?query=" ++ account)))
+                            , onClick
+                                (AndThen (OpenConfigPanel False)
+                                    (ChangeUrl ("search?query=" ++ wallet.account))
+                                )
                             ]
                             [ text (translate language MyAccount) ]
                         , a
@@ -239,18 +277,18 @@ accountInfoView language { account, authority } configPanelOpen =
             , div [ class "panel" ]
                 [ h3 []
                     [ text (translate language TotalAmount)
-                    , strong [] [ text "1820 EOS" ]
+                    , strong [] [ text totalAmount ]
                     ]
                 , ul [ class "status" ]
                     [ li []
                         [ text
                             (translate language UnstakedAmount)
-                        , strong [] [ text "30 EOS" ]
+                        , strong [] [ text unstakingAmount ]
                         ]
                     , li []
                         [ text
                             (translate language StakedAmount)
-                        , strong [] [ text "10 EOS" ]
+                        , strong [] [ text stakedAmount ]
                         ]
                     ]
                 , div [ class "graph" ] [ span [ style [ ( "width", "50%" ) ], title "50%" ] [] ]
@@ -284,7 +322,7 @@ foldClass folded =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ configPanelOpen, fold } as model) =
+update message ({ fold, wallet } as model) =
     case message of
         AuthenticateAccount ->
             ( model, Port.authenticateAccount () )
@@ -302,7 +340,25 @@ update message ({ configPanelOpen, fold } as model) =
             ( { model | language = language }, Cmd.none )
 
         UpdateState state ->
-            ( { model | state = state }, Cmd.none )
+            let
+                newCmd =
+                    case state of
+                        AccountInfo ->
+                            let
+                                body =
+                                    Encode.object
+                                        [ ( "account_name", Encode.string wallet.account ) ]
+                                        |> Http.jsonBody
+                            in
+                                post (getFullPath "/v1/chain/get_account")
+                                    body
+                                    accountDecoder
+                                    |> (Http.send OnFetchAccount)
+
+                        _ ->
+                            Cmd.none
+            in
+                ( { model | state = state }, newCmd )
 
         UpdateWalletStatus resp ->
             let
@@ -323,7 +379,7 @@ update message ({ configPanelOpen, fold } as model) =
             ( model, Navigation.newUrl url )
 
         OpenConfigPanel bool ->
-            ( { model | configPanelOpen = not configPanelOpen }, Cmd.none )
+            ( { model | configPanelOpen = bool }, Cmd.none )
 
         AndThen firstMessage secondMessage ->
             let
@@ -334,6 +390,12 @@ update message ({ configPanelOpen, fold } as model) =
                     update secondMessage firstModel
             in
                 ( secondModel, Cmd.batch [ firstCmd, secondCmd ] )
+
+        OnFetchAccount (Ok data) ->
+            ( { model | account = data }, Cmd.none )
+
+        OnFetchAccount (Err error) ->
+            ( model, Cmd.none )
 
 
 
