@@ -76,8 +76,8 @@ type Message
 -- TODO(heejae): Consider making nav as a separate component.
 
 
-view : Language -> Model -> Html Message
-view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } =
+view : Language -> Model -> String -> Html Message
+view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
     section [ class "action view panel transfer" ]
         [ nav []
             [ a
@@ -149,7 +149,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                 [ h4 []
                     [ text (translate language TransferableAmount)
                     , br [] []
-                    , strong [] [ text "120 EOS" ]
+                    , strong [] [ text eosLiquidAmount ]
                     ]
                 , Html.form
                     []
@@ -211,18 +211,18 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
 -- UPDATE
 
 
-update : Message -> Model -> String -> ( Model, Cmd Message )
-update message ({ transfer } as model) account =
+update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
+update message ({ transfer } as model) accountName eosLiquidAmount =
     case message of
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = account } |> Action.Transfer |> encodeAction |> Port.pushAction
+                    { transfer | from = accountName } |> Action.Transfer |> encodeAction |> Port.pushAction
             in
                 ( model, cmd )
 
         SetTransferMessageField field value ->
-            ( setTransferMessageField field value model, Cmd.none )
+            ( setTransferMessageField field value model eosLiquidAmount, Cmd.none )
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
@@ -238,25 +238,25 @@ update message ({ transfer } as model) account =
 -- Utility functions.
 
 
-setTransferMessageField : TransferMessageFormField -> String -> Model -> Model
-setTransferMessageField field value ({ transfer } as model) =
+setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> Model
+setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
     case field of
         To ->
-            validate { model | transfer = { transfer | to = value } }
+            validate { model | transfer = { transfer | to = value } } eosLiquidAmount
 
         Quantity ->
-            validate { model | transfer = { transfer | quantity = value } }
+            validate { model | transfer = { transfer | quantity = value } } eosLiquidAmount
 
         Memo ->
-            validate { model | transfer = { transfer | memo = value } }
+            validate { model | transfer = { transfer | memo = value } } eosLiquidAmount
 
 
 
 -- TODO(heejae): Add tests.
 
 
-validate : Model -> Model
-validate ({ transfer } as model) =
+validate : Model -> Float -> Model
+validate ({ transfer } as model) eosLiquidAmount =
     let
         { to, quantity, memo } =
             transfer
@@ -280,9 +280,7 @@ validate ({ transfer } as model) =
                 in
                     case maybeQuantity of
                         Ok quantity ->
-                            if quantity == 0 then
-                                EmptyQuantity
-                            else if quantity > 1000000000 || quantity < 0 then
+                            if quantity > eosLiquidAmount || quantity <= 0 then
                                 InvalidQuantity
                             else
                                 ValidQuantity

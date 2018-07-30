@@ -42,6 +42,7 @@ import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushAction
 import Json.Decode as JD exposing (Decoder)
 import View.Notification as Notification
 import Util.Validation exposing (isAccount, isPublicKey)
+import Util.Formatter exposing (eosStringToFloat)
 
 
 -- MODEL
@@ -174,7 +175,12 @@ view { page, header, notification, sidebar, showUnderConstruction } =
                     Html.map VotingMessage (Voting.view sidebar.language subModel)
 
                 TransferPage subModel ->
-                    Html.map TransferMessage (Transfer.view sidebar.language subModel)
+                    Html.map TransferMessage
+                        (Transfer.view
+                            sidebar.language
+                            subModel
+                            sidebar.account.core_liquid_balance
+                        )
 
                 IndexPage ->
                     Html.map IndexMessage (Index.view sidebar.language)
@@ -286,7 +292,11 @@ update message ({ page, notification, header, sidebar } as model) =
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Transfer.update subMessage subModel sidebar.wallet.account
+                    Transfer.update
+                        subMessage
+                        subModel
+                        sidebar.wallet.account
+                        (eosStringToFloat sidebar.account.core_liquid_balance)
             in
                 ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
