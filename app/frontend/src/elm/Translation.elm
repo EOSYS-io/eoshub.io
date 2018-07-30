@@ -134,13 +134,13 @@ getMessages i18n =
         Hello ->
             { korean = "안녕하세요"
             , english = "Hello"
-            , chinese = "您好!"
+            , chinese = "哈罗!"
             }
 
         WelcomeEosHub ->
             { korean = "이오스 허브입니다"
             , english = "Welcome to EOS Hub"
-            , chinese = "我是eoshub"
+            , chinese = "欢迎使用eoshub"
             }
 
         IfYouHaveEos ->
@@ -158,25 +158,25 @@ getMessages i18n =
         AttachableWallet1 ->
             { korean = "이오스 허브와 연동이"
             , english = "Attachable wallets"
-            , chinese = "能够与eoshub"
+            , chinese = "能够联动的钱包"
             }
 
         AttachableWallet2 ->
             { korean = "가능한 EOS 지갑입니다"
             , english = "for EOS Hub"
-            , chinese = "联动的钱包"
+            , chinese = ""
             }
 
         FurtherUpdate1 ->
             { korean = "추후 업데이트를 통해 연동가능한"
             , english = "Wait for further updates to include"
-            , chinese = "通过更新我们将逐渐扩"
+            , chinese = "通过更新逐渐增加"
             }
 
         FurtherUpdate2 ->
             { korean = "지갑수를 늘려갈 예정이오니 조금만 기다려주세요!"
             , english = "more wallets!"
-            , chinese = "展能够联动的钱包数量"
+            , chinese = "能够联动的钱包数量"
             }
 
         HowToAttach ->
@@ -254,7 +254,7 @@ getMessages i18n =
         TransferDesc ->
             { korean = "여기서 토큰을 보내실 수 있어요"
             , english = "Send tokens here"
-            , chinese = "传送代币"
+            , chinese = "去传送代币"
             }
 
         Vote ->
@@ -266,7 +266,7 @@ getMessages i18n =
         VoteDesc ->
             { korean = "토큰 홀더라면 투표하실 수 있어요"
             , english = "Vote with your EOS"
-            , chinese = "EOS币持有者都可以投票"
+            , chinese = "持有EOS币的用户可以进行投票"
             }
 
         RamMarket ->
@@ -278,7 +278,7 @@ getMessages i18n =
         RamMarketDesc ->
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or sell RAM here"
-            , chinese = "买卖RAM"
+            , chinese = "去买卖RAM"
             }
 
         Application ->
@@ -290,7 +290,7 @@ getMessages i18n =
         ApplicationDesc ->
             { korean = "이오스 기반의 다양한 서비스들을 만나보세요"
             , english = "Meet interesting applications based on EOS"
-            , chinese = "请体验基于EOS的各种各样的应用"
+            , chinese = "请体验各种各样的应用"
             }
 
         ProxyVote ->
@@ -302,7 +302,7 @@ getMessages i18n =
         ProxyVoteDesc ->
             { korean = "맡겨 두시면 대신 투표 해드립니다"
             , english = "Delegate your vote to a proxy"
-            , chinese = "我们能够为您代理投票"
+            , chinese = "我们可以为您代理投票"
             }
 
         Faq ->
@@ -314,7 +314,7 @@ getMessages i18n =
         FaqDesc ->
             { korean = "이오스에 대해 궁금하신 내용들을 정리했어요"
             , english = "All you need to know about EOS Hub"
-            , chinese = "我们总结了有关EOS的常见问题"
+            , chinese = "总结了有关EOS的常见问题"
             }
 
         TransferSucceeded receiver ->
@@ -356,13 +356,13 @@ getMessages i18n =
         TransferInfo1 ->
             { korean = "총 보유수량과 전송가능한 수량은"
             , english = "Total amount and transferable amount can be "
-            , chinese = "在unstaking的过程当中有可能产生代币"
+            , chinese = "在unstaking过程中有可能产生"
             }
 
         TransferInfo2 ->
             { korean = "보관 취소중인 수량에 따라 다를 수 있습니다."
             , english = "different depending on unstaking amounts"
-            , chinese = "的总数量与能够传送的代币数量的误差"
+            , chinese = "代币总数量与可传送代币数量的不一致"
             }
 
         TransferHelp ->
@@ -374,7 +374,7 @@ getMessages i18n =
         TransferableAmount ->
             { korean = "전송 가능한 수량"
             , english = "Transferable amount"
-            , chinese = "能够传送的数量"
+            , chinese = "可传送数量"
             }
 
         CheckAccountName ->
@@ -410,7 +410,7 @@ getMessages i18n =
         MemoNotMandatory ->
             { korean = "필수는 아니에요 :)"
             , english = "Optional :)"
-            , chinese = "不是必填事项 :)"
+            , chinese = "选填"
             }
 
         UnderConstruction1 ->
