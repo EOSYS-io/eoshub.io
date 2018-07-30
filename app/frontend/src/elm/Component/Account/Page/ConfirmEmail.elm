@@ -13,6 +13,7 @@ import Validate exposing (Validator, ifInvalidEmail, ifBlank, validate)
 import Array.Hamt as Array exposing (Array)
 import View.Notification as Notification
 import Translation exposing (Language, toLocale, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
+import Navigation as Navigation
 
 
 -- MODEL
@@ -48,6 +49,7 @@ type Message
     | CreateUser
     | NewUser (Result Http.Error Response)
     | NotificationMessage Notification.Message
+    | ChangeUrl String
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
@@ -125,6 +127,9 @@ update msg ({ notification } as model) flags language =
             , Cmd.none
             )
 
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
+
 
 
 -- VIEW
@@ -175,8 +180,8 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
                 [ text "링크 보내기" ]
             ]
         , p [ class "exist_account" ]
-            [ text "이미 이오스 계정이 있으신가요?    "
-            , a [ href "#" ]
+            [ text "이미 이오스 계정이 있으신가요?"
+            , a [ onClick (ChangeUrl "/") ]
                 [ text "로그인하기" ]
             ]
         , Html.map NotificationMessage (Notification.view notification language)
