@@ -146,7 +146,7 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
                 [ text "새로운 계정을 만들기 위해 이메일을 인증하세요!    " ]
             , p []
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
-            , form [ onSubmit CreateUser, action "" ]
+            , form [ onSubmit CreateUser ]
                 [ input
                     [ placeholder "example@email.com"
                     , attribute "required" ""

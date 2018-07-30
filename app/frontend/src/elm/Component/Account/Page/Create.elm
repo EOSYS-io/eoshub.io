@@ -140,7 +140,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                     []
                 , text "ex) eoshuby12345"
                 ]
-            , form [ onSubmit CreateEosAccount, action "" ]
+            , form [ onSubmit CreateEosAccount ]
                 [ input
                     [ class "account_name"
                     , placeholder "계정이름은 반드시 12글자로 입력해주세요"
