@@ -35,7 +35,7 @@ import Html.Attributes
         )
 import Translation exposing (I18n(..), Language, translate)
 import Http
-import Util.HttpRequest exposing (..)
+import Util.HttpRequest exposing (getFullPath, post)
 import Json.Encode as Encode
 import Data.Action exposing (Action)
 import Data.Account exposing (Account, ResourceInEos, Resource, Refund, accountDecoder, keyAccountsDecoder)
@@ -103,11 +103,6 @@ initCmd query =
         newCmd
 
 
-apiUrl : String
-apiUrl =
-    "https://rpc.eosys.io"
-
-
 
 -- UPDATE
 
@@ -134,12 +129,11 @@ view : Language -> Model -> Html Message
 view language { account } =
     let
         totalAmount =
-            (getTotalAmount
+            getTotalAmount
                 account.core_liquid_balance
                 account.voter_info.staked
                 account.refund_request.net_amount
                 account.refund_request.cpu_amount
-            )
 
         unstakingAmount =
             getUnstakingAmount account.refund_request.net_amount account.refund_request.cpu_amount

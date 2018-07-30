@@ -2,16 +2,12 @@ module Util.HttpRequest exposing (..)
 
 import Http
 import Json.Decode as JD exposing (Decoder)
-
-
-apiUrl : String
-apiUrl =
-    "https://rpc.eosys.io"
+import Util.Urls exposing (mainnetRpcUrl)
 
 
 getFullPath : String -> String
 getFullPath path =
-    apiUrl ++ path
+    mainnetRpcUrl ++ path
 
 
 post : String -> Http.Body -> Decoder a -> Http.Request a

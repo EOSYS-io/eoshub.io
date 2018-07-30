@@ -1,10 +1,10 @@
-module Util.Urls exposing (..)
+module Util.Urls exposing (usersApiUrl, createEosAccountUrl, mainnetRpcUrl)
 
 import Util.Flags exposing (Flags)
 
 
-eoshub_host : Flags -> String
-eoshub_host flags =
+eoshubHost : Flags -> String
+eoshubHost flags =
     if flags.node_env == "development" then
         "http://localhost:3000"
     else if flags.node_env == "test" then
@@ -19,9 +19,14 @@ eoshub_host flags =
 
 usersApiUrl : Flags -> String
 usersApiUrl flags =
-    eoshub_host flags ++ "/users"
+    eoshubHost flags ++ "/users"
 
 
 createEosAccountUrl : ( Flags, String ) -> String
 createEosAccountUrl ( flags, confirmToken ) =
-    eoshub_host flags ++ "/users/" ++ confirmToken ++ "/create_eos_account"
+    eoshubHost flags ++ "/users/" ++ confirmToken ++ "/create_eos_account"
+
+
+mainnetRpcUrl : String
+mainnetRpcUrl =
+    "https://rpc.eosys.io"
