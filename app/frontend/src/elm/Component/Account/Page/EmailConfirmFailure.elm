@@ -2,6 +2,7 @@ module Component.Account.Page.EmailConfirmFailure exposing (Message(..), Model, 
 
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)
+import Translation exposing (Language)
 
 
 -- MODEL
@@ -35,7 +36,7 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view model language =
     div [ class "container join" ]
         [ h1 [] [ text "인증 실패" ] ]

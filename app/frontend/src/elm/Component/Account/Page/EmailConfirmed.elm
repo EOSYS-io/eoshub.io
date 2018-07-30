@@ -4,6 +4,7 @@ import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1
 import Html.Attributes exposing (class, attribute, alt, src, type_)
 import Html.Events exposing (onClick, onInput)
 import Navigation
+import Translation exposing (Language)
 
 
 -- MODEL
@@ -46,8 +47,8 @@ update msg model confirmToken =
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view model language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]

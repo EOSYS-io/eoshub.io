@@ -12,7 +12,7 @@ import Util.Urls as Urls
 import Validate exposing (Validator, ifInvalidEmail, ifBlank, validate)
 import Array.Hamt as Array exposing (Array)
 import View.Notification as Notification
-import Translation exposing (Language, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
+import Translation exposing (Language, toLocale, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
 
 
 -- MODEL
@@ -50,8 +50,8 @@ type Message
     | NotificationMessage Notification.Message
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update msg ({ notification } as model) flags =
+update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
+update msg ({ notification } as model) flags language =
     case msg of
         ValidateEmail email ->
             let
@@ -70,7 +70,7 @@ update msg ({ notification } as model) flags =
                 ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
 
         CreateUser ->
-            ( { model | requested = True }, createUserRequest model flags )
+            ( { model | requested = True }, createUserRequest model flags language )
 
         NewUser (Ok res) ->
             ( { model
@@ -203,14 +203,14 @@ createUserBodyParams model =
         |> Http.jsonBody
 
 
-postUsers : Model -> Flags -> Http.Request Response
-postUsers model flags =
-    Http.post (Urls.usersApiUrl flags) (createUserBodyParams model) responseDecoder
+postUsers : Model -> Flags -> Language -> Http.Request Response
+postUsers model flags language =
+    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) responseDecoder
 
 
-createUserRequest : Model -> Flags -> Cmd Message
-createUserRequest model flags =
-    Http.send NewUser <| postUsers model flags
+createUserRequest : Model -> Flags -> Language -> Cmd Message
+createUserRequest model flags language =
+    Http.send NewUser <| postUsers model flags language
 
 
 

@@ -17,14 +17,14 @@ eoshubHost flags =
         "http://localhost:3000"
 
 
-usersApiUrl : Flags -> String
-usersApiUrl flags =
-    eoshubHost flags ++ "/users"
+usersApiUrl : Flags -> String -> String
+usersApiUrl flags locale =
+    eoshubHost flags ++ "/users?locale=" ++ locale
 
 
-createEosAccountUrl : ( Flags, String ) -> String
-createEosAccountUrl ( flags, confirmToken ) =
-    eoshubHost flags ++ "/users/" ++ confirmToken ++ "/create_eos_account"
+createEosAccountUrl : Flags -> String -> String -> String
+createEosAccountUrl flags confirmToken locale =
+    eoshubHost flags ++ "/users/" ++ confirmToken ++ "/create_eos_account?locale=" ++ locale
 
 
 mainnetRpcUrl : String

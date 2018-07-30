@@ -5,6 +5,7 @@ import Html.Attributes exposing (class, attribute, alt, src, id, type_)
 import Html.Events exposing (onClick)
 import Navigation
 import Port exposing (KeyPair)
+import Translation exposing (Language)
 
 
 -- MODEL
@@ -54,8 +55,8 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view model language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]

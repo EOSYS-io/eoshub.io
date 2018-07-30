@@ -12,7 +12,7 @@ import Util.Urls as Urls
 import Navigation
 import Util.Validation exposing (checkAccountName)
 import View.Notification as Notification
-import Translation exposing (Language, I18n(EmptyMessage, DebugMessage, AccountCreationFailure))
+import Translation exposing (Language, toLocale, I18n(EmptyMessage, DebugMessage, AccountCreationFailure))
 
 
 -- MODEL
@@ -50,8 +50,8 @@ type Message
     | NotificationMessage Notification.Message
 
 
-update : Message -> Model -> Flags -> String -> ( Model, Cmd Message )
-update msg ({ notification } as model) flags confirmToken =
+update : Message -> Model -> Flags -> String -> Language -> ( Model, Cmd Message )
+update msg ({ notification } as model) flags confirmToken language =
     case msg of
         ValidateAccountName accountName ->
             let
@@ -67,7 +67,7 @@ update msg ({ notification } as model) flags confirmToken =
                 ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags confirmToken )
+            ( model, createEosAccountRequest model flags confirmToken language )
 
         NewUser (Ok res) ->
             ( { model | requestSuccess = True }, Navigation.newUrl ("/account/created") )
@@ -211,11 +211,11 @@ createEosAccountBodyParams model =
         |> Http.jsonBody
 
 
-postCreateEosAccount : Model -> Flags -> String -> Http.Request Response
-postCreateEosAccount model flags confirmToken =
+postCreateEosAccount : Model -> Flags -> String -> Language -> Http.Request Response
+postCreateEosAccount model flags confirmToken language =
     let
         url =
-            Urls.createEosAccountUrl ( flags, confirmToken )
+            Urls.createEosAccountUrl flags confirmToken (toLocale language)
 
         params =
             createEosAccountBodyParams model
@@ -223,6 +223,6 @@ postCreateEosAccount model flags confirmToken =
         Http.post url params responseDecoder
 
 
-createEosAccountRequest : Model -> Flags -> String -> Cmd Message
-createEosAccountRequest model flags confirmToken =
-    Http.send NewUser <| postCreateEosAccount model flags confirmToken
+createEosAccountRequest : Model -> Flags -> String -> Language -> Cmd Message
+createEosAccountRequest model flags confirmToken language =
+    Http.send NewUser <| postCreateEosAccount model flags confirmToken language

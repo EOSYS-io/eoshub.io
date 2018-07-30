@@ -1,10 +1,39 @@
-module Translation exposing (Language(Korean, English, Chinese), I18n(..), translate, getMessages)
+module Translation exposing (Language(Korean, English, Chinese), I18n(..), translate, getMessages, toLanguage, toLocale)
 
 
 type Language
     = English
     | Korean
     | Chinese
+
+
+toLanguage : String -> Language
+toLanguage locale =
+    case locale of
+        "ko" ->
+            Korean
+
+        "en" ->
+            English
+
+        "zh-cn" ->
+            Chinese
+
+        _ ->
+            Korean
+
+
+toLocale : Language -> String
+toLocale language =
+    case language of
+        Korean ->
+            "ko"
+
+        English ->
+            "en"
+
+        Chinese ->
+            "zh-cn"
 
 
 type alias Messages =

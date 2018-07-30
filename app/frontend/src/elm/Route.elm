@@ -6,8 +6,8 @@ import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, strin
 
 type Route
     = IndexRoute
-    | ConfirmEmailRoute
-    | EmailConfirmedRoute String (Maybe String)
+    | ConfirmEmailRoute (Maybe String)
+    | EmailConfirmedRoute String (Maybe String) (Maybe String)
     | EmailConfirmFailureRoute
     | CreateKeysRoute
     | CreatedRoute
@@ -23,8 +23,8 @@ matchRoute : Parser (Route -> a) a
 matchRoute =
     oneOf
         [ map IndexRoute top
-        , map ConfirmEmailRoute (s "account" </> s "confirm_email")
-        , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string <?> stringParam "email")
+        , map ConfirmEmailRoute (s "account" </> s "confirm_email" <?> stringParam "locale")
+        , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string <?> stringParam "email" <?> stringParam "locale")
         , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
         , map CreateKeysRoute (s "account" </> s "create_keys")
         , map CreatedRoute (s "account" </> s "created")
