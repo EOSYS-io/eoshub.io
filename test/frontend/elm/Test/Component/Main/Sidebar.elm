@@ -14,7 +14,7 @@ tests =
     describe "Wallet module"
         [ describe "update"
             [ describe "UpdateWalletStatus"
-                [ test "authenticated should change both wallet and state" <|
+                [ test "authenticated should change wallet, state and account" <|
                     \() ->
                         let
                             message =
@@ -33,8 +33,12 @@ tests =
                                         }
                                     , state = AccountInfo
                                 }
+
+                            {- TODO(heejae): Find a way to properly compare Http request commands.
+                               For now, this test handles only expected model
+                            -}
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
+                            Expect.equal expectedModel (Tuple.first (update message initModel))
                 , test "loaded should change state to SignIn" <|
                     \() ->
                         let
@@ -121,12 +125,12 @@ tests =
                 , test "SetConfigPanel" <|
                     \() ->
                         Expect.equal
-                            ( { initModel | configPanelOpen = True }, Cmd.none )
+                            ( { initModel | configPanelOpen = False }, Cmd.none )
                             (update (OpenConfigPanel False) initModel)
                 , test "AndThen" <|
                     \() ->
                         Expect.equal
-                            ( { initModel | configPanelOpen = True, fold = True }
+                            ( { initModel | configPanelOpen = False, fold = True }
                             , Cmd.batch [ Cmd.none, Cmd.none ]
                             )
                             (update (AndThen ToggleSidebar (OpenConfigPanel False)) initModel)
