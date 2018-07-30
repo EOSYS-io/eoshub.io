@@ -14,7 +14,7 @@ tests =
                     Expect.equal
                         { korean = "안녕하세요"
                         , english = "Hello"
-                        , chinese = "您好!"
+                        , chinese = "哈罗!"
                         }
                         (getMessages Hello)
             ]
@@ -24,6 +24,6 @@ tests =
             , test "english" <|
                 \() -> Expect.equal "Hello" (translate English Hello)
             , test "chinese" <|
-                \() -> Expect.equal "您好!" (translate Chinese Hello)
+                \() -> Expect.equal "哈罗!" (translate Chinese Hello)
             ]
         ]
