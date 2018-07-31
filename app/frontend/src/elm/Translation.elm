@@ -103,8 +103,16 @@ type I18n
     | ConfirmEmailSent
     | AlreadyExistEmail
     | AccountCreationFailure
+    | AccountCreationProgressEmail
+    | AccountCreationProgressKeypair
+    | AccountCreationProgressCreateNew
+    | AccountCreationConfirmEmail
+    | AccountCreationClickConfirmLink
     | AccountCreationEmailValid
     | AccountCreationEmailInvalid
+    | AccountCreationEmailSend
+    | AccountCreationAlreadyHaveAccount
+    | AccountCreationLoginLink
 
 
 translate : Language -> I18n -> String
@@ -486,6 +494,36 @@ getMessages i18n =
             , chinese = "无法创建EOS帐户"
             }
 
+        AccountCreationProgressEmail ->
+            { korean = "인증하기"
+            , english = "Email"
+            , chinese = "认证"
+            }
+
+        AccountCreationProgressKeypair ->
+            { korean = "키 생성"
+            , english = "Key pair"
+            , chinese = "密钥生成"
+            }
+
+        AccountCreationProgressCreateNew ->
+            { korean = "계정 생성"
+            , english = "Create New"
+            , chinese = "创建一个帐户"
+            }
+
+        AccountCreationConfirmEmail ->
+            { korean = "새로운 계정을 만들기 위해 이메일을 인증하세요!"
+            , english = "Type in your email address to make a new account!"
+            , chinese = "验证您的电子邮件以创建新帐户！"
+            }
+
+        AccountCreationClickConfirmLink ->
+            { korean = "받으신 메일의 링크를 클릭해주세요."
+            , english = "Confirm by clicking the link in the email you receive"
+            , chinese = "单击您收到的电子邮件中的链接进行确认"
+            }
+
         AccountCreationEmailValid ->
             { korean = "올바른 이메일 주소입니다."
             , english = "Valid email address"
@@ -496,4 +534,22 @@ getMessages i18n =
             { korean = "잘못된 이메일 주소입니다."
             , english = "Invalid email address"
             , chinese = "电子邮件地址无效。"
+            }
+
+        AccountCreationEmailSend ->
+            { korean = "링크 보내기"
+            , english = "Send Link"
+            , chinese = "发送链接"
+            }
+
+        AccountCreationAlreadyHaveAccount ->
+            { korean = "이미 이오스 계정이 있으신가요?"
+            , english = "Already have an EOS account?"
+            , chinese = "已经有一个eos帐户？"
+            }
+
+        AccountCreationLoginLink ->
+            { korean = "로그인하기"
+            , english = "Sign in"
+            , chinese = "签到"
             }

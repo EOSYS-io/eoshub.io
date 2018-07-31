@@ -11,7 +11,27 @@ import Util.Flags exposing (Flags)
 import Util.Urls as Urls
 import Validate exposing (isValidEmail)
 import View.Notification as Notification
-import Translation exposing (Language, toLocale, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage, AccountCreationEmailValid, AccountCreationEmailInvalid))
+import Translation
+    exposing
+        ( Language
+        , toLocale
+        , I18n
+            ( EmptyMessage
+            , ConfirmEmailSent
+            , AlreadyExistEmail
+            , DebugMessage
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationConfirmEmail
+            , AccountCreationClickConfirmLink
+            , AccountCreationEmailValid
+            , AccountCreationEmailInvalid
+            , AccountCreationEmailSend
+            , AccountCreationAlreadyHaveAccount
+            , AccountCreationLoginLink
+            )
+        )
 import Navigation as Navigation
 import View.I18nViews exposing (textViewI18n)
 
@@ -166,17 +186,17 @@ view ({ validationMsg, requested, emailValid, inputValid, notification } as mode
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "ing" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li []
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li []
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "1" ]
             [ h1 []
-                [ text "새로운 계정을 만들기 위해 이메일을 인증하세요!    " ]
+                [ textViewI18n language AccountCreationConfirmEmail ]
             , p []
-                [ text "받으신 메일의 링크를 클릭해주세요." ]
+                [ textViewI18n language AccountCreationClickConfirmLink ]
             , form [ onSubmit CreateUser ]
                 (emailForm model language)
             ]
@@ -193,12 +213,12 @@ view ({ validationMsg, requested, emailValid, inputValid, notification } as mode
                 , type_ "button"
                 , onClick CreateUser
                 ]
-                [ text "링크 보내기" ]
+                [ textViewI18n language AccountCreationEmailSend ]
             ]
         , p [ class "exist_account" ]
-            [ text "이미 이오스 계정이 있으신가요?"
+            [ textViewI18n language AccountCreationAlreadyHaveAccount
             , a [ onClick (ChangeUrl "/") ]
-                [ text "로그인하기" ]
+                [ textViewI18n language AccountCreationLoginLink ]
             ]
         , Html.map NotificationMessage (Notification.view notification language)
         ]
