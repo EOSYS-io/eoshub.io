@@ -133,29 +133,17 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     span [] []
 
             quantityWarning =
-                let
-                    ( classValue, textValue ) =
-                        case quantityValidation of
-                            InvalidQuantity ->
-                                ( "warning"
-                                , translate language InvalidAmount
-                                )
-
-                            OverTransferableQuantity ->
-                                ( "warning"
-                                , translate language OverTransferableAmount
-                                )
-
-                            _ ->
-                                ( "", "" )
-                in
-                    span [ class classValue ] [ text textValue ]
+                quantityWarningView quantityValidation language
 
             memoWarning =
-                if memoValidation == MemoTooLong then
-                    span [] [ text (translate language Translation.MemoTooLong) ]
-                else
-                    span [] [ text (translate language MemoNotMandatory) ]
+                span []
+                    [ case memoValidation of
+                        MemoTooLong ->
+                            text (translate language Translation.MemoTooLong)
+
+                        _ ->
+                            text (translate language MemoNotMandatory)
+                    ]
           in
             div
                 [ class "card" ]
@@ -218,6 +206,27 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     ]
                 ]
         ]
+
+
+quantityWarningView : QuantityStatus -> Language -> Html Message
+quantityWarningView quantityStatus language =
+    let
+        ( classValue, textValue ) =
+            case quantityStatus of
+                InvalidQuantity ->
+                    ( "warning"
+                    , translate language InvalidAmount
+                    )
+
+                OverTransferableQuantity ->
+                    ( "warning"
+                    , translate language OverTransferableAmount
+                    )
+
+                _ ->
+                    ( "", "" )
+    in
+        span [ class classValue ] [ text textValue ]
 
 
 
