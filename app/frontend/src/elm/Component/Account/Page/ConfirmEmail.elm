@@ -9,11 +9,11 @@ import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
-import Validate exposing (Validator, ifInvalidEmail, ifBlank, validate)
-import Array.Hamt as Array exposing (Array)
+import Validate exposing (isValidEmail)
 import View.Notification as Notification
-import Translation exposing (Language, toLocale, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
+import Translation exposing (Language, toLocale, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage, AccountCreationEmailValid, AccountCreationEmailInvalid))
 import Navigation as Navigation
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -21,7 +21,7 @@ import Navigation as Navigation
 
 type alias Model =
     { email : String
-    , validationMsg : String
+    , validationMsg : I18n
     , requested : Bool
     , emailValid : Bool
     , inputValid : String
@@ -32,7 +32,7 @@ type alias Model =
 initModel : Model
 initModel =
     { email = ""
-    , validationMsg = "Please enter an email address."
+    , validationMsg = EmptyMessage
     , requested = False
     , emailValid = False
     , inputValid = "invalid"
@@ -61,7 +61,10 @@ update msg ({ notification } as model) flags language =
                     { model | email = email }
 
                 ( validationMsg, emailValid ) =
-                    validation newModel
+                    if String.isEmpty email then
+                        ( EmptyMessage, False )
+                    else
+                        validation newModel
 
                 inputValid =
                     if emailValid then
@@ -135,8 +138,31 @@ update msg ({ notification } as model) flags language =
 -- VIEW
 
 
+emailInput : Model -> Html Message
+emailInput { inputValid } =
+    input
+        [ placeholder "example@email.com"
+        , attribute "required" ""
+        , type_ "email"
+        , attribute inputValid ""
+        , onInput ValidateEmail
+        ]
+        []
+
+
+emailForm : Model -> Language -> List (Html Message)
+emailForm ({ inputValid, validationMsg } as model) language =
+    if validationMsg == EmptyMessage then
+        [ emailInput model ]
+    else
+        [ emailInput model
+        , span [ class "validate" ]
+            [ textViewI18n language validationMsg ]
+        ]
+
+
 view : Model -> Language -> Html Message
-view { validationMsg, requested, emailValid, inputValid, notification } language =
+view ({ validationMsg, requested, emailValid, inputValid, notification } as model) language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "ing" ]
@@ -152,17 +178,7 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
             , p []
                 [ text "받으신 메일의 링크를 클릭해주세요." ]
             , form [ onSubmit CreateUser ]
-                [ input
-                    [ placeholder "example@email.com"
-                    , attribute "required" ""
-                    , type_ "email"
-                    , attribute inputValid ""
-                    , onInput ValidateEmail
-                    ]
-                    []
-                , span [ class "validate" ]
-                    [ text validationMsg ]
-                ]
+                (emailForm model language)
             ]
         , div [ class "btn_area" ]
             [ button
@@ -222,21 +238,9 @@ createUserRequest model flags language =
 -- VALIDATION
 
 
-modelValidator : Validator String Model
-modelValidator =
-    Validate.all
-        [ Validate.firstError
-            [ ifBlank .email "이메일을 입력해주세요."
-            , ifInvalidEmail .email (\_ -> "잘못된 이메일 주소입니다.")
-            ]
-        ]
-
-
-validation : Model -> ( String, Bool )
-validation model =
-    case Array.get 0 (Array.fromList (validate modelValidator model)) of
-        Nothing ->
-            ( "올바른 이메일 주소입니다.", True )
-
-        Just msg ->
-            ( msg, False )
+validation : Model -> ( I18n, Bool )
+validation { email } =
+    if isValidEmail email then
+        ( AccountCreationEmailValid, True )
+    else
+        ( AccountCreationEmailInvalid, False )

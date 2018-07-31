@@ -103,6 +103,8 @@ type I18n
     | ConfirmEmailSent
     | AlreadyExistEmail
     | AccountCreationFailure
+    | AccountCreationEmailValid
+    | AccountCreationEmailInvalid
 
 
 translate : Language -> I18n -> String
@@ -482,4 +484,16 @@ getMessages i18n =
             { korean = "EOS 계정 생성에 실패했습니다."
             , english = "Failed to create EOS account"
             , chinese = "无法创建EOS帐户"
+            }
+
+        AccountCreationEmailValid ->
+            { korean = "올바른 이메일 주소입니다."
+            , english = "Valid email address"
+            , chinese = "这是一个有效的电子邮件地址。"
+            }
+
+        AccountCreationEmailInvalid ->
+            { korean = "잘못된 이메일 주소입니다."
+            , english = "Invalid email address"
+            , chinese = "电子邮件地址无效。"
             }
