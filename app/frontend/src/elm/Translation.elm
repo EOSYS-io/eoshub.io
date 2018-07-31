@@ -117,6 +117,11 @@ type I18n
     | ClickNext
     | Next
     | AccountCreationEmailConfirmFailure
+    | AccountCreationKeypairGenerated
+    | AccountCreationKeypairCaution
+    | PublicKey
+    | PrivateKey
+    | CopyAll
 
 
 translate : Language -> I18n -> String
@@ -580,4 +585,34 @@ getMessages i18n =
             { korean = "이메일 인증 실패"
             , english = "Failed to confirm email"
             , chinese = "电子邮件验证失败"
+            }
+
+        AccountCreationKeypairGenerated ->
+            { korean = "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!"
+            , english = "A key pair is generated. Please copy and save!"
+            , chinese = "我做了一对钥匙。 确保将其复制到安全的地方！"
+            }
+
+        AccountCreationKeypairCaution ->
+            { korean = "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
+            , english = "Make sure you save the key pair somewhere safe! It is used to verify your account."
+            , chinese = "确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
+            }
+
+        PublicKey ->
+            { korean = "공개 키"
+            , english = "Public Key"
+            , chinese = "公钥"
+            }
+
+        PrivateKey ->
+            { korean = "개인 키"
+            , english = "Private Key"
+            , chinese = "私钥"
+            }
+
+        CopyAll ->
+            { korean = "한 번에 복사하기"
+            , english = "Copy All"
+            , chinese = "立即复制"
             }

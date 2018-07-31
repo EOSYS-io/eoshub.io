@@ -5,7 +5,21 @@ import Html.Attributes exposing (class, attribute, alt, src, id, type_)
 import Html.Events exposing (onClick)
 import Navigation
 import Port exposing (KeyPair)
-import Translation exposing (Language)
+import View.I18nViews exposing (textViewI18n)
+import Translation
+    exposing
+        ( Language
+        , I18n
+            ( AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationKeypairGenerated
+            , AccountCreationKeypairCaution
+            , PublicKey
+            , PrivateKey
+            , CopyAll
+            )
+        )
 
 
 -- MODEL
@@ -60,31 +74,31 @@ view model language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li [ class "ing" ]
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li []
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "3" ]
             [ h1 []
-                [ text "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!    " ]
+                [ textViewI18n language AccountCreationKeypairGenerated ]
             , p []
-                [ text "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!" ]
+                [ textViewI18n language AccountCreationKeypairCaution ]
             , dl [ class "keybox" ]
                 [ dt []
-                    [ text "공개 키" ]
+                    [ textViewI18n language PublicKey ]
                 , dd []
                     [ text model.keys.publicKey ]
                 , dt []
-                    [ text "개인 키" ]
+                    [ textViewI18n language PrivateKey ]
                 , dd []
                     [ text model.keys.privateKey ]
                 ]
             , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
                 [ text ("PublicKey:" ++ model.keys.publicKey ++ "\nPrivateKey:" ++ model.keys.privateKey) ]
             , button [ class "button middle copy blue_white", id "copy", type_ "button", onClick Copy ]
-                [ text "한번에 복사하기" ]
+                [ textViewI18n language CopyAll ]
             ]
         , div [ class "btn_area" ]
             [ button
@@ -100,7 +114,7 @@ view model language =
                 , type_ "button"
                 , onClick Next
                 ]
-                [ text "다음" ]
+                [ textViewI18n language Translation.Next ]
             ]
         ]
 
