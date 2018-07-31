@@ -26,6 +26,26 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
+    active_material (1.4.2)
+    activeadmin (1.3.0)
+      arbre (>= 1.1.1)
+      coffee-rails
+      formtastic (~> 3.1)
+      formtastic_i18n
+      inherited_resources (>= 1.7.0)
+      jquery-rails (>= 4.2.0)
+      kaminari (>= 0.15)
+      railties (>= 4.2, < 5.3)
+      ransack (~> 1.3)
+      sass (~> 3.1)
+      sprockets (< 4.1)
+    activeadmin_addons (1.6.0)
+      active_material
+      railties
+      require_all (~> 1.5)
+      sass-rails
+      select2-rails (~> 4.0)
+      xdan-datetimepicker-rails (~> 2.5.1)
     activejob (5.2.0)
       activesupport (= 5.2.0)
       globalid (>= 0.3.6)
@@ -49,9 +69,16 @@ GEM
     annotate (2.7.4)
       activerecord (>= 3.2, < 6.0)
       rake (>= 10.4, < 13.0)
+    arbre (1.1.1)
+      activesupport (>= 3.0.0)
     archive-zip (0.11.0)
       io-like (~> 0.3.0)
+    arctic_admin (1.5.0)
+      activeadmin (>= 1.1.0, < 2.0)
+      font-awesome-rails
+      jquery-rails
     arel (9.0.0)
+    bcrypt (3.1.12)
     bindex (0.5.0)
     bootsnap (1.3.0)
       msgpack (~> 1.0)
@@ -73,8 +100,21 @@ GEM
     chromedriver-helper (1.2.0)
       archive-zip (~> 0.10)
       nokogiri (~> 1.8)
+    coffee-rails (4.2.2)
+      coffee-script (>= 2.2.0)
+      railties (>= 4.0.0)
+    coffee-script (2.4.1)
+      coffee-script-source
+      execjs
+    coffee-script-source (1.12.2)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
+    devise (4.4.3)
+      bcrypt (~> 3.0)
+      orm_adapter (~> 0.1)
+      railties (>= 4.1.0, < 6.0)
+      responders
+      warden (~> 1.2.3)
     dotenv (2.5.0)
     dotenv-rails (2.5.0)
       dotenv (= 2.5.0)
@@ -84,14 +124,43 @@ GEM
       ffi (>= 1.3.0)
     execjs (2.7.0)
     ffi (1.9.25)
+    font-awesome-rails (4.7.0.4)
+      railties (>= 3.2, < 6.0)
+    formtastic (3.1.5)
+      actionpack (>= 3.2.13)
+    formtastic_i18n (0.6.0)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
+    has_scope (0.7.2)
+      actionpack (>= 4.1)
+      activesupport (>= 4.1)
     i18n (1.0.1)
       concurrent-ruby (~> 1.0)
+    inherited_resources (1.8.0)
+      actionpack (>= 4.2, <= 5.2)
+      has_scope (~> 0.6)
+      railties (>= 4.2, <= 5.2)
+      responders
     io-like (0.3.0)
     jbuilder (2.7.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
+    jquery-rails (4.3.3)
+      rails-dom-testing (>= 1, < 3)
+      railties (>= 4.2.0)
+      thor (>= 0.14, < 2.0)
+    kaminari (1.1.1)
+      activesupport (>= 4.1.0)
+      kaminari-actionview (= 1.1.1)
+      kaminari-activerecord (= 1.1.1)
+      kaminari-core (= 1.1.1)
+    kaminari-actionview (1.1.1)
+      actionview
+      kaminari-core (= 1.1.1)
+    kaminari-activerecord (1.1.1)
+      activerecord
+      kaminari-core (= 1.1.1)
+    kaminari-core (1.1.1)
     launchy (2.4.3)
       addressable (~> 2.3)
     letter_opener (1.6.0)
@@ -118,7 +187,10 @@ GEM
     nio4r (2.3.1)
     nokogiri (1.8.3)
       mini_portile2 (~> 2.3.0)
+    orm_adapter (0.5.0)
     pg (1.0.0)
+    polyamorous (1.3.3)
+      activerecord (>= 3.0)
     public_suffix (3.0.2)
     puma (3.11.4)
     rack (2.0.5)
@@ -151,9 +223,19 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.18.1, < 2.0)
     rake (12.3.1)
+    ransack (1.8.8)
+      actionpack (>= 3.0)
+      activerecord (>= 3.0)
+      activesupport (>= 3.0)
+      i18n
+      polyamorous (~> 1.3.2)
     rb-fsevent (0.10.3)
     rb-inotify (0.9.10)
       ffi (>= 0.5.0, < 2)
+    require_all (1.5.0)
+    responders (2.4.0)
+      actionpack (>= 4.2.0, < 5.3)
+      railties (>= 4.2.0, < 5.3)
     ruby_dep (1.5.0)
     rubyzip (1.2.1)
     sass (3.5.6)
@@ -167,6 +249,8 @@ GEM
       sprockets (>= 2.8, < 4.0)
       sprockets-rails (>= 2.0, < 4.0)
       tilt (>= 1.1, < 3)
+    select2-rails (4.0.3)
+      thor (~> 0.14)
     selenium-webdriver (3.13.0)
       childprocess (~> 0.5)
       rubyzip (~> 1.2)
@@ -191,6 +275,8 @@ GEM
       thread_safe (~> 0.1)
     uglifier (4.1.12)
       execjs (>= 0.3.0, < 3)
+    warden (1.2.7)
+      rack (>= 1.0)
     web-console (3.6.2)
       actionview (>= 5.0)
       activemodel (>= 5.0)
@@ -203,6 +289,9 @@ GEM
     websocket-driver (0.7.0)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.3)
+    xdan-datetimepicker-rails (2.5.4)
+      jquery-rails
+      rails (>= 3.2.16)
     xpath (3.1.0)
       nokogiri (~> 1.8)
 
@@ -211,12 +300,16 @@ PLATFORMS
 
 DEPENDENCIES
   aasm
+  activeadmin
+  activeadmin_addons
   annotate
+  arctic_admin
   bootsnap (>= 1.1.0)
   browserify-rails
   byebug
   capybara (>= 2.15, < 4.0)
   chromedriver-helper
+  devise
   dotenv-rails
   jbuilder (~> 2.5)
   letter_opener
