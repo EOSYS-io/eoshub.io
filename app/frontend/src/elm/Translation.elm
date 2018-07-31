@@ -113,6 +113,9 @@ type I18n
     | AccountCreationEmailSend
     | AccountCreationAlreadyHaveAccount
     | AccountCreationLoginLink
+    | AccountCreationEmailConfirmed
+    | ClickNext
+    | Next
 
 
 translate : Language -> I18n -> String
@@ -552,4 +555,22 @@ getMessages i18n =
             { korean = "로그인하기"
             , english = "Sign in"
             , chinese = "签到"
+            }
+
+        AccountCreationEmailConfirmed ->
+            { korean = "이메일 인증완료!"
+            , english = "Email Confirmed!"
+            , chinese = "电子邮件已确认！"
+            }
+
+        ClickNext ->
+            { korean = "다음으로 넘어가주세요"
+            , english = "Click Next"
+            , chinese = "点击下一步"
+            }
+
+        Next ->
+            { korean = "다음"
+            , english = "Next"
+            , chinese = "下一个"
             }

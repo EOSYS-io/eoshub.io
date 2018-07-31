@@ -4,7 +4,18 @@ import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1
 import Html.Attributes exposing (class, attribute, alt, src, type_)
 import Html.Events exposing (onClick, onInput)
 import Navigation
-import Translation exposing (Language)
+import Translation
+    exposing
+        ( Language
+        , I18n
+            ( AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationEmailConfirmed
+            , ClickNext
+            )
+        )
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -52,22 +63,22 @@ view model language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li []
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li []
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "2" ]
             [ h1 []
-                [ text "이메일 인증완료!    " ]
+                [ textViewI18n language AccountCreationEmailConfirmed ]
             , p []
-                [ text "다음으로 넘어가주세요" ]
+                [ textViewI18n language ClickNext ]
             , h2 []
                 [ text model.email ]
             ]
         , div [ class "btn_area" ]
             [ button [ class "middle white_blue next button", type_ "button", onClick Next ]
-                [ text "다음" ]
+                [ textViewI18n language Translation.Next ]
             ]
         ]
