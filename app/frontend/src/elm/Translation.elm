@@ -128,6 +128,10 @@ type I18n
     | AccountCreationNameCondition
     | AccountCreationNameConditionExample
     | AccountCreationNamePlaceholder
+    | AccountCreationCongratulation
+    | AccountCreationWelcome
+    | AccountCreationYouCanSignIn
+    | AccountCreationGoHome
 
 
 translate : Language -> I18n -> String
@@ -657,4 +661,28 @@ getMessages i18n =
             { korean = "계정이름은 반드시 12글자로 입력해주세요"
             , english = "Type in 12 characters"
             , chinese = "帐户名称必须为12个字符"
+            }
+
+        AccountCreationCongratulation ->
+            { korean = "축하합니다! 새로운 계정을 만들었어요!"
+            , english = "Congratulations! A new account is created!"
+            , chinese = "恭喜！ 我创建了一个新帐户！"
+            }
+
+        AccountCreationWelcome ->
+            { korean = "정식 주민이 된 것을 환영합니다!"
+            , english = "Welcome aboard to EOS blockchain!"
+            , chinese = "欢迎登陆EOS区块链！"
+            }
+
+        AccountCreationYouCanSignIn ->
+            { korean = "이제 홈에서 로그인하실 수 있어요!"
+            , english = "Now you can Sign In!"
+            , chinese = "现在你可以登录了！"
+            }
+
+        AccountCreationGoHome ->
+            { korean = "홈 화면 바로가기"
+            , english = "Go Home"
+            , chinese = "回家"
             }
