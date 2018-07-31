@@ -2,7 +2,8 @@ module Component.Account.Page.EmailConfirmFailure exposing (Message(..), Model, 
 
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)
-import Translation exposing (Language)
+import Translation exposing (Language, I18n(AccountCreationEmailConfirmFailure))
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -39,4 +40,4 @@ update msg model =
 view : Model -> Language -> Html Message
 view model language =
     div [ class "container join" ]
-        [ h1 [] [ text "인증 실패" ] ]
+        [ h1 [] [ textViewI18n language AccountCreationEmailConfirmFailure ] ]

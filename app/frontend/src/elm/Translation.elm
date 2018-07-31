@@ -116,6 +116,7 @@ type I18n
     | AccountCreationEmailConfirmed
     | ClickNext
     | Next
+    | AccountCreationEmailConfirmFailure
 
 
 translate : Language -> I18n -> String
@@ -573,4 +574,10 @@ getMessages i18n =
             { korean = "다음"
             , english = "Next"
             , chinese = "下一个"
+            }
+
+        AccountCreationEmailConfirmFailure ->
+            { korean = "이메일 인증 실패"
+            , english = "Failed to confirm email"
+            , chinese = "电子邮件验证失败"
             }
