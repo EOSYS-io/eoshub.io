@@ -122,6 +122,12 @@ type I18n
     | PublicKey
     | PrivateKey
     | CopyAll
+    | AccountCreationNameValid
+    | AccountCreationNameInvalid
+    | AccountCreationTypeName
+    | AccountCreationNameCondition
+    | AccountCreationNameConditionExample
+    | AccountCreationNamePlaceholder
 
 
 translate : Language -> I18n -> String
@@ -615,4 +621,40 @@ getMessages i18n =
             { korean = "한 번에 복사하기"
             , english = "Copy All"
             , chinese = "立即复制"
+            }
+
+        AccountCreationNameValid ->
+            { korean = "가능한 계정이에요"
+            , english = "Available"
+            , chinese = "这是一个可能的帐户。"
+            }
+
+        AccountCreationNameInvalid ->
+            { korean = "불가능한 계정이에요"
+            , english = "Unavailable"
+            , chinese = "这是一个不可能的帐户。"
+            }
+
+        AccountCreationTypeName ->
+            { korean = "원하는 계정의 이름을 입력해주세요!"
+            , english = "Type in the name of your account!"
+            , chinese = "请输入您想要的帐户名称！"
+            }
+
+        AccountCreationNameCondition ->
+            { korean = "계정명은 1~5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다!"
+            , english = "An account name can contain lowercase english characters or numbers 1~5, in total 12 characters :)"
+            , chinese = "帐户名称是1到5之间的数字和英文小写字母的组合，只有12个字母！"
+            }
+
+        AccountCreationNameConditionExample ->
+            { korean = "(예시: eoshuby12345)"
+            , english = "ex) eoshuby12345"
+            , chinese = "(示例：eoshuby12345)"
+            }
+
+        AccountCreationNamePlaceholder ->
+            { korean = "계정이름은 반드시 12글자로 입력해주세요"
+            , english = "Type in 12 characters"
+            , chinese = "帐户名称必须为12个字符"
             }
