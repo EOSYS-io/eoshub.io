@@ -31,6 +31,7 @@ type AccountStatus
 
 type QuantityStatus
     = EmptyQuantity
+    | OverTransferableQuantity
     | InvalidQuantity
     | ValidQuantity
 
@@ -132,11 +133,23 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     span [] []
 
             quantityWarning =
-                if quantityValidation == InvalidQuantity then
-                    span [ class "warning" ]
-                        [ text (translate language OverTransferableAmount) ]
-                else
-                    span [] []
+                let
+                    ( classValue, textValue ) =
+                        case quantityValidation of
+                            InvalidQuantity ->
+                                ( "warning"
+                                , translate language InvalidAmount
+                                )
+
+                            OverTransferableQuantity ->
+                                ( "warning"
+                                , translate language OverTransferableAmount
+                                )
+
+                            _ ->
+                                ( "", "" )
+                in
+                    span [ class classValue ] [ text textValue ]
 
             memoWarning =
                 if memoValidation == MemoTooLong then
@@ -280,8 +293,10 @@ validate ({ transfer } as model) eosLiquidAmount =
                 in
                     case maybeQuantity of
                         Ok quantity ->
-                            if quantity > eosLiquidAmount || quantity <= 0 then
+                            if quantity <= 0 then
                                 InvalidQuantity
+                            else if quantity > eosLiquidAmount then
+                                OverTransferableQuantity
                             else
                                 ValidQuantity
 

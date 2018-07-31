@@ -63,6 +63,7 @@ type I18n
     | TransferableAmount
     | CheckAccountName
     | ReceiverAccountName
+    | InvalidAmount
     | OverTransferableAmount
     | Memo
     | MemoTooLong
@@ -387,6 +388,12 @@ getMessages i18n =
             { korean = "받는 계정"
             , english = "Receiver's Account Name"
             , chinese = "接受账户"
+            }
+
+        InvalidAmount ->
+            { korean = "유효하지 않은 수량입니다."
+            , english = "Invalid amount!"
+            , chinese = "金额无效"
             }
 
         OverTransferableAmount ->
