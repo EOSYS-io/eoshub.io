@@ -11,7 +11,6 @@ import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
 import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Test exposing (..)
 import Translation
-import View.Notification as Notification
 import Route
 
 
@@ -43,14 +42,14 @@ tests =
         describe "Page module"
             [ describe "getPage"
                 [ test "ConfirmEmailRoute" <|
-                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel) (getPage Route.ConfirmEmailRoute)
+                    \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel) (Just "ko" |> Route.ConfirmEmailRoute |> getPage)
                 , test "EmailConfirmedRoute" <|
                     \() ->
                         let
                             email =
                                 Just "test@chain.partners"
                         in
-                            Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel email)) (getPage (Route.EmailConfirmedRoute confirmToken email))
+                            Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel email)) (Just "ko" |> Route.EmailConfirmedRoute confirmToken email |> getPage)
                 , test "EmailConfirmFailureRoute" <|
                     \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel) (getPage Route.EmailConfirmFailureRoute)
                 , test "CreateKeysRoute" <|

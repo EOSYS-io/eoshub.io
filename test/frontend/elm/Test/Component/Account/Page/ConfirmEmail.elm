@@ -5,12 +5,13 @@ import Http
 import Component.Account.Page.ConfirmEmail exposing (..)
 import Test exposing (..)
 import View.Notification as Notification
+import Translation exposing (I18n(EmptyMessage))
 
 
 model : Model
 model =
     { email = "test@chain.partners"
-    , validationMsg = "Please enter an email address."
+    , validationMsg = EmptyMessage
     , requested = False
     , emailValid = False
     , inputValid = "invalid"
