@@ -24,7 +24,6 @@ import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Component.Main.Page.NotFound as NotFound
 import Translation exposing (Language)
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (Language, toLanguage)
 import Util.Flags exposing (Flags)
 
 
@@ -48,6 +47,16 @@ type alias Model =
     }
 
 
+toLanguage : Maybe String -> Language
+toLanguage maybeLocale =
+    case maybeLocale of
+        Just locale ->
+            Translation.toLanguage locale
+
+        Nothing ->
+            Translation.Korean
+
+
 initModel : Location -> Model
 initModel location =
     let
@@ -59,34 +68,16 @@ initModel location =
     in
         case route of
             ConfirmEmailRoute maybeLocale ->
-                let
-                    language =
-                        case maybeLocale of
-                            Just locale ->
-                                toLanguage locale
-
-                            Nothing ->
-                                Translation.Korean
-                in
-                    { page = page
-                    , confirmToken = ""
-                    , language = language
-                    }
+                { page = page
+                , confirmToken = ""
+                , language = toLanguage maybeLocale
+                }
 
             EmailConfirmedRoute confirmToken email maybeLocale ->
-                let
-                    language =
-                        case maybeLocale of
-                            Just locale ->
-                                toLanguage locale
-
-                            Nothing ->
-                                Translation.Korean
-                in
-                    { page = page
-                    , confirmToken = confirmToken
-                    , language = language
-                    }
+                { page = page
+                , confirmToken = confirmToken
+                , language = toLanguage maybeLocale
+                }
 
             _ ->
                 { page = page
