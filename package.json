@@ -17,6 +17,7 @@
     "elm-test": "^0.18.12",
     "elm-webpack-loader": "^4.5.0",
     "eosjs": "^15.0.3",
+    "eosjs-ecc": "^4.0.2",
     "es6-promise": "^4.2.4",
     "eslint": "^5.0.1",
     "eslint-config-airbnb-base": "^13.0.0",
