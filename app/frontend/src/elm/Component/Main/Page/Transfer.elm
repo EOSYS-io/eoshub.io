@@ -264,10 +264,6 @@ setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
             validate { model | transfer = { transfer | memo = value } } eosLiquidAmount
 
 
-
--- TODO(heejae): Add tests.
-
-
 validate : Model -> Float -> Model
 validate ({ transfer } as model) eosLiquidAmount =
     let
