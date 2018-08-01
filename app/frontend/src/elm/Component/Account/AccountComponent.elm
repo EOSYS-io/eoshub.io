@@ -24,7 +24,6 @@ import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Component.Main.Page.NotFound as NotFound
 import Translation exposing (Language)
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 
 
@@ -48,6 +47,16 @@ type alias Model =
     }
 
 
+toLanguage : Maybe String -> Language
+toLanguage maybeLocale =
+    case maybeLocale of
+        Just locale ->
+            Translation.toLanguage locale
+
+        Nothing ->
+            Translation.Korean
+
+
 initModel : Location -> Model
 initModel location =
     let
@@ -58,10 +67,16 @@ initModel location =
             getPage route
     in
         case route of
-            EmailConfirmedRoute confirmToken email ->
+            ConfirmEmailRoute maybeLocale ->
+                { page = page
+                , confirmToken = ""
+                , language = toLanguage maybeLocale
+                }
+
+            EmailConfirmedRoute confirmToken email maybeLocale ->
                 { page = page
                 , confirmToken = confirmToken
-                , language = Translation.Korean
+                , language = toLanguage maybeLocale
                 }
 
             _ ->
@@ -115,16 +130,16 @@ view { language, page } =
                     Html.map ConfirmEmailMessage (ConfirmEmail.view subModel language)
 
                 EmailConfirmedPage subModel ->
-                    Html.map EmailConfirmedMessage (EmailConfirmed.view subModel)
+                    Html.map EmailConfirmedMessage (EmailConfirmed.view subModel language)
 
                 EmailConfirmFailurePage subModel ->
-                    Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel)
+                    Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel language)
 
                 CreateKeysPage subModel ->
-                    Html.map CreateKeysMessage (CreateKeys.view subModel)
+                    Html.map CreateKeysMessage (CreateKeys.view subModel language)
 
                 CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel)
+                    Html.map CreatedMessage (Created.view subModel language)
 
                 CreatePage subModel ->
                     Html.map CreateMessage (Create.view subModel language)
@@ -140,12 +155,12 @@ view { language, page } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, confirmToken } as model) flags =
+update message ({ page, confirmToken, language } as model) flags =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    ConfirmEmail.update subMessage subModel flags
+                    ConfirmEmail.update subMessage subModel flags language
             in
                 ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
 
@@ -180,7 +195,7 @@ update message ({ page, confirmToken } as model) flags =
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags confirmToken
+                    Create.update subMessage subModel flags confirmToken language
             in
                 ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
@@ -198,12 +213,7 @@ update message ({ page, confirmToken } as model) flags =
                 cmd =
                     initCmd newModel
             in
-                case route of
-                    EmailConfirmedRoute confirmToken email ->
-                        ( { newModel | confirmToken = confirmToken }, cmd )
-
-                    _ ->
-                        ( newModel, cmd )
+                ( newModel, cmd )
 
         ( _, _ ) ->
             ( model, Cmd.none )
@@ -226,10 +236,10 @@ subscriptions model =
 getPage : Route -> Page
 getPage route =
     case route of
-        ConfirmEmailRoute ->
+        ConfirmEmailRoute maybeLocale ->
             ConfirmEmailPage ConfirmEmail.initModel
 
-        EmailConfirmedRoute confirmToken email ->
+        EmailConfirmedRoute confirmToken email maybeLocale ->
             EmailConfirmedPage (EmailConfirmed.initModel email)
 
         EmailConfirmFailureRoute ->

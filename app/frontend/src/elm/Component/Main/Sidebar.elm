@@ -15,7 +15,7 @@ import Http
 import Json.Encode as Encode
 import Navigation
 import Port
-import Translation exposing (Language(..), I18n(..), translate)
+import Translation exposing (Language(..), I18n(..), translate, toLocale)
 import Util.HttpRequest exposing (getFullPath, post)
 import Util.WalletDecoder
     exposing
@@ -173,7 +173,7 @@ signInView language =
                 [ text (translate language Login) ]
             , a
                 [ class "middle white_blue button"
-                , onClick (ChangeUrl "/account/confirm_email")
+                , onClick (ChangeUrl ("/account/confirm_email?locale=" ++ (toLocale language)))
                 ]
                 [ text (translate language NewAccount) ]
             ]

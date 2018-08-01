@@ -12,7 +12,28 @@ import Util.Urls as Urls
 import Navigation
 import Util.Validation exposing (checkAccountName)
 import View.Notification as Notification
-import Translation exposing (Language, I18n(EmptyMessage, DebugMessage, AccountCreationFailure))
+import Translation
+    exposing
+        ( Language
+        , toLocale
+        , translate
+        , I18n
+            ( EmptyMessage
+            , DebugMessage
+            , Next
+            , AccountCreationFailure
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationNameValid
+            , AccountCreationNameInvalid
+            , AccountCreationTypeName
+            , AccountCreationNameCondition
+            , AccountCreationNameConditionExample
+            , AccountCreationNamePlaceholder
+            )
+        )
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -22,7 +43,7 @@ type alias Model =
     { accountName : String
     , pubkey : String
     , validation : Bool
-    , validationMsg : String
+    , validationMsg : I18n
     , requestSuccess : Bool
     , notification : Notification.Model
     }
@@ -33,7 +54,7 @@ initModel pubkey =
     { accountName = ""
     , pubkey = pubkey
     , validation = False
-    , validationMsg = ""
+    , validationMsg = EmptyMessage
     , requestSuccess = False
     , notification = Notification.initModel
     }
@@ -50,8 +71,8 @@ type Message
     | NotificationMessage Notification.Message
 
 
-update : Message -> Model -> Flags -> String -> ( Model, Cmd Message )
-update msg ({ notification } as model) flags confirmToken =
+update : Message -> Model -> Flags -> String -> Language -> ( Model, Cmd Message )
+update msg ({ notification } as model) flags confirmToken language =
     case msg of
         ValidateAccountName accountName ->
             let
@@ -60,14 +81,14 @@ update msg ({ notification } as model) flags confirmToken =
 
                 ( validateMsg, validate ) =
                     if checkAccountName accountName then
-                        ( "가능한 ID에요", True )
+                        ( AccountCreationNameValid, True )
                     else
-                        ( "불가능한 ID에요", False )
+                        ( AccountCreationNameInvalid, False )
             in
                 ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags confirmToken )
+            ( model, createEosAccountRequest model flags confirmToken language )
 
         NewUser (Ok res) ->
             ( { model | requestSuccess = True }, Navigation.newUrl ("/account/created") )
@@ -125,25 +146,25 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li [ class "done" ]
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li [ class "ing" ]
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "4" ]
             [ h1 []
-                [ text "원하는 계정의 이름을 입력해주세요!    " ]
+                [ textViewI18n language AccountCreationTypeName ]
             , p []
-                [ text "계정명은 1~5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다!"
+                [ textViewI18n language AccountCreationNameCondition
                 , br []
                     []
-                , text "ex) eoshuby12345"
+                , textViewI18n language AccountCreationNameConditionExample
                 ]
             , form [ onSubmit CreateEosAccount ]
                 [ input
                     [ class "account_name"
-                    , placeholder "계정이름은 반드시 12글자로 입력해주세요"
+                    , placeholder (translate language AccountCreationNamePlaceholder)
                     , attribute "required" ""
                     , attribute
                         (if validation then
@@ -166,7 +187,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                           )
                         ]
                     ]
-                    [ text validationMsg ]
+                    [ textViewI18n language validationMsg ]
                 ]
             ]
         , div [ class "btn_area" ]
@@ -182,7 +203,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                 , type_ "button"
                 , onClick CreateEosAccount
                 ]
-                [ text "다음" ]
+                [ textViewI18n language Next ]
             ]
         , Html.map NotificationMessage (Notification.view notification language)
         ]
@@ -211,11 +232,11 @@ createEosAccountBodyParams model =
         |> Http.jsonBody
 
 
-postCreateEosAccount : Model -> Flags -> String -> Http.Request Response
-postCreateEosAccount model flags confirmToken =
+postCreateEosAccount : Model -> Flags -> String -> Language -> Http.Request Response
+postCreateEosAccount model flags confirmToken language =
     let
         url =
-            Urls.createEosAccountUrl ( flags, confirmToken )
+            Urls.createEosAccountUrl flags confirmToken (toLocale language)
 
         params =
             createEosAccountBodyParams model
@@ -223,6 +244,6 @@ postCreateEosAccount model flags confirmToken =
         Http.post url params responseDecoder
 
 
-createEosAccountRequest : Model -> Flags -> String -> Cmd Message
-createEosAccountRequest model flags confirmToken =
-    Http.send NewUser <| postCreateEosAccount model flags confirmToken
+createEosAccountRequest : Model -> Flags -> String -> Language -> Cmd Message
+createEosAccountRequest model flags confirmToken language =
+    Http.send NewUser <| postCreateEosAccount model flags confirmToken language

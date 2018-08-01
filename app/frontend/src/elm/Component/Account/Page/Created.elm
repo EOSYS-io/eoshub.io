@@ -4,6 +4,20 @@ import Html exposing (Html, button, div, h1, text, ol, li, h1, br, p, article, i
 import Html.Attributes exposing (class, attribute, alt, src, href)
 import Html.Events exposing (onClick)
 import Navigation
+import Translation
+    exposing
+        ( Language
+        , I18n
+            ( AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationCongratulation
+            , AccountCreationWelcome
+            , AccountCreationYouCanSignIn
+            , AccountCreationGoHome
+            )
+        )
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -37,29 +51,29 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Html Message
-view model =
+view : Model -> Language -> Html Message
+view model language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "done" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li [ class "done" ]
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li [ class "done" ]
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "5" ]
             [ h1 [ class "finished" ]
-                [ text "축하합니다! 새로운 계정을 만들었어요!"
+                [ textViewI18n language AccountCreationCongratulation
                 , br []
                     []
-                , text "        정식 주민이 된 것을 환영합니다!"
+                , textViewI18n language AccountCreationWelcome
                 ]
             , p []
-                [ text "이제 홈에서 로그인하실 수 있어요!" ]
+                [ textViewI18n language AccountCreationYouCanSignIn ]
             ]
         , div [ class "btn_area" ]
             [ a [ class "middle button blue_white", onClick Home ]
-                [ text "홈 화면 바로가기" ]
+                [ textViewI18n language AccountCreationGoHome ]
             ]
         ]

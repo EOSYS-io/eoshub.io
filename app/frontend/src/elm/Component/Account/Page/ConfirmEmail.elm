@@ -9,10 +9,31 @@ import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
-import Validate exposing (Validator, ifInvalidEmail, ifBlank, validate)
-import Array.Hamt as Array exposing (Array)
+import Validate exposing (isValidEmail)
 import View.Notification as Notification
-import Translation exposing (Language, I18n(EmptyMessage, ConfirmEmailSent, AlreadyExistEmail, DebugMessage))
+import Translation
+    exposing
+        ( Language
+        , toLocale
+        , I18n
+            ( EmptyMessage
+            , ConfirmEmailSent
+            , AlreadyExistEmail
+            , DebugMessage
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationProgressCreateNew
+            , AccountCreationConfirmEmail
+            , AccountCreationClickConfirmLink
+            , AccountCreationEmailValid
+            , AccountCreationEmailInvalid
+            , AccountCreationEmailSend
+            , AccountCreationAlreadyHaveAccount
+            , AccountCreationLoginLink
+            )
+        )
+import Navigation as Navigation
+import View.I18nViews exposing (textViewI18n)
 
 
 -- MODEL
@@ -20,7 +41,7 @@ import Translation exposing (Language, I18n(EmptyMessage, ConfirmEmailSent, Alre
 
 type alias Model =
     { email : String
-    , validationMsg : String
+    , validationMsg : I18n
     , requested : Bool
     , emailValid : Bool
     , inputValid : String
@@ -31,7 +52,7 @@ type alias Model =
 initModel : Model
 initModel =
     { email = ""
-    , validationMsg = "Please enter an email address."
+    , validationMsg = EmptyMessage
     , requested = False
     , emailValid = False
     , inputValid = "invalid"
@@ -48,10 +69,11 @@ type Message
     | CreateUser
     | NewUser (Result Http.Error Response)
     | NotificationMessage Notification.Message
+    | ChangeUrl String
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update msg ({ notification } as model) flags =
+update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
+update msg ({ notification } as model) flags language =
     case msg of
         ValidateEmail email ->
             let
@@ -59,7 +81,10 @@ update msg ({ notification } as model) flags =
                     { model | email = email }
 
                 ( validationMsg, emailValid ) =
-                    validation newModel
+                    if String.isEmpty email then
+                        ( EmptyMessage, False )
+                    else
+                        validation newModel
 
                 inputValid =
                     if emailValid then
@@ -70,7 +95,7 @@ update msg ({ notification } as model) flags =
                 ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
 
         CreateUser ->
-            ( { model | requested = True }, createUserRequest model flags )
+            ( { model | requested = True }, createUserRequest model flags language )
 
         NewUser (Ok res) ->
             ( { model
@@ -125,39 +150,55 @@ update msg ({ notification } as model) flags =
             , Cmd.none
             )
 
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
+
 
 
 -- VIEW
 
 
+emailInput : Model -> Html Message
+emailInput { inputValid } =
+    input
+        [ placeholder "example@email.com"
+        , attribute "required" ""
+        , type_ "email"
+        , attribute inputValid ""
+        , onInput ValidateEmail
+        ]
+        []
+
+
+emailForm : Model -> Language -> List (Html Message)
+emailForm ({ inputValid, validationMsg } as model) language =
+    if validationMsg == EmptyMessage then
+        [ emailInput model ]
+    else
+        [ emailInput model
+        , span [ class "validate" ]
+            [ textViewI18n language validationMsg ]
+        ]
+
+
 view : Model -> Language -> Html Message
-view { validationMsg, requested, emailValid, inputValid, notification } language =
+view ({ validationMsg, requested, emailValid, inputValid, notification } as model) language =
     div [ class "container join" ]
         [ ol [ class "progress bar" ]
             [ li [ class "ing" ]
-                [ text "인증하기" ]
+                [ textViewI18n language AccountCreationProgressEmail ]
             , li []
-                [ text "키 생성" ]
+                [ textViewI18n language AccountCreationProgressKeypair ]
             , li []
-                [ text "계정생성" ]
+                [ textViewI18n language AccountCreationProgressCreateNew ]
             ]
         , article [ attribute "data-step" "1" ]
             [ h1 []
-                [ text "새로운 계정을 만들기 위해 이메일을 인증하세요!    " ]
+                [ textViewI18n language AccountCreationConfirmEmail ]
             , p []
-                [ text "받으신 메일의 링크를 클릭해주세요." ]
+                [ textViewI18n language AccountCreationClickConfirmLink ]
             , form [ onSubmit CreateUser ]
-                [ input
-                    [ placeholder "example@email.com"
-                    , attribute "required" ""
-                    , type_ "email"
-                    , attribute inputValid ""
-                    , onInput ValidateEmail
-                    ]
-                    []
-                , span [ class "validate" ]
-                    [ text validationMsg ]
-                ]
+                (emailForm model language)
             ]
         , div [ class "btn_area" ]
             [ button
@@ -172,12 +213,12 @@ view { validationMsg, requested, emailValid, inputValid, notification } language
                 , type_ "button"
                 , onClick CreateUser
                 ]
-                [ text "링크 보내기" ]
+                [ textViewI18n language AccountCreationEmailSend ]
             ]
         , p [ class "exist_account" ]
-            [ text "이미 이오스 계정이 있으신가요?    "
-            , a [ href "#" ]
-                [ text "로그인하기" ]
+            [ textViewI18n language AccountCreationAlreadyHaveAccount
+            , a [ onClick (ChangeUrl "/") ]
+                [ textViewI18n language AccountCreationLoginLink ]
             ]
         , Html.map NotificationMessage (Notification.view notification language)
         ]
@@ -203,35 +244,23 @@ createUserBodyParams model =
         |> Http.jsonBody
 
 
-postUsers : Model -> Flags -> Http.Request Response
-postUsers model flags =
-    Http.post (Urls.usersApiUrl flags) (createUserBodyParams model) responseDecoder
+postUsers : Model -> Flags -> Language -> Http.Request Response
+postUsers model flags language =
+    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) responseDecoder
 
 
-createUserRequest : Model -> Flags -> Cmd Message
-createUserRequest model flags =
-    Http.send NewUser <| postUsers model flags
+createUserRequest : Model -> Flags -> Language -> Cmd Message
+createUserRequest model flags language =
+    Http.send NewUser <| postUsers model flags language
 
 
 
 -- VALIDATION
 
 
-modelValidator : Validator String Model
-modelValidator =
-    Validate.all
-        [ Validate.firstError
-            [ ifBlank .email "이메일을 입력해주세요."
-            , ifInvalidEmail .email (\_ -> "잘못된 이메일 주소입니다.")
-            ]
-        ]
-
-
-validation : Model -> ( String, Bool )
-validation model =
-    case Array.get 0 (Array.fromList (validate modelValidator model)) of
-        Nothing ->
-            ( "올바른 이메일 주소입니다.", True )
-
-        Just msg ->
-            ( msg, False )
+validation : Model -> ( I18n, Bool )
+validation { email } =
+    if isValidEmail email then
+        ( AccountCreationEmailValid, True )
+    else
+        ( AccountCreationEmailInvalid, False )

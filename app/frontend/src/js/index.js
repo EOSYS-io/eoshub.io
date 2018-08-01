@@ -96,20 +96,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   app.ports.generateKeys.subscribe(async () => {
-    // Create a new random private key
-    let privateWif
-    ecc.PrivateKey.randomKey().then(privateKey => {
-      privateWif = privateKey.toWif()
-      // Convert to a public key
-      var pubkey = ecc.PrivateKey.fromString(privateWif).toPublic().toString()
+    ecc.PrivateKey.randomKey().then((privateKey) => {
+      // Create a new random private key
+      const privateWif = privateKey.toWif();
 
-      var keys = { privateKey: privateWif, publicKey: pubkey }
+      // Convert to a public key
+      const pubkey = ecc.PrivateKey.fromString(privateWif).toPublic().toString();
+
+      const keys = { privateKey: privateWif, publicKey: pubkey };
       app.ports.receiveKeys.send(keys);
-    })
+    });
   });
 
   app.ports.copy.subscribe(async () => {
-    console.log('copy');
     document.querySelector('#key').select();
     document.execCommand('copy');
   });

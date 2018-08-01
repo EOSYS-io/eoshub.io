@@ -1,10 +1,39 @@
-module Translation exposing (Language(Korean, English, Chinese), I18n(..), translate, getMessages)
+module Translation exposing (Language(Korean, English, Chinese), I18n(..), translate, getMessages, toLanguage, toLocale)
 
 
 type Language
     = English
     | Korean
     | Chinese
+
+
+toLanguage : String -> Language
+toLanguage locale =
+    case locale of
+        "ko" ->
+            Korean
+
+        "en" ->
+            English
+
+        "zh-cn" ->
+            Chinese
+
+        _ ->
+            Korean
+
+
+toLocale : Language -> String
+toLocale language =
+    case language of
+        Korean ->
+            "ko"
+
+        English ->
+            "en"
+
+        Chinese ->
+            "zh-cn"
 
 
 type alias Messages =
@@ -75,6 +104,35 @@ type I18n
     | ConfirmEmailSent
     | AlreadyExistEmail
     | AccountCreationFailure
+    | AccountCreationProgressEmail
+    | AccountCreationProgressKeypair
+    | AccountCreationProgressCreateNew
+    | AccountCreationConfirmEmail
+    | AccountCreationClickConfirmLink
+    | AccountCreationEmailValid
+    | AccountCreationEmailInvalid
+    | AccountCreationEmailSend
+    | AccountCreationAlreadyHaveAccount
+    | AccountCreationLoginLink
+    | AccountCreationEmailConfirmed
+    | ClickNext
+    | Next
+    | AccountCreationEmailConfirmFailure
+    | AccountCreationKeypairGenerated
+    | AccountCreationKeypairCaution
+    | PublicKey
+    | PrivateKey
+    | CopyAll
+    | AccountCreationNameValid
+    | AccountCreationNameInvalid
+    | AccountCreationTypeName
+    | AccountCreationNameCondition
+    | AccountCreationNameConditionExample
+    | AccountCreationNamePlaceholder
+    | AccountCreationCongratulation
+    | AccountCreationWelcome
+    | AccountCreationYouCanSignIn
+    | AccountCreationGoHome
 
 
 translate : Language -> I18n -> String
@@ -460,4 +518,178 @@ getMessages i18n =
             { korean = "EOS 계정 생성에 실패했습니다."
             , english = "Failed to create EOS account"
             , chinese = "无法创建EOS帐户"
+            }
+
+        AccountCreationProgressEmail ->
+            { korean = "인증하기"
+            , english = "Email"
+            , chinese = "认证"
+            }
+
+        AccountCreationProgressKeypair ->
+            { korean = "키 생성"
+            , english = "Key pair"
+            , chinese = "密钥生成"
+            }
+
+        AccountCreationProgressCreateNew ->
+            { korean = "계정 생성"
+            , english = "Create New"
+            , chinese = "创建一个帐户"
+            }
+
+        AccountCreationConfirmEmail ->
+            { korean = "새로운 계정을 만들기 위해 이메일을 인증하세요!"
+            , english = "Type in your email address to make a new account!"
+            , chinese = "验证您的电子邮件以创建新帐户！"
+            }
+
+        AccountCreationClickConfirmLink ->
+            { korean = "받으신 메일의 링크를 클릭해주세요."
+            , english = "Confirm by clicking the link in the email you receive"
+            , chinese = "单击您收到的电子邮件中的链接进行确认"
+            }
+
+        AccountCreationEmailValid ->
+            { korean = "올바른 이메일 주소입니다."
+            , english = "Valid email address"
+            , chinese = "这是一个有效的电子邮件地址。"
+            }
+
+        AccountCreationEmailInvalid ->
+            { korean = "잘못된 이메일 주소입니다."
+            , english = "Invalid email address"
+            , chinese = "电子邮件地址无效。"
+            }
+
+        AccountCreationEmailSend ->
+            { korean = "링크 보내기"
+            , english = "Send Link"
+            , chinese = "发送链接"
+            }
+
+        AccountCreationAlreadyHaveAccount ->
+            { korean = "이미 이오스 계정이 있으신가요?"
+            , english = "Already have an EOS account?"
+            , chinese = "已经有一个eos帐户？"
+            }
+
+        AccountCreationLoginLink ->
+            { korean = "로그인하기"
+            , english = "Sign in"
+            , chinese = "签到"
+            }
+
+        AccountCreationEmailConfirmed ->
+            { korean = "이메일 인증완료!"
+            , english = "Email Confirmed!"
+            , chinese = "电子邮件已确认！"
+            }
+
+        ClickNext ->
+            { korean = "다음으로 넘어가주세요"
+            , english = "Click Next"
+            , chinese = "点击下一步"
+            }
+
+        Next ->
+            { korean = "다음"
+            , english = "Next"
+            , chinese = "下一个"
+            }
+
+        AccountCreationEmailConfirmFailure ->
+            { korean = "이메일 인증 실패"
+            , english = "Failed to confirm email"
+            , chinese = "电子邮件验证失败"
+            }
+
+        AccountCreationKeypairGenerated ->
+            { korean = "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!"
+            , english = "A key pair is generated. Please copy and save!"
+            , chinese = "我做了一对钥匙。 确保将其复制到安全的地方！"
+            }
+
+        AccountCreationKeypairCaution ->
+            { korean = "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
+            , english = "Make sure you save the key pair somewhere safe! It is used to verify your account."
+            , chinese = "确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
+            }
+
+        PublicKey ->
+            { korean = "공개 키"
+            , english = "Public Key"
+            , chinese = "公钥"
+            }
+
+        PrivateKey ->
+            { korean = "개인 키"
+            , english = "Private Key"
+            , chinese = "私钥"
+            }
+
+        CopyAll ->
+            { korean = "한 번에 복사하기"
+            , english = "Copy All"
+            , chinese = "立即复制"
+            }
+
+        AccountCreationNameValid ->
+            { korean = "가능한 계정이에요"
+            , english = "Available"
+            , chinese = "这是一个可能的帐户。"
+            }
+
+        AccountCreationNameInvalid ->
+            { korean = "불가능한 계정이에요"
+            , english = "Unavailable"
+            , chinese = "这是一个不可能的帐户。"
+            }
+
+        AccountCreationTypeName ->
+            { korean = "원하는 계정의 이름을 입력해주세요!"
+            , english = "Type in the name of your account!"
+            , chinese = "请输入您想要的帐户名称！"
+            }
+
+        AccountCreationNameCondition ->
+            { korean = "계정명은 1~5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다!"
+            , english = "An account name can contain lowercase english characters or numbers 1~5, in total 12 characters :)"
+            , chinese = "帐户名称是1到5之间的数字和英文小写字母的组合，只有12个字母！"
+            }
+
+        AccountCreationNameConditionExample ->
+            { korean = "(예시: eoshuby12345)"
+            , english = "ex) eoshuby12345"
+            , chinese = "(示例：eoshuby12345)"
+            }
+
+        AccountCreationNamePlaceholder ->
+            { korean = "계정이름은 반드시 12글자로 입력해주세요"
+            , english = "Type in 12 characters"
+            , chinese = "帐户名称必须为12个字符"
+            }
+
+        AccountCreationCongratulation ->
+            { korean = "축하합니다! 새로운 계정을 만들었어요!"
+            , english = "Congratulations! A new account is created!"
+            , chinese = "恭喜！ 我创建了一个新帐户！"
+            }
+
+        AccountCreationWelcome ->
+            { korean = "정식 주민이 된 것을 환영합니다!"
+            , english = "Welcome aboard to EOS blockchain!"
+            , chinese = "欢迎登陆EOS区块链！"
+            }
+
+        AccountCreationYouCanSignIn ->
+            { korean = "이제 홈에서 로그인하실 수 있어요!"
+            , english = "Now you can Sign In!"
+            , chinese = "现在你可以登录了！"
+            }
+
+        AccountCreationGoHome ->
+            { korean = "홈 화면 바로가기"
+            , english = "Go Home"
+            , chinese = "回家"
             }
