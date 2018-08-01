@@ -88,6 +88,7 @@ GEM
       sprockets (>= 3.6.0)
     builder (3.2.3)
     byebug (10.0.2)
+    cancan (1.6.10)
     capybara (3.3.0)
       addressable
       mini_mime (>= 0.1.3)
@@ -307,6 +308,7 @@ DEPENDENCIES
   bootsnap (>= 1.1.0)
   browserify-rails
   byebug
+  cancan
   capybara (>= 2.15, < 4.0)
   chromedriver-helper
   devise

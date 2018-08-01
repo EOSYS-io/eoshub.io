@@ -2,6 +2,16 @@ ActiveAdmin.register User do
   menu priority: 2
   permit_params :state, :confirm_token
 
+  index do
+    selectable_column
+    id_column
+    column :email
+    state_column :state
+    column :created_at
+    column :updated_at
+    actions
+  end
+
   show do
     attributes_table do
       row :email
