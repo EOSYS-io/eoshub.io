@@ -20,6 +20,7 @@ import Translation
         , I18n
             ( EmptyMessage
             , DebugMessage
+            , Next
             , AccountCreationFailure
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
@@ -202,7 +203,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                 , type_ "button"
                 , onClick CreateEosAccount
                 ]
-                [ textViewI18n language Translation.Next ]
+                [ textViewI18n language Next ]
             ]
         , Html.map NotificationMessage (Notification.view notification language)
         ]
