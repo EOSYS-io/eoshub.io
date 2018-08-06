@@ -1,0 +1,16 @@
+<div id="login">
+  <h2><%= active_admin_application.site_title %> <%= title I18n.t('devise.confirmations.show.title') %></h2>
+
+  <%= devise_error_messages! %>
+  <%= semantic_form_for(resource, :as => resource_name, :url => confirm_admin_user_confirmation_path) do |form| %>
+    <%= form.inputs do %>
+      <%= form.input :password, :input_html => {:autofocus => true} %>
+      <%= form.input :password_confirmation %>
+      <%= form.input :confirmation_token, :as => :hidden, :input_html => { :value => @confirmation_token } %>
+    <% end %>
+
+    <%= form.actions do %>
+      <%= form.action :submit, :label => 'Confirm Account' %>
+    <% end %>
+  <% end %>
+</div>

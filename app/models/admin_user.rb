@@ -3,6 +3,9 @@
 # Table name: admin_users
 #
 #  id                     :bigint(8)        not null, primary key
+#  confirmation_sent_at   :datetime
+#  confirmation_token     :string
+#  confirmed_at           :datetime
 #  current_sign_in_at     :datetime
 #  current_sign_in_ip     :inet
 #  email                  :string           default(""), not null
@@ -19,21 +22,32 @@
 #
 # Indexes
 #
+#  index_admin_users_on_confirmation_token    (confirmation_token) UNIQUE
 #  index_admin_users_on_email                 (email) UNIQUE
 #  index_admin_users_on_reset_password_token  (reset_password_token) UNIQUE
 #
 
 class AdminUser < ApplicationRecord
   # Include default devise modules. Others available are:
-  # :confirmable, :lockable, :timeoutable and :omniauthable
+  # :lockable, :timeoutable and :omniauthable
   devise :database_authenticatable, 
-         :recoverable, :rememberable, :trackable, :validatable
+         :recoverable, :rememberable, :trackable, :validatable, :confirmable
 
   validates :email, presence: true
 
   enum role: {
-    newbie: 0, # 신규가입
-    admin: 1, # 운영자
-    super_admin: 2, # 슈퍼운영자
+    admin: 0, # 운영자
+    super_admin: 1, # 슈퍼운영자
   }
+
+  def password_required?
+    super if confirmed?
+  end
+
+  def password_match?
+    self.errors[:password] << "can't be blank" if password.blank?
+    self.errors[:password_confirmation] << "can't be blank" if password_confirmation.blank?
+    self.errors[:password_confirmation] << "does not match password" if password != password_confirmation
+    password == password_confirmation && !password.blank?
+  end
 end
