@@ -1,0 +1,33 @@
+ko:
+  activerecord:
+    models:
+      admin_user: '내부어드민 관리자'
+      comment: '댓글'
+
+    attributes:
+      attribute_commons: &commons
+        id: 'ID'
+        created_at: '생성일'
+        updated_at: '수정일'
+        email: '이메일'
+        state: '상태'
+      admin_user:
+        <<: *commons
+        encrypted_password: '비밀번호'
+        username: '사용자명'
+        current_sign_in_at: '최근 로그인'
+        last_sign_in_at: '마지막 로그인'
+        sign_in_count: '로그인 횟수'
+
+    #http://guides.rubyonrails.org/i18n.html
+    errors:
+      messages:
+        record_invalid: "%{errors}"
+        blank: "%{attribute} 을(를) 입력해주세요."
+        taken: "%{attribute} 은(는) 이미 존재합니다."
+
+    messages:
+      description/nil: '미입력'
+      registration:
+        nil: '미등록'
+        not_nil: '등록완료'

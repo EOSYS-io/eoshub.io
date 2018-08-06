@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  devise_for :admin_users, ActiveAdmin::Devise.config.merge(controllers: { confirmations: "admin/admin_users/confirmations" })
+  ActiveAdmin.routes(self)
   root to: 'root#index'
   get 'health_check.html', to: proc{[200, {}, ['<html><head></head><body>HealthCheck OK</body></html>']]}
 
@@ -7,6 +9,10 @@ Rails.application.routes.draw do
       get :confirm_email
       post :create_eos_account
     end
+  end
+
+  devise_scope :admin_user do
+    patch "/admin/confirmation" => "admin/admin_users/confirmations#confirm", as: :confirm_admin_user_confirmation
   end
 
   get '*path', to: 'root#index'

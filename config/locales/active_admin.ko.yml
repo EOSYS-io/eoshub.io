@@ -1,0 +1,17 @@
+ko:
+  active_admin:
+    any: '전체'
+    filters:
+      buttons:
+        filter: '검색'
+      predicates:
+        eq: '='
+        gteq_datetime: '>'
+        lteq_datetime: '<'
+    access_denied:
+      message: '페이지 접근 권한이 없습니다'
+    scopes:
+      all: '전체'
+      super_admin: '슈퍼관리자'
+      admin: '일반조회자'
+      newbie: '신규계정'

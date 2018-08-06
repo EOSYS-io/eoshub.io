@@ -77,3 +77,9 @@ gem 'aasm'
 
 # Adds a method to MiniTest that creates a method stub on any instance of a class for the duration of a block
 gem "minitest-stub_any_instance"
+
+gem 'devise'
+gem 'activeadmin'
+gem 'activeadmin_addons'
+gem 'arctic_admin'
+gem 'cancan'
