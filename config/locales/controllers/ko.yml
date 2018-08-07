@@ -3,6 +3,7 @@ ko:
     create_ok: '인증 메일이 전송되었습니다! 이메일을 확인해주세요.'
     already_confirmed_email: 'EOS 계정 생성을 위해 이미 사용된 이메일입니다.'
     failed_to_create_email_verification_log: '시스템에 문제가 있어 이메일 인증 기록을 저장하는데 실패했습니다.'
+    smtp_authentication_error: '시스템에 문제가 있어 이메일 전송에 실패했습니다.'
     eos_account_already_exist: 'EOS 블록체인에 해당 계정이 이미 존재합니다.'
     eos_account_created: "환영합니다! EOS 계정, \"%{account_name}\"이(가) 만들어졌습니다."
     eos_account_creation_failure_no_such_email: '해당 이메일로 생성된 사용자가 없습니다.'

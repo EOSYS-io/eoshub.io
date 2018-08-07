@@ -4,7 +4,7 @@ import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1
 import Html.Attributes exposing (placeholder, class, alt, src, action, href, attribute, type_, rel)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, string)
+import Json.Decode exposing (Decoder, string, decodeString)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Util.Flags exposing (Flags)
@@ -18,8 +18,8 @@ import Translation
         , I18n
             ( EmptyMessage
             , ConfirmEmailSent
-            , AlreadyExistEmail
             , DebugMessage
+            , UnknownError
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
             , AccountCreationProgressCreateNew
@@ -113,7 +113,11 @@ update msg ({ notification } as model) flags language =
                     ( { model
                         | requested = False
                         , notification =
-                            { content = Notification.Error { message = AlreadyExistEmail, detail = EmptyMessage }
+                            { content =
+                                Notification.Error
+                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    , detail = EmptyMessage
+                                    }
                             , open = True
                             }
                       }
@@ -124,7 +128,11 @@ update msg ({ notification } as model) flags language =
                     ( { model
                         | requested = False
                         , notification =
-                            { content = Notification.Error { message = AlreadyExistEmail, detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }
+                            { content =
+                                Notification.Error
+                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
+                                    }
                             , open = True
                             }
                       }
@@ -135,7 +143,11 @@ update msg ({ notification } as model) flags language =
                     ( { model
                         | requested = False
                         , notification =
-                            { content = Notification.Error { message = AlreadyExistEmail, detail = DebugMessage (toString error) }
+                            { content =
+                                Notification.Error
+                                    { message = UnknownError
+                                    , detail = DebugMessage (toString error)
+                                    }
                             , open = True
                             }
                       }
@@ -152,6 +164,16 @@ update msg ({ notification } as model) flags language =
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
+
+
+decodeResponseBodyMsg : Http.Response String -> String
+decodeResponseBodyMsg response =
+    case decodeString responseDecoder response.body of
+        Ok body ->
+            body.msg
+
+        Err body ->
+            body
 
 
 
