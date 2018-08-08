@@ -3,6 +3,7 @@ en:
     create_ok: 'Verification mail sent! Please check your email.'
     already_confirmed_email: 'This email has already been used to create an EOS account.'
     failed_to_create_email_verification_log: 'Failed to create an email verification log'
+    smtp_authentication_error: 'Failed to send a verification email'
     eos_account_already_exist: 'The account already exists in the EOS block chain'
     eos_account_created: "Welcome to the EOS! \"%{account_name}\" has been created."
     eos_account_creation_failure_no_such_email: 'User does not exist with this email'

@@ -14,6 +14,8 @@ class UsersController < ApiController
 
     UserMailer.email_confirmation(@user).deliver
     render json: { msg: I18n.t('users.create_ok') }, status: :ok
+  rescue Net::SMTPAuthenticationError
+    render json: { msg: I18n.t('users.smtp_authentication_error') }, status: :internal_server_error
   end
 
   def confirm_email
