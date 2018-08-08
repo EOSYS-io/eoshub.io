@@ -148,7 +148,7 @@ initComponent location =
                         MainComponent.initModel location
 
                     componentCmd =
-                        MainComponent.initCmd location
+                        MainComponent.initCmd componentModel location
                 in
                     ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
 

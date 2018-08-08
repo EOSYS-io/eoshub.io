@@ -33,11 +33,12 @@ import Html.Attributes
         , type_
         , scope
         )
+import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
 import Http
 import Util.HttpRequest exposing (getFullPath, post)
 import Json.Encode as Encode
-import Data.Action exposing (Action)
+import Data.Action exposing (Action, actionsDecoder, refineAction)
 import Data.Account
     exposing
         ( Account
@@ -64,20 +65,41 @@ import Util.Formatter
 type alias Model =
     { account : Account
     , actions : List Action
+    , pagination : Pagination
     }
+
+
+type alias Pagination =
+    { latestActionSeq : Int
+    , nextPos : Int
+    , offset : Int
+    , isEnd : Bool
+    }
+
+
+
+-- Note(boseok): (EOSIO bug) when only pos = -1, it gets the 'offset' number of actions (intended),
+-- otherwise it gets the 'offset+1' number of actions (not intended)
+-- it's different from get_actions --help
 
 
 initModel : Model
 initModel =
     { account = defaultAccount
     , actions = []
+    , pagination =
+        { latestActionSeq = 0
+        , nextPos = -1
+        , offset = -30
+        , isEnd = False
+        }
     }
 
 
-initCmd : String -> Cmd Message
-initCmd query =
+initCmd : String -> Model -> Cmd Message
+initCmd query { pagination } =
     let
-        newCmd =
+        accountCmd =
             let
                 body =
                     Encode.object
@@ -86,8 +108,26 @@ initCmd query =
             in
                 post (getFullPath "/v1/chain/get_account") body accountDecoder
                     |> (Http.send OnFetchAccount)
+
+        actionsCmd =
+            getActions query pagination.nextPos pagination.offset
     in
-        newCmd
+        Cmd.batch [ accountCmd, actionsCmd ]
+
+
+getActions : String -> Int -> Int -> Cmd Message
+getActions query nextPos offset =
+    let
+        body =
+            Encode.object
+                [ ( "account_name", Encode.string query )
+                , ( "pos", Encode.int nextPos )
+                , ( "offset", Encode.int offset )
+                ]
+                |> Http.jsonBody
+    in
+        post (getFullPath "/v1/history/get_actions") body actionsDecoder
+            |> (Http.send OnFetchActions)
 
 
 
@@ -96,10 +136,12 @@ initCmd query =
 
 type Message
     = OnFetchAccount (Result Http.Error Account)
+    | OnFetchActions (Result Http.Error (List Action))
+    | ShowMore
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message model =
+update message ({ account, actions, pagination } as model) =
     case message of
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
@@ -107,13 +149,46 @@ update message model =
         OnFetchAccount (Err error) ->
             ( model, Cmd.none )
 
+        OnFetchActions (Ok actions) ->
+            let
+                refinedAction =
+                    List.map (refineAction account.account_name) actions
+
+                smallestActionSeq =
+                    case List.head actions of
+                        Just action ->
+                            action.accountActionSeq
+
+                        Nothing ->
+                            -1
+            in
+                if smallestActionSeq > 0 then
+                    ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+                else
+                    -- no more action to load
+                    ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+
+        OnFetchActions (Err error) ->
+            ( model, Cmd.none )
+
+        ShowMore ->
+            let
+                actionsCmd =
+                    getActions account.account_name pagination.nextPos pagination.offset
+            in
+                if not pagination.isEnd then
+                    ( model, actionsCmd )
+                else
+                    -- TODO(boseok): alert it is the end of records
+                    ( model, Cmd.none )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Html Message
-view language { account } =
+view language { account, actions } =
     let
         totalAmount =
             getTotalAmount
@@ -246,6 +321,8 @@ view language { account } =
                     [ thead []
                         [ tr []
                             [ th [ scope "col" ]
+                                [ text "#" ]
+                            , th [ scope "col" ]
                                 [ text "type" ]
                             , th [ scope "col" ]
                                 [ text "time" ]
@@ -254,67 +331,31 @@ view language { account } =
                             ]
                         ]
                     , tbody []
-                        [ tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "received" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        , tr []
-                            [ td []
-                                [ text "recieved" ]
-                            , td []
-                                [ text "8:06:36 AM, Apr 6, 2018" ]
-                            , td []
-                                [ text "eosyscommuni -& eosyslievink 0.1 EOS" ]
-                            ]
-                        ]
+                        (viewActionList actions)
                     ]
                 , div [ class "btn_area center" ]
-                    [ button [ class "bg_icon add blue_white load button", type_ "button" ]
+                    [ button [ class "bg_icon add blue_white load button", type_ "button", onClick ShowMore ]
                         [ text "더 보기" ]
                     ]
                 ]
             ]
+
+
+viewActionList : List Action -> List (Html Message)
+viewActionList actions =
+    List.indexedMap viewAction actions
+        |> List.reverse
+
+
+viewAction : Int -> Action -> Html Message
+viewAction index { accountActionSeq, blockTime, actionTag, info } =
+    tr []
+        [ td []
+            [ text (toString accountActionSeq) ]
+        , td []
+            [ text actionTag ]
+        , td []
+            [ text blockTime ]
+        , td []
+            [ text info ]
+        ]

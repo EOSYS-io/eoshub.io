@@ -121,8 +121,8 @@ type alias PublicKeyQuery =
     String
 
 
-initCmd : Location -> Cmd Message
-initCmd location =
+initCmd : Model -> Location -> Cmd Message
+initCmd { page } location =
     let
         route =
             location |> parseLocation
@@ -130,10 +130,18 @@ initCmd location =
         case route of
             SearchRoute query ->
                 let
+                    searchInitModel =
+                        case page of
+                            SearchPage searchModel ->
+                                searchModel
+
+                            _ ->
+                                Search.initModel
+
                     subInitCmd =
                         case query of
                             Just str ->
-                                Search.initCmd str
+                                Search.initCmd str searchInitModel
 
                             Nothing ->
                                 Cmd.none
@@ -338,7 +346,7 @@ update message ({ page, notification, header, sidebar } as model) =
                     getPage location
 
                 cmd =
-                    initCmd location
+                    initCmd model location
             in
                 ( { model | page = newPage }, cmd )
 
