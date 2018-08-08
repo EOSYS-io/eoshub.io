@@ -32,6 +32,7 @@ import Html.Attributes
         , attribute
         , type_
         , scope
+        , hidden
         )
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
@@ -66,6 +67,7 @@ type alias Model =
     { account : Account
     , actions : List Action
     , pagination : Pagination
+    , selectedActionCategory : SelectedActionCategory
     }
 
 
@@ -75,6 +77,10 @@ type alias Pagination =
     , offset : Int
     , isEnd : Bool
     }
+
+
+type alias SelectedActionCategory =
+    String
 
 
 
@@ -93,6 +99,7 @@ initModel =
         , offset = -30
         , isEnd = False
         }
+    , selectedActionCategory = "all"
     }
 
 
@@ -137,6 +144,7 @@ getActions query nextPos offset =
 type Message
     = OnFetchAccount (Result Http.Error Account)
     | OnFetchActions (Result Http.Error (List Action))
+    | SelectActionCategory SelectedActionCategory
     | ShowMore
 
 
@@ -171,6 +179,9 @@ update message ({ account, actions, pagination } as model) =
         OnFetchActions (Err error) ->
             ( model, Cmd.none )
 
+        SelectActionCategory selectedActionCategory ->
+            ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
+
         ShowMore ->
             let
                 actionsCmd =
@@ -188,7 +199,7 @@ update message ({ account, actions, pagination } as model) =
 
 
 view : Language -> Model -> Html Message
-view language { account, actions } =
+view language { account, actions, selectedActionCategory } =
     let
         totalAmount =
             getTotalAmount
@@ -306,12 +317,10 @@ view language { account, actions } =
                     [ button [ attribute "aria-level" "1", attribute "role" "listitem", type_ "button" ]
                         [ text "트랜잭션 타입" ]
                     , div [ class "wrapper" ]
-                        [ button [ attribute "role" "listitem", type_ "button" ]
+                        [ button [ attribute "role" "listitem", type_ "button", onClick (SelectActionCategory "all") ]
                             [ text "All" ]
-                        , button [ attribute "role" "listitem", type_ "button" ]
-                            [ text "빌려주기" ]
-                        , button [ attribute "role" "listitem", type_ "button" ]
-                            [ text "전송하기" ]
+                        , button [ attribute "role" "listitem", type_ "button", onClick (SelectActionCategory "transfer") ]
+                            [ text "transfer" ]
                         ]
                     ]
                 , node "script"
@@ -331,7 +340,7 @@ view language { account, actions } =
                             ]
                         ]
                     , tbody []
-                        (viewActionList actions)
+                        (viewActionList selectedActionCategory actions)
                     ]
                 , div [ class "btn_area center" ]
                     [ button [ class "bg_icon add blue_white load button", type_ "button", onClick ShowMore ]
@@ -341,15 +350,15 @@ view language { account, actions } =
             ]
 
 
-viewActionList : List Action -> List (Html Message)
-viewActionList actions =
-    List.indexedMap viewAction actions
+viewActionList : SelectedActionCategory -> List Action -> List (Html Message)
+viewActionList selectedActionCategory actions =
+    List.map (viewAction selectedActionCategory) actions
         |> List.reverse
 
 
-viewAction : Int -> Action -> Html Message
-viewAction index { accountActionSeq, blockTime, actionTag, info } =
-    tr []
+viewAction : SelectedActionCategory -> Action -> Html Message
+viewAction selectedActionCategory { accountActionSeq, blockTime, actionName, actionTag, info } =
+    tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
         , td []
@@ -359,3 +368,16 @@ viewAction index { accountActionSeq, blockTime, actionTag, info } =
         , td []
             [ text info ]
         ]
+
+
+actionHidden : SelectedActionCategory -> String -> Bool
+actionHidden selectedActionCategory currentAction =
+    case selectedActionCategory of
+        "all" ->
+            False
+
+        _ ->
+            if currentAction == selectedActionCategory then
+                False
+            else
+                True
