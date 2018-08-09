@@ -3,6 +3,7 @@ module Data.Action exposing (..)
 import Json.Decode as Decode exposing (Decoder, oneOf, decodeString)
 import Json.Encode as Encode exposing (encode)
 import Json.Decode.Pipeline exposing (decode, required, optional, requiredAt, hardcoded)
+import Util.Formatter exposing (formatEosQuantity)
 
 
 -- the reason why it uses actionTag field separated with actionName is
@@ -455,3 +456,34 @@ errorDecoder : Decoder String
 errorDecoder =
     Decode.value
         |> Decode.map (encode 0)
+
+
+
+-- encoder part
+
+
+encodeAction : ActionParameters -> Encode.Value
+encodeAction action =
+    case action of
+        Transfer message ->
+            transferParametersToValue message
+
+        _ ->
+            Encode.null
+
+
+transferParametersToValue : TransferParameters -> Encode.Value
+transferParametersToValue { from, to, quantity, memo } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio.token" )
+        , ( "action", Encode.string "transfer" )
+        , ( "payload"
+          , Encode.object
+                [ ( "from", Encode.string from )
+                , ( "to", Encode.string to )
+                , ( "quantity", Encode.string ((quantity |> formatEosQuantity) ++ " EOS") )
+                , ( "memo", Encode.string memo )
+                ]
+          )
+        ]
