@@ -1,6 +1,6 @@
 module Component.Main.Page.Transfer exposing (..)
 
-import Data.Action exposing (TransferParameters, encodeAction)
+import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -239,7 +239,7 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = accountName } |> Data.Action.Transfer |> encodeAction |> Port.pushAction
+                    { transfer | from = accountName } |> Action.Transfer |> encodeAction |> Port.pushAction
             in
                 ( model, cmd )
 
