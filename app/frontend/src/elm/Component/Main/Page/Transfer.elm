@@ -1,6 +1,6 @@
 module Component.Main.Page.Transfer exposing (..)
 
-import Action exposing (TransferParameters, encodeAction)
+import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)

@@ -38,3 +38,8 @@ unitConverterRound4 value unit =
 percentageConverter : Int -> Int -> Float
 percentageConverter numerator denominator =
     toFloat (numerator * 100) / toFloat denominator
+
+
+formatEosQuantity : String -> String
+formatEosQuantity =
+    String.toFloat >> Result.withDefault 0 >> Round.round 4
