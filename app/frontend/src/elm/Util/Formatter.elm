@@ -2,6 +2,7 @@ module Util.Formatter exposing (..)
 
 import Round
 import Regex exposing (..)
+import Date.Extra as Date
 
 
 larimerToEos : Int -> Float
@@ -43,3 +44,17 @@ percentageConverter numerator denominator =
 formatEosQuantity : String -> String
 formatEosQuantity =
     String.toFloat >> Result.withDefault 0 >> Round.round 4
+
+
+
+-- Time
+
+
+timeFormatter : String -> String
+timeFormatter time =
+    case Date.fromIsoString time of
+        Ok date ->
+            Date.toFormattedString "h:mm:ss a, MMMM, YYYY" date
+
+        Err str ->
+            str
