@@ -1,5 +1,6 @@
 module Util.Formatter exposing (..)
 
+import Translation exposing (Language(..))
 import Round
 import Regex exposing (..)
 import Date.Extra as Date
@@ -50,11 +51,20 @@ formatEosQuantity =
 -- Time
 
 
-timeFormatter : String -> String
-timeFormatter time =
+timeFormatter : Language -> String -> String
+timeFormatter language time =
     case Date.fromIsoString time of
         Ok date ->
-            Date.toFormattedString "h:mm:ss a, MMMM, YYYY" date
+            case language of
+                Korean ->
+                    Date.toFormattedString "YYYY년, M월 d일, h:mm:ss a" date
+
+                English ->
+                    Date.toFormattedString "h:mm:ss a, MMMM d, YYYY" date
+
+                Chinese ->
+                    -- TODO(boseok): Add chinese
+                    Date.toFormattedString "h:mm:ss a, MMMM d, YYYY" date
 
         Err str ->
             str
