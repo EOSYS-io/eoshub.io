@@ -26,7 +26,7 @@ import Html.Attributes
         , type_
         , id
         )
-import Html.Events exposing (on, onInput, onClick, keyCode)
+import Html.Events exposing (on, onInput, onClick, onSubmit)
 import Navigation exposing (Location)
 import Component.Main.Page.Index as Index
 import Component.Main.Page.NotFound as NotFound
@@ -39,7 +39,6 @@ import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), translate)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
-import Json.Decode as JD exposing (Decoder)
 import View.Notification as Notification
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.Formatter exposing (eosStringToFloat)
@@ -231,8 +230,8 @@ view { page, header, notification, sidebar, showUnderConstruction } =
             [ Html.map SidebarMessage (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
             , div [ class "wrapper" ]
                 [ section [ class "tick_display" ]
-                    [ form [ class "search", disabled True ]
-                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch, onEnter (CheckSearchQuery header.searchInput) ]
+                    [ form [ class "search", onSubmit (CheckSearchQuery header.searchInput) ]
+                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch ]
                             []
                         , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
                             [ text "검색하기" ]
@@ -259,18 +258,6 @@ view { page, header, notification, sidebar, showUnderConstruction } =
                 , underConstructionView
                 ]
             ]
-
-
-onEnter : Message -> Attribute Message
-onEnter msg =
-    let
-        isEnter code =
-            if code == 13 then
-                JD.succeed msg
-            else
-                JD.fail "not ENTER"
-    in
-        on "keydown" (JD.andThen isEnter keyCode)
 
 
 

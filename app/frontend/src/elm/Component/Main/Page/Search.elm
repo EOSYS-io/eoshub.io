@@ -57,6 +57,7 @@ import Util.Formatter
     exposing
         ( larimerToEos
         , eosFloatToString
+        , timeFormatter
         )
 
 
@@ -364,7 +365,7 @@ viewAction selectedActionCategory { accountActionSeq, blockTime, actionName, act
         , td []
             [ text actionTag ]
         , td []
-            [ text blockTime ]
+            [ text (timeFormatter blockTime) ]
         , td []
             [ text info ]
         ]
