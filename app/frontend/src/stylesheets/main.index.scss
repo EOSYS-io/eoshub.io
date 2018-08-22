@@ -1,0 +1,239 @@
+// --------------------------------------------------------------------------------
+// main section
+// --------------------------------------------------------------------------------
+main {
+	// namespace
+	box-sizing:border-box;
+}
+
+
+
+
+
+
+
+// --------------------------------------------------------------------------------
+// main :: index view
+// --------------------------------------------------------------------------------
+main.index {
+	.menu_area {
+		margin:-6px;
+		.container {
+			display:grid;
+			grid-template-columns: 1fr repeat(2,332px);
+			grid-template-rows: repeat(2,252px);
+
+			@include media ('>1280px','<=1920px') {
+				grid-template-columns: 1fr repeat(2,19.21875vw);
+				grid-template-rows: repeat(2,13.4375vw);
+			}
+
+			@include media ('<=1280px') {
+				grid-template-columns: 422px 1fr 1fr;
+				grid-template-rows: repeat(2,172px);
+			}
+
+			> div,
+			> a {
+				margin:6px;
+				display:block;
+			}
+
+			div.greeting {
+				grid-row-start:1;
+				grid-row-end:3;
+			}
+
+			a {
+				display:flex;
+				flex-direction:column;
+				justify-content:flex-end;
+
+				background-position:32px 32px;
+				background-repeat:no-repeat;
+				background-size:22px 22px;
+			}
+
+			a.transfer {
+				background-image:url('../image/icon-transaction.svg');
+			}
+
+			a.ram_market {
+				background-image:url('../image/icon-server.svg');
+			}
+
+			a.vote {
+				background-image:url('../image/icon-vote-circle.svg');
+			}
+
+			a.proxy_vote {
+				background-image:url('../image/icon-vote-eoshub.svg');
+			}
+		}
+	}
+
+}
+
+
+
+
+
+// --------------------------------------------------------------------------------
+// details :: index > menus
+// --------------------------------------------------------------------------------
+main.index .menu_area h2 {
+	@include screen_reader();
+}
+
+main.index .menu_area .container {
+	.greeting,
+	.card {
+		background-color:#282828;
+		box-sizing:border-box;
+
+		h3 {
+			color:$white;
+		}
+
+		p {
+			font-size:rem(14);
+			margin:0;
+		}
+	}
+
+	.greeting {
+		padding:48px;
+		background-image:url('../image/bi-hubby-cutted.svg');
+		background-position:right bottom;
+		background-repeat:no-repeat;
+		background-size:333px 300px;
+
+		@include media ('>1280px','<=1920px') {
+			background-size:16.84375vw auto;
+		}
+		@include media ('<=1280px') {
+			background-size:209px 184px;
+		}
+
+
+		h3 {
+			font-size: rem(24);
+			line-height: 1.25;
+		}
+
+		p {
+			margin-top:8px;
+		}
+	}
+
+	.card {
+		padding:32px;
+
+		h3 {
+			font-size:rem(20);
+			line-height:1.7;
+		}
+
+	}
+}
+
+
+// --------------------------------------------------------------------------------
+// details :: index > dapps
+// --------------------------------------------------------------------------------
+main.index .dapps {
+	position:relative;
+	margin-top:40px;
+
+	h2 {
+		font-size: rem(20);
+		color: $white;
+		padding-left:32px;
+		background:url('../image/icon-application.svg') left center no-repeat;
+		background-size:22px 22px;
+
+		+ p {
+			font-size:rem(14);
+		}
+	}
+
+	.rolling.banner {
+		display:flex;
+		align-items:center;
+		justify-content:center;
+		height:240px;
+		border-radius: 4px;
+		background-image: linear-gradient(97deg, #d735df, #4239fc);
+		color:$white;
+
+		margin-top:24px;
+	}
+
+	.container {
+		display:none;	// !!!!!! 임시임
+		margin-top:12px;
+		display:flex;
+
+		a {
+			flex:1;
+			display:flex;
+			justify-content:center;
+			flex-direction:column;
+			height:120px;
+			border-radius:4px;
+			background-color:#232323;
+			box-sizing:border-box;
+			margin:0 6px;
+			padding:32px;
+
+			&:first-child {
+				margin-left:0;
+			}
+
+			&:last-child {
+				margin-right:0;
+			}
+
+			h3 {
+				font-size:rem(16);
+				color:$white;
+			}
+
+			p {
+				font-size:rem(14);
+				margin:0;
+				color:#999;
+			}
+		}
+
+	}
+}
+
+
+
+// view more button
+main.index a.view.more {
+	font-size: $small;
+	text-align: right;
+	color: $gray;
+	position:absolute;
+	right:0;
+	top:34px;
+
+	&:before {
+		content:'+ ';
+	}
+}
+
+
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+
+

@@ -10,25 +10,18 @@
 // reset
 @import 'base.scss';
 
-// element
+// element unit
 @import 'button.scss';
 
-// layout
+// set layout, wrapper element style
 @import 'layout.scss';
 
-// common,superset
-@import 'common.scss';
 
-// sidebar
-@import 'sidebar.scss';
+// specific
+@import 'header.scss';
+@import 'nav.scss';
+@import 'footer.scss';
+@import 'aside.scss';
 
-
-// details
-@import 'tick-display.scss';
-@import 'action-view-container.scss';
-@import 'action-view-search.scss';
-@import 'action-view-transfer.scss';
-
-
-// extra. join process
-@import 'join.scss';
+@import 'main.index.scss';
+@import 'main.join.scss';

@@ -1,3 +1,4 @@
+// reset
 html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cite, code, del, dfn, em, font, img, ins, q, s, samp, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
     line-height: 1.3em;
     border: 0 none;
@@ -10,7 +11,6 @@ body {
     font-family: $font-base-stack;
     word-break: normal;
     text-size-adjust: 100%;
-    -webkit-text-size-adjust: 100%;
 }
 
 sub,sup {
@@ -56,17 +56,19 @@ h1,h2,h3,h4,h5,h6 {
     font-family:inherit;
     line-height:1.1;
     font-weight:normal;
+	margin:0;
 }
 
-
-// anchor
-a {
-    cursor:pointer;
+h2 {
+	font-weight:$light;
+	color:$white
 }
 
-a:link {
-    text-decoration:none;
+h3 {
+	font-weight:$light;
+	color:$white
 }
+
 
 
 // zero club
@@ -96,26 +98,115 @@ em {
 
 // Inheritance font size
 input,textarea,table,th,td,fieldset,button {
+	background-color:inherit;
     font-size:inherit;
 }
 
 
-// base ux feedback (GUI - mose)
+// base ux feedback (GUI - mouse)
+input[type='checkbox']+label,
+input[type='radio']+label,
 input[type="submit"],
-button { 
+button {
     cursor:pointer;
 }
 
 
-// reset to related table 
-
+// reset to related table
 table {
     border-collapse: collapse;
 	border-spacing: 0;
     width:100%;
-    
+
     th:first-letter,
     td:first-letter {
         text-transform:uppercase;
     }
+}
+
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+
+
+
+// link
+a {
+	color:inherit;
+    cursor:pointer;
+}
+
+a:link {
+    text-decoration:none;
+}
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+// input
+input[type="text"] {
+	color:inherit;
+	border-color:transparent;
+}
+
+
+input[type="email"]::placeholder {
+	color:$gray;
+}
+
+input[type='checkbox'] {
+	@include screen_reader();
+	visibility:hidden;
+
+	+ label {
+
+		transition:color 0.4s;
+		&:before {
+			content:'';
+			vertical-align:calc((1em - 20px) / 2);
+			display:inline-block;
+			font-size:inherit;
+			width:1rem;
+			height:1rem;
+			line-height:inherit;
+			border-radius:2px;
+			margin-right:0.6em;
+
+			border:1px solid $dark-gray;
+			transition:background 0.4s;
+		}
+
+		// uncheck
+		&:before {
+			// background-color:$gray;
+		}
+
+	}
+
+	+ label:hover,
+	&:checked + label {
+		color:$white;
+	}
+
+	&:checked {
+		& + label:before {
+			border-color:transparent;
+			background:url('../image/check.svg') center center no-repeat $purple;
+		}
+	}
+}
+
+// button
+button {
+	color:inherit;
+	border-color:transparent;
 }

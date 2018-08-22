@@ -1,0 +1,31 @@
+footer {
+	background:#000;
+	text-align:center;
+	padding-bottom:8px;
+
+	a.sns {
+		display:block;
+
+		width:22px;
+		height:22px;
+
+		margin:12px auto;
+
+		@include ir();
+
+		background-repeat:no-repeat;
+		background-size:cover;
+
+		&.medium {
+			background-image:url('../image/bi-medium.svg');
+		}
+
+		&.twitter {
+			background-image:url('../image/bi-twitter.svg');
+		}
+
+		&.telegram {
+			background-image:url('../image/bi-telegram.svg');
+		}
+	}
+}

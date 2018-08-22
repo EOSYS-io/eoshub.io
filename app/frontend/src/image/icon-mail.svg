@@ -1,13 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: sketchtool 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
-    <title>20394B76-E93E-40D1-91B2-42EEBD03DD1B</title>
-    <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <g id="icon_mail" stroke="#4D6BFF" stroke-width="1.3">
-            <path d="M2.8,3 L17.2,3 C18.19,3 19,3.81 19,4.8 L19,15.6 C19,16.59 18.19,17.4 17.2,17.4 L2.8,17.4 C1.81,17.4 1,16.59 1,15.6 L1,4.8 C1,3.81 1.81,3 2.8,3 Z" id="Shape"></path>
-            <polyline id="Shape" points="19 4.8 10 11.1 1 4.8"></polyline>
-        </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
+    <g fill="none" fill-rule="evenodd" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.3">
+        <path d="M2.8 3h14.4c.99 0 1.8.81 1.8 1.8v10.8c0 .99-.81 1.8-1.8 1.8H2.8c-.99 0-1.8-.81-1.8-1.8V4.8C1 3.81 1.81 3 2.8 3z"/>
+        <path d="M19 4.8l-9 6.3-9-6.3"/>
     </g>
 </svg>

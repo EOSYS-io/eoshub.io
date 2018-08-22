@@ -1,74 +1,134 @@
-@charset 'UTF-8';
+$header_height:64px;
+$lnb_width:60px;
+$browser_min_width:1260px;
+$browser_min_height:580px;
 
-$lnb_width:400px;
+// --------------------------------------------------------------------------------
 
-html,body,main,div#elm-target {
-    min-width:1250px;
-    width:100%;
-    height:100%;
+html,body {
+	height:100%;
 }
 
-.container {
-    min-height:760px;
-
-    background-color:#f5f6fb;
-    position:relative;
-    margin:0 auto;
-
-    min-height:100%;
-
-    box-sizing:border-box;
-    // padding:40px;
-
-    display:flex;
-    align-items:stretch;
-
-    div.sidebar {
-        display:flex;
-        flex-flow:column;
-        justify-content:space-between;
-
-        position:relative;
-    }
-
-    div.sidebar + div.wrapper {
-        min-height:760px;
-        flex:1;
-        box-sizing:border-box;
-        position:relative;
-    }
-
+body {
+	// overflow-y:hidden;
 }
 
-// main panel section view
-.container > .wrapper {
-    $padding:40px;
+div#elm-target {
+	height:100vh;
+	box-sizing:border-box;
 
-    padding:$padding;
+	min-width:$browser_min_width;
+	min-height:$browser_min_height;
+}
 
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
+body {
+	color:#999;
+	background-color:#161616;
+}
 
-    &:before,&:after {
-        content:'';
-        display:block;
-        flex:1;
-    }
 
-    .tick_display {
-        flex:0 0 52px;
-    }
+// --------------------------------------------------------------------------------
+// layout
+// just only one element in SPA
+// --------------------------------------------------------------------------------
 
-    &:before {
-        order:2;
-    }
+header {
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+	height:$header_height;
+	z-index:60;
+}
 
-    .action.view.panel {
-        order:3;
-    }
+nav {
+	position:fixed;
+	width:$lnb_width;
+	height:inherit;
+	top:$header_height;
+	left:0;
+	z-index:50;
+}
 
-    &:after {
-        order:4;
-    }
+footer {
+	position:fixed;
+	width:$lnb_width;
+	left:0;
+	bottom:0;
+	z-index:50;
+}
+
+
+// --------------------------------------------------------------------------------
+// content > aside(status section) + main
+// --------------------------------------------------------------------------------
+section.content {
+	box-sizing:border-box;
+
+	display:flex;
+	justify-content:center;
+
+	padding-top:$header_height;
+
+	// gnb가 있는 경우에만 필요함
+	nav ~ & {
+		padding-left:$lnb_width;
+	}
+
+	main.index {
+		height:inherit;
+		box-sizing:border-box;
+		max-width:1560px;
+		width:80.425vw;
+		min-width:965px;
+		padding:42px;
+
+		@include media ('>1600px') {
+			margin-left:calc(300px);
+		}
+		@include media ('>1280px','<=1600px') {
+			padding: 2.425vw;
+			margin-left:calc(18.75vw);
+		}
+		@include media ('<=1280px') {
+			padding:27px;
+			margin-left:240px;
+		}
+
+	}
+
+	aside {
+		position:relative;
+		box-sizing:border-box;
+
+		position:fixed;
+		left:$lnb_width;
+		top:$header_height;
+		bottom:0;
+		max-width:300px;
+		min-width:240px;
+		width:18.75vw;
+	}
+}
+
+
+
+// --------------------------------------------------------------------------------
+// fluid layout
+// --------------------------------------------------------------------------------
+
+aside {
+	transition:transform 0.4s;
+
+	&.shrink {
+		transform:translateX(-100%);
+	}
+}
+
+main.index {
+	transition:margin 0.4s;
+}
+
+aside.shrink + main.index {
+	margin-left:0;
 }

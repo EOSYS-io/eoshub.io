@@ -1,0 +1,260 @@
+// --------------------------------------------------------------------------------
+// account status..etc :: main > aside
+// --------------------------------------------------------------------------------
+
+aside {
+	background-color: #282828;
+	box-shadow: 4px 0 12px 0 rgba(0, 0, 0, 0.08);
+
+	padding-top:40px;
+	padding-bottom:40px;
+
+	@include media ('>1920px') {
+		padding-left:30px;
+		padding-right:30px;
+	}
+	@include media ('>1280px','<=1920px') {
+		padding-left:calc(20px + 0.5vw);
+		padding-right:calc(20px + 0.5vw);
+	}
+	@include media ('<=1280px') {
+		padding-left:20px;
+		padding-right:20px;
+	}
+
+	font-size:$small;
+	color:$gray;
+
+	h2 {
+		color:#fff;
+		font-size:$large;
+		line-height:1.3;
+		font-weight:$light;
+	}
+
+	h2 + p {
+		line-height:1.43;
+		margin:20px 0;
+		font-size:$small;
+
+		@include media ('<1550px') {
+			br {
+				display:none;
+			}
+		}
+	}
+
+	.btn_area {
+		display:flex;
+		justify-content:space-between;
+		align-items:stretch;
+		width:100%;
+
+		a.button {
+			line-height:48px;
+			flex: 0 0 49%;
+			border-radius: 2px;
+
+			&.login {
+				background-image: linear-gradient(112deg, #ff5252, #aa00ff);
+				color:#fff;
+			}
+
+			&.join {
+				border-width:1px;
+				border-color:#999;
+			}
+		}
+
+		@include media ('<1650px') {
+			display:block;
+			width:100%;
+
+			a.button {
+				margin:2px 0;
+				display:block;
+				width:100%;
+
+			}
+		}
+
+	}
+
+	// element :: available wallet for peristalsis
+	.available_wallet_list {
+		width:100%;
+		list-style-type:none;
+		padding:0;
+		margin:40px 0 0;
+		font-size:$small;
+
+		border-bottom:1px solid #5d5d5d;
+
+		li {
+			display:flex;
+			justify-content:space-between;
+			align-items:center;
+
+			border-top:1px solid #5d5d5d;
+
+			padding-left:40px;
+
+			height:72px;
+
+			&:first-letter {
+				text-transform:uppercase;
+			}
+		}
+
+		li.scatter {
+			background:url('../image/bi-scatter@2x.png') left center no-repeat transparent;
+			background-size:32px 32px;
+		}
+
+		li.nova {
+			background:url('../image/bi-nova@2x.png') left center no-repeat transparent;
+			background-size:32px 32px;
+		}
+
+		button {
+			font-size:inherit;
+			color:#fff;
+		}
+	}
+
+	.available_wallet_list + a.go.link.wallet_sync {
+		margin-top:40px;
+		display:block;
+		line-height:16px;
+		height:16px;
+		padding-left:20px;
+		background:url('../image/icon-info-mark.svg') left center no-repeat;
+		background-size:16px 16px;
+	}
+
+
+	button.back {
+		background:url('../image/icon-back.svg') left center no-repeat transparent;
+		background-size:12px 12px;
+		line-height:20px;
+		height:20px;
+		margin-bottom:21px;
+		padding-left:16px;
+	}
+
+
+	// after login
+	.wallet.status {
+		margin:44px -30px 0;
+		padding:0;
+		color:#fff;
+		background-color:#232323;
+
+		li {
+			$x:24px;
+			$y:20px;
+
+			box-sizing:border-box;
+
+			height:102px;
+			list-style-type:none;
+
+			position:relative;
+
+			&:first-child {
+				background-image: linear-gradient(113deg, #ff5252, #aa00ff);
+			}
+
+			span {
+				position:absolute;
+
+				&.title {
+					top:$y;
+					left:$x;
+					display:inline-block;
+					&:first-letter {
+						text-transform:uppercase;
+					}
+				}
+
+				&.amount {
+					font-size:$large;
+					font-weight:$light;
+					right:$x;
+					bottom:$y;
+
+					&:after {
+						content:'EOS';
+						font-size:$x-small;
+						display:inline-block;
+						margin-left:0.4em;
+						vertical-align:text-bottom;
+					}
+				}
+
+				&.status,
+				&.remaining.time {
+					font-size:$x-small;
+					top:$y + 2px;
+					right:$x;
+				}
+
+				&.status:before {
+					content:'';
+					display:inline-block;
+					width:10px;
+					height:10px;
+					border-radius:100%;
+					margin-right:0.4em;
+
+					vertical-align:baseline;
+				}
+
+				&.status.available:before {
+					background-color:#79c720;
+				}
+
+				&.status.unavailable:before {
+					background-color:#ff6b64;
+				}
+			}
+		}
+	}
+
+	button.resource.management {
+		position:absolute;
+		background:#000;
+		height:52px;
+		line-height:52px;
+		color:#fff;
+		border-radius:2px;
+		bottom:24px;
+		left:16px;
+		right:16px;
+		display:block;
+		width:calc(100% - 16px * 2);
+	}
+}
+
+aside.log.off {
+	display:flex;
+	align-items:flex-start;
+	flex-direction:column;
+	justify-content:center;
+}
+
+aside.log.in {
+	h2 {
+		text-align:center;
+		font-size:$normal;
+		font-weight:700;
+		line-height:1.5;
+
+		span.description {
+			display:block;
+			color:#999;
+			font-size:0.875em;
+			font-weight:$light;
+		}
+	}
+}
