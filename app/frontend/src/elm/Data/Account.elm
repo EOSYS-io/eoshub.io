@@ -110,12 +110,13 @@ accountDecoder =
                 |> required "available" JD.int
                 |> required "max" JD.int
             )
-        |> required "total_resources"
+        |> optional "total_resources"
             (decode ResourceInEos
                 |> required "net_weight" JD.string
                 |> required "cpu_weight" JD.string
                 |> required "ram_bytes" (JD.nullable JD.int)
             )
+            (ResourceInEos "0 EOS" "0 EOS" Nothing)
         |> optional "self_delegated_bandwidth"
             (decode ResourceInEos
                 |> required "net_weight" JD.string
@@ -166,65 +167,73 @@ getResource : String -> Int -> Int -> Int -> ( String, String, String )
 getResource resourceType used available max =
     let
         totalString =
-            case resourceType of
-                "net" ->
-                    -- Bytes
-                    if max < kilo then
-                        toString max ++ " bytes"
-                        -- KB
-                    else if (max >= kilo) && (max < mega) then
-                        unitConverterRound4 max kilo ++ " KB"
-                        -- MB
-                    else if (max >= mega) && (max < giga) then
-                        unitConverterRound4 max mega ++ " MB"
-                        -- GB
-                    else if (max >= giga) && (max < tera) then
-                        unitConverterRound4 max giga ++ " GB"
-                        -- TB
-                    else
-                        unitConverterRound4 max tera ++ " TB"
-
-                "cpu" ->
-                    -- ms
-                    if max < second then
-                        toString max ++ " ms"
-                        -- second
-                    else if (max >= second) && (max < minute) then
-                        unitConverterRound4 max second ++ " s"
-                        -- minute
-                    else if (max >= minute) && (max < hour) then
-                        unitConverterRound4 max minute ++ " min"
-                        -- hour
-                    else if (max >= hour) && (max < day) then
-                        unitConverterRound4 max hour ++ " hour"
-                        -- day
-                    else
-                        unitConverterRound4 max day ++ " day"
-
-                "ram" ->
-                    -- Bytes
-                    if max < 1024 then
-                        toString max ++ " bytes"
-                        -- KB
-                    else if (max >= kilo) && (max < mega) then
-                        unitConverterRound4 max kilo ++ " KB"
-                        -- MB
-                    else if (max >= mega) && (max < giga) then
-                        unitConverterRound4 max mega ++ " MB"
-                        -- GB
-                    else if (max >= giga) && (max < tera) then
-                        unitConverterRound4 max giga ++ " GB"
-                        -- TB
-                    else
-                        unitConverterRound4 max tera ++ " TB"
+            case max of
+                (-1) ->
+                    "unlimit"
 
                 _ ->
-                    ""
+                    case resourceType of
+                        "net" ->
+                            -- Bytes
+                            if max < kilo then
+                                toString max ++ " bytes"
+                                -- KB
+                            else if (max >= kilo) && (max < mega) then
+                                unitConverterRound4 max kilo ++ " KB"
+                                -- MB
+                            else if (max >= mega) && (max < giga) then
+                                unitConverterRound4 max mega ++ " MB"
+                                -- GB
+                            else if (max >= giga) && (max < tera) then
+                                unitConverterRound4 max giga ++ " GB"
+                                -- TB
+                            else
+                                unitConverterRound4 max tera ++ " TB"
+
+                        "cpu" ->
+                            -- ms
+                            if max < second then
+                                toString max ++ " ms"
+                                -- second
+                            else if (max >= second) && (max < minute) then
+                                unitConverterRound4 max second ++ " s"
+                                -- minute
+                            else if (max >= minute) && (max < hour) then
+                                unitConverterRound4 max minute ++ " min"
+                                -- hour
+                            else if (max >= hour) && (max < day) then
+                                unitConverterRound4 max hour ++ " hour"
+                                -- day
+                            else
+                                unitConverterRound4 max day ++ " day"
+
+                        "ram" ->
+                            -- Bytes
+                            if max < 1024 then
+                                toString max ++ " bytes"
+                                -- KB
+                            else if (max >= kilo) && (max < mega) then
+                                unitConverterRound4 max kilo ++ " KB"
+                                -- MB
+                            else if (max >= mega) && (max < giga) then
+                                unitConverterRound4 max mega ++ " MB"
+                                -- GB
+                            else if (max >= giga) && (max < tera) then
+                                unitConverterRound4 max giga ++ " GB"
+                                -- TB
+                            else
+                                unitConverterRound4 max tera ++ " TB"
+
+                        _ ->
+                            ""
 
         avaliablePercent =
             case max of
                 0 ->
                     "0%"
+
+                (-1) ->
+                    "100%"
 
                 _ ->
                     (percentageConverter available max |> Round.round 2) ++ "%"
@@ -233,6 +242,9 @@ getResource resourceType used available max =
             case max of
                 0 ->
                     "hell"
+
+                (-1) ->
+                    "fine"
 
                 _ ->
                     let

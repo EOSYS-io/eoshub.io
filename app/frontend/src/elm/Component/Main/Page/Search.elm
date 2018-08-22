@@ -153,10 +153,14 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message ({ account, actions, pagination } as model) =
     case message of
         OnFetchAccount (Ok data) ->
-            ( { model | account = data }, Cmd.none )
+            ( { model | account = data |> Debug.log "data" }, Cmd.none )
 
         OnFetchAccount (Err error) ->
-            ( model, Cmd.none )
+            let
+                ee =
+                    error |> Debug.log "error"
+            in
+                ( model, Cmd.none )
 
         OnFetchActions (Ok actions) ->
             let
@@ -263,7 +267,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "CPU                "
                         , strong []
-                            [ text (cpuTotal ++ " Total") ]
+                            [ text ("/ " ++ cpuTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span
@@ -284,7 +288,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "NET                "
                         , strong []
-                            [ text (netTotal ++ " Total") ]
+                            [ text ("/ " ++ netTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span
@@ -301,7 +305,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "RAM                "
                         , strong []
-                            [ text (ramTotal ++ " Total") ]
+                            [ text ("/ " ++ ramTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span [ attribute "data-status" ramColor, attribute "style" ("width: " ++ ramPercent), title ("RAM : " ++ ramPercent) ]
