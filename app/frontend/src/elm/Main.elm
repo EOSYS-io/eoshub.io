@@ -172,16 +172,13 @@ updateComponent currentComponent location flags =
         case componentRoute of
             Route.MainComponentRoute ->
                 let
-                    componentModel =
+                    ( newComponentModel, componentCmd ) =
                         case currentComponent of
                             MainComponent subModel ->
-                                subModel
+                                subModel |> MainComponent.update (MainComponent.OnLocationChange location False)
 
                             _ ->
-                                MainComponent.initModel location
-
-                    ( newComponentModel, componentCmd ) =
-                        MainComponent.update (MainComponent.OnLocationChange location) componentModel
+                                MainComponent.initModel location |> MainComponent.update (MainComponent.OnLocationChange location True)
                 in
                     ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
 

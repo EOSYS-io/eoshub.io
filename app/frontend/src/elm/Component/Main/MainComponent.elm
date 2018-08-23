@@ -101,7 +101,7 @@ type Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
-    | OnLocationChange Location
+    | OnLocationChange Location Bool
     | NotificationMessage Notification.Message
     | SidebarMessage Sidebar.Message
     | CloseUnderConstruction
@@ -122,51 +122,58 @@ type alias PublicKeyQuery =
 
 initCmd : Model -> Location -> Cmd Message
 initCmd { page } location =
+    Cmd.batch
+        [ pageCmd page location
+        , Cmd.map SidebarMessage Sidebar.initCmd
+        ]
+
+
+updateCmd : Model -> Location -> Cmd Message
+updateCmd { page } location =
+    pageCmd page location
+
+
+pageCmd : Page -> Location -> Cmd Message
+pageCmd page location =
     let
         route =
             location |> parseLocation
-
-        pageInitCmd =
-            case route of
-                SearchRoute query ->
-                    let
-                        searchInitModel =
-                            case page of
-                                SearchPage searchModel ->
-                                    searchModel
-
-                                _ ->
-                                    Search.initModel
-
-                        subInitCmd =
-                            case query of
-                                Just str ->
-                                    Search.initCmd str searchInitModel
-
-                                Nothing ->
-                                    Cmd.none
-                    in
-                        Cmd.map SearchMessage subInitCmd
-
-                SearchKeyRoute query ->
-                    let
-                        subInitCmd =
-                            case query of
-                                Just str ->
-                                    SearchKey.initCmd str
-
-                                Nothing ->
-                                    Cmd.none
-                    in
-                        Cmd.map SearchKeyMessage subInitCmd
-
-                _ ->
-                    Cmd.none
     in
-        Cmd.batch
-            [ pageInitCmd
-            , Cmd.map SidebarMessage Sidebar.initCmd
-            ]
+        case route of
+            SearchRoute query ->
+                let
+                    searchInitModel =
+                        case page of
+                            SearchPage searchModel ->
+                                searchModel
+
+                            _ ->
+                                Search.initModel
+
+                    subInitCmd =
+                        case query of
+                            Just str ->
+                                Search.initCmd str searchInitModel
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    Cmd.map SearchMessage subInitCmd
+
+            SearchKeyRoute query ->
+                let
+                    subInitCmd =
+                        case query of
+                            Just str ->
+                                SearchKey.initCmd str
+
+                            Nothing ->
+                                Cmd.none
+                in
+                    Cmd.map SearchKeyMessage subInitCmd
+
+            _ ->
+                Cmd.none
 
 
 
@@ -333,13 +340,18 @@ update message ({ page, notification, header, sidebar } as model) =
                 , Cmd.none
                 )
 
-        ( OnLocationChange location, _ ) ->
+        ( OnLocationChange location newComponent, _ ) ->
             let
                 newPage =
                     getPage location
 
                 cmd =
-                    initCmd model location
+                    case newComponent of
+                        True ->
+                            initCmd model location
+
+                        False ->
+                            updateCmd model location
             in
                 ( { model | page = newPage }, cmd )
 
