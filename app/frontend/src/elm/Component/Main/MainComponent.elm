@@ -160,11 +160,7 @@ initCmd { page } location =
                     Cmd.map SearchKeyMessage subInitCmd
 
             IndexRoute ->
-                let
-                    subInitCmd =
-                        Sidebar.initCmd
-                in
-                    Cmd.map SidebarMessage subInitCmd
+                Cmd.map SidebarMessage Sidebar.initCmd
 
             _ ->
                 Cmd.none
