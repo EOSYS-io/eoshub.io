@@ -84,6 +84,11 @@ type Message
     | OnFetchAccount (Result Http.Error Account)
 
 
+initCmd : Cmd Message
+initCmd =
+    Port.checkWalletStatus ()
+
+
 
 -- VIEW
 

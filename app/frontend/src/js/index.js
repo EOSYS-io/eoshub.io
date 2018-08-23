@@ -50,7 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   app.ports.checkWalletStatus.subscribe(async () => {
-    app.ports.receiveWalletStatus.send(createResponseStatus());
+    window.setTimeout(
+      () => {
+        app.ports.receiveWalletStatus.send(createResponseStatus());
+      },
+      500,
+    );
   });
 
   // TODO(heejae): After wallet auth success/error message popup is devised,
@@ -147,13 +152,13 @@ document.addEventListener('scatterLoaded', () => {
 // TODO(heejae): This function is a temporary work cause it makes an assumption that
 // elm and scatter finish loading after 0.5 seconds from beginning.
 // Need to find a good way to handle scatter not found.
-window.setTimeout(
-  () => {
-    const { scatterClient } = getScatter();
-    if (!scatterClient) {
-      const app = getElm();
-      app.ports.receiveWalletStatus.send(createResponseStatus());
-    }
-  },
-  500,
-);
+// window.setTimeout(
+//   () => {
+//     const { scatterClient } = getScatter();
+//     if (!scatterClient) {
+//       const app = getElm();
+//       app.ports.receiveWalletStatus.send(createResponseStatus());
+//     }
+//   },
+//   500,
+// );
