@@ -97,10 +97,6 @@ type I18n
     | Memo
     | MemoTooLong
     | MemoNotMandatory
-    | UnderConstruction1
-    | UnderConstruction2
-    | UnderConstructionDesc1
-    | UnderConstructionDesc2
     | ConfirmEmailSent
     | AlreadyExistEmail
     | AccountCreationFailure
@@ -476,30 +472,6 @@ getMessages i18n =
             { korean = "필수는 아니에요 :)"
             , english = "Optional :)"
             , chinese = "选填"
-            }
-
-        UnderConstruction1 ->
-            { korean = "여기는 아직"
-            , english = "Comming soon!"
-            , chinese = "这里还在"
-            }
-
-        UnderConstruction2 ->
-            { korean = "공사중이에요!"
-            , english = ""
-            , chinese = "工事当中"
-            }
-
-        UnderConstructionDesc1 ->
-            { korean = "추후 업데이트 될 예정이오니"
-            , english = "This page will be updated soon"
-            , chinese = "我们会短时间内进行更新"
-            }
-
-        UnderConstructionDesc2 ->
-            { korean = "조금만 기다려주세요!"
-            , english = "We appreciate your patience!"
-            , chinese = "请各位尽情等待!"
             }
 
         ConfirmEmailSent ->

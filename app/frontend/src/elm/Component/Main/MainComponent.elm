@@ -69,7 +69,6 @@ type alias Model =
     , notification : Notification.Model
     , header : Header
     , sidebar : Sidebar.Model
-    , showUnderConstruction : Bool
     }
 
 
@@ -84,7 +83,6 @@ initModel location =
         , errMessage = ""
         }
     , sidebar = Sidebar.initModel
-    , showUnderConstruction = False
     }
 
 
@@ -104,7 +102,6 @@ type Message
     | OnLocationChange Location Bool
     | NotificationMessage Notification.Message
     | SidebarMessage Sidebar.Message
-    | CloseUnderConstruction
 
 
 type Query
@@ -181,7 +178,7 @@ pageCmd page location =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, showUnderConstruction } =
+view { page, header, notification, sidebar } =
     let
         newContentHtml =
             case page of
@@ -207,37 +204,6 @@ view { page, header, notification, sidebar, showUnderConstruction } =
 
                 _ ->
                     NotFound.view sidebar.language
-
-        underConstructionView =
-            div
-                [ id "underConstruction"
-                , class
-                    ("notificaiton under_construction"
-                        ++ if showUnderConstruction then
-                            " viewing"
-                           else
-                            ""
-                    )
-                ]
-                [ div [ class "panel" ]
-                    [ h2 []
-                        [ text (translate sidebar.language UnderConstruction1)
-                        , br [] []
-                        , text (translate sidebar.language UnderConstruction2)
-                        ]
-                    , p []
-                        [ text (translate sidebar.language UnderConstructionDesc1)
-                        , br [] []
-                        , text (translate sidebar.language UnderConstructionDesc2)
-                        ]
-                    , button
-                        [ type_ "button"
-                        , class "icon close notification button"
-                        , onClick CloseUnderConstruction
-                        ]
-                        [ text "닫기" ]
-                    ]
-                ]
     in
         div [ class "container" ]
             [ Html.map SidebarMessage (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
@@ -268,7 +234,6 @@ view { page, header, notification, sidebar, showUnderConstruction } =
                         notification
                         sidebar.language
                     )
-                , underConstructionView
                 ]
             ]
 
@@ -286,9 +251,6 @@ update message ({ page, notification, header, sidebar } as model) =
                     Search.update subMessage subModel
             in
                 ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
-
-        ( TransferMessage Transfer.OpenUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = True }, Cmd.none )
 
         ( SearchKeyMessage subMessage, SearchKeyPage subModel ) ->
             let
@@ -317,9 +279,6 @@ update message ({ page, notification, header, sidebar } as model) =
 
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
-
-        ( IndexMessage Index.OpenUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = True }, Cmd.none )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let
@@ -390,9 +349,6 @@ update message ({ page, notification, header, sidebar } as model) =
                     Sidebar.update sidebarMessage sidebar
             in
                 ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
-
-        ( CloseUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = False }, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
