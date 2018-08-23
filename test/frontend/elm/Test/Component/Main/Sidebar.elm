@@ -98,11 +98,6 @@ tests =
                         Expect.equal
                             ( initModel, Port.invalidateAccount () )
                             (update InvalidateAccount initModel)
-                , test "UpdateLanguage" <|
-                    \() ->
-                        Expect.equal
-                            ( { initModel | language = Korean }, Cmd.none )
-                            (update (UpdateLanguage Korean) initModel)
                 , test "UpdateState" <|
                     \() ->
                         Expect.equal

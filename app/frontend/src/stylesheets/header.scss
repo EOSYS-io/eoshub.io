@@ -1,0 +1,83 @@
+header {
+	background:#232323;
+	box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);
+
+	display:flex;
+
+	padding:0 32px;
+
+	align-items:center;
+	justify-content:space-between;
+
+	h1 {
+		width:95px;
+		height:20px;
+		background:url('../image/logo-eoshub.svg#white') center center no-repeat transparent;
+		background-size:contain;
+
+		a {
+			display:inline-block;
+			width:inherit;
+			height:inherit;
+			@include ir();
+		}
+	}
+
+	div.language {
+		margin-left:48px;
+		flex:1;
+
+		button {
+			margin:0 8px;
+			font-size: 14px;
+			color: #5d5d5d;
+
+			&.selected {
+				color:#fff;
+			}
+		}
+	}
+
+	form {
+		width:332px;
+		height:40px;
+
+		display:flex;
+
+		background-color:#161616;
+		align-items:center;
+		border-radius:20px;
+		padding:0 20px;
+		font-size:rem(13);
+
+		input {
+			flex:1;
+			outline:0;
+			padding-left:32px;
+
+			background-image:url('../image/icon-search.svg#gray');
+			background-position:left center;
+			background-repeat:no-repeat;
+			background-size:20px 20px;
+
+			height:20px;
+			line-height:20px;
+
+			&:focus {
+				background-image:url('../image/icon-search.svg#white');
+			}
+		}
+
+		button {
+			outline:0;
+			height:inherit;
+
+			&:hover,
+			&:active {
+				color:#fff;
+			}
+		}
+	}
+
+}
+

@@ -1,0 +1,353 @@
+
+// --------------------------------------------------------------------------------
+// main :: join process
+// --------------------------------------------------------------------------------
+
+main.join { /* namespace */ }
+
+// common asset
+main.join {
+
+	h2 + p {
+		line-height:1.6;
+		font-size:$small;
+	}
+
+	input[type='email'],
+	input[type='text'] {
+		outline: 0;
+		padding: 14px 0 14px 31px;
+
+		border: 0;
+		border-bottom: 1px solid #e8e8e8;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	input[type='email'] {
+		background:url('../image/icon-mail.svg') left center no-repeat;
+	}
+
+	input[type='text'] {
+		background:url('../image/icon-id-default.svg') left center no-repeat;
+	}
+
+	div.btn_area {
+		margin-top:32px;
+		display:flex;
+	}
+
+	button[type="button"].button,
+	a.button {
+		flex:1;
+		outline:0;
+		display:inline-block;
+
+		line-height:50px;
+		height: 52px;
+
+		border-radius: 2px;
+
+		font-size:$small;
+
+		// type case
+		&.purple {
+			background: $purple-light;
+			color:$white;
+		}
+
+		&.pink {
+			background-image: $pink-gradient;
+			color:$white;
+		}
+
+		&.gray {
+			background-image:none;
+			background-color: $x-dark-gray;
+		}
+
+		&.mono {
+			border:1px solid $gray;
+		}
+
+		// pesudo deco
+		&:disabled {
+			background-image:none;
+			background-color: #282828;
+		}
+
+		&:last-child {
+			margin-left:8px;
+		}
+	}
+
+	article {
+		box-sizing:border-box;
+	}
+
+
+	article[data-step="validate-email"],
+	article[data-step="validate-email-ok"],
+	article[data-step="copy-key-pair"],
+	article[data-step="payment-info"],
+	article[data-step="done"] {
+		width:400px;
+	}
+
+	article[data-step="validate-email"],
+	article[data-step="make-account"],
+	article[data-step="copy-key-pair"],
+	article[data-step="payment-info"],
+	article[data-step="done"] {
+		padding-top:19vh;
+	}
+
+	form {
+		span.validate {
+			font-size:$small;
+			height:20px;
+			background-size: 20px;
+			padding-left: 28px;
+			margin-top:12px;
+			display:block;
+
+			visibility:hidden;
+		}
+
+		input[valid] + span.validate {
+			visibility:visible;
+			color: #79c720;
+			background: url(../image/icon-check-circle.svg) left center no-repeat;
+		}
+
+		input[invalid] + span.validate {
+			visibility:visible;
+			color: #ff6b64;
+			background: url(../image/icon-x-circle.svg) left center no-repeat;
+		}
+	}
+
+	dl {
+		margin:40px 0 0;
+
+		display:grid;
+		grid-template-columns:20% auto;
+
+		dt,dd  {
+			box-sizing:border-box;
+			padding:0 16px;
+			line-height:62px;
+			font-size:$small;
+			border-top:1px solid #5d5d5d;
+
+			&:nth-of-type(1) {
+				border-top-width:0;
+			}
+		}
+
+		dt {
+			background:#232323;
+			text-align:center;
+			color:$white;
+		}
+
+		dd {
+			background-color:$x-dark-gray;
+			color:#999;
+			overflow-x:hidden;
+			text-overflow:ellipsis;
+		}
+	}
+
+	span[data-progress] {
+		display:flex;
+		align-items:center;
+		justify-content:space-between;
+		font-size:$xx-large;
+		font-weight: 100;
+		font-style: normal;
+		font-stretch: normal;
+		line-height: 1.19;
+		letter-spacing: normal;
+		color: #ffffff;
+		margin-bottom:24px;
+
+		&:after {
+			content:'';
+			display:inline-block;
+			width:46px;
+			height:10px;
+		}
+
+		&[data-progress="01"]:after {
+			background:
+			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at center, #666 5px, transparent 5px),
+			radial-gradient(circle at 40px, #666 5px, transparent 5px);
+		}
+
+		&[data-progress="02"]:after {
+			background:
+			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at center, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at 40px, #666 5px, transparent 5px);
+		}
+
+		&[data-progress="03"]:after {
+			background:
+			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at center, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at 40px, #ff5252 0, #aa00ff 5px, transparent 5px);
+		}
+
+	}
+}
+
+
+
+
+main.join {
+	article[data-step="validate-email"] {
+		form {
+			span.validate {
+				font-size:$small;
+				height:20px;
+				background-size: 20px;
+				padding-left: 28px;
+				margin-top:12px;
+				display:block;
+
+				visibility:hidden;
+			}
+
+			input[valid] + span.validate {
+				visibility:visible;
+				color: #79c720;
+				background: url(../image/icon-check-circle.svg) left center no-repeat;
+			}
+
+			input[invalid] + span.validate {
+				visibility:visible;
+				color: #ff6b64;
+				background: url(../image/icon-x-circle.svg) left center no-repeat;
+			}
+		}
+
+
+		p.exist_account {
+			text-align:center;
+			font-size:$small;
+
+			a {
+				color:$white;
+				margin-left:0.6em;
+				text-decoration:underline;
+
+				&:visited {
+					color:$purple;
+				}
+			}
+		}
+	}
+
+	article[data-step="validate-email-ok"] {
+		height:calc(100vh - #{$header_height});
+		text-align:center;
+
+		padding-top:67px + 32px;
+		background:url('../image/bi-hubby.svg#white') center calc(50% - 67px - 32px) no-repeat;
+		background-size:61px 67px;
+
+		display:flex;
+		flex-direction:column;
+		justify-content:center;
+
+	}
+
+	article[data-step*="make-account"] {
+		form {
+			margin-top:104px;
+		}
+	}
+
+	article[data-step="copy-key-pair"] {
+		textarea.hidden_copy_field {
+			border: 0;
+			clip: rect(1px, 1px, 1px, 1px);
+			clip-path: inset(50%);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute !important;
+			width: 1px;
+			word-wrap: normal !important;
+		}
+	}
+
+	article[data-step="payment-info"] {
+		// area
+		.select_payment_type.area {
+			margin-top:16px;
+			padding-bottom:16px;
+			border-bottom:1px solid #5d5d5d;
+
+			display:flex;
+			align-items:center;
+
+			button.button {
+				height:36px;
+				line-height:34px;
+				max-width:96px;
+				padding:0;
+				margin-right:0.6em;
+			}
+
+		}
+
+		.confirm.area {
+			margin-top:32px;
+
+			display:flex;
+			justify-content:space-between;
+			align-items:center;
+
+			form {
+				label {
+					font-size:$small;
+				}
+			}
+
+			button.button  {
+				max-width:136px;
+			}
+
+		}
+
+		p.amount {
+			flex:1;
+			text-align:right;
+			margin:0;
+			font-size:$x-small;
+			strong {
+				font-size: $x-large;
+				color: $white;
+				font-weight:100;
+				margin:0 0.2em;
+			}
+		}
+
+		dl.invoice {
+			grid-template-columns:30% auto;
+			text-align:center;
+		}
+	}
+
+	article[data-step="done"] {
+		background:url('../image/bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
+		background-size:61px 67px;
+	}
+}
+
+
+

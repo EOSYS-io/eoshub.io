@@ -3,28 +3,30 @@ module Component.Main.MainComponent exposing (..)
 import Html
     exposing
         ( Html
-        , Attribute
-        , br
         , div
-        , h2
         , section
         , form
-        , ul
-        , li
-        , p
-        , span
         , input
         , button
         , text
+        , a
+        , h1
+        , nav
+        , ul
+        , li
+        , span
+        , footer
         )
 import Html.Attributes
     exposing
         ( placeholder
-        , disabled
         , class
         , attribute
         , type_
+        , style
         , id
+        , rel
+        , href
         )
 import Html.Events exposing (on, onInput, onClick, onSubmit)
 import Navigation exposing (Location)
@@ -37,7 +39,7 @@ import Component.Main.Page.Voting as Voting
 import Component.Main.Sidebar as Sidebar
 import Port
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (I18n(..), translate)
+import Translation exposing (Language(..), I18n(..), translate)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
 import Util.Validation exposing (isAccount, isPublicKey)
@@ -61,6 +63,7 @@ type alias Header =
     , eosPrice : Int
     , ramPrice : Int
     , errMessage : String
+    , language : Language
     }
 
 
@@ -69,7 +72,6 @@ type alias Model =
     , notification : Notification.Model
     , header : Header
     , sidebar : Sidebar.Model
-    , showUnderConstruction : Bool
     }
 
 
@@ -82,9 +84,9 @@ initModel location =
         , eosPrice = 0
         , ramPrice = 0
         , errMessage = ""
+        , language = Korean
         }
     , sidebar = Sidebar.initModel
-    , showUnderConstruction = False
     }
 
 
@@ -104,7 +106,8 @@ type Message
     | OnLocationChange Location Bool
     | NotificationMessage Notification.Message
     | SidebarMessage Sidebar.Message
-    | CloseUnderConstruction
+    | ChangeUrl String
+    | UpdateLanguage Language
 
 
 type Query
@@ -181,95 +184,184 @@ pageCmd page location =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, showUnderConstruction } =
+view { page, header, notification, sidebar } =
     let
+        { language } =
+            header
+
         newContentHtml =
             case page of
                 SearchPage subModel ->
-                    Html.map SearchMessage (Search.view sidebar.language subModel)
+                    Html.map SearchMessage (Search.view language subModel)
 
                 SearchKeyPage subModel ->
-                    Html.map SearchKeyMessage (SearchKey.view sidebar.language subModel)
+                    Html.map SearchKeyMessage (SearchKey.view language subModel)
 
                 VotingPage subModel ->
-                    Html.map VotingMessage (Voting.view sidebar.language subModel)
+                    Html.map VotingMessage (Voting.view language subModel)
 
                 TransferPage subModel ->
                     Html.map TransferMessage
                         (Transfer.view
-                            sidebar.language
+                            language
                             subModel
                             sidebar.account.core_liquid_balance
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view sidebar.language)
+                    Html.map IndexMessage (Index.view language)
 
                 _ ->
-                    NotFound.view sidebar.language
+                    NotFound.view language
 
-        underConstructionView =
-            div
-                [ id "underConstruction"
-                , class
-                    ("notificaiton under_construction"
-                        ++ if showUnderConstruction then
-                            " viewing"
-                           else
-                            ""
-                    )
-                ]
-                [ div [ class "panel" ]
-                    [ h2 []
-                        [ text (translate sidebar.language UnderConstruction1)
-                        , br [] []
-                        , text (translate sidebar.language UnderConstruction2)
+        getLanguageClass lang =
+            if lang == language then
+                class "selected"
+            else
+                class ""
+
+        sidebarButtonClass =
+            if sidebar.fold then
+                class "toggle dashboard shrink"
+            else
+                class "toggle dashboard"
+
+        headerView =
+            Html.header []
+                [ h1 []
+                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
+                    ]
+                , div [ class "language" ]
+                    [ button
+                        [ type_ "button"
+                        , getLanguageClass Korean
+                        , attribute "data-lang" "ko"
+                        , onClick (UpdateLanguage Korean)
                         ]
-                    , p []
-                        [ text (translate sidebar.language UnderConstructionDesc1)
-                        , br [] []
-                        , text (translate sidebar.language UnderConstructionDesc2)
-                        ]
+                        [ text "한글" ]
                     , button
                         [ type_ "button"
-                        , class "icon close notification button"
-                        , onClick CloseUnderConstruction
+                        , getLanguageClass English
+                        , attribute "data-lang" "en"
+                        , onClick (UpdateLanguage English)
                         ]
-                        [ text "닫기" ]
+                        [ text "ENG" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass Chinese
+                        , attribute "data-lang" "cn"
+                        , onClick (UpdateLanguage Chinese)
+                        ]
+                        [ text "中文" ]
+                    ]
+                , form [ onSubmit (CheckSearchQuery header.searchInput) ]
+                    [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "text", onInput InputSearch ]
+                        []
+                    , button [ type_ "button", onClick (CheckSearchQuery header.searchInput) ]
+                        [ text "검색하기" ]
+                    ]
+                ]
+
+        navigationView =
+            nav []
+                [ ul []
+                    [ li
+                        []
+                        [ button
+                            [ type_ "button"
+                            , sidebarButtonClass
+                            , id "openAside"
+                            , onClick (SidebarMessage Sidebar.ToggleSidebar)
+                            ]
+                            [ text (translate language Translation.OpenCloseSidebar) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.OpenCloseSidebar)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "resource"
+                            , onClick (ChangeUrl "/resource")
+                            ]
+                            [ text "리소스 관리" ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text "리소스 관리" ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "transfer"
+                            , onClick (ChangeUrl "/transfer")
+                            ]
+                            [ text (translate language Translation.Transfer) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.Transfer)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "ram_market"
+                            , onClick (ChangeUrl "/ram-market")
+                            ]
+                            [ text (translate language Translation.RamMarket) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.RamMarket)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "vote"
+                            , onClick (ChangeUrl "/voting")
+                            ]
+                            [ text (translate language Translation.Vote) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.Vote)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "dapps"
+                            , onClick (ChangeUrl "/dapps")
+                            ]
+                            [ text "Dapps" ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text "Dapps"
+                            ]
+                        ]
+                    ]
+                ]
+
+        footerView =
+            footer []
+                [ div [ class "sns area" ]
+                    [ a [ href "#", class "sns medium button" ] [ text "Go to Medium" ]
+                    , a [ href "#", class "sns twitter button" ] [ text "Go to Twitter" ]
+                    , a [ href "#", class "sns telegram button" ] [ text "Go to Telegram" ]
                     ]
                 ]
     in
-        div [ class "container" ]
-            [ Html.map SidebarMessage (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
-            , div [ class "wrapper" ]
-                [ section [ class "tick_display" ]
-                    [ form [ class "search", onSubmit (CheckSearchQuery header.searchInput) ]
-                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch ]
-                            []
-                        , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
-                            [ text "검색하기" ]
-                        ]
-                    , ul [ class "price" ]
-                        [ li []
-                            [ text "이오스 시세                           "
-                            , span [ attribute "data-before" "lower" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        , li []
-                            [ text "RAM 가격                            "
-                            , span [ attribute "data-before" "higher" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        ]
-                    ]
+        div []
+            [ headerView
+            , navigationView
+            , section [ class "content" ]
+                [ Html.map SidebarMessage (Sidebar.view sidebar language)
                 , newContentHtml
                 , Html.map NotificationMessage
                     (Notification.view
                         notification
-                        sidebar.language
+                        language
                     )
-                , underConstructionView
                 ]
+            , footerView
             ]
 
 
@@ -286,9 +378,6 @@ update message ({ page, notification, header, sidebar } as model) =
                     Search.update subMessage subModel
             in
                 ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
-
-        ( TransferMessage Transfer.OpenUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = True }, Cmd.none )
 
         ( SearchKeyMessage subMessage, SearchKeyPage subModel ) ->
             let
@@ -317,9 +406,6 @@ update message ({ page, notification, header, sidebar } as model) =
 
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
-
-        ( IndexMessage Index.OpenUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = True }, Cmd.none )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let
@@ -391,8 +477,11 @@ update message ({ page, notification, header, sidebar } as model) =
             in
                 ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 
-        ( CloseUnderConstruction, _ ) ->
-            ( { model | showUnderConstruction = False }, Cmd.none )
+        ( ChangeUrl url, _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateLanguage language, _ ) ->
+            ( { model | header = { header | language = language } }, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )

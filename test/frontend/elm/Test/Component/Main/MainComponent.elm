@@ -7,7 +7,7 @@ import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Voting as Voting
 import Test exposing (..)
-import Translation exposing (I18n(TransferSucceeded, CheckDetail))
+import Translation exposing (Language(..), I18n(TransferSucceeded, CheckDetail))
 import Util.WalletDecoder exposing (WalletStatus(Authenticated))
 import View.Notification
 
@@ -89,6 +89,15 @@ tests =
                             Expect.equal
                                 ( expectedModel, Cmd.none )
                                 (update (UpdatePushActionResponse pushActionResponse) model)
+                , test "UpdateLanguage" <|
+                    \() ->
+                        let
+                            ({ header } as model) =
+                                initModel location
+                        in
+                            Expect.equal
+                                ( { model | header = { header | language = English } }, Cmd.none )
+                                (update (UpdateLanguage English) model)
                 , test "CloseNotification" <|
                     \() ->
                         let

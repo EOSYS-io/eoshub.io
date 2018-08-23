@@ -1,15 +1,19 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <!-- Generator: sketchtool 51 (57462) - http://www.bohemiancoding.com/sketch -->
-    <title>208A1D39-FAC0-4E75-A3F6-A47F8811689C</title>
-    <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <g id="icon_search" stroke="#536DFE" stroke-width="2">
-            <g id="search" transform="translate(1.000000, 1.000000)">
-                <circle id="Oval" cx="9.47276063" cy="9.47276063" r="8.56037527"></circle>
-                <path d="M21.457286,21.457286 L15.5220925,15.5220925" id="Shape"></path>
-            </g>
-        </g>
-    </g>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+	<style>
+		g { display: none }
+		g:target g,
+		g:target { display: inline }
+	</style>
+	<g id="gray">
+		<g fill="none" fill-rule="evenodd" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)">
+			<circle cx="9.473" cy="9.473" r="8.56"/>
+			<path d="M21.457 21.457l-5.935-5.935"/>
+		</g>
+	</g>
+	<g id="white">
+		<g fill="none" fill-rule="evenodd" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)">
+			<circle cx="9.473" cy="9.473" r="8.56"/>
+			<path d="M21.457 21.457l-5.935-5.935"/>
+		</g>
+	</g>
 </svg>
