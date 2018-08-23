@@ -42,8 +42,7 @@ type State
 
 
 type alias Model =
-    { language : Language
-    , wallet : Wallet
+    { wallet : Wallet
     , state : State
     , fold : Bool
     , configPanelOpen : Bool
@@ -53,8 +52,7 @@ type alias Model =
 
 initModel : Model
 initModel =
-    { language = English
-    , wallet =
+    { wallet =
         { status = NotFound
         , account = ""
         , authority = ""
@@ -75,7 +73,6 @@ type Message
     | CheckWalletStatus
     | ToggleSidebar
     | InvalidateAccount
-    | UpdateLanguage Language
     | UpdateWalletStatus WalletResponse
     | UpdateState State
     | ChangeUrl String
@@ -93,8 +90,8 @@ initCmd =
 -- VIEW
 
 
-view : Model -> List (Html Message)
-view ({ state, language } as model) =
+view : Model -> Language -> List (Html Message)
+view ({ state } as model) language =
     [ header []
         [ h1
             [ style [ ( "cursor", "pointer" ) ]
@@ -108,7 +105,7 @@ view ({ state, language } as model) =
             , attribute "aria-hidden" "true"
             , onClick ToggleSidebar
             ]
-            [ text (translate language OpenCloseSidebar) ]
+            [ text "openclose" ]
         ]
     , case state of
         SignIn ->
@@ -118,7 +115,7 @@ view ({ state, language } as model) =
             pairWalletView language
 
         AccountInfo ->
-            accountInfoView model
+            accountInfoView model language
 
         Loading ->
             loadingView language
@@ -128,29 +125,7 @@ view ({ state, language } as model) =
             , a [ class "sns twitter button" ] []
             , a [ class "sns telegram button" ] []
             ]
-        , div [ class "lang_area" ]
-            [ button
-                [ type_ "button"
-                , class "lang ko transparent button"
-                , attribute "data-lang" "ko"
-                , onClick (UpdateLanguage Korean)
-                ]
-                [ text "한글" ]
-            , button
-                [ type_ "button"
-                , class "lang en transparent button"
-                , attribute "data-lang" "en"
-                , onClick (UpdateLanguage English)
-                ]
-                [ text "ENG" ]
-            , button
-                [ type_ "button"
-                , class "lang en transparent button"
-                , attribute "data-lang" "cn"
-                , onClick (UpdateLanguage Chinese)
-                ]
-                [ text "中文" ]
-            ]
+        , div [ class "lang_area" ] []
         ]
     ]
 
@@ -216,8 +191,8 @@ pairWalletView language =
         ]
 
 
-accountInfoView : Model -> Html Message
-accountInfoView { language, wallet, configPanelOpen, account } =
+accountInfoView : Model -> Language -> Html Message
+accountInfoView { wallet, configPanelOpen, account } language =
     let
         { core_liquid_balance, voter_info, refund_request } =
             account
@@ -340,9 +315,6 @@ update message ({ fold, wallet } as model) =
 
         InvalidateAccount ->
             ( model, Port.invalidateAccount () )
-
-        UpdateLanguage language ->
-            ( { model | language = language }, Cmd.none )
 
         UpdateState state ->
             let

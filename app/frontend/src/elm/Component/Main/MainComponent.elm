@@ -16,6 +16,8 @@ import Html
         , input
         , button
         , text
+        , a
+        , h1
         )
 import Html.Attributes
     exposing
@@ -25,6 +27,7 @@ import Html.Attributes
         , attribute
         , type_
         , id
+        , style
         )
 import Html.Events exposing (on, onInput, onClick, onSubmit)
 import Navigation exposing (Location)
@@ -37,7 +40,7 @@ import Component.Main.Page.Voting as Voting
 import Component.Main.Sidebar as Sidebar
 import Port
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (I18n(..), translate)
+import Translation exposing (Language(..), I18n(..), translate)
 import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
 import Util.Validation exposing (isAccount, isPublicKey)
@@ -61,6 +64,7 @@ type alias Header =
     , eosPrice : Int
     , ramPrice : Int
     , errMessage : String
+    , language : Language
     }
 
 
@@ -81,6 +85,7 @@ initModel location =
         , eosPrice = 0
         , ramPrice = 0
         , errMessage = ""
+        , language = Korean
         }
     , sidebar = Sidebar.initModel
     }
@@ -102,6 +107,8 @@ type Message
     | OnLocationChange Location Bool
     | NotificationMessage Notification.Message
     | SidebarMessage Sidebar.Message
+    | ChangeUrl String
+    | UpdateLanguage Language
 
 
 type Query
@@ -183,56 +190,81 @@ view { page, header, notification, sidebar } =
         newContentHtml =
             case page of
                 SearchPage subModel ->
-                    Html.map SearchMessage (Search.view sidebar.language subModel)
+                    Html.map SearchMessage (Search.view header.language subModel)
 
                 SearchKeyPage subModel ->
-                    Html.map SearchKeyMessage (SearchKey.view sidebar.language subModel)
+                    Html.map SearchKeyMessage (SearchKey.view header.language subModel)
 
                 VotingPage subModel ->
-                    Html.map VotingMessage (Voting.view sidebar.language subModel)
+                    Html.map VotingMessage (Voting.view header.language subModel)
 
                 TransferPage subModel ->
                     Html.map TransferMessage
                         (Transfer.view
-                            sidebar.language
+                            header.language
                             subModel
                             sidebar.account.core_liquid_balance
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view sidebar.language)
+                    Html.map IndexMessage (Index.view header.language)
 
                 _ ->
-                    NotFound.view sidebar.language
+                    NotFound.view header.language
+
+        getLanguageClass lang =
+            if lang == header.language then
+                class "selected"
+            else
+                class ""
     in
-        div [ class "container" ]
-            [ Html.map SidebarMessage (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar))
-            , div [ class "wrapper" ]
-                [ section [ class "tick_display" ]
-                    [ form [ class "search", onSubmit (CheckSearchQuery header.searchInput) ]
-                        [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "search", onInput InputSearch ]
-                            []
-                        , button [ class "search button", type_ "button", onClick (CheckSearchQuery (header.searchInput)) ]
-                            [ text "검색하기" ]
+        div []
+            [ Html.header []
+                [ h1 []
+                    [ a
+                        [ style [ ( "cursor", "pointer" ) ]
+                        , onClick (ChangeUrl "/")
                         ]
-                    , ul [ class "price" ]
-                        [ li []
-                            [ text "이오스 시세                           "
-                            , span [ attribute "data-before" "lower" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        , li []
-                            [ text "RAM 가격                            "
-                            , span [ attribute "data-before" "higher" ]
-                                [ text "1.000 EOS                           " ]
-                            ]
-                        ]
+                        [ text "eoshub" ]
                     ]
+                , div [ class "language" ]
+                    [ button
+                        [ type_ "button"
+                        , getLanguageClass Korean
+                        , attribute "data-lang" "ko"
+                        , onClick (UpdateLanguage Korean)
+                        ]
+                        [ text "한글" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass English
+                        , attribute "data-lang" "en"
+                        , onClick (UpdateLanguage English)
+                        ]
+                        [ text "ENG" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass Chinese
+                        , attribute "data-lang" "cn"
+                        , onClick (UpdateLanguage Chinese)
+                        ]
+                        [ text "中文" ]
+                    ]
+                , form []
+                    [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "text", onInput InputSearch ]
+                        []
+                    , button [ type_ "button", onClick (CheckSearchQuery header.searchInput) ]
+                        [ text "검색하기" ]
+                    ]
+                ]
+            , section [ class "content" ]
+                [ Html.map SidebarMessage
+                    (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar header.language))
                 , newContentHtml
                 , Html.map NotificationMessage
                     (Notification.view
                         notification
-                        sidebar.language
+                        header.language
                     )
                 ]
             ]
@@ -349,6 +381,12 @@ update message ({ page, notification, header, sidebar } as model) =
                     Sidebar.update sidebarMessage sidebar
             in
                 ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+
+        ( ChangeUrl url, _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateLanguage language, _ ) ->
+            ( { model | header = { header | language = language } }, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
