@@ -123,22 +123,20 @@ signInView language =
         , br [] []
         , text (translate language WelcomeEosHub)
         ]
-    , div [ class "panel" ]
-        [ p []
-            [ text (translate language IfYouHaveEos)
-            , br [] []
-            , text (translate language IfYouAreNew)
-            ]
+    , p []
+        [ text (translate language IfYouHaveEos)
+        , br [] []
+        , text (translate language IfYouAreNew)
         ]
     , div [ class "btn_area" ]
         [ a
-            [ class "middle blue_white button"
+            [ class "login button"
             , onClick (UpdateState PairWallet)
             ]
             [ text (translate language Login) ]
         , a
-            [ class "middle white_blue button"
-            , onClick (ChangeUrl ("/account/confirm_email?locale=" ++ (toLocale language)))
+            [ class "join button"
+            , onClick (ChangeUrl ("/account/confirm_email?locale=" ++ toLocale language))
             ]
             [ text (translate language NewAccount) ]
         ]
@@ -147,20 +145,21 @@ signInView language =
 
 pairWalletView : Language -> List (Html Message)
 pairWalletView language =
-    [ h2 []
+    [ button
+        [ type_ "button"
+        , class "back button"
+        , onClick (UpdateState SignIn)
+        ]
+        [ text "뒤로가기" ]
+    , h2 []
         [ text (translate language AttachableWallet1)
         , br [] []
         , text (translate language AttachableWallet2)
         ]
-    , div [ class "panel" ]
-        [ p []
-            [ text (translate language FurtherUpdate1)
-            , br [] []
-            , text (translate language FurtherUpdate2)
-            ]
-        , p [ class "help info" ]
-            [ a [] [ text (translate language HowToAttach) ]
-            ]
+    , p []
+        [ text (translate language FurtherUpdate1)
+        , br [] []
+        , text (translate language FurtherUpdate2)
         ]
     , ul [ class "available_wallet_list" ]
         [ li [ class "scatter" ]
@@ -171,12 +170,20 @@ pairWalletView language =
                 ]
                 [ text (translate language Attach) ]
             ]
+        , li [ class "nova" ]
+            [ text "NOVA"
+            , button
+                [ type_ "button"
+                ]
+                [ text (translate language Attach) ]
+            ]
         ]
+    , a [ class "go link wallet_sync" ] [ text (translate language HowToAttach) ]
     ]
 
 
 accountInfoView : Model -> Language -> List (Html Message)
-accountInfoView { wallet, configPanelOpen, account } language =
+accountInfoView { wallet, account } language =
     let
         { core_liquid_balance, voter_info, refund_request } =
             account
@@ -193,74 +200,62 @@ accountInfoView { wallet, configPanelOpen, account } language =
 
         stakedAmount =
             eosFloatToString (larimerToEos voter_info.staked)
-
-        configPanelClass =
-            class
-                ("config_panel"
-                    ++ (if configPanelOpen then
-                            " expand"
-                        else
-                            ""
-                       )
-                )
     in
-        [ div [ class "user_status" ]
-            [ h2 [] [ text (wallet.account ++ "@" ++ wallet.authority) ]
-            , div
-                [ configPanelClass ]
-                [ button
-                    [ type_ "button"
-                    , class "icon gear button"
-                    , attribute "wai-aria" "hidden"
-                    , onClick (OpenConfigPanel (not configPanelOpen))
-                    ]
-                    [ text "option" ]
-                , div [ class "menu_list" ]
-                    [ a
-                        [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
-                        ]
-                        [ text (translate language ChangeWallet) ]
-                    , a
-                        [ onClick
-                            (AndThen (OpenConfigPanel False)
-                                (ChangeUrl ("search?query=" ++ wallet.account))
-                            )
-                        ]
-                        [ text (translate language MyAccount) ]
-                    , a
-                        [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
-                        ]
-                        [ text (translate language SignOut) ]
-                    ]
+        [ h2 []
+            [ text wallet.account
+            , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
+            ]
+        , ul [ class "wallet status" ]
+            [ li []
+                [ span [ class "title" ] [ text "total" ]
+                , span [ class "amount" ] [ text (deleteFromBack 4 totalAmount) ]
+                ]
+            , li []
+                [ span [ class "title" ] [ text "stake" ]
+                , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
+                , span [ class "status available" ] [ text (translate language TransactionPossible) ]
+
+                -- span [ class "status unavailable" ] [ text "" ]
+                ]
+            , li []
+                [ span [ class "title" ] [ text "refunding" ]
+                , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
+                , span [ class "remaining time" ] [ text "72.3 hours" ]
                 ]
             ]
-        , div [ class "panel" ]
-            [ h3 []
-                [ text (translate language TotalAmount)
-                , strong [] [ text totalAmount ]
-                ]
-            , ul [ class "status" ]
-                [ li []
-                    [ text
-                        (translate language UnstakedAmount)
-                    , strong [] [ text unstakingAmount ]
-                    ]
-                , li []
-                    [ text
-                        (translate language StakedAmount)
-                    , strong [] [ text stakedAmount ]
-                    ]
-                ]
-            , div [ class "graph" ] [ span [ style [ ( "width", "50%" ) ], title "50%" ] [] ]
-            , p [ class "description" ] [ text (translate language FastTransactionPossible) ]
+        , button
+            [ type_ "button"
+            , class "resource management"
             ]
-        , div [ class "btn_area" ]
-            [ a [ class "middle lightgray_white button manage" ]
-                [ text (translate language ManageStaking) ]
-            ]
-        , p [ class "help" ]
-            [ a [] [ text (translate language WhatIsStaking) ]
-            ]
+            [ text (translate language ManageStaking) ]
+
+        -- Code block for config panel.
+        -- [ configPanelClass ]
+        -- [ button
+        --     [ type_ "button"
+        --     , class "icon gear button"
+        --     , attribute "wai-aria" "hidden"
+        --     , onClick (OpenConfigPanel (not configPanelOpen))
+        --     ]
+        --     [ text "option" ]
+        -- , div [ class "menu_list" ]
+        --     [ a
+        --         [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
+        --         ]
+        --         [ text (translate language ChangeWallet) ]
+        --     , a
+        --         [ onClick
+        --             (AndThen (OpenConfigPanel False)
+        --                 (ChangeUrl ("search?query=" ++ wallet.account))
+        --             )
+        --         ]
+        --         [ text (translate language MyAccount) ]
+        --     , a
+        --         [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
+        --         ]
+        --         [ text (translate language SignOut) ]
+        --     ]
+        -- ]
         ]
 
 
@@ -354,3 +349,12 @@ update message ({ fold, wallet } as model) =
 subscriptions : Model -> Sub Message
 subscriptions _ =
     Port.receiveWalletStatus UpdateWalletStatus
+
+
+
+-- Utility functions
+
+
+deleteFromBack : Int -> String -> String
+deleteFromBack digit string =
+    String.slice 0 ((string |> String.length) - digit) string

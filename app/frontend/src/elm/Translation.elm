@@ -65,7 +65,7 @@ type I18n
     | TotalAmount
     | StakedAmount
     | UnstakedAmount
-    | FastTransactionPossible
+    | TransactionPossible
     | ManageStaking
     | WhatIsStaking
     | Transfer
@@ -282,9 +282,9 @@ getMessages i18n =
             , chinese = "staking代币"
             }
 
-        FastTransactionPossible ->
-            { korean = "원할한 트랜잭션 사용이 가능합니다"
-            , english = "Fast transactions possible"
+        TransactionPossible ->
+            { korean = "트랜잭션 가능"
+            , english = "Transactions possible"
             , chinese = "可以进行交易"
             }
 
