@@ -3,31 +3,30 @@ module Component.Main.MainComponent exposing (..)
 import Html
     exposing
         ( Html
-        , Attribute
-        , br
         , div
-        , h2
         , section
         , form
-        , ul
-        , li
-        , p
-        , span
         , input
         , button
         , text
         , a
         , h1
+        , nav
+        , ul
+        , li
+        , span
+        , footer
         )
 import Html.Attributes
     exposing
         ( placeholder
-        , disabled
         , class
         , attribute
         , type_
-        , id
         , style
+        , id
+        , rel
+        , href
         )
 import Html.Events exposing (on, onInput, onClick, onSubmit)
 import Navigation exposing (Location)
@@ -187,45 +186,50 @@ pageCmd page location =
 view : Model -> Html Message
 view { page, header, notification, sidebar } =
     let
+        { language } =
+            header
+
         newContentHtml =
             case page of
                 SearchPage subModel ->
-                    Html.map SearchMessage (Search.view header.language subModel)
+                    Html.map SearchMessage (Search.view language subModel)
 
                 SearchKeyPage subModel ->
-                    Html.map SearchKeyMessage (SearchKey.view header.language subModel)
+                    Html.map SearchKeyMessage (SearchKey.view language subModel)
 
                 VotingPage subModel ->
-                    Html.map VotingMessage (Voting.view header.language subModel)
+                    Html.map VotingMessage (Voting.view language subModel)
 
                 TransferPage subModel ->
                     Html.map TransferMessage
                         (Transfer.view
-                            header.language
+                            language
                             subModel
                             sidebar.account.core_liquid_balance
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view header.language)
+                    Html.map IndexMessage (Index.view language)
 
                 _ ->
-                    NotFound.view header.language
+                    NotFound.view language
 
         getLanguageClass lang =
-            if lang == header.language then
+            if lang == language then
                 class "selected"
             else
                 class ""
-    in
-        div []
-            [ Html.header []
+
+        sidebarButtonClass =
+            if sidebar.fold then
+                class "toggle dashboard shrink"
+            else
+                class "toggle dashboard"
+
+        headerView =
+            Html.header []
                 [ h1 []
-                    [ a
-                        [ style [ ( "cursor", "pointer" ) ]
-                        , onClick (ChangeUrl "/")
-                        ]
-                        [ text "eoshub" ]
+                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
                     ]
                 , div [ class "language" ]
                     [ button
@@ -257,16 +261,107 @@ view { page, header, notification, sidebar } =
                         [ text "검색하기" ]
                     ]
                 ]
+
+        navigationView =
+            nav []
+                [ ul []
+                    [ li
+                        []
+                        [ button
+                            [ type_ "button"
+                            , sidebarButtonClass
+                            , id "openAside"
+                            , onClick (SidebarMessage Sidebar.ToggleSidebar)
+                            ]
+                            [ text (translate language Translation.OpenCloseSidebar) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.OpenCloseSidebar)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "resource"
+                            , onClick (ChangeUrl "/resource")
+                            ]
+                            [ text "리소스 관리" ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text "리소스 관리" ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "transfer"
+                            , onClick (ChangeUrl "/transfer")
+                            ]
+                            [ text (translate language Translation.Transfer) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.Transfer)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "ram_market"
+                            , onClick (ChangeUrl "/ram-market")
+                            ]
+                            [ text (translate language Translation.RamMarket) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.RamMarket)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "vote"
+                            , onClick (ChangeUrl "/voting")
+                            ]
+                            [ text (translate language Translation.Vote) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.Vote)
+                            ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "dapps"
+                            , onClick (ChangeUrl "/dapps")
+                            ]
+                            [ text "Dapps" ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text "Dapps"
+                            ]
+                        ]
+                    ]
+                ]
+
+        footerView =
+            footer []
+                [ div [ class "sns area" ]
+                    [ a [ href "#", class "sns medium button" ] [ text "Go to Medium" ]
+                    , a [ href "#", class "sns twitter button" ] [ text "Go to Twitter" ]
+                    , a [ href "#", class "sns telegram button" ] [ text "Go to Telegram" ]
+                    ]
+                ]
+    in
+        div []
+            [ headerView
+            , navigationView
             , section [ class "content" ]
-                [ Html.map SidebarMessage
-                    (div [ Sidebar.foldClass sidebar.fold ] (Sidebar.view sidebar header.language))
+                [ Html.map SidebarMessage (Sidebar.view sidebar language)
                 , newContentHtml
                 , Html.map NotificationMessage
                     (Notification.view
                         notification
-                        header.language
+                        language
                     )
                 ]
+            , footerView
             ]
 
 

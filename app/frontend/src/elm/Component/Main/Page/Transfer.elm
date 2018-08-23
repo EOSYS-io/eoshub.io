@@ -64,7 +64,6 @@ type TransferMessageFormField
 type Message
     = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
-    | ChangeUrl String
     | SetFormValidation Bool
     | OpenUnderConstruction
 
@@ -80,47 +79,14 @@ type Message
 view : Language -> Model -> String -> Html Message
 view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
     section [ class "action view panel transfer" ]
-        [ nav []
-            [ a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick (ChangeUrl "/transfer")
-                , class "viewing"
-                ]
-                [ text (translate language Translation.Transfer) ]
-            , a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick OpenUnderConstruction
-                ]
-                [ text (translate language RamMarket) ]
-            , a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick OpenUnderConstruction
-                ]
-                [ text (translate language Application) ]
-            , a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick OpenUnderConstruction
-                ]
-                [ text (translate language Vote) ]
-            , a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick OpenUnderConstruction
-                ]
-                [ text (translate language ProxyVote) ]
-            , a
-                [ style [ ( "cursor", "pointer" ) ]
-                , onClick OpenUnderConstruction
-                ]
-                [ text (translate language Faq) ]
-            ]
-        , h3 [] [ text (translate language Transfer) ]
+        [ h3 [] [ text (translate language Transfer) ]
         , p []
             [ text (translate language TransferInfo1)
             , br [] []
             , text (translate language TransferInfo2)
             ]
         , p [ class "help info" ]
-            [ a [ style [ ( "cursor", "pointer" ) ] ] [ text (translate language TransferHelp) ]
+            [ a [] [ text (translate language TransferHelp) ]
             ]
         , let
             { to, quantity, memo } =
@@ -245,9 +211,6 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
 
         SetTransferMessageField field value ->
             ( setTransferMessageField field value model eosLiquidAmount, Cmd.none )
-
-        ChangeUrl url ->
-            ( model, Navigation.newUrl url )
 
         SetFormValidation validity ->
             ( { model | isFormValid = validity }, Cmd.none )

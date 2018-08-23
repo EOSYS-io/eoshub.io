@@ -21,8 +21,7 @@ view : Language -> Html Message
 view language =
     section [ class "action view panel" ]
         [ a
-            [ style [ ( "cursor", "pointer" ) ]
-            , onClick (ChangeUrl "/transfer")
+            [ onClick (ChangeUrl "/transfer")
             ]
             [ div [ class "card transfer" ]
                 [ h3 [] [ text (translate language Transfer) ]
