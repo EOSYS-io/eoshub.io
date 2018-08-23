@@ -148,17 +148,3 @@ document.addEventListener('scatterLoaded', () => {
   const app = getElm();
   app.ports.receiveWalletStatus.send(createResponseStatus());
 });
-
-// TODO(heejae): This function is a temporary work cause it makes an assumption that
-// elm and scatter finish loading after 0.5 seconds from beginning.
-// Need to find a good way to handle scatter not found.
-// window.setTimeout(
-//   () => {
-//     const { scatterClient } = getScatter();
-//     if (!scatterClient) {
-//       const app = getElm();
-//       app.ports.receiveWalletStatus.send(createResponseStatus());
-//     }
-//   },
-//   500,
-// );
