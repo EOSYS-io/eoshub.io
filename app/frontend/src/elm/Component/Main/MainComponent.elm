@@ -254,7 +254,7 @@ view { page, header, notification, sidebar } =
                         ]
                         [ text "中文" ]
                     ]
-                , form []
+                , form [ onSubmit (CheckSearchQuery header.searchInput) ]
                     [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "text", onInput InputSearch ]
                         []
                     , button [ type_ "button", onClick (CheckSearchQuery header.searchInput) ]
