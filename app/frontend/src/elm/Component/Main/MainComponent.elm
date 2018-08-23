@@ -125,45 +125,48 @@ initCmd { page } location =
     let
         route =
             location |> parseLocation
+
+        pageInitCmd =
+            case route of
+                SearchRoute query ->
+                    let
+                        searchInitModel =
+                            case page of
+                                SearchPage searchModel ->
+                                    searchModel
+
+                                _ ->
+                                    Search.initModel
+
+                        subInitCmd =
+                            case query of
+                                Just str ->
+                                    Search.initCmd str searchInitModel
+
+                                Nothing ->
+                                    Cmd.none
+                    in
+                        Cmd.map SearchMessage subInitCmd
+
+                SearchKeyRoute query ->
+                    let
+                        subInitCmd =
+                            case query of
+                                Just str ->
+                                    SearchKey.initCmd str
+
+                                Nothing ->
+                                    Cmd.none
+                    in
+                        Cmd.map SearchKeyMessage subInitCmd
+
+                _ ->
+                    Cmd.none
     in
-        case route of
-            SearchRoute query ->
-                let
-                    searchInitModel =
-                        case page of
-                            SearchPage searchModel ->
-                                searchModel
-
-                            _ ->
-                                Search.initModel
-
-                    subInitCmd =
-                        case query of
-                            Just str ->
-                                Search.initCmd str searchInitModel
-
-                            Nothing ->
-                                Cmd.none
-                in
-                    Cmd.map SearchMessage subInitCmd
-
-            SearchKeyRoute query ->
-                let
-                    subInitCmd =
-                        case query of
-                            Just str ->
-                                SearchKey.initCmd str
-
-                            Nothing ->
-                                Cmd.none
-                in
-                    Cmd.map SearchKeyMessage subInitCmd
-
-            IndexRoute ->
-                Cmd.map SidebarMessage Sidebar.initCmd
-
-            _ ->
-                Cmd.none
+        Cmd.batch
+            [ pageInitCmd
+            , Cmd.map SidebarMessage Sidebar.initCmd
+            ]
 
 
 
