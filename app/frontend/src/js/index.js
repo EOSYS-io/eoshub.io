@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   app.ports.checkWalletStatus.subscribe(async () => {
+    // the delay is required to wait for loading scatter or changing component subscription
     window.setTimeout(
       () => {
         app.ports.receiveWalletStatus.send(createResponseStatus());
