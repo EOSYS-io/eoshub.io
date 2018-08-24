@@ -183,7 +183,7 @@ pairWalletView language =
 
 
 accountInfoView : Model -> Language -> List (Html Message)
-accountInfoView { wallet, account } language =
+accountInfoView { wallet, account, configPanelOpen } language =
     let
         { core_liquid_balance, voter_info, refund_request } =
             account
@@ -200,10 +200,46 @@ accountInfoView { wallet, account } language =
 
         stakedAmount =
             eosFloatToString (larimerToEos voter_info.staked)
+
+        configPanelClass =
+            class
+                ("config panel"
+                    ++ (if configPanelOpen then
+                            " expand"
+                        else
+                            ""
+                       )
+                )
     in
         [ h2 []
             [ text wallet.account
             , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
+            ]
+        , div [ configPanelClass ]
+            [ button
+                [ type_ "button"
+                , class "icon gear button"
+                , attribute "wai-aria" "hidden"
+                , onClick (OpenConfigPanel (not configPanelOpen))
+                ]
+                [ text "option" ]
+            , div [ class "menu_list" ]
+                [ a
+                    [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
+                    ]
+                    [ text (translate language ChangeWallet) ]
+                , a
+                    [ onClick
+                        (AndThen (OpenConfigPanel False)
+                            (ChangeUrl ("search?query=" ++ wallet.account))
+                        )
+                    ]
+                    [ text (translate language MyAccount) ]
+                , a
+                    [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
+                    ]
+                    [ text (translate language SignOut) ]
+                ]
             ]
         , ul [ class "wallet status" ]
             [ li []
@@ -228,34 +264,6 @@ accountInfoView { wallet, account } language =
             , class "resource management"
             ]
             [ text (translate language ManageStaking) ]
-
-        -- Code block for config panel.
-        -- [ configPanelClass ]
-        -- [ button
-        --     [ type_ "button"
-        --     , class "icon gear button"
-        --     , attribute "wai-aria" "hidden"
-        --     , onClick (OpenConfigPanel (not configPanelOpen))
-        --     ]
-        --     [ text "option" ]
-        -- , div [ class "menu_list" ]
-        --     [ a
-        --         [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
-        --         ]
-        --         [ text (translate language ChangeWallet) ]
-        --     , a
-        --         [ onClick
-        --             (AndThen (OpenConfigPanel False)
-        --                 (ChangeUrl ("search?query=" ++ wallet.account))
-        --             )
-        --         ]
-        --         [ text (translate language MyAccount) ]
-        --     , a
-        --         [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
-        --         ]
-        --         [ text (translate language SignOut) ]
-        --     ]
-        -- ]
         ]
 
 
