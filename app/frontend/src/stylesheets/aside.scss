@@ -264,4 +264,52 @@ aside.log.in {
 		margin:44px 0;
 	}
 
+	div.config.panel {
+		position:absolute;
+		width:20px;
+		height:20px;
+		top:16px;
+		right:16px;
+
+		button.gear {
+			@include ir();
+
+			width:20px;
+			height:20px;
+			background:url('../image/icon-setting.svg') center center no-repeat;
+			background-size:cover;
+		}
+
+		div.menu_list {
+			display:none;
+			position:absolute;
+			z-index:99;
+			top:10px;
+			left:13px;
+			border:1px solid $dark-gray;
+			border-top:0;
+
+			a {
+				border-top:1px solid $dark-gray;
+				display:block;
+				background-color:$xx-dark-gray;
+				width:135px;
+				height:40px;
+				line-height:38px;
+				text-align:center;
+				color:#999;
+				font-size:rem(14);
+
+				&:hover {
+					background-color:$x-dark-gray;
+					color:$white;
+				}
+			}
+		}
+
+		&.expand div.menu_list {
+			display:block;
+		}
+    }
 }
+

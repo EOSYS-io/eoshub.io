@@ -100,7 +100,7 @@ em {
 
 
 // Inheritance font size
-input,textarea,table,th,td,fieldset,button {
+input,textarea,table,th,td,fieldset,button,select {
 	background-color:inherit;
     font-size:inherit;
 }
@@ -217,3 +217,8 @@ button {
 
 
 
+// select
+select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
