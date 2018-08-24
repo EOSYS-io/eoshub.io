@@ -1,19 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-	<style>
-		g { display: none }
-		g:target g,
-		g:target { display: inline }
-	</style>
-	<g id="gray">
-		<g fill="none" fill-rule="evenodd" stroke="#aaa" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)">
-			<circle cx="9.473" cy="9.473" r="8.56"/>
-			<path d="M21.457 21.457l-5.935-5.935"/>
-		</g>
-	</g>
-	<g id="white">
-		<g fill="none" fill-rule="evenodd" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)">
-			<circle cx="9.473" cy="9.473" r="8.56"/>
-			<path d="M21.457 21.457l-5.935-5.935"/>
-		</g>
-	</g>
+    <g fill="none" fill-rule="evenodd" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)">
+        <circle cx="9.473" cy="9.473" r="8.56"/>
+        <path d="M21.457 21.457l-5.935-5.935"/>
+    </g>
 </svg>

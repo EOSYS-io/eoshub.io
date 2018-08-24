@@ -1,26 +1,61 @@
 button[type='button'],
 a.button,
 input[type='submit'] {
-    // reset
-    cursor:pointer;
-    border-width:0;
-    border-style:solid;
-    border-color:transparent;
+	// reset
+	cursor:pointer;
+	border-width:0;
+	border-style:solid;
+	border-color:transparent;
 
-    font-family:inherit;
-    background-color:transparent;
+	font-family:inherit;
+	background-color:transparent;
 
-    appearance:none;
+	appearance:none;
 
-    display:inline-block;
-    line-height:1.1;
-    box-sizing:border-box;
-    text-align: center;
-    font-family:inherit;
-    border-radius:0;
-    padding:0;
+	display:inline-block;
+	line-height:1.1;
+	box-sizing:border-box;
+	text-align: center;
+	font-family:inherit;
+	border-radius:0;
+	padding:0;
 
-    &:first-letter {
-        text-transform:uppercase;
-    }
+	&:first-letter {
+		text-transform:uppercase;
+	}
 }
+
+button[type="button"].button,
+a.button {
+	flex:1;
+	outline:0;
+	display:inline-block;
+
+	line-height:50px;
+	height: 52px;
+
+	border-radius: 2px;
+
+	font-size:$small;
+
+	// type case
+	&.ok {
+		background-image: $pink-gradient;
+		color:$white;
+	}
+
+	&.undo {
+		border:1px solid $gray;
+	}
+
+	// pesudo deco
+	&:disabled {
+		color:$dark-gray;
+		border-color:$dark-gray;
+		background:transparent;
+		border:1px solid $dark-gray;
+		cursor:not-allowed;
+	}
+}
+
+

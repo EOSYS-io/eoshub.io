@@ -61,7 +61,10 @@ h1,h2,h3,h4,h5,h6 {
 
 h2 {
 	font-weight:$light;
-	color:$white
+	color:$white;
+	+ p {
+		font-size:$small;	//default type
+	}
 }
 
 h3 {
@@ -153,7 +156,8 @@ a:link {
 
 
 // input
-input[type="text"] {
+input[type="text"],
+input[type="email"] {
 	color:inherit;
 	border-color:transparent;
 }
@@ -210,3 +214,6 @@ button {
 	color:inherit;
 	border-color:transparent;
 }
+
+
+

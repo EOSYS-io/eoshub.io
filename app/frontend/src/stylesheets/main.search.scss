@@ -1,0 +1,145 @@
+// --------------------------------------------------------------------------------
+// search page
+// --------------------------------------------------------------------------------
+main.search { /* namespace */ }
+
+main.search {
+	.container {
+		background:$x-dark-gray;
+		padding:40px 0;
+	}
+
+	.summary {
+		box-sizing:border-box;
+		h3 {
+			@include screen_reader();
+		}
+
+		padding:0 32px;
+
+		dl {
+			display:grid;
+			grid-template-columns:auto 1fr;
+			grid-template-rows:repeat(2,20px);
+
+			// layout
+			dt:nth-of-type(2) {
+				grid-row-start:1;
+				grid-row-end:2;
+				grid-column-start:2;
+				grid-column-end:3;
+			}
+
+			// styling
+			dt,dd {
+				margin-right:27px;
+			}
+
+			dt {
+				color:$gray;
+				font-size:$small;
+			}
+			dd {
+				color:$white;
+				font-size:$large;
+			}
+		}
+	}
+
+	// common :: 3 column grid box
+	.account.status .wrapper,
+	.resource .wrapper {
+		display:grid;
+		grid-template-columns:repeat(3,1fr);
+		column-gap:8px;
+
+		> div {
+			background-color:$xx-dark-gray;
+			font-size:$small;
+			padding:24px 32px;
+
+			&:first-child {
+				margin-left:0;
+			}
+
+		}
+	}
+
+	.account.status {
+		margin-top:40px;
+
+		padding:0 32px;
+		padding-top:40px;
+
+		border-top:1px solid $dark-gray;
+
+		h3 {
+			@include screen_reader();
+		}
+
+		.wrapper {
+			display:grid;
+			grid-template-columns:repeat(3,1fr);
+			column-gap:8px;
+
+			> div {
+				font-size:$small;
+				color:$gray;
+
+				&:first-letter {
+					text-transform:uppercase;
+				}
+
+				strong {
+					margin-top:5px;
+					display:block;
+					color:$white;
+					font-weight:300;
+					font-size:$large;
+					white-space:nowrap;
+					overflow:hidden;
+					text-overflow:ellipsis;
+					max-width:210px;
+				}
+			}
+		}
+	}
+
+	.resource {
+		margin-top:32px;
+
+		padding:0 32px;
+		padding-top:40px;
+
+		.wrapper {
+			margin-top:22px;
+
+			> div {
+				position:relative;
+				h4 {
+					font-size: $small;
+					color: $white;
+					line-height:1.6;
+				}
+
+				p {
+					font-size: $small;
+					color: $gray;
+					line-height:1.6;
+					margin:1.5em 0 0 0;
+				}
+
+				.status {
+					position:absolute;
+					top:0;
+					right:32px;
+					width:73px;
+					height:73px;
+					border-radius:100%;
+
+					display:flex;
+				}
+			}
+		}
+	}
+}

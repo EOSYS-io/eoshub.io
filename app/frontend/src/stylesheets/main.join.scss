@@ -37,50 +37,6 @@ main.join {
 		display:flex;
 	}
 
-	button[type="button"].button,
-	a.button {
-		flex:1;
-		outline:0;
-		display:inline-block;
-
-		line-height:50px;
-		height: 52px;
-
-		border-radius: 2px;
-
-		font-size:$small;
-
-		// type case
-		&.purple {
-			background: $purple-light;
-			color:$white;
-		}
-
-		&.pink {
-			background-image: $pink-gradient;
-			color:$white;
-		}
-
-		&.gray {
-			background-image:none;
-			background-color: $x-dark-gray;
-		}
-
-		&.mono {
-			border:1px solid $gray;
-		}
-
-		// pesudo deco
-		&:disabled {
-			background-image:none;
-			background-color: #282828;
-		}
-
-		&:last-child {
-			margin-left:8px;
-		}
-	}
-
 	article {
 		box-sizing:border-box;
 	}
@@ -163,7 +119,7 @@ main.join {
 		display:flex;
 		align-items:center;
 		justify-content:space-between;
-		font-size:$xx-large;
+		font-size:$xxx-large;
 		font-weight: 100;
 		font-style: normal;
 		font-stretch: normal;
@@ -282,6 +238,10 @@ main.join {
 			position: absolute !important;
 			width: 1px;
 			word-wrap: normal !important;
+		}
+
+		.btn_area button:last-child {
+			margin-left:8px;
 		}
 	}
 

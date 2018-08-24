@@ -1,0 +1,128 @@
+// --------------------------------------------------------------------------------
+// transfer page
+// --------------------------------------------------------------------------------
+main.transfer {
+	// namespace
+}
+
+main.transfer {
+	.container {
+		margin-top:40px;
+		padding:32px;
+		background-color:$x-dark-gray;
+
+
+		// reset
+		ul,li {
+			margin:0;
+			padding:0;
+			list-style-type:none;
+		}
+
+		form {
+			li {
+				margin-top:4px;
+				background:$xx-dark-gray;
+				padding:32px;
+
+				&:first-child {
+					margin-top:initial;
+				}
+			}
+
+			input[type="text"],
+			input[type="number"] {
+				border:0;
+				width:100%;
+				height: 28px;
+				font-size: 28px;
+				font-weight: 100;
+				color: $white;
+				transition:border-color 0.4s;
+
+				&:focus {
+					border-color:$white;
+					outline:0;
+				}
+
+				&:focus::placeholder {
+					transition:color 0.4s;
+					color:$light-gray
+				}
+
+				+ span.description {
+					margin-top:12px;
+					display:block;
+					font-size: $x-small;
+					line-height: 1.54;
+					color: $gray;
+				}
+
+				&:invalid + span.validate,
+				& + span.false.validate.description {
+					color:$red;
+				}
+
+				&:valid + span.validate,
+				& + span.true.validate.description {
+					color:$green;
+				}
+
+				&:placeholder-shown + span.description {
+					color:inherit;
+				}
+
+				&::-webkit-inner-spin-button,
+				&::-webkit-outer-spin-button {
+					-webkit-appearance: none;
+					margin: 0;
+				}
+
+			}
+		}
+	}
+}
+
+main.transfer .btn_area {
+	margin-top:16px;
+
+	text-align:right;
+	button.button {
+		margin-left:4px;
+		min-width:136px;
+	}
+}
+
+
+main.transfer .wallet.status {
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	margin:0 0 32px 0;
+
+	p  {
+		font-size: $small;
+		color: $gray;
+		margin:0;
+
+		em {
+			margin-top:12px;
+			display:block;
+			font-size: $xx-large;
+			font-weight: 300;
+			color: $white;
+		}
+	}
+
+	a {
+		text-decoration:underline;
+		color:$white;
+		font-size:$small;
+		font-weight:100;
+	}
+}
+
+
+
+
+

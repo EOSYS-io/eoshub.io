@@ -145,7 +145,6 @@ aside {
 
 	// after login
 	.wallet.status {
-		margin:44px -30px 0;
 		padding:0;
 		color:#fff;
 		background-color:#232323;
@@ -244,6 +243,9 @@ aside.log.off {
 }
 
 aside.log.in {
+	padding-left:0;
+	padding-right:0;
+
 	h2 {
 		text-align:center;
 		font-size:$normal;
@@ -257,4 +259,9 @@ aside.log.in {
 			font-weight:$light;
 		}
 	}
+
+	.wallet.status {
+		margin:44px 0;
+	}
+
 }
