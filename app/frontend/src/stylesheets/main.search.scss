@@ -349,6 +349,9 @@ main.search {
 
 // search :: public key
 main.search.public_key {
+	.container {
+		margin-top:40px;
+	}
 	.summary {
 		dd {
 			margin-top:8px;
