@@ -38,6 +38,7 @@ type QuantityStatus
 
 type MemoStatus
     = MemoTooLong
+    | EmptyMemo
     | ValidMemo
 
 
@@ -46,7 +47,7 @@ initModel =
     { transfer = { from = "", to = "", quantity = "", memo = "" }
     , accountValidation = EmptyAccount
     , quantityValidation = EmptyQuantity
-    , memoValidation = ValidMemo
+    , memoValidation = EmptyMemo
     , isFormValid = False
     }
 
@@ -95,25 +96,13 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     transfer
 
                 accountWarning =
-                    span [ class "validate description" ]
-                        (if accountValidation == InvalidAccount then
-                            [ text (translate language CheckAccountName) ]
-                         else
-                            []
-                        )
+                    accountWarningSpan accountValidation language
 
                 quantityWarning =
-                    quantityWarningView quantityValidation language
+                    quantityWarningSpan quantityValidation language
 
                 memoWarning =
-                    span [ class "description" ]
-                        [ case memoValidation of
-                            MemoTooLong ->
-                                text (translate language Translation.MemoTooLong)
-
-                            _ ->
-                                text (translate language MemoNotMandatory)
-                        ]
+                    memoWarningSpan memoValidation language
               in
                 Html.form []
                     [ ul []
@@ -132,6 +121,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                             [ input
                                 [ type_ "number"
                                 , placeholder "전송하실 수량을 입력하세요."
+                                , step ".0001"
                                 , onInput <| SetTransferMessageField Quantity
                                 , value quantity
                                 ]
@@ -160,8 +150,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text "취소" ]
                 , button
                     [ type_ "button"
-                    , id "send"
-                    , class "middle blue_white"
+                    , class "ok button"
                     , onClick SubmitAction
                     , disabled (not isFormValid)
                     ]
@@ -171,21 +160,61 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
         ]
 
 
-quantityWarningView : QuantityStatus -> Language -> Html Message
-quantityWarningView quantityStatus language =
+accountWarningSpan : AccountStatus -> Language -> Html Message
+accountWarningSpan accountStatus language =
     let
-        textValue =
+        ( classAddedValue, textValue ) =
+            case accountStatus of
+                EmptyAccount ->
+                    ( "", "계정이름 예시: eoshubby" )
+
+                InvalidAccount ->
+                    ( " false", translate language CheckAccountName )
+
+                ValidAccount ->
+                    ( " true", "계정이름 예시: eoshubby" )
+    in
+        span [ class ("validate description" ++ classAddedValue) ]
+            [ text textValue ]
+
+
+quantityWarningSpan : QuantityStatus -> Language -> Html Message
+quantityWarningSpan quantityStatus language =
+    let
+        ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
-                    translate language InvalidAmount
+                    ( " false", translate language InvalidAmount )
 
                 OverTransferableQuantity ->
-                    translate language OverTransferableAmount
+                    ( " false", translate language OverTransferableAmount )
 
-                _ ->
-                    ""
+                ValidQuantity ->
+                    ( " true", "전송가능한 수량만큼 전송가능합니다." )
+
+                EmptyQuantity ->
+                    ( "", "전송가능한 수량만큼 전송가능합니다." )
     in
-        span [ class "validate description" ] [ text textValue ]
+        span [ class ("validate description" ++ classAddedValue) ]
+            [ text textValue ]
+
+
+memoWarningSpan : MemoStatus -> Language -> Html Message
+memoWarningSpan memoStatus language =
+    let
+        ( classAddedValue, textValue ) =
+            case memoStatus of
+                MemoTooLong ->
+                    ( " false", translate language Translation.MemoTooLong )
+
+                EmptyMemo ->
+                    ( "", translate language MemoNotMandatory )
+
+                ValidMemo ->
+                    ( " true", translate language MemoNotMandatory )
+    in
+        span [ class ("validate description" ++ classAddedValue) ]
+            [ text textValue ]
 
 
 
