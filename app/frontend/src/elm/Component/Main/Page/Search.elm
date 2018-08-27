@@ -153,14 +153,10 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message ({ account, actions, pagination } as model) =
     case message of
         OnFetchAccount (Ok data) ->
-            ( { model | account = data |> Debug.log "data" }, Cmd.none )
+            ( { model | account = data }, Cmd.none )
 
         OnFetchAccount (Err error) ->
-            let
-                ee =
-                    error |> Debug.log "error"
-            in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         OnFetchActions (Ok actions) ->
             let
