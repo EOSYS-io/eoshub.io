@@ -71,20 +71,21 @@ update message model =
 
 view : Language -> Model -> Html Message
 view language { accounts, publickey } =
-    section [ class "action view panel public_key" ]
-        [ div [ class "account summary" ]
-            [ ul [ class "summary" ]
-                [ li []
-                    [ text "공개 키                "
-                    , strong [ title "" ]
-                        [ text publickey ]
-                    ]
+    main_ [ class "search public_key" ]
+        [ h2 []
+            [ text "공개 키 검색" ]
+        , p []
+            [ text "검색하신 계정에 대한 정보입니다." ]
+        , div [ class "container" ]
+            [ div [ class "summary" ]
+                [ dt []
+                    [ text "공개 키 이름" ]
+                , dd []
+                    [ text publickey ]
                 ]
+            , div [ class "keybox" ]
+                (viewAccountCardList accounts)
             ]
-        , h3 []
-            [ text "관련 계정" ]
-        , div [ class "list" ]
-            (viewAccountCardList accounts)
         ]
 
 
@@ -95,11 +96,21 @@ viewAccountCardList accounts =
 
 viewAccountCard : Int -> String -> Html Message
 viewAccountCard index account =
-    div [ class "card" ]
-        [ span []
-            [ text <| "계정 " ++ (toString (index + 1)) ]
-        , h4 []
+    div []
+        [ span [] [ text <| "계정 " ++ (toString (index + 1)) ]
+        , strong
+            [ title account ]
             [ text account ]
-        , a [ onClick (ChangeUrl ("/search?query=" ++ account)) ]
-            [ text "자세히 보기" ]
+        , button [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
+            [ text "자세한 검색 보기" ]
         ]
+
+
+
+-- [ span []
+--     [ text <| "계정 " ++ (toString (index + 1)) ]
+-- , h4 []
+--     [ text account ]
+-- , a [ onClick (ChangeUrl ("/search?query=" ++ account)) ]
+--     [ text "자세히 보기" ]
+-- ]
