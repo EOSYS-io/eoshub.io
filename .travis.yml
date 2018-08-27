@@ -23,7 +23,7 @@ jobs:
         submodules:
           false
       before_install:
-        - echo -e "machine github.com\n  login ci-user\n  password $CI_USER_PASSWORD" >~/.netrc
+        - echo -e "machine github.com\n  login heejaejoo\n  password $CI_USER_PASSWORD" >~/.netrc
         - git submodule update --init --recursive
         - nvm install 10
         - yarn install
