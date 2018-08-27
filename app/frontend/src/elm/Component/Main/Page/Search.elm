@@ -263,7 +263,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "CPU                "
                         , strong []
-                            [ text (cpuTotal ++ " Total") ]
+                            [ text ("/ " ++ cpuTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span
@@ -284,7 +284,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "NET                "
                         , strong []
-                            [ text (netTotal ++ " Total") ]
+                            [ text ("/ " ++ netTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span
@@ -301,7 +301,7 @@ view language { account, actions, selectedActionCategory } =
                     [ h4 []
                         [ text "RAM                "
                         , strong []
-                            [ text (ramTotal ++ " Total") ]
+                            [ text ("/ " ++ ramTotal) ]
                         ]
                     , div [ class "graph" ]
                         [ span [ attribute "data-status" ramColor, attribute "style" ("width: " ++ ramPercent), title ("RAM : " ++ ramPercent) ]
@@ -341,7 +341,7 @@ view language { account, actions, selectedActionCategory } =
                             ]
                         ]
                     , tbody []
-                        (viewActionList selectedActionCategory actions)
+                        (viewActionList language selectedActionCategory actions)
                     ]
                 , div [ class "btn_area center" ]
                     [ button [ class "bg_icon add blue_white load button", type_ "button", onClick ShowMore ]
@@ -351,21 +351,21 @@ view language { account, actions, selectedActionCategory } =
             ]
 
 
-viewActionList : SelectedActionCategory -> List Action -> List (Html Message)
-viewActionList selectedActionCategory actions =
-    List.map (viewAction selectedActionCategory) actions
+viewActionList : Language -> SelectedActionCategory -> List Action -> List (Html Message)
+viewActionList language selectedActionCategory actions =
+    List.map (viewAction language selectedActionCategory) actions
         |> List.reverse
 
 
-viewAction : SelectedActionCategory -> Action -> Html Message
-viewAction selectedActionCategory { accountActionSeq, blockTime, actionName, actionTag, info } =
+viewAction : Language -> SelectedActionCategory -> Action -> Html Message
+viewAction language selectedActionCategory { accountActionSeq, blockTime, actionName, actionTag, info } =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
         , td []
             [ text actionTag ]
         , td []
-            [ text (timeFormatter blockTime) ]
+            [ text (timeFormatter language blockTime) ]
         , td []
             [ text info ]
         ]

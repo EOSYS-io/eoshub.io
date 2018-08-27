@@ -146,12 +146,7 @@ pageCmd page location =
             SearchRoute query ->
                 let
                     searchInitModel =
-                        case page of
-                            SearchPage searchModel ->
-                                searchModel
-
-                            _ ->
-                                Search.initModel
+                        Search.initModel
 
                     subInitCmd =
                         case query of

@@ -30,5 +30,4 @@ createEosAccountUrl flags confirmToken locale =
 mainnetRpcUrl : String
 mainnetRpcUrl =
     -- TODO(boseok): Consider to find fastest api node that we can use.
-    -- it may need to configure access-control-allow-origin to other bp's rpc node
-    "https://api.eosnewyork.io"
+    "http://rpc1.eosys.io:8888"

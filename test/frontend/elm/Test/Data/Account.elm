@@ -59,6 +59,28 @@ tests =
                             Expect.equal
                                 (Ok expectedAccount)
                                 (JD.decodeString accountDecoder accountJson)
+                , test "Account parsing (total_resources: null, self_delegated_bandwidth: null)" <|
+                    \() ->
+                        let
+                            accountJson =
+                                "{\"account_name\":\"eosio\",\"head_block_num\":4256783,\"head_block_time\":\"2018-07-05T07:42:13.000\",\"privileged\":true,\"last_code_update\":\"2018-07-01T09:16:36.000\",\"created\":\"2018-06-08T08:08:08.500\",\"core_liquid_balance\":\"10.0055 EOS\",\"ram_quota\":-1,\"net_weight\":-1,\"cpu_weight\":-1,\"net_limit\":{\"used\":-1,\"available\":-1,\"max\":-1},\"cpu_limit\":{\"used\":-1,\"available\":-1,\"max\":-1},\"ram_usage\":38299755,\"permissions\":[{\"perm_name\":\"active\",\"parent\":\"owner\",\"required_auth\":{\"threshold\":1,\"keys\":[],\"accounts\":[{\"permission\":{\"actor\":\"eosio.prods\",\"permission\":\"active\"},\"weight\":1}],\"waits\":[]}},{\"perm_name\":\"owner\",\"parent\":\"\",\"required_auth\":{\"threshold\":1,\"keys\":[],\"accounts\":[{\"permission\":{\"actor\":\"eosio.prods\",\"permission\":\"active\"},\"weight\":1}],\"waits\":[]}}],\"total_resources\":null,\"self_delegated_bandwidth\":null,\"refund_request\":null,\"voter_info\":null}"
+
+                            expectedAccount =
+                                Account
+                                    "eosio"
+                                    "10.0055 EOS"
+                                    (VoterInfo 0)
+                                    -1
+                                    38299755
+                                    (Resource -1 -1 -1)
+                                    (Resource -1 -1 -1)
+                                    (ResourceInEos "0 EOS" "0 EOS" Nothing)
+                                    (ResourceInEos "0 EOS" "0 EOS" Nothing)
+                                    (Refund "" "" "0 EOS" "0 EOS")
+                        in
+                            Expect.equal
+                                (Ok expectedAccount)
+                                (JD.decodeString accountDecoder accountJson)
                 ]
             , describe "getTotalAmount"
                 [ test "arguments \"9159.2669 EOS\" 28348132 \"2.0000 EOS\" \"2.0000 EOS\"" <|
