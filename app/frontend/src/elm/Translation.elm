@@ -439,7 +439,7 @@ getMessages i18n =
             }
 
         ReceiverAccountName ->
-            { korean = "받는 계정"
+            { korean = "전송하실 계정의 이름을 입력하세요"
             , english = "Receiver's Account Name"
             , chinese = "接受账户"
             }
