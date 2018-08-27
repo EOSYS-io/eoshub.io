@@ -23,6 +23,16 @@ import Html
         , tbody
         , td
         , node
+        , main_
+        , h2
+        , dl
+        , dt
+        , dd
+        , br
+        , select
+        , option
+        , em
+        , caption
         )
 import Html.Attributes
     exposing
@@ -33,13 +43,17 @@ import Html.Attributes
         , type_
         , scope
         , hidden
+        , name
+        , value
+        , id
         )
-import Html.Events exposing (onClick)
+import Html.Events exposing (on, targetValue)
 import Translation exposing (I18n(..), Language, translate)
 import Http
 import Util.HttpRequest exposing (getFullPath, post)
+import Json.Decode as Decode
 import Json.Encode as Encode
-import Data.Action exposing (Action, actionsDecoder, refineAction)
+import Data.Action exposing (Action, actionsDecoder, refineAction, viewActionInfo)
 import Data.Account
     exposing
         ( Account
@@ -181,7 +195,11 @@ update message ({ account, actions, pagination } as model) =
             ( model, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
-            ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
+            let
+                ee =
+                    toString selectedActionCategory |> Debug.log "selected value"
+            in
+                ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
 
         ShowMore ->
             let
@@ -224,141 +242,168 @@ view language { account, actions, selectedActionCategory } =
         ( ramTotal, ramPercent, ramColor ) =
             getResource "ram" account.ram_usage (account.ram_quota - account.ram_usage) account.ram_quota
     in
-        section [ class "action view panel search_result" ]
-            [ div [ class "account summary" ]
-                [ ul [ class "summary" ]
-                    [ li []
-                        [ text "계정이름                "
-                        , strong [ title account.account_name ]
+        main_ [ class "search" ]
+            [ h2 []
+                [ text "계정 검색" ]
+            , p []
+                [ text "검색하신 계정에 대한 정보입니다." ]
+            , div [ class "container" ]
+                [ section [ class "summary" ]
+                    [ h3 []
+                        [ text "계정 요약" ]
+                    , dl []
+                        [ dt []
+                            [ text "계정이름" ]
+                        , dd []
                             [ text account.account_name ]
-                        ]
-                    , li []
-                        [ text (translate language TotalAmount)
-                        , strong []
+                        , dt []
+                            [ text (translate language TotalAmount) ]
+                        , dd []
                             [ text totalAmount ]
                         ]
                     ]
-                , ul [ class "details" ]
-                    [ li []
-                        [ text "보관 안한 토큰"
-                        , strong []
-                            [ text account.core_liquid_balance ]
-                        ]
-                    , li []
-                        [ text "보관 취소 토큰                "
-                        , strong []
-                            [ text unstakingAmount ]
-                        ]
-                    , li []
-                        [ text "보관한 토큰                "
-                        , strong []
-                            [ text stakedAmount ]
-                        ]
-                    ]
-                ]
-            , h3 []
-                [ text "리소스" ]
-            , div [ class "resource" ]
-                [ div [ class "cpu" ]
-                    [ h4 []
-                        [ text "CPU                "
-                        , strong []
-                            [ text ("/ " ++ cpuTotal) ]
-                        ]
-                    , div [ class "graph" ]
-                        [ span
-                            [ attribute "data-status" cpuColor
-                            , attribute "style"
-                                ("width:" ++ cpuPercent)
-                            , title
-                                ("CPU :" ++ cpuPercent)
-                            ]
-                            []
-                        ]
-                    , p []
-                        [ text
-                            ("사용 가능한 용량이 " ++ cpuPercent ++ " 남았어요")
-                        ]
-                    ]
-                , div [ class "net" ]
-                    [ h4 []
-                        [ text "NET                "
-                        , strong []
-                            [ text ("/ " ++ netTotal) ]
-                        ]
-                    , div [ class "graph" ]
-                        [ span
-                            [ attribute "data-status" netColor
-                            , attribute "style" ("width:" ++ netPercent)
-                            , title ("NET :" ++ netPercent)
-                            ]
-                            []
-                        ]
-                    , p []
-                        [ text ("사용 가능한 용량이 " ++ netPercent ++ " 남았어요") ]
-                    ]
-                , div [ class "ram" ]
-                    [ h4 []
-                        [ text "RAM                "
-                        , strong []
-                            [ text ("/ " ++ ramTotal) ]
-                        ]
-                    , div [ class "graph" ]
-                        [ span [ attribute "data-status" ramColor, attribute "style" ("width: " ++ ramPercent), title ("RAM : " ++ ramPercent) ]
-                            []
-                        ]
-                    , p []
-                        [ text ("사용 가능한 용량이 " ++ ramPercent ++ " 남았어요") ]
-                    ]
-                ]
-            , div [ class "transaction_history" ]
-                [ h3 []
-                    [ text "트랜잭션" ]
-                , div [ class "custom dropdown_list area", attribute "role" "list" ]
-                    [ button [ attribute "aria-level" "1", attribute "role" "listitem", type_ "button" ]
-                        [ text "트랜잭션 타입" ]
+                , section [ class "account status" ]
+                    [ h3 []
+                        [ text "계정 정보" ]
                     , div [ class "wrapper" ]
-                        [ button [ attribute "role" "listitem", type_ "button", onClick (SelectActionCategory "all") ]
-                            [ text "All" ]
-                        , button [ attribute "role" "listitem", type_ "button", onClick (SelectActionCategory "transfer") ]
-                            [ text "transfer" ]
-                        ]
-                    ]
-                , node "script"
-                    []
-                    [ text "(function () {            var target = document.querySelector('div.dropdown_list'),                handler = document.querySelector('div.dropdown_list.area > button[aria-level]');            handler.addEventListener('click',function () {                target.classList.toggle('expand');            });        })();        " ]
-                , table []
-                    [ thead []
-                        [ tr []
-                            [ th [ scope "col" ]
-                                [ text "#" ]
-                            , th [ scope "col" ]
-                                [ text "type" ]
-                            , th [ scope "col" ]
-                                [ text "time" ]
-                            , th [ scope "col" ]
-                                [ text "info" ]
+                        [ div []
+                            [ text "Unstaked"
+                            , strong [ title account.core_liquid_balance ]
+                                [ text account.core_liquid_balance ]
+                            ]
+                        , div []
+                            [ text "refunding"
+                            , strong [ title unstakingAmount ]
+                                [ text unstakingAmount ]
+                            ]
+                        , div []
+                            [ text "staked"
+                            , strong [ title stakedAmount ]
+                                [ text stakedAmount ]
                             ]
                         ]
-                    , tbody []
-                        (viewActionList language selectedActionCategory actions)
                     ]
-                , div [ class "btn_area center" ]
-                    [ button [ class "bg_icon add blue_white load button", type_ "button", onClick ShowMore ]
-                        [ text "더 보기" ]
+                , section [ class "resource" ]
+                    [ h3 []
+                        [ text "리소스" ]
+                    , div [ class "wrapper" ]
+                        [ div []
+                            [ h4 []
+                                [ text "CPU"
+                                , br []
+                                    []
+                                , text (cpuTotal ++ " Total")
+                                ]
+                            , p []
+                                [ text "사용가능한 용량이"
+                                , br []
+                                    []
+                                , text (cpuPercent ++ "남았어요.")
+                                , br []
+                                    []
+                                , text "2sec/3sec"
+                                ]
+                            , div [ class "status" ]
+                                [ span [ class "good", attribute "style" ("height:" ++ cpuPercent) ]
+                                    []
+                                , text cpuPercent
+                                ]
+                            ]
+                        , div []
+                            [ h4 []
+                                [ text "NET"
+                                , br []
+                                    []
+                                , text (netTotal ++ " Total")
+                                ]
+                            , p []
+                                [ text "사용가능한 용량이"
+                                , br []
+                                    []
+                                , text (netPercent ++ "남았어요.")
+                                , br []
+                                    []
+                                , text "2kb/3kb"
+                                ]
+                            , div [ class "status" ]
+                                [ span [ class "hell", attribute "style" ("height:" ++ netPercent) ]
+                                    []
+                                , text netPercent
+                                ]
+                            ]
+                        , div []
+                            [ h4 []
+                                [ text "RAM"
+                                , br []
+                                    []
+                                , text (ramTotal ++ " Total")
+                                ]
+                            , p []
+                                [ text "사용가능한 용량이"
+                                , br []
+                                    []
+                                , text (ramPercent ++ "남았어요.")
+                                , br []
+                                    []
+                                , text "2kb/3kb"
+                                ]
+                            , div [ class "status" ]
+                                [ span [ class "bad", attribute "style" ("height:" ++ ramPercent) ]
+                                    []
+                                , text ramPercent
+                                ]
+                            ]
+                        ]
+                    ]
+                , section [ class "transaction history" ]
+                    [ h3 []
+                        [ text "트랜잭션" ]
+                    , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
+                        [ option [ attribute "disabled" "", attribute "selected" "", value "-1" ]
+                            [ text "트랜잭션 타입" ]
+                        , option [ value "all" ]
+                            [ text "All" ]
+                        , option [ value "transfer" ]
+                            [ text "전송하기" ]
+                        ]
+                    , table []
+                        [ caption []
+                            [ text "트랜잭션 타입 :: All" ]
+                        , thead []
+                            [ tr []
+                                [ th [ scope "col" ]
+                                    [ text "번호" ]
+                                , th [ scope "col" ]
+                                    [ text "타입" ]
+                                , th [ scope "col" ]
+                                    [ text "시간" ]
+                                , th [ scope "col" ]
+                                    [ text "정보" ]
+                                ]
+                            ]
+                        , tbody []
+                            (viewActionList language selectedActionCategory account.account_name actions)
+                        ]
+                    , node "script"
+                        []
+                        [ text "(function () {var handler = document.querySelectorAll('span.memo.popup button.view');var opened_handler = '';for(var i=0; i < handler.length; i++) {handler[i].addEventListener('click',function () {if (!!opened_handler) {opened_handler.parentNode.parentNode.classList.remove('viewing');}if (opened_handler !== this) {this.parentNode.parentNode.classList.add('viewing');opened_handler = this;} else {this.parentNode.parentNode.classList.remove('viewing');opened_handler = '';}});}})();" ]
+                    , div [ class "btn_area" ]
+                        [ button [ type_ "button", class "view_more button" ]
+                            [ text "더 보기" ]
+                        ]
                     ]
                 ]
             ]
 
 
-viewActionList : Language -> SelectedActionCategory -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory actions =
-    List.map (viewAction language selectedActionCategory) actions
+viewActionList : Language -> SelectedActionCategory -> String -> List Action -> List (Html Message)
+viewActionList language selectedActionCategory accountName actions =
+    List.map (viewAction language selectedActionCategory accountName) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> Action -> Html Message
-viewAction language selectedActionCategory { accountActionSeq, blockTime, actionName, actionTag, info } =
+viewAction : Language -> SelectedActionCategory -> String -> Action -> Html Message
+viewAction language selectedActionCategory accountName ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
@@ -366,8 +411,23 @@ viewAction language selectedActionCategory { accountActionSeq, blockTime, action
             [ text actionTag ]
         , td []
             [ text (timeFormatter language blockTime) ]
-        , td []
-            [ text info ]
+        , (viewActionInfo accountName action)
+
+        -- td [ class "info" ]
+        --     [ em []
+        --         [ text "eosyscommuni" ]
+        --     , text info
+        --     , span [ class "memo popup viewing", title "클릭하시면 메모를 보실 수 있습니다." ]
+        --         [ span []
+        --             [ strong [ attribute "role" "title" ]
+        --                 [ text "메모" ]
+        --             , span [ class "description" ]
+        --                 [ text "앱을 설치하신 후에는 위젯 등을 사용하시기 전에 앱을 먼저 실행하여 동기화를 완료하신 후 사용하여 주시기 바랍니다. 기억해야 할 것들이 점점 많아지는 세상에서 살아남으세요." ]
+        --             , button [ class "icon view button", type_ "button" ]
+        --                 [ text "열기/닫기" ]
+        --             ]
+        --         ]
+        --     ]
         ]
 
 
