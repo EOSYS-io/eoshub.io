@@ -79,7 +79,8 @@ import Util.Formatter
 
 
 type alias Model =
-    { account : Account
+    { query : String
+    , account : Account
     , actions : List Action
     , pagination : Pagination
     , selectedActionCategory : SelectedActionCategory
@@ -104,9 +105,10 @@ type alias SelectedActionCategory =
 -- it's different from get_actions --help
 
 
-initModel : Model
-initModel =
-    { account = defaultAccount
+initModel : String -> Model
+initModel accountName =
+    { query = accountName
+    , account = defaultAccount
     , actions = []
     , pagination =
         { latestActionSeq = 0
@@ -164,7 +166,7 @@ type Message
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ account, actions, pagination } as model) =
+update message ({ query, account, actions, pagination } as model) =
     case message of
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
@@ -175,7 +177,7 @@ update message ({ account, actions, pagination } as model) =
         OnFetchActions (Ok actions) ->
             let
                 refinedAction =
-                    List.map (refineAction account.account_name) actions
+                    List.map (refineAction query) actions
 
                 smallestActionSeq =
                     case List.head actions of
@@ -195,16 +197,12 @@ update message ({ account, actions, pagination } as model) =
             ( model, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
-            let
-                ee =
-                    toString selectedActionCategory |> Debug.log "selected value"
-            in
-                ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
+            ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
 
         ShowMore ->
             let
                 actionsCmd =
-                    getActions account.account_name pagination.nextPos pagination.offset
+                    getActions query pagination.nextPos pagination.offset
             in
                 if not pagination.isEnd then
                     ( model, actionsCmd )

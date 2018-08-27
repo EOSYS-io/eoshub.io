@@ -145,13 +145,10 @@ pageCmd page location =
         case route of
             SearchRoute query ->
                 let
-                    searchInitModel =
-                        Search.initModel
-
                     subInitCmd =
                         case query of
                             Just str ->
-                                Search.initCmd str searchInitModel
+                                Search.initCmd str (Search.initModel str)
 
                             Nothing ->
                                 Cmd.none
@@ -520,7 +517,7 @@ getPage location =
             SearchRoute query ->
                 case query of
                     Just str ->
-                        SearchPage Search.initModel
+                        SearchPage (Search.initModel str)
 
                     Nothing ->
                         -- it needs no result page. it shows NotFoundPage temporarily

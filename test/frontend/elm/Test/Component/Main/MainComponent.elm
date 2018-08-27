@@ -47,7 +47,7 @@ tests =
                     \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" })
                 , test "SearchRoute" <|
                     \() ->
-                        Expect.equal (SearchPage Search.initModel) (getPage { location | pathname = "/search", search = "?query=123412341234" })
+                        Expect.equal (SearchPage (Search.initModel "123412341234")) (getPage { location | pathname = "/search", search = "?query=123412341234" })
                 , test "NotFoundRoute" <|
                     \() -> Expect.equal NotFoundPage (getPage location)
                 ]
