@@ -137,23 +137,23 @@ main.join {
 
 		&[data-progress="01"]:after {
 			background:
-			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at 5px, #ff5252 0, $pink 5px, transparent 5px),
 			radial-gradient(circle at center, #666 5px, transparent 5px),
 			radial-gradient(circle at 40px, #666 5px, transparent 5px);
 		}
 
 		&[data-progress="02"]:after {
 			background:
-			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
-			radial-gradient(circle at center, #ff5252 0, #aa00ff 5px, transparent 5px),
+			radial-gradient(circle at 5px, #ff5252 0, $pink 5px, transparent 5px),
+			radial-gradient(circle at center, #ff5252 0, $pink 5px, transparent 5px),
 			radial-gradient(circle at 40px, #666 5px, transparent 5px);
 		}
 
 		&[data-progress="03"]:after {
 			background:
-			radial-gradient(circle at 5px, #ff5252 0, #aa00ff 5px, transparent 5px),
-			radial-gradient(circle at center, #ff5252 0, #aa00ff 5px, transparent 5px),
-			radial-gradient(circle at 40px, #ff5252 0, #aa00ff 5px, transparent 5px);
+			radial-gradient(circle at 5px, #ff5252 0, $pink 5px, transparent 5px),
+			radial-gradient(circle at center, #ff5252 0, $pink 5px, transparent 5px),
+			radial-gradient(circle at 40px, #ff5252 0, $pink 5px, transparent 5px);
 		}
 
 	}

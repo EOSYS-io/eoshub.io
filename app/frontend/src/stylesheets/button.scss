@@ -44,8 +44,15 @@ a.button {
 		color:$white;
 	}
 
-	&.undo {
+	&.undo,
+	&.choice {
 		border:1px solid $gray;
+	}
+
+	&.choice.ing {
+		color:$white;
+		border-color:transparent;
+		background-color:$pink;
 	}
 
 	// pesudo deco
