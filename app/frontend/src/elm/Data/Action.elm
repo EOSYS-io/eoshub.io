@@ -10,6 +10,7 @@ import Html
         , span
         , td
         , em
+        , node
         )
 import Html.Attributes
     exposing
@@ -282,16 +283,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Sent"
                                     else
                                         "exceptional case"
-
-                                info =
-                                    params.from
-                                        ++ " -> "
-                                        ++ params.to
-                                        ++ " "
-                                        ++ params.quantity
-                                        ++ " (Memo: "
-                                        ++ params.memo
-                                        ++ ")"
                             in
                                 { model | actionTag = actionTag }
 
@@ -304,9 +295,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Sell Ram"
-
-                                info =
-                                    params.account ++ " sold " ++ params.bytes ++ " bytes RAM"
                             in
                                 { model | actionTag = actionTag }
 
@@ -319,9 +307,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Buy Ram"
-
-                                info =
-                                    params.payer ++ " bought " ++ params.quant ++ " RAM for " ++ params.receiver
                             in
                                 { model | actionTag = actionTag }
 
@@ -334,13 +319,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Buy Ram Bytes"
-
-                                info =
-                                    params.payer
-                                        ++ " bought "
-                                        ++ toString params.bytes
-                                        ++ " bytes RAM for "
-                                        ++ params.receiver
                             in
                                 { model | actionTag = actionTag }
 
@@ -353,21 +331,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Delegate"
-
-                                info =
-                                    params.from
-                                        ++ " delegated to the account "
-                                        ++ params.receiver
-                                        ++ " "
-                                        ++ params.stakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.stakeCpuQuantity
-                                        ++ " for CPU "
-                                        ++ (if params.transfer == 1 then
-                                                "(transfer)"
-                                            else
-                                                ""
-                                           )
                             in
                                 { model | actionTag = actionTag }
 
@@ -380,16 +343,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Undelegate"
-
-                                info =
-                                    params.receiver
-                                        ++ " undelegated from the account "
-                                        ++ params.from
-                                        ++ " "
-                                        ++ params.unstakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.unstakeCpuQuantity
-                                        ++ " for CPU"
                             in
                                 { model | actionTag = actionTag }
 
@@ -406,13 +359,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Register Proxy"
                                     else
                                         "Unregister Proxy"
-
-                                info =
-                                    if params.isproxy == 1 then
-                                        params.proxy ++ " registered as voting proxy"
-                                    else
-                                        params.proxy
-                                            ++ " unregistered as voting proxy"
                             in
                                 { model | actionTag = actionTag }
 
@@ -429,13 +375,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Vote"
                                     else
                                         "Vote though proxy"
-
-                                info =
-                                    -- is not proxy case
-                                    if (String.length params.proxy) == 0 then
-                                        params.voter ++ " voted for block producers " ++ toString params.producers
-                                    else
-                                        params.voter ++ " voted through " ++ params.proxy
                             in
                                 { model | actionTag = actionTag }
 
@@ -448,9 +387,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "New Account"
-
-                                info =
-                                    "New account " ++ params.name ++ " was created by " ++ params.creator
                             in
                                 { model | actionTag = actionTag }
 
@@ -463,6 +399,10 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
         -- undefined actions in eoshub
         Err str ->
             { model | actionTag = contractAccount ++ ":" ++ actionName }
+
+
+
+-- VIEW
 
 
 viewActionInfo : String -> Action -> Html msg
@@ -481,7 +421,7 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
                                 , em []
                                     [ text params.to ]
                                 , text (" " ++ params.quantity)
-                                , span [ class "memo popup viewing", title "클릭하시면 메모를 보실 수 있습니다." ]
+                                , span [ class "memo popup", title "클릭하시면 메모를 보실 수 있습니다." ]
                                     [ span []
                                         [ strong [ attribute "role" "title" ]
                                             [ text "메모" ]
@@ -491,6 +431,9 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
                                             [ text "열기/닫기" ]
                                         ]
                                     ]
+                                , node "script"
+                                    []
+                                    [ text "(function () {var handler = document.querySelectorAll('span.memo.popup button.view');var opened_handler = '';for(var i=0; i < handler.length; i++) {handler[i].addEventListener('click',function () {if (!!opened_handler) {opened_handler.parentNode.parentNode.classList.remove('viewing');}if (opened_handler !== this) {this.parentNode.parentNode.classList.add('viewing');opened_handler = this;} else {this.parentNode.parentNode.classList.remove('viewing');opened_handler = '';}});}})();" ]
                                 ]
 
                         _ ->

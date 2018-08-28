@@ -34,4 +34,4 @@ mainnetRpcUrl =
 
 
 
--- "https://api.eosnewyork.io"
+--"https://api.eosnewyork.io"

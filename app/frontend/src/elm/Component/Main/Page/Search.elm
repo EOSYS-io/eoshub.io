@@ -47,7 +47,7 @@ import Html.Attributes
         , value
         , id
         )
-import Html.Events exposing (on, targetValue)
+import Html.Events exposing (on, onClick, targetValue)
 import Translation exposing (I18n(..), Language, translate)
 import Http
 import Util.HttpRequest exposing (getFullPath, post)
@@ -231,13 +231,13 @@ view language { account, actions, selectedActionCategory } =
         stakedAmount =
             eosFloatToString (larimerToEos account.voter_info.staked)
 
-        ( cpuTotal, cpuPercent, cpuColor ) =
+        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpu_limit.used account.cpu_limit.available account.cpu_limit.max
 
-        ( netTotal, netPercent, netColor ) =
+        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
             getResource "net" account.net_limit.used account.net_limit.available account.net_limit.max
 
-        ( ramTotal, ramPercent, ramColor ) =
+        ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
             getResource "ram" account.ram_usage (account.ram_quota - account.ram_usage) account.ram_quota
     in
         main_ [ class "search" ]
@@ -288,21 +288,18 @@ view language { account, actions, selectedActionCategory } =
                         [ div []
                             [ h4 []
                                 [ text "CPU"
-                                , br []
-                                    []
-                                , text (cpuTotal ++ " Total")
                                 ]
                             , p []
-                                [ text "사용가능한 용량이"
+                                [ text ("Total: " ++ cpuTotal)
                                 , br []
                                     []
-                                , text (cpuPercent ++ "남았어요.")
+                                , text ("Used: " ++ cpuUsed)
                                 , br []
                                     []
-                                , text "2sec/3sec"
+                                , text ("Available: " ++ cpuAvailable)
                                 ]
                             , div [ class "status" ]
-                                [ span [ class "good", attribute "style" ("height:" ++ cpuPercent) ]
+                                [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
                                     []
                                 , text cpuPercent
                                 ]
@@ -310,21 +307,18 @@ view language { account, actions, selectedActionCategory } =
                         , div []
                             [ h4 []
                                 [ text "NET"
-                                , br []
-                                    []
-                                , text (netTotal ++ " Total")
                                 ]
                             , p []
-                                [ text "사용가능한 용량이"
+                                [ text ("Total: " ++ netTotal)
                                 , br []
                                     []
-                                , text (netPercent ++ "남았어요.")
+                                , text ("Used: " ++ netUsed)
                                 , br []
                                     []
-                                , text "2kb/3kb"
+                                , text ("Available: " ++ netAvailable)
                                 ]
                             , div [ class "status" ]
-                                [ span [ class "hell", attribute "style" ("height:" ++ netPercent) ]
+                                [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
                                     []
                                 , text netPercent
                                 ]
@@ -332,21 +326,18 @@ view language { account, actions, selectedActionCategory } =
                         , div []
                             [ h4 []
                                 [ text "RAM"
-                                , br []
-                                    []
-                                , text (ramTotal ++ " Total")
                                 ]
                             , p []
-                                [ text "사용가능한 용량이"
+                                [ text ("Total: " ++ ramTotal)
                                 , br []
                                     []
-                                , text (ramPercent ++ "남았어요.")
+                                , text ("Used: " ++ ramUsed)
                                 , br []
                                     []
-                                , text "2kb/3kb"
+                                , text ("Available: " ++ ramAvailable)
                                 ]
                             , div [ class "status" ]
-                                [ span [ class "bad", attribute "style" ("height:" ++ ramPercent) ]
+                                [ span [ class ramColor, attribute "style" ("height:" ++ ramPercent) ]
                                     []
                                 , text ramPercent
                                 ]
@@ -386,7 +377,7 @@ view language { account, actions, selectedActionCategory } =
                         []
                         [ text "(function () {var handler = document.querySelectorAll('span.memo.popup button.view');var opened_handler = '';for(var i=0; i < handler.length; i++) {handler[i].addEventListener('click',function () {if (!!opened_handler) {opened_handler.parentNode.parentNode.classList.remove('viewing');}if (opened_handler !== this) {this.parentNode.parentNode.classList.add('viewing');opened_handler = this;} else {this.parentNode.parentNode.classList.remove('viewing');opened_handler = '';}});}})();" ]
                     , div [ class "btn_area" ]
-                        [ button [ type_ "button", class "view_more button" ]
+                        [ button [ type_ "button", class "view_more button", onClick ShowMore ]
                             [ text "더 보기" ]
                         ]
                     ]
@@ -410,22 +401,6 @@ viewAction language selectedActionCategory accountName ({ accountActionSeq, bloc
         , td []
             [ text (timeFormatter language blockTime) ]
         , (viewActionInfo accountName action)
-
-        -- td [ class "info" ]
-        --     [ em []
-        --         [ text "eosyscommuni" ]
-        --     , text info
-        --     , span [ class "memo popup viewing", title "클릭하시면 메모를 보실 수 있습니다." ]
-        --         [ span []
-        --             [ strong [ attribute "role" "title" ]
-        --                 [ text "메모" ]
-        --             , span [ class "description" ]
-        --                 [ text "앱을 설치하신 후에는 위젯 등을 사용하시기 전에 앱을 먼저 실행하여 동기화를 완료하신 후 사용하여 주시기 바랍니다. 기억해야 할 것들이 점점 많아지는 세상에서 살아남으세요." ]
-        --             , button [ class "icon view button", type_ "button" ]
-        --                 [ text "열기/닫기" ]
-        --             ]
-        --         ]
-        --     ]
         ]
 
 

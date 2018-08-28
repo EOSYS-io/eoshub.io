@@ -55,6 +55,7 @@ import Util.Formatter
         , eosFloatToString
         , eosStringToFloat
         , unitConverterRound4
+        , resourceUnitConverter
         , percentageConverter
         )
 import Util.Constant exposing (second, minute, hour, day, kilo, mega, giga, tera)
@@ -207,72 +208,43 @@ getUnstakingAmount unstaking_net_amount unstaking_cpu_amount =
 
 
 
--- getResource ( cpu/net, used, available, max ) -> ( totalString, avaliablePercent )
+-- getResource ( cpu/net, used, available, max ) -> ( totalString, avaliablePercent, color )
 
 
-getResource : String -> Int -> Int -> Int -> ( String, String, String )
+getResource : String -> Int -> Int -> Int -> ( String, String, String, String, String )
 getResource resourceType used available max =
     let
+        -- NOTE(boseok): there's no ram available field, so calculate it by max - used.
+        -- but when max is -1 (unlimited case), available needs to be just -1
+        availableMinusCase =
+            if available < 0 then
+                -1
+            else
+                available
+
         totalString =
             case max of
                 (-1) ->
                     "unlimit"
 
                 _ ->
-                    case resourceType of
-                        "net" ->
-                            -- Bytes
-                            if max < kilo then
-                                toString max ++ " bytes"
-                                -- KB
-                            else if (max >= kilo) && (max < mega) then
-                                unitConverterRound4 max kilo ++ " KB"
-                                -- MB
-                            else if (max >= mega) && (max < giga) then
-                                unitConverterRound4 max mega ++ " MB"
-                                -- GB
-                            else if (max >= giga) && (max < tera) then
-                                unitConverterRound4 max giga ++ " GB"
-                                -- TB
-                            else
-                                unitConverterRound4 max tera ++ " TB"
+                    resourceUnitConverter resourceType max
 
-                        "cpu" ->
-                            -- ms
-                            if max < second then
-                                toString max ++ " ms"
-                                -- second
-                            else if (max >= second) && (max < minute) then
-                                unitConverterRound4 max second ++ " s"
-                                -- minute
-                            else if (max >= minute) && (max < hour) then
-                                unitConverterRound4 max minute ++ " min"
-                                -- hour
-                            else if (max >= hour) && (max < day) then
-                                unitConverterRound4 max hour ++ " hour"
-                                -- day
-                            else
-                                unitConverterRound4 max day ++ " day"
+        usedString =
+            case used of
+                (-1) ->
+                    "unlimit"
 
-                        "ram" ->
-                            -- Bytes
-                            if max < 1024 then
-                                toString max ++ " bytes"
-                                -- KB
-                            else if (max >= kilo) && (max < mega) then
-                                unitConverterRound4 max kilo ++ " KB"
-                                -- MB
-                            else if (max >= mega) && (max < giga) then
-                                unitConverterRound4 max mega ++ " MB"
-                                -- GB
-                            else if (max >= giga) && (max < tera) then
-                                unitConverterRound4 max giga ++ " GB"
-                                -- TB
-                            else
-                                unitConverterRound4 max tera ++ " TB"
+                _ ->
+                    resourceUnitConverter resourceType used
 
-                        _ ->
-                            ""
+        availableString =
+            case availableMinusCase of
+                (-1) ->
+                    "unlimit"
+
+                _ ->
+                    resourceUnitConverter resourceType availableMinusCase
 
         avaliablePercent =
             case max of
@@ -283,7 +255,14 @@ getResource resourceType used available max =
                     "100%"
 
                 _ ->
-                    (percentageConverter available max |> Round.round 2) ++ "%"
+                    let
+                        value =
+                            (percentageConverter available max |> Round.round 2) ++ "%"
+                    in
+                        if value == "100.00%" then
+                            "100%"
+                        else
+                            value
 
         color =
             case max of
@@ -298,13 +277,13 @@ getResource resourceType used available max =
                         percentage =
                             percentageConverter available max
                     in
-                        if percentage < 25 then
+                        if percentage < 10 then
                             "hell"
-                        else if percentage >= 25 && percentage < 50 then
+                        else if percentage >= 10 && percentage < 30 then
                             "bad"
-                        else if percentage >= 50 && percentage < 75 then
+                        else if percentage >= 30 && percentage < 100 then
                             "good"
                         else
                             "fine"
     in
-        ( totalString, avaliablePercent, color )
+        ( usedString, availableString, totalString, avaliablePercent, color )
