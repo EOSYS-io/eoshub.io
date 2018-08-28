@@ -7,8 +7,6 @@ sudo: required
 git:
   submodules: false
 
-before_install:
-
 jobs:
   include:
     - stage: Test
