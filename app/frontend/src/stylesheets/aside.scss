@@ -147,7 +147,7 @@ aside {
 	.wallet.status {
 		padding:0;
 		color:#fff;
-		background-color:#232323;
+		background-color:$xx-dark-gray;
 
 		li {
 			$x:24px;
@@ -161,7 +161,7 @@ aside {
 			position:relative;
 
 			&:first-child {
-				background-image: linear-gradient(113deg, #ff5252, #aa00ff);
+				background-color:$x-dark-gray;
 			}
 
 			span {
@@ -222,7 +222,7 @@ aside {
 
 	button.resource.management {
 		position:absolute;
-		background:#000;
+		background:$xxxx-dark-gray;
 		height:52px;
 		line-height:52px;
 		color:#fff;

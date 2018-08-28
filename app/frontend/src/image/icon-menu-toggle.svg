@@ -1,9 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20">
     <defs>
         <linearGradient id="fill-expand" x1="0%" y1="0%" y2="100%">
-            <stop offset="0%" stop-color="#FF5252"/>
-            <stop offset="100%" stop-color="#A0F"/>
+            <stop offset="0%" stop-color="#FF606B"/>
+            <stop offset="100%" stop-color="#FF1F90"/>
         </linearGradient>
+
 		<style>
 			g { display: none }
 			g:target g,
@@ -12,9 +13,9 @@
     </defs>
 	<g id="shrink">
 		<g fill="none" fill-rule="evenodd">
-			<path fill="none" d="M-20-84h1280v720H-20z"/>
+			<path fill="none" d="M-20-84h1920V996H-20z"/>
 			<g>
-				<rect width="20" height="20" fill="#161616" rx="2"/>
+				<rect width="20" height="20" fill="#999" rx="2"/>
 				<rect width="6" height="14" x="3" y="3" fill="#FFF" rx="1"/>
 			</g>
 		</g>
@@ -29,4 +30,3 @@
 		</g>
 	</g>
 </svg>
-
