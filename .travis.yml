@@ -8,8 +8,6 @@ git:
   submodules: false
 
 before_install:
-  - echo -e "\n\nmachine github.com\n  $CI_USER_TOKEN\n" >~/.netrc
-  - git submodule update --init --recursive
 
 jobs:
   include:
@@ -27,6 +25,8 @@ jobs:
         - TEST_DATABASE_URL=postgresql://postgres:@localhost/eoshub_test
         - NODE_ENV=test
       before_install:
+        - echo -e "\n\nmachine github.com\n  $CI_USER_TOKEN\n" >~/.netrc
+        - git submodule update --init --recursive
         - nvm install 10
         - yarn install
         - yarn run elm package install -y
@@ -43,6 +43,9 @@ jobs:
       language: bash
       services:
         - docker
+      before_install:
+        - echo -e "\n\nmachine github.com\n  $CI_USER_TOKEN\n" >~/.netrc
+        - git submodule update --init --recursive
       install:
         # install AWS SDK
         - pip install --user awscli
