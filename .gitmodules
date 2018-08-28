@@ -1,3 +1,3 @@
-[submodule "app/frontend/src/js/third_party/charting_library"]
-	path = app/frontend/src/js/third_party/charting_library
-	url = git@github.com:tradingview/charting_library.git
+[submodule "vendor/assets/js/charting_library"]
+	path = vendor/assets/js/charting_library
+	url = https://github.com/tradingview/charting_library
