@@ -70,7 +70,7 @@ type alias ClaimrewardsParameters =
 
 type alias SellramParameters =
     { account : String
-    , bytes : String
+    , bytes : Int
     }
 
 
@@ -191,7 +191,7 @@ sellramDecoder =
     Decode.map Sellram <|
         (decode SellramParameters
             |> required "account" Decode.string
-            |> required "bytes" Decode.string
+            |> required "bytes" Decode.int
         )
 
 
@@ -445,7 +445,7 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
                             td [ class "info" ]
                                 [ em []
                                     [ text params.account ]
-                                , text (" sold " ++ params.bytes ++ " bytes RAM")
+                                , text (" sold " ++ (toString params.bytes) ++ " bytes RAM")
                                 ]
 
                         _ ->
@@ -581,16 +581,16 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
                                 ]
 
                         _ ->
-                            td [] []
+                            td [ class "info" ] []
 
                 _ ->
-                    td []
-                        [ text (toString actionParameters) ]
+                    td [ class "info" ]
+                        [ text ("Ok, not matched" ++ (toString actionParameters)) ]
 
         -- undefined actions in eoshub
         Err str ->
-            td []
-                [ text (toString str) ]
+            td [ class "info" ]
+                [ text ("Err" ++ (toString str)) ]
 
 
 
