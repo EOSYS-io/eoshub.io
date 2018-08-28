@@ -1,5 +1,5 @@
 nav {
-	background:$black;
+	background:$xxxx-dark-gray;
 
 	ul,li {
 		margin:0;
@@ -20,13 +20,14 @@ nav {
 		width:60px;
 		height:60px;
 
+		box-sizing:border-box;
+
 		background-repeat:no-repeat;
 		background-position:center center;
 		background-size:22px 22px;
 
-		&:hover,
-		&.viewing {
-			background-color:#282828;
+		&:hover{
+			background-color:$xx-dark-gray;
 		}
 
 		&:active {
@@ -34,9 +35,18 @@ nav {
 		}
 	}
 
+	a.viewing {
+		border-left:4px solid $pink;
+		background-color:$xxx-dark-gray;
+
+		&:hover{
+			background-color:$xx-dark-gray;
+		}
+	}
+
 	// bg image
 	button.dashboard.toggle {
-		background-color:#282828;
+		background-color:$xx-dark-gray;
 		background-image:url('../image/icon-menu-toggle.svg#expand');
 
 		&.shrink {
@@ -45,7 +55,7 @@ nav {
 		}
 
 		&:hover {
-			background-color:#282828;
+			background-color:$xx-dark-gray;
 		}
 
 	}
@@ -69,6 +79,7 @@ nav {
 	a.dapps {
 		background-image:url('../image/icon-application.svg');
 	}
+
 
 	// tooltip
 	span.tooltip {

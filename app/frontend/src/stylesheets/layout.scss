@@ -78,7 +78,8 @@ section.content {
 
 	main.index,
 	main.transfer,
-	main.search {
+	main.search,
+	main.ram_market {
 		height:inherit;
 		box-sizing:border-box;
 		padding:42px;
@@ -136,7 +137,8 @@ aside {
 
 main.index,
 main.transfer,
-main.search {
+main.search,
+main.ram_market {
 	transition:margin 0.4s;
 }
 
@@ -147,7 +149,8 @@ section.modal.popup {
 aside.shrink {
 	+ main.index,
 	+ main.transfer,
-	+ main.search {
+	+ main.search,
+	+ main.ram_market {
 		margin-left:0;
 	}
 

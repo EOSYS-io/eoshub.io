@@ -5,7 +5,7 @@ main.search { /* namespace */ }
 
 main.search {
 	.container {
-		background:$x-dark-gray;
+		background:$xx-dark-gray;
 		padding:40px 0;
 		margin-top:40px;
 	}
@@ -56,7 +56,7 @@ main.search {
 		column-gap:8px;
 
 		> div {
-			background-color:$xx-dark-gray;
+			background-color:$xxx-dark-gray;
 			font-size:$small;
 			padding:24px 32px;
 
@@ -140,13 +140,13 @@ main.search {
 					height:73px;
 
 					border-radius:100%;
-					background-color:$x-dark-gray;
+					background-color:$xx-dark-gray;
 
 					display:flex;
 					align-items:center;
 					justify-content:center;
 
-					font-size:$large;
+					font-size:$small;
 					font-weight:100;
 					color:$white;
 
@@ -209,10 +209,10 @@ main.search {
 
 		table {
 			margin-top:12px;
-			background-color:$xx-dark-gray;
+			background-color:$xxx-dark-gray;
 
 			thead {
-				border-bottom:1px solid $x-dark-gray;
+				border-bottom:1px solid $xx-dark-gray;
 			}
 
 			th,td {
@@ -244,12 +244,14 @@ main.search {
 			}
 
 			tbody tr {
-				border-top:1px solid $xxx-dark-gray;
+				border-top:1px solid $xxxx-dark-gray;
 			}
 
 			td.info {
 				width:51.276102088%;
 				position:relative;
+				word-break:break-all;
+				padding-right:40px;
 
 				span.memo.popup {
 					$padding:20px;
@@ -367,7 +369,7 @@ main.search.public_key {
 		row-gap:8px;
 
 		> div {
-			background-color:$xx-dark-gray;
+			background-color:$xxx-dark-gray;
 			font-size:$small;
 			padding:24px 32px;
 
