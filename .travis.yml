@@ -4,6 +4,13 @@ branches:
   - alpha
 sudo: required
 
+git:
+  submodules: false
+
+before_install:
+  - echo -e "\n\nmachine github.com\n  $CI_USER_TOKEN\n" >~/.netrc
+  - git submodule update --init --recursive
+
 jobs:
   include:
     - stage: Test
