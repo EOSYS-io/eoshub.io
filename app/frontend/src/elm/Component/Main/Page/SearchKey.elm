@@ -73,31 +73,31 @@ view : Language -> Model -> Html Message
 view language { accounts, publickey } =
     main_ [ class "search public_key" ]
         [ h2 []
-            [ text "공개 키 검색" ]
+            [ text (translate language SearchPublicKey) ]
         , p []
-            [ text "검색하신 계정에 대한 정보입니다." ]
+            [ text (translate language SearchResultPublicKey) ]
         , div [ class "container" ]
             [ div [ class "summary" ]
                 [ dt []
-                    [ text "공개 키 이름" ]
+                    [ text (translate language SearchPublicKey) ]
                 , dd []
                     [ text publickey ]
                 ]
             , div [ class "keybox" ]
-                (viewAccountCardList accounts)
+                (viewAccountCardList language accounts)
             ]
         ]
 
 
-viewAccountCardList : List String -> List (Html Message)
-viewAccountCardList accounts =
-    List.indexedMap viewAccountCard accounts
+viewAccountCardList : Language -> List String -> List (Html Message)
+viewAccountCardList language accounts =
+    List.indexedMap (viewAccountCard language) accounts
 
 
-viewAccountCard : Int -> String -> Html Message
-viewAccountCard index account =
+viewAccountCard : Language -> Int -> String -> Html Message
+viewAccountCard language index account =
     div []
-        [ span [] [ text <| "계정 " ++ (toString (index + 1)) ]
+        [ span [] [ text <| (translate language Translation.Account) ++ " " ++ (toString (index + 1)) ]
         , strong
             [ title account ]
             [ text account ]

@@ -129,6 +129,21 @@ type I18n
     | AccountCreationWelcome
     | AccountCreationYouCanSignIn
     | AccountCreationGoHome
+    | Search
+    | SearchDescribe
+    | SearchAccount
+    | SearchResultAccount
+    | Account
+    | Resource
+    | Transactions
+    | Number
+    | Type
+    | Time
+    | Info
+    | All
+    | ShowMore
+    | SearchPublicKey
+    | SearchResultPublicKey
 
 
 translate : Language -> I18n -> String
@@ -664,4 +679,94 @@ getMessages i18n =
             { korean = "홈 화면 바로가기"
             , english = "Go Home"
             , chinese = "回家"
+            }
+
+        Search ->
+            { korean = "검색"
+            , english = "Search"
+            , chinese = "查询"
+            }
+
+        SearchDescribe ->
+            { korean = "계정명, 공개 키 검색하기"
+            , english = "Search account name or public key"
+            , chinese = "查询账户名，公匙"
+            }
+
+        SearchAccount ->
+            { korean = "계정 검색"
+            , english = "Search account "
+            , chinese = "查询账户"
+            }
+
+        SearchResultAccount ->
+            { korean = "검색하신 계정에 대한 정보입니다 :)"
+            , english = "Search result"
+            , chinese = "如下为查询到的账户信息"
+            }
+
+        Account ->
+            { korean = "계정 이름"
+            , english = "Account"
+            , chinese = "账户名"
+            }
+
+        Resource ->
+            { korean = "리소스"
+            , english = "Resource"
+            , chinese = "资源"
+            }
+
+        Transactions ->
+            { korean = "트랜잭션"
+            , english = "Transactions"
+            , chinese = "交易"
+            }
+
+        Number ->
+            { korean = "번호"
+            , english = "No."
+            , chinese = "号码"
+            }
+
+        Type ->
+            { korean = "타입"
+            , english = "Type"
+            , chinese = "种类"
+            }
+
+        Time ->
+            { korean = "시간"
+            , english = "Time"
+            , chinese = "时间"
+            }
+
+        Info ->
+            { korean = "정보"
+            , english = "Info"
+            , chinese = "信息"
+            }
+
+        All ->
+            { korean = "전체"
+            , english = "All"
+            , chinese = "全部"
+            }
+
+        ShowMore ->
+            { korean = "더보기"
+            , english = "Show more"
+            , chinese = "更多"
+            }
+
+        SearchPublicKey ->
+            { korean = "공개 키 검색"
+            , english = "Search Public Key"
+            , chinese = "查询公匙"
+            }
+
+        SearchResultPublicKey ->
+            { korean = "검색하신 공개 키에 대한 정보입니다 :)"
+            , english = "Search result of the public key"
+            , chinese = "如下为查询到的公匙信息"
             }

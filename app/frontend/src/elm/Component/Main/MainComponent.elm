@@ -247,10 +247,10 @@ view { page, header, notification, sidebar } =
                         [ text "中文" ]
                     ]
                 , form [ onSubmit (CheckSearchQuery header.searchInput) ]
-                    [ input [ placeholder "계정명,퍼블릭키 검색하기", type_ "text", onInput InputSearch ]
+                    [ input [ placeholder (translate language SearchDescribe), type_ "text", onInput InputSearch ]
                         []
                     , button [ type_ "button", onClick (CheckSearchQuery header.searchInput) ]
-                        [ text "검색하기" ]
+                        [ text (translate language Translation.Search) ]
                     ]
                 ]
 

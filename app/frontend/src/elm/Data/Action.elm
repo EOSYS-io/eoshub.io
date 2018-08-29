@@ -596,7 +596,7 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                     case actionParameters of
                         Newaccount params ->
                             td [ class "info" ]
-                                [ text "New account"
+                                [ text "New account "
                                 , em []
                                     [ text params.name ]
                                 , text " was created by "
