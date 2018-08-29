@@ -295,6 +295,9 @@ aside.shrink {
 	.wrapper {
 		h2 {
 			margin-left:32px;
+			+ p {
+				margin-left:32px;
+			}
 		}
 
 		form {
@@ -316,13 +319,17 @@ aside.shrink {
 		input,button {
 			height:20px;
 		}
+
 		input {
 			flex:1;
 			font-size:inherit;
-			background:url('../image/icon-search.svg') left center no-repeat;
 			padding-left:32px;
 			outline:0;
 			color:#fff;
+
+			&.search_token {
+				background:url('../image/icon-search.svg') left center no-repeat;
+			}
 		}
 
 		button {
