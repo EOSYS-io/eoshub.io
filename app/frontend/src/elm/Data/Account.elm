@@ -207,15 +207,11 @@ getUnstakingAmount unstaking_net_amount unstaking_cpu_amount =
     eosFloatToString (eosStringToFloat unstaking_net_amount + eosStringToFloat unstaking_cpu_amount)
 
 
-
--- getResource ( cpu/net, used, available, max ) -> ( totalString, avaliablePercent, color )
-
-
 getResource : String -> Int -> Int -> Int -> ( String, String, String, String, String )
 getResource resourceType used available max =
     let
-        -- NOTE(boseok): there's no ram available field, so calculate it by max - used.
-        -- but when max is -1 (unlimited case), available needs to be just -1
+        -- NOTE(boseok): there's no ram available field, so calculate it by (available = max - used).
+        -- but when available is less than 0 (unlimited case), available needs to be just -1
         availableMinusCase =
             if available < 0 then
                 -1

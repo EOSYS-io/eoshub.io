@@ -20,6 +20,7 @@ import Html.Attributes
         , type_
         , name
         )
+import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, oneOf, decodeString)
 import Json.Encode as Encode exposing (encode)
 import Json.Decode.Pipeline exposing (decode, required, optional, requiredAt, hardcoded)
@@ -130,6 +131,22 @@ type alias NewaccountParameters =
     { creator : String
     , name : String
     }
+
+
+
+-- UPDATE
+
+
+type Message
+    = ShowMemo OpenedActionSeq
+
+
+type alias OpenedActionSeq =
+    Int
+
+
+type alias LetOpen =
+    Bool
 
 
 actionsDecoder : Decoder (List Action)
@@ -405,8 +422,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 -- VIEW
 
 
-viewActionInfo : String -> Action -> Html msg
-viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
+viewActionInfo : String -> Action -> Int -> Html Message
+viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, data } as model) openedActionSeq =
     case data of
         -- controlled actions
         Ok actionParameters ->
@@ -421,19 +438,26 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
                                 , em []
                                     [ text params.to ]
                                 , text (" " ++ params.quantity)
-                                , span [ class "memo popup", title "클릭하시면 메모를 보실 수 있습니다." ]
+                                , span
+                                    [ class
+                                        ("memo popup"
+                                            ++ (if accountActionSeq == openedActionSeq then
+                                                    " viewing"
+                                                else
+                                                    ""
+                                               )
+                                        )
+                                    , title "클릭하시면 메모를 보실 수 있습니다."
+                                    ]
                                     [ span []
                                         [ strong [ attribute "role" "title" ]
                                             [ text "메모" ]
                                         , span [ class "description" ]
                                             [ text params.memo ]
-                                        , button [ class "icon view button", type_ "button" ]
+                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo accountActionSeq) ]
                                             [ text "열기/닫기" ]
                                         ]
                                     ]
-                                , node "script"
-                                    []
-                                    [ text "(function () {var handler = document.querySelectorAll('span.memo.popup button.view');var opened_handler = '';for(var i=0; i < handler.length; i++) {handler[i].addEventListener('click',function () {if (!!opened_handler) {opened_handler.parentNode.parentNode.classList.remove('viewing');}if (opened_handler !== this) {this.parentNode.parentNode.classList.add('viewing');opened_handler = this;} else {this.parentNode.parentNode.classList.remove('viewing');opened_handler = '';}});}})();" ]
                                 ]
 
                         _ ->
@@ -585,12 +609,12 @@ viewActionInfo accountName ({ contractAccount, actionName, data } as model) =
 
                 _ ->
                     td [ class "info" ]
-                        [ text ("Ok, not matched" ++ (toString actionParameters)) ]
+                        [ text (toString actionParameters) ]
 
         -- undefined actions in eoshub
         Err str ->
             td [ class "info" ]
-                [ text ("Err" ++ (toString str)) ]
+                [ text (toString str) ]
 
 
 

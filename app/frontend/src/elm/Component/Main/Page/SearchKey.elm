@@ -104,13 +104,3 @@ viewAccountCard index account =
         , button [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
             [ text "자세한 검색 보기" ]
         ]
-
-
-
--- [ span []
---     [ text <| "계정 " ++ (toString (index + 1)) ]
--- , h4 []
---     [ text account ]
--- , a [ onClick (ChangeUrl ("/search?query=" ++ account)) ]
---     [ text "자세히 보기" ]
--- ]

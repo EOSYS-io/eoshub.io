@@ -53,7 +53,7 @@ import Http
 import Util.HttpRequest exposing (getFullPath, post)
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Data.Action exposing (Action, actionsDecoder, refineAction, viewActionInfo)
+import Data.Action exposing (Message(..), Action, actionsDecoder, refineAction, viewActionInfo)
 import Data.Account
     exposing
         ( Account
@@ -84,6 +84,7 @@ type alias Model =
     , actions : List Action
     , pagination : Pagination
     , selectedActionCategory : SelectedActionCategory
+    , openedActionSeq : Int
     }
 
 
@@ -117,6 +118,7 @@ initModel accountName =
         , isEnd = False
         }
     , selectedActionCategory = "all"
+    , openedActionSeq = -1
     }
 
 
@@ -163,10 +165,11 @@ type Message
     | OnFetchActions (Result Http.Error (List Action))
     | SelectActionCategory SelectedActionCategory
     | ShowMore
+    | ActionMessage Data.Action.Message
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ query, account, actions, pagination } as model) =
+update message ({ query, account, actions, pagination, openedActionSeq } as model) =
     case message of
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
@@ -210,13 +213,23 @@ update message ({ query, account, actions, pagination } as model) =
                     -- TODO(boseok): alert it is the end of records
                     ( model, Cmd.none )
 
+        ActionMessage (ShowMemo clickedActionSeq) ->
+            let
+                newOpenedActionSeq =
+                    if openedActionSeq == clickedActionSeq then
+                        -1
+                    else
+                        clickedActionSeq
+            in
+                ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Html Message
-view language { account, actions, selectedActionCategory } =
+view language { account, actions, selectedActionCategory, openedActionSeq } =
     let
         totalAmount =
             getTotalAmount
@@ -371,11 +384,8 @@ view language { account, actions, selectedActionCategory } =
                                 ]
                             ]
                         , tbody []
-                            (viewActionList language selectedActionCategory account.account_name actions)
+                            (viewActionList language selectedActionCategory account.account_name openedActionSeq actions)
                         ]
-                    , node "script"
-                        []
-                        [ text "(function () {var handler = document.querySelectorAll('span.memo.popup button.view');var opened_handler = '';for(var i=0; i < handler.length; i++) {handler[i].addEventListener('click',function () {if (!!opened_handler) {opened_handler.parentNode.parentNode.classList.remove('viewing');}if (opened_handler !== this) {this.parentNode.parentNode.classList.add('viewing');opened_handler = this;} else {this.parentNode.parentNode.classList.remove('viewing');opened_handler = '';}});}})();" ]
                     , div [ class "btn_area" ]
                         [ button [ type_ "button", class "view_more button", onClick ShowMore ]
                             [ text "더 보기" ]
@@ -385,14 +395,14 @@ view language { account, actions, selectedActionCategory } =
             ]
 
 
-viewActionList : Language -> SelectedActionCategory -> String -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory accountName actions =
-    List.map (viewAction language selectedActionCategory accountName) actions
+viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
+viewActionList language selectedActionCategory accountName openedActionSeq actions =
+    List.map (viewAction language selectedActionCategory accountName openedActionSeq) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> String -> Action -> Html Message
-viewAction language selectedActionCategory accountName ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
+viewAction language selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
@@ -400,7 +410,7 @@ viewAction language selectedActionCategory accountName ({ accountActionSeq, bloc
             [ text actionTag ]
         , td []
             [ text (timeFormatter language blockTime) ]
-        , (viewActionInfo accountName action)
+        , Html.map ActionMessage (viewActionInfo accountName action openedActionSeq)
         ]
 
 
