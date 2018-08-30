@@ -1,5 +1,26 @@
 module Data.Action exposing (..)
 
+import Html
+    exposing
+        ( Html
+        , button
+        , text
+        , text
+        , strong
+        , span
+        , td
+        , em
+        , node
+        )
+import Html.Attributes
+    exposing
+        ( class
+        , title
+        , attribute
+        , type_
+        , name
+        )
+import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, oneOf, decodeString)
 import Json.Encode as Encode exposing (encode)
 import Json.Decode.Pipeline exposing (decode, required, optional, requiredAt, hardcoded)
@@ -19,7 +40,6 @@ type alias Action =
     , actionName : String
     , data : Result String ActionParameters
     , actionTag : String
-    , info : String
     }
 
 
@@ -51,7 +71,7 @@ type alias ClaimrewardsParameters =
 
 type alias SellramParameters =
     { account : String
-    , bytes : String
+    , bytes : Int
     }
 
 
@@ -113,6 +133,22 @@ type alias NewaccountParameters =
     }
 
 
+
+-- UPDATE
+
+
+type Message
+    = ShowMemo OpenedActionSeq
+
+
+type alias OpenedActionSeq =
+    Int
+
+
+type alias LetOpen =
+    Bool
+
+
 actionsDecoder : Decoder (List Action)
 actionsDecoder =
     Decode.field "actions"
@@ -125,7 +161,6 @@ actionsDecoder =
                 |> requiredAt [ "action_trace", "act", "account" ] Decode.string
                 |> requiredAt [ "action_trace", "act", "name" ] Decode.string
                 |> requiredAt [ "action_trace", "act", "data" ] actionParametersDecoder
-                |> hardcoded ""
                 |> hardcoded ""
             )
         )
@@ -173,7 +208,7 @@ sellramDecoder =
     Decode.map Sellram <|
         (decode SellramParameters
             |> required "account" Decode.string
-            |> required "bytes" Decode.string
+            |> required "bytes" Decode.int
         )
 
 
@@ -265,18 +300,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Sent"
                                     else
                                         "exceptional case"
-
-                                info =
-                                    params.from
-                                        ++ " -> "
-                                        ++ params.to
-                                        ++ " "
-                                        ++ params.quantity
-                                        ++ " (Memo: "
-                                        ++ params.memo
-                                        ++ ")"
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -287,11 +312,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Sell Ram"
-
-                                info =
-                                    params.account ++ " sold " ++ params.bytes ++ " bytes RAM"
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -302,11 +324,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Buy Ram"
-
-                                info =
-                                    params.payer ++ " bought " ++ params.quant ++ " RAM for " ++ params.receiver
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -317,15 +336,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Buy Ram Bytes"
-
-                                info =
-                                    params.payer
-                                        ++ " bought "
-                                        ++ toString params.bytes
-                                        ++ " bytes RAM for "
-                                        ++ params.receiver
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -336,23 +348,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Delegate"
-
-                                info =
-                                    params.from
-                                        ++ " delegated to the account "
-                                        ++ params.receiver
-                                        ++ " "
-                                        ++ params.stakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.stakeCpuQuantity
-                                        ++ " for CPU "
-                                        ++ (if params.transfer == 1 then
-                                                "(transfer)"
-                                            else
-                                                ""
-                                           )
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -363,18 +360,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "Undelegate"
-
-                                info =
-                                    params.receiver
-                                        ++ " undelegated from the account "
-                                        ++ params.from
-                                        ++ " "
-                                        ++ params.unstakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.unstakeCpuQuantity
-                                        ++ " for CPU"
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -389,15 +376,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Register Proxy"
                                     else
                                         "Unregister Proxy"
-
-                                info =
-                                    if params.isproxy == 1 then
-                                        params.proxy ++ " registered as voting proxy"
-                                    else
-                                        params.proxy
-                                            ++ " unregistered as voting proxy"
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -412,15 +392,8 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Vote"
                                     else
                                         "Vote though proxy"
-
-                                info =
-                                    -- is not proxy case
-                                    if (String.length params.proxy) == 0 then
-                                        params.voter ++ " voted for block producers " ++ toString params.producers
-                                    else
-                                        params.voter ++ " voted through " ++ params.proxy
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -431,21 +404,217 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 actionTag =
                                     "New Account"
-
-                                info =
-                                    "New account " ++ params.name ++ " was created by " ++ params.creator
                             in
-                                { model | actionTag = actionTag, info = info }
+                                { model | actionTag = actionTag }
 
                         _ ->
                             model
 
                 _ ->
-                    { model | actionTag = contractAccount ++ ":" ++ actionName, info = toString actionParameters }
+                    { model | actionTag = contractAccount ++ ":" ++ actionName }
 
         -- undefined actions in eoshub
         Err str ->
-            { model | actionTag = contractAccount ++ ":" ++ actionName, info = str }
+            { model | actionTag = contractAccount ++ ":" ++ actionName }
+
+
+
+-- VIEW
+
+
+viewActionInfo : String -> Action -> Int -> Html Message
+viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, data } as model) openedActionSeq =
+    case data of
+        -- controlled actions
+        Ok actionParameters ->
+            case ( contractAccount, actionName ) of
+                ( "eosio.token", "transfer" ) ->
+                    case actionParameters of
+                        Transfer params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.from ]
+                                , text " -> "
+                                , em []
+                                    [ text params.to ]
+                                , text (" " ++ params.quantity)
+                                , span
+                                    [ class
+                                        ("memo popup"
+                                            ++ (if accountActionSeq == openedActionSeq then
+                                                    " viewing"
+                                                else
+                                                    ""
+                                               )
+                                        )
+                                    , title "클릭하시면 메모를 보실 수 있습니다."
+                                    ]
+                                    [ span []
+                                        [ strong [ attribute "role" "title" ]
+                                            [ text "메모" ]
+                                        , span [ class "description" ]
+                                            [ text params.memo ]
+                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo accountActionSeq) ]
+                                            [ text "열기/닫기" ]
+                                        ]
+                                    ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "sellram" ) ->
+                    case actionParameters of
+                        Sellram params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.account ]
+                                , text (" sold " ++ (toString params.bytes) ++ " bytes RAM")
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "buyram" ) ->
+                    case actionParameters of
+                        Buyram params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.payer ]
+                                , text (" bought " ++ params.quant ++ " RAM for ")
+                                , em []
+                                    [ text params.receiver ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "buyrambytes" ) ->
+                    case actionParameters of
+                        Buyrambytes params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.payer ]
+                                , text (" bought " ++ toString params.bytes ++ "bytes RAM for ")
+                                , em []
+                                    [ text params.receiver ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "delegatebw" ) ->
+                    case actionParameters of
+                        Delegatebw params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.from ]
+                                , text " delegated to the account "
+                                , em []
+                                    [ text params.receiver ]
+                                , text
+                                    (" "
+                                        ++ params.stakeNetQuantity
+                                        ++ " for NET, and "
+                                        ++ params.stakeCpuQuantity
+                                        ++ " for CPU "
+                                        ++ (if params.transfer == 1 then
+                                                "(transfer)"
+                                            else
+                                                ""
+                                           )
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "undelegatebw" ) ->
+                    case actionParameters of
+                        Undelegatebw params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.receiver ]
+                                , text " undelegated from the account "
+                                , em []
+                                    [ text params.from ]
+                                , text
+                                    (" "
+                                        ++ params.unstakeNetQuantity
+                                        ++ " for NET, and "
+                                        ++ params.unstakeCpuQuantity
+                                        ++ " for CPU"
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "regproxy" ) ->
+                    case actionParameters of
+                        Regproxy params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.proxy ]
+                                , text
+                                    (if params.isproxy == 1 then
+                                        " registered as voting proxy"
+                                     else
+                                        " unregistered as voting proxy"
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "voteproducer" ) ->
+                    case actionParameters of
+                        Voteproducer params ->
+                            td [ class "info" ]
+                                [ em []
+                                    [ text params.voter ]
+                                , text
+                                    (if (String.length params.proxy) == 0 then
+                                        (" voted for block producers " ++ toString params.producers)
+                                     else
+                                        " voted through "
+                                    )
+                                , em []
+                                    [ text
+                                        (if (String.length params.proxy) == 0 then
+                                            ""
+                                         else
+                                            params.proxy
+                                        )
+                                    ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "newaccount" ) ->
+                    case actionParameters of
+                        Newaccount params ->
+                            td [ class "info" ]
+                                [ text "New account "
+                                , em []
+                                    [ text params.name ]
+                                , text " was created by "
+                                , em []
+                                    [ text params.creator ]
+                                ]
+
+                        _ ->
+                            td [ class "info" ] []
+
+                _ ->
+                    td [ class "info" ]
+                        [ text (toString actionParameters) ]
+
+        -- undefined actions in eoshub
+        Err str ->
+            td [ class "info" ]
+                [ text (toString str) ]
 
 
 
