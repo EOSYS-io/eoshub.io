@@ -17,6 +17,12 @@ sub,sup {
     font-family:inherit;
 }
 
+i {
+	font-style:normal;
+	font-size:inherit;
+	font-family:inherit;
+}
+
 // for screen reader
 .skip_nav {
     position: absolute;
@@ -155,6 +161,15 @@ input[type="email"]::placeholder {
 	color:$gray;
 }
 
+
+input[type="number"] {
+	&::-webkit-inner-spin-button,
+	&::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+}
+
 input[type='checkbox'] {
 	@include screen_reader();
 	visibility:hidden;
@@ -201,15 +216,38 @@ input[type='checkbox'] {
 button {
 	color:inherit;
 	border-color:transparent;
+	outline:0;
 }
 
 
 
 // select
+// --------------------------------------------------------------------------------
 select {
+	outline:0;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 }
+
+select {
+	color:$white;
+	font-size:$small;
+	height: 42px;
+
+	display:inline-block;
+	background: url(../image/icon-dropdown.svg) calc(100% - 16px) calc(50%) no-repeat #161616;
+	background-size: 20px 20px;
+	border:0;
+	border-radius: 2px;
+	width:160px;
+	padding:0 14px;
+
+	option:disabled {
+		display:none;
+	}
+}
+
+
 
 
 // --------------------------------------------------------------------------------
@@ -232,3 +270,46 @@ table {
 		@include screen_reader();
 	}
 }
+
+// for eoshub.io
+table {
+	border-collapse:collapse;
+	background-color:$xxx-dark-gray;
+
+	thead {
+		border-bottom:1px solid $xx-dark-gray;
+	}
+
+	th,td {
+		padding:16px 12px;;
+	}
+
+	th {
+		font-size:$small;
+		color:$white;
+		font-weight:$light;
+		text-align:left;
+		&:first-child {
+			text-align:center;
+		}
+	}
+
+	td {
+		font-size:$x-small;
+		word-break:break-all;
+
+		em {
+			color:$pink;
+		}
+	}
+
+	td:first-child {
+		text-align:center;
+	}
+
+	tbody tr {
+		border-top:1px solid $xxxx-dark-gray;
+	}
+
+}
+

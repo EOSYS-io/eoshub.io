@@ -104,7 +104,8 @@ section.content {
 	}
 
 	main.transfer,
-	main.search {
+	main.search,
+	main.ram_market	{
 		width:965px;
 	}
 
@@ -276,6 +277,29 @@ aside.shrink {
 		left:calc(240px + #{$lnb_width});
 	}
 
+	// superset
+	span.validate.description {
+		font-size: $small;
+		line-height:20px;
+		height: 20px;
+		background-size: 20px;
+		padding-left: 28px;
+		display: block;
+		visibility: hidden;
+
+		&.true {
+			visibility: visible;
+			color: #ff6b64;
+			background: url('../image/icon-x-circle.svg') left center no-repeat;
+		}
+
+		&.false {
+			visibility: visible;
+			color: #79c720;
+			background: url('../image/icon-check-circle.svg') left center no-repeat;
+		}
+	}
+
 	.wrapper {
 		background-color:$x-dark-gray;
 
@@ -326,9 +350,17 @@ aside.shrink {
 			padding-left:32px;
 			outline:0;
 			color:#fff;
+			background-color:transparent;
+			background-position:left center;
+			background-repeat:no-repeat;
+			background-size:20px;
 
 			&.search_token {
-				background:url('../image/icon-search.svg') left center no-repeat;
+				background-image:url('../image/icon-search.svg');
+			}
+
+			&.user {
+				background-image:url('../image/icon-id-default.svg');
 			}
 		}
 
@@ -452,5 +484,24 @@ aside.shrink {
 		}
 	}
 
+}
+// type case
+.modal.popup.buy_ram {
+	form {
+		margin-bottom:0;
+		border-radius:0;
+		border-bottom:1px solid $white;
+	}
 
+	form + .container {
+		margin-top:12px;
+		margin-left:32px;
+	}
+
+	.btn_area {
+		margin:43px 32px 0;
+		button {
+			width:100%;
+		}
+	}
 }

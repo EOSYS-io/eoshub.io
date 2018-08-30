@@ -102,6 +102,7 @@ main.search {
 					overflow:hidden;
 					text-overflow:ellipsis;
 					max-width:210px;
+
 				}
 			}
 		}
@@ -151,6 +152,7 @@ main.search {
 					color:$white;
 
 					overflow:hidden;
+					text-shadow:0 1px 6px rgba(0,0,0,0.6);
 
 					span {
 						content:'';
@@ -189,68 +191,12 @@ main.search {
 			margin-bottom:22px;
 		}
 
-		select {
-			color:$white;
-			font-size:$small;
-			height: 42px;
-
-			display:inline-block;
-			background: url(../image/icon-dropdown.svg) calc(100% - 16px) calc(50%) no-repeat #161616;
-			background-size: 20px 20px;
-			border:0;
-			border-radius: 2px;
-			width:160px;
-			padding:0 14px;
-
-			option:disabled {
-				display:none;
-			}
-		}
-
 		table {
 			margin-top:12px;
-			background-color:$xxx-dark-gray;
-
-			thead {
-				border-bottom:1px solid $xx-dark-gray;
-			}
-
-			th,td {
-				padding:16px 12px;;
-			}
-
-			th {
-				font-size:$small;
-				color:$white;
-				font-weight:$light;
-				text-align:left;
-				&:first-child {
-					text-align:center;
-				}
-			}
-
-			td {
-				font-size:$x-small;
-			}
-
-			td {
-				em {
-					color:$pink;
-				}
-			}
-
-			td:first-child {
-				text-align:center;
-			}
-
-			tbody tr {
-				border-top:1px solid $xxxx-dark-gray;
-			}
 
 			td.info {
 				width:51.276102088%;
 				position:relative;
-				word-break:break-all;
 				padding-right:40px;
 
 				span.memo.popup {
@@ -330,18 +276,6 @@ main.search {
 	div.btn_area {
 		margin-top:16px;
 		text-align:center;
-
-		button.view_more {
-			padding:0 40px;
-			height: 52px;
-			border-radius: 2px;
-			background-color: #161616;
-			min-width:152px;
-
-			&:before {
-				content:'+ ';
-			}
-		}
 	}
 }
 
