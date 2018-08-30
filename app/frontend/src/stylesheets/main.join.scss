@@ -35,6 +35,10 @@ main.join {
 	div.btn_area {
 		margin-top:32px;
 		display:flex;
+
+		button {
+			flex:1;
+		}
 	}
 
 	article {

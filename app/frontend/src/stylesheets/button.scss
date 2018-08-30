@@ -27,16 +27,23 @@ input[type='submit'] {
 
 button[type="button"].button,
 a.button {
-	flex:1;
+	// flex:1;
 	outline:0;
 	display:inline-block;
-
-	line-height:50px;
-	height: 52px;
-
 	border-radius: 2px;
 
 	font-size:$small;
+
+	transition:background-color 0.3s, color 0.3s, background-image 0.3s;
+
+	// size
+	&.ok,
+	&.undo,
+	&.choice,
+	&.tab	{
+		line-height:50px;
+		height: 52px;
+	}
 
 	// type case
 	&.ok {
@@ -52,7 +59,7 @@ a.button {
 	&.choice.ing {
 		color:$white;
 		border-color:transparent;
-		background-color:$pink;
+		background-color:$x-dark-gray;
 	}
 
 	// pesudo deco
@@ -62,6 +69,19 @@ a.button {
 		background:transparent;
 		border:1px solid $dark-gray;
 		cursor:not-allowed;
+	}
+
+	// 더 보기
+	&.view_more {
+		padding:0 40px;
+		height: 52px;
+		border-radius: 2px;
+		background-color: #161616;
+		min-width:152px;
+
+		&:before {
+			content:'+ ';
+		}
 	}
 }
 

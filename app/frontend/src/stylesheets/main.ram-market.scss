@@ -1,0 +1,360 @@
+main.ram_market { /* namespace */ }
+
+main.ram_market {
+
+	> .container {
+		margin-top:40px;
+	}
+
+	h3 {
+		font-size: $normal;
+		color: #ffffff;
+
+		& + p {
+			margin:8px 0 0 0;
+			font-size:$small;
+		}
+	}
+
+	// eos ram price,ram share,graph
+	.dashboard {
+		display:flex;
+		min-height:545px;
+		align-items:justify;
+
+
+		.ram.status {
+			background-color:$xx-dark-gray;
+
+			padding:32px;
+			box-sizing:border-box;
+
+			flex:1;
+
+			display:grid;
+			grid-template-columns:repeat(2,50%);
+			grid-template-rows:86px;
+
+			.wrapper {
+				margin-left:8px;
+				padding:24px;
+				background-color:$xxx-dark-gray;
+
+				&:first-child {
+					margin:0;
+				}
+			}
+
+			.graph {
+				margin-top:8px;
+				background-color:$xxx-dark-gray;
+				grid-column-start:1;
+				grid-column-end:4;
+			}
+		}
+
+		.my.status {
+			margin-left:8px;
+			width:354px;
+			box-sizing:border-box;
+			display:flex;
+			flex-direction:column;
+			justify-content:stretch;
+
+			//  my ram, mini graph
+
+			.summary {
+				background-color:$xx-dark-gray;
+				padding:35px 32px;
+				box-sizing:border-box;
+				height:138px;
+
+				h3 span {
+					display:block;
+					margin-top:8px;
+					font-size:$small;
+				}
+
+				position:relative;
+				.status {
+					position:absolute;
+					top:50%;
+					transform:translateY(-50%);
+					right:32px;
+					width:73px;
+					height:73px;
+
+					border-radius:100%;
+					background-color:$xxxx-dark-gray;
+					box-shadow:0 4px 7px rgba(0,0,0,0.4);
+
+					display:flex;
+					align-items:center;
+					justify-content:center;
+
+					font-size:$small;
+					font-weight:100;
+					color:$white;
+
+					overflow:hidden;
+					text-shadow:0 1px 6px rgba(0,0,0,0.6);
+
+					span {
+						content:'';
+						position:absolute;
+						bottom:0;
+						left:0;
+						right:0;
+						z-index:-1;
+
+						&.fine {
+							background-color:#536dfe;
+						}
+
+						&.good {
+							background-color:#79c720;
+						}
+
+						&.bad {
+							background-color:#f5cb23;
+						}
+
+						&.hell {
+							background-color:#ff6b64;
+						}
+					}
+				}
+			}
+
+			// sell, buy
+			.sell_buy {
+				flex:1;
+
+				background-color:$xxxx-dark-gray;
+				margin-top:8px;
+
+				display:flex;
+				flex-flow:column;
+
+				// layout
+				&:before {
+					content:'';
+					display:block;
+					order:2;
+					flex:1;
+				}
+
+				.tab,
+				.unit {
+					order:1;
+				}
+
+				.input.panel,
+				.btn_area,
+				.target {
+					order:3;
+				}
+
+				div.tab {
+					box-sizing:border-box;
+					display:flex;
+
+					button {
+						flex:1 0 50%;
+						height:52px;
+						background-color:$xx-dark-gray;
+						box-sizing:border-box;
+
+						height:inherit;
+						text-align:center;
+						border-radius:0;
+
+						&.ing {
+							border-top:2px solid $pink;
+							background-color:transparent;
+						}
+					}
+				}
+
+				div.target {
+					margin:0 32px 12px;
+					font-size:$small;
+
+					button.close.button {
+						@include ir();
+						width:18px;
+						height:18px;
+
+						background:url('../image/icon-close-red.svg') center center no-repeat;
+					}
+				}
+
+				div.unit {
+					margin:0 32px;
+					margin-top:32px;
+
+					display:flex;
+					justify-content:space-between;
+					align-items:center;
+
+					div.select.period  {
+						flex:1;
+
+						border-radius: 2px;
+						border:1px solid $x-dark-gray;
+
+						color:$gray;
+						background-color:transparent;
+
+						display:flex;
+
+						height: 40px;
+
+						align-items:center;
+						justify-content:space-between;
+
+						padding-left:16px;
+						padding-right:8px;
+						color:$white;
+						font-size:$small;
+
+						button.button {
+							width:16px;
+							height:16px;
+
+							@include ir();
+							background-size:9px 14px;
+							margin-left:8px;
+
+							&.prev {
+								background:url('../image/icon-arrow.svg#left') center center no-repeat;
+							}
+
+							&.next {
+								background:url('../image/icon-arrow.svg#right') center center no-repeat;
+							}
+						}
+
+						i {
+							flex:1;
+						}
+					}
+
+					a {
+						display:inline-block;
+						margin-left:70px;
+						font-size:$small;
+						text-decoration:underline;
+
+						&[hidden] {
+							display:none;
+						}
+					}
+				}
+
+				// layout
+				form.input.panel {
+					margin:0 32px;
+					position:relative;
+
+					// layout
+					input[type="number"] {
+						margin-bottom:12px;
+						outline:0;
+						color:$white;
+					}
+
+					// styling
+					button {
+						font-size:$small;
+						height:28px;
+						border:1px solid $x-dark-gray;
+						border-radius:2px;
+						margin-left:4px;
+						color:$dark-gray;
+
+						&:nth-of-type(1) {
+							margin-left:0;
+						}
+
+						&.clicked {
+							color:$white;
+							background-color:$x-dark-gray;
+							border-color:$x-dark-gray;
+						}
+					}
+
+					> div {
+						display:flex;
+
+						&:last-child {
+							padding-top:8px;
+							border-top:1px solid $x-dark-gray;
+						}
+
+						button {
+							flex:1;
+						}
+
+						input[type="number"] {
+							flex:1;
+							padding-right:0.6em;
+							box-sizing:border-box;
+							border:0;
+							+ span.unit {
+								text-transform:uppercase;
+								display:block;
+								font-size:$small;
+								font-weight:$light;
+							}
+						}
+					}
+				}
+
+				div.btn_area {
+					margin:32px;
+					button {
+						width:100%;
+					}
+				}
+			}
+		}
+	}
+
+
+	// transaction history
+	.history.list {
+		margin-top:8px;
+		background-color:$xx-dark-gray;
+		padding:32px;
+
+		// set width
+		tr > *:nth-of-type(1) { width:11%; }
+		tr > *:nth-of-type(2) {}
+		tr > *:nth-of-type(3) {}
+		tr > *:nth-of-type(4) {width:22%;}
+		tr > *:nth-of-type(5) { width:27%; }
+
+		table {
+			table-layout:fixed;
+			td:last-child {
+				overflow:hidden;
+				text-overflow:ellipsis;
+				white-space:nowrap;
+			}
+		}
+
+		tr.log {
+			&.buy td:first-child {
+				color:$green;
+			}
+			&.sell td:first-child {
+				color:$red;
+			}
+		}
+		.btn_area {
+			margin-top:16px;
+			text-align:center;
+		}
+	}
+}
