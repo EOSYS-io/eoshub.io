@@ -8,6 +8,7 @@ default: &default
     - https://rpc.eosys.io
     - https://api.eosnewyork.io  # Thanks eos newyork!
     - http://mainnet.eoscalgary.io  # Thanks eos calgary!
+  eos_get_table_url: /v1/chain/get_table_rows
 
 development:
   <<: *default
