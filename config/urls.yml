@@ -4,6 +4,10 @@ default: &default
   eos_account_url: /account
   account_create_email_confirmed_url: /account/email_confirmed
   account_create_email_confirm_failure_url: /account/email_confirm_failure
+  eos_rpc_urls:
+    - https://rpc.eosys.io
+    - https://api.eosnewyork.io  # Thanks eos newyork!
+    - http://mainnet.eoscalgary.io  # Thanks eos calgary!
 
 development:
   <<: *default
