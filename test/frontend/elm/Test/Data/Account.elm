@@ -30,8 +30,8 @@ tests =
                                     2996
                                     (Resource 0 0 0)
                                     (Resource 0 0 0)
-                                    (ResourceInEos "0.0000 EOS" "0.0000 EOS" (Just 3050))
-                                    (ResourceInEos "0 EOS" "0 EOS" Nothing)
+                                    (ResourceInEos "0.0000 EOS" "0.0000 EOS" 3050)
+                                    (ResourceInEos "0 EOS" "0 EOS" 0)
                                     (Refund "" "" "0 EOS" "0 EOS")
                         in
                             Expect.equal
@@ -52,8 +52,8 @@ tests =
                                     4223
                                     (Resource 105 778970655 778970760)
                                     (Resource 11533 148290056 148301589)
-                                    (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" (Just 65741))
-                                    (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" Nothing)
+                                    (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" 65741)
+                                    (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" 0)
                                     (Refund "" "" "0 EOS" "0 EOS")
                         in
                             Expect.equal
@@ -74,8 +74,30 @@ tests =
                                     38299755
                                     (Resource -1 -1 -1)
                                     (Resource -1 -1 -1)
-                                    (ResourceInEos "0 EOS" "0 EOS" Nothing)
-                                    (ResourceInEos "0 EOS" "0 EOS" Nothing)
+                                    (ResourceInEos "0 EOS" "0 EOS" 0)
+                                    (ResourceInEos "0 EOS" "0 EOS" 0)
+                                    (Refund "" "" "0 EOS" "0 EOS")
+                        in
+                            Expect.equal
+                                (Ok expectedAccount)
+                                (JD.decodeString accountDecoder accountJson)
+                , test "Account parsing (resource type is not Int but String)" <|
+                    \() ->
+                        let
+                            accountJson =
+                                "{\"account_name\":\"eosyskoreabp\",\"head_block_num\":6014531,\"head_block_time\":\"2018-07-15T13:12:56.000\",\"privileged\":false,\"last_code_update\":\"1970-01-01T00:00:00.000\",\"created\":\"2018-06-10T13:04:24.500\",\"core_liquid_balance\":\"9159.2669 EOS\",\"ram_quota\":\"3012341234\",\"net_weight\":14199066,\"cpu_weight\":14199066,\"net_limit\":{\"used\":\"3012341234\",\"available\":\"3012341234\",\"max\":\"3012341234\"},\"cpu_limit\":{\"used\":\"3012341234\",\"available\":\"3012341234\",\"max\":\"3012341234\"},\"ram_usage\":\"3012341234\",\"permissions\":[{\"perm_name\":\"active\",\"parent\":\"owner\",\"required_auth\":{\"threshold\":1,\"keys\":[{\"key\":\"EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX\",\"weight\":1}],\"accounts\":[],\"waits\":[]}},{\"perm_name\":\"owner\",\"parent\":\"\",\"required_auth\":{\"threshold\":1,\"keys\":[{\"key\":\"EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk\",\"weight\":1}],\"accounts\":[],\"waits\":[]}}],\"total_resources\":{\"owner\":\"eosyskoreabp\",\"net_weight\":\"1419.9066 EOS\",\"cpu_weight\":\"1419.9066 EOS\",\"ram_bytes\":\"3012341234\"},\"self_delegated_bandwidth\":{\"from\":\"eosyskoreabp\",\"to\":\"eosyskoreabp\",\"net_weight\":\"1416.9066 EOS\",\"cpu_weight\":\"1416.9066 EOS\"},\"refund_request\":null,\"voter_info\":{\"owner\":\"eosyskoreabp\",\"proxy\":\"\",\"producers\":[\"eosyskoreabp\"],\"staked\":28348132,\"last_vote_weight\":\"10650460953284.50585937500000000\",\"proxied_vote_weight\":\"0.00000000000000000\",\"is_proxy\":0}}"
+
+                            expectedAccount =
+                                Account
+                                    "eosyskoreabp"
+                                    "9159.2669 EOS"
+                                    (VoterInfo 28348132)
+                                    3012341234
+                                    3012341234
+                                    (Resource 3012341234 3012341234 3012341234)
+                                    (Resource 3012341234 3012341234 3012341234)
+                                    (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" 3012341234)
+                                    (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" 0)
                                     (Refund "" "" "0 EOS" "0 EOS")
                         in
                             Expect.equal

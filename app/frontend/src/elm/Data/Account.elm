@@ -47,7 +47,7 @@ import Html.Attributes
         , value
         , id
         )
-import Json.Decode as JD exposing (Decoder, at)
+import Json.Decode as JD exposing (Decoder, at, oneOf)
 import Json.Decode.Pipeline exposing (decode, required, optional)
 import Util.Formatter
     exposing
@@ -79,7 +79,7 @@ type alias Account =
 type alias ResourceInEos =
     { net_weight : String
     , cpu_weight : String
-    , ram_bytes : Maybe Int
+    , ram_bytes : Int
     }
 
 
@@ -118,12 +118,12 @@ defaultAccount =
     , total_resources =
         { net_weight = "0 EOS"
         , cpu_weight = "0 EOS"
-        , ram_bytes = Just 0
+        , ram_bytes = 0
         }
     , self_delegated_bandwidth =
         { net_weight = "0 EOS"
         , cpu_weight = "0 EOS"
-        , ram_bytes = Nothing
+        , ram_bytes = 0
         }
     , refund_request =
         { owner = ""
@@ -144,34 +144,34 @@ accountDecoder =
                 |> required "staked" JD.int
             )
             (VoterInfo 0)
-        |> required "ram_quota" JD.int
-        |> required "ram_usage" JD.int
+        |> required "ram_quota" intOrStringDecoder
+        |> required "ram_usage" intOrStringDecoder
         |> required "net_limit"
             (decode Resource
-                |> required "used" JD.int
-                |> required "available" JD.int
-                |> required "max" JD.int
+                |> required "used" intOrStringDecoder
+                |> required "available" intOrStringDecoder
+                |> required "max" intOrStringDecoder
             )
         |> required "cpu_limit"
             (decode Resource
-                |> required "used" JD.int
-                |> required "available" JD.int
-                |> required "max" JD.int
+                |> required "used" intOrStringDecoder
+                |> required "available" intOrStringDecoder
+                |> required "max" intOrStringDecoder
             )
         |> optional "total_resources"
             (decode ResourceInEos
                 |> required "net_weight" JD.string
                 |> required "cpu_weight" JD.string
-                |> required "ram_bytes" (JD.nullable JD.int)
+                |> optional "ram_bytes" intOrStringDecoder 0
             )
-            (ResourceInEos "0 EOS" "0 EOS" Nothing)
+            (ResourceInEos "0 EOS" "0 EOS" 0)
         |> optional "self_delegated_bandwidth"
             (decode ResourceInEos
                 |> required "net_weight" JD.string
                 |> required "cpu_weight" JD.string
-                |> optional "ram_bytes" (JD.nullable JD.int) Nothing
+                |> optional "ram_bytes" intOrStringDecoder 0
             )
-            (ResourceInEos "0 EOS" "0 EOS" Nothing)
+            (ResourceInEos "0 EOS" "0 EOS" 0)
         |> optional "refund_request"
             (decode Refund
                 |> required "owner" JD.string
@@ -185,6 +185,29 @@ accountDecoder =
 keyAccountsDecoder : JD.Decoder (List String)
 keyAccountsDecoder =
     JD.field "account_names" (JD.list JD.string)
+
+
+intOrStringDecoder : Decoder Int
+intOrStringDecoder =
+    JD.oneOf [ integerStringDecoder, JD.int ]
+
+
+
+-- NOTE(boseok): integerString - format is 'number', type is String
+
+
+integerStringDecoder : Decoder Int
+integerStringDecoder =
+    JD.map
+        (\str ->
+            case (String.toInt str) of
+                Ok value ->
+                    value
+
+                Err str ->
+                    0
+        )
+        JD.string
 
 
 
