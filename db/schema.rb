@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_06_040957) do
+ActiveRecord::Schema.define(version: 2018_08_30_094048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,21 @@ ActiveRecord::Schema.define(version: 2018_08_06_040957) do
     t.index ["confirmation_token"], name: "index_admin_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "eos_ram_price_histories", primary_key: ["intvl", "start_time"], force: :cascade do |t|
+    t.integer "intvl", null: false
+    t.datetime "start_time", null: false
+    t.datetime "end_time", null: false
+    t.decimal "open", null: false
+    t.decimal "close", null: false
+    t.decimal "high", null: false
+    t.decimal "low", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
   end
 
   create_table "users", force: :cascade do |t|
