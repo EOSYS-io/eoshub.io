@@ -1,0 +1,17 @@
+# == Schema Information
+#
+# Table name: eos_ram_price_histories
+#
+#  close      :decimal(38, 8)   not null
+#  end_time   :datetime         not null
+#  high       :decimal(38, 8)   not null
+#  intvl      :integer          not null, primary_key
+#  low        :decimal(38, 8)   not null
+#  open       :decimal(38, 8)   not null
+#  start_time :datetime         not null, primary_key
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+class EosRamPriceHistory < ApplicationRecord
+end
