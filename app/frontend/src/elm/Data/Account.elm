@@ -189,11 +189,15 @@ keyAccountsDecoder =
 
 intOrStringDecoder : Decoder Int
 intOrStringDecoder =
-    JD.oneOf [ intStringDecoder, JD.int ]
+    JD.oneOf [ integerStringDecoder, JD.int ]
 
 
-intStringDecoder : Decoder Int
-intStringDecoder =
+
+-- NOTE(boseok): integerString - format is 'number', type is String
+
+
+integerStringDecoder : Decoder Int
+integerStringDecoder =
     JD.map
         (\str ->
             case (String.toInt str) of
