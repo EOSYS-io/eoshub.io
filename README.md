@@ -47,7 +47,7 @@ rails s(erver)
 bin/webpack-dev-server # for development
 ```
 ```
-bundle exec whenever --set 'environment=<env(development, production)>' -i # for cron job.
+bundle exec sidekiq RAILS_ENV=<env> # execute sidekiq for a cron job.
 ```
 
 ## Test
