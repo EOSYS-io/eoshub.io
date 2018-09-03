@@ -45,6 +45,9 @@ rails s(erver)
 ```
 bin/webpack-dev-server # for development
 ```
+```
+bundle exec whenever --set 'environment=<env(development, production)>' -i # for cron job.
+```
 
 ## Test
 - Elm
