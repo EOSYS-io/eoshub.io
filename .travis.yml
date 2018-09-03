@@ -7,6 +7,9 @@ sudo: required
 git:
   submodules: false
 
+addons:
+  postgresql: "9.6"
+
 jobs:
   include:
     - stage: Test
