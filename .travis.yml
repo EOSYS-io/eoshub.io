@@ -19,6 +19,7 @@ jobs:
         directories:
           - /home/travis/.rvm/
       services:
+        - redis-server
         - postgresql
       env:
         - RACK_ENV=test
