@@ -39,3 +39,6 @@ yarn-debug.log*
 .env
 .vscode*
 bin/ecs-deploy
+
+cron.log
+error.log
