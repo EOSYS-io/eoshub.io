@@ -26,8 +26,8 @@ class CronWorker
           break
         end
       end
-      # Sleep for eos block interval.
-      sleep 0.5
+      # Sleep for eos block interval + network delay.
+      sleep 0.45
     end
   end
 end
