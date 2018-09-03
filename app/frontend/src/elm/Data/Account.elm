@@ -63,23 +63,23 @@ import Round
 
 
 type alias Account =
-    { account_name : String
-    , core_liquid_balance : String
-    , voter_info : VoterInfo
-    , ram_quota : Int
-    , ram_usage : Int
-    , net_limit : Resource
-    , cpu_limit : Resource
-    , total_resources : ResourceInEos
-    , self_delegated_bandwidth : ResourceInEos
-    , refund_request : Refund
+    { accountName : String
+    , coreLiquidBalance : String
+    , voterInfo : VoterInfo
+    , ramQuota : Int
+    , ramUsage : Int
+    , netLimit : Resource
+    , cpuLimit : Resource
+    , totalResources : ResourceInEos
+    , selfDelegatedBandwidth : ResourceInEos
+    , refundRequest : Refund
     }
 
 
 type alias ResourceInEos =
-    { net_weight : String
-    , cpu_weight : String
-    , ram_bytes : Int
+    { netWeight : String
+    , cpuWeight : String
+    , ramBytes : Int
     }
 
 
@@ -92,9 +92,9 @@ type alias Resource =
 
 type alias Refund =
     { owner : String
-    , request_time : String
-    , net_amount : String
-    , cpu_amount : String
+    , requestTime : String
+    , netAmount : String
+    , cpuAmount : String
     }
 
 
@@ -105,31 +105,31 @@ type alias VoterInfo =
 
 defaultAccount : Account
 defaultAccount =
-    { account_name = "Loading..."
-    , core_liquid_balance = "0 EOS"
-    , voter_info =
+    { accountName = "Loading..."
+    , coreLiquidBalance = "0 EOS"
+    , voterInfo =
         { staked = 0 }
-    , ram_quota = 0
-    , ram_usage = 0
-    , net_limit =
+    , ramQuota = 0
+    , ramUsage = 0
+    , netLimit =
         { used = 0, available = 0, max = 0 }
-    , cpu_limit =
+    , cpuLimit =
         { used = 0, available = 0, max = 0 }
-    , total_resources =
-        { net_weight = "0 EOS"
-        , cpu_weight = "0 EOS"
-        , ram_bytes = 0
+    , totalResources =
+        { netWeight = "0 EOS"
+        , cpuWeight = "0 EOS"
+        , ramBytes = 0
         }
-    , self_delegated_bandwidth =
-        { net_weight = "0 EOS"
-        , cpu_weight = "0 EOS"
-        , ram_bytes = 0
+    , selfDelegatedBandwidth =
+        { netWeight = "0 EOS"
+        , cpuWeight = "0 EOS"
+        , ramBytes = 0
         }
-    , refund_request =
+    , refundRequest =
         { owner = ""
-        , request_time = ""
-        , net_amount = "0 EOS"
-        , cpu_amount = "0 EOS"
+        , requestTime = ""
+        , netAmount = "0 EOS"
+        , cpuAmount = "0 EOS"
         }
     }
 
@@ -215,19 +215,19 @@ integerStringDecoder =
 
 
 getTotalAmount : String -> Int -> String -> String -> String
-getTotalAmount core_liquid_balance staked unstaking_net_amount unstaking_cpu_amount =
-    (eosStringToFloat core_liquid_balance
+getTotalAmount coreLiquidBalance staked unstakingNetAmount unstakingCpuAmount =
+    (eosStringToFloat coreLiquidBalance
         + larimerToEos staked
-        + eosStringToFloat unstaking_net_amount
-        + eosStringToFloat unstaking_cpu_amount
+        + eosStringToFloat unstakingNetAmount
+        + eosStringToFloat unstakingCpuAmount
         |> Round.round 4
     )
         ++ " EOS"
 
 
 getUnstakingAmount : String -> String -> String
-getUnstakingAmount unstaking_net_amount unstaking_cpu_amount =
-    eosFloatToString (eosStringToFloat unstaking_net_amount + eosStringToFloat unstaking_cpu_amount)
+getUnstakingAmount unstakingNetAmount unstakingCpuAmount =
+    eosFloatToString (eosStringToFloat unstakingNetAmount + eosStringToFloat unstakingCpuAmount)
 
 
 getResource : String -> Int -> Int -> Int -> ( String, String, String, String, String )

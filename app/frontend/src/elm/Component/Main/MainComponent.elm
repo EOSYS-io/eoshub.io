@@ -197,7 +197,7 @@ view { page, header, notification, sidebar } =
                         (Transfer.view
                             language
                             subModel
-                            sidebar.account.core_liquid_balance
+                            sidebar.account.coreLiquidBalance
                         )
 
                 IndexPage ->
@@ -385,7 +385,7 @@ update message ({ page, notification, header, sidebar } as model) =
                         subMessage
                         subModel
                         sidebar.wallet.account
-                        (eosStringToFloat sidebar.account.core_liquid_balance)
+                        (eosStringToFloat sidebar.account.coreLiquidBalance)
             in
                 ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 

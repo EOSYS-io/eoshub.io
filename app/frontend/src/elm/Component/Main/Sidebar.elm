@@ -185,21 +185,21 @@ pairWalletView language =
 accountInfoView : Model -> Language -> List (Html Message)
 accountInfoView { wallet, account, configPanelOpen } language =
     let
-        { core_liquid_balance, voter_info, refund_request } =
+        { coreLiquidBalance, voterInfo, refundRequest } =
             account
 
         totalAmount =
             getTotalAmount
-                core_liquid_balance
-                voter_info.staked
-                refund_request.net_amount
-                refund_request.cpu_amount
+                coreLiquidBalance
+                voterInfo.staked
+                refundRequest.netAmount
+                refundRequest.cpuAmount
 
         unstakingAmount =
-            getUnstakingAmount refund_request.net_amount refund_request.cpu_amount
+            getUnstakingAmount refundRequest.netAmount refundRequest.cpuAmount
 
         stakedAmount =
-            eosFloatToString (larimerToEos voter_info.staked)
+            eosFloatToString (larimerToEos voterInfo.staked)
 
         configPanelClass =
             class
