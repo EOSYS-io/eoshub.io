@@ -85,3 +85,5 @@ gem 'arctic_admin'
 gem 'cancan'
 
 gem 'whenever', require: false
+gem 'sidekiq'
+gem 'sidekiq-cron'

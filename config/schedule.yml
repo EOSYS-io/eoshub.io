@@ -1,0 +1,4 @@
+# Schedule file for sidekiq-cron.
+cron_job:
+  cron: "1 * * * *"
+  class: "CronWorker"
