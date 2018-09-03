@@ -43,15 +43,16 @@ class CreateEosRamPriceHistories < ActiveRecord::Migration[5.2]
       DECLARE
         v_intvl integer;
       BEGIN
-        INSERT INTO eos_ram_price_histories(intvl, start_time, end_time, open, close, high, low)
+        INSERT INTO eos_ram_price_histories(intvl, start_time, end_time, open, close, high, low, created_at, updated_at)
           SELECT sub.seconds, sub.start_time, sub.start_time + seconds * interval '1 second',
-            a_price, a_price, a_price, a_price
+            a_price, a_price, a_price, a_price, a_exec_at, a_exec_at
             FROM (SELECT seconds, time_floor(seconds, a_exec_at) as start_time FROM price_history_intvls) AS sub
         ON CONFLICT (intvl, start_time)
           DO UPDATE SET
             close = a_price,
-            high = GREATEST(price_histories.high, a_price),
-            low = LEAST(price_histories.low, a_price);
+            high = GREATEST(eos_ram_price_histories.high, a_price),
+            low = LEAST(eos_ram_price_histories.low, a_price),
+            updated_at = a_exec_at;
         RETURN;
       END;
       $$ LANGUAGE plpgsql;"
