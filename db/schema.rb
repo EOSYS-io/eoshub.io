@@ -55,10 +55,10 @@ ActiveRecord::Schema.define(version: 2018_08_30_094048) do
     t.integer "intvl", null: false
     t.datetime "start_time", null: false
     t.datetime "end_time", null: false
-    t.decimal "open", null: false
-    t.decimal "close", null: false
-    t.decimal "high", null: false
-    t.decimal "low", null: false
+    t.decimal "open", precision: 38, scale: 8, null: false
+    t.decimal "close", precision: 38, scale: 8, null: false
+    t.decimal "high", precision: 38, scale: 8, null: false
+    t.decimal "low", precision: 38, scale: 8, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

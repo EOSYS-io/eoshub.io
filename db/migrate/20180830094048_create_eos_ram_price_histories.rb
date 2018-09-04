@@ -1,17 +1,14 @@
 class CreateEosRamPriceHistories < ActiveRecord::Migration[5.2]
   def change
-    # Define new domain for price field which cannot be zero and be negative.
-    execute "CREATE DOMAIN positive_8 AS decimal(38, 8) CHECK (VALUE > 0)"
-
     create_table :eos_ram_price_histories, id: false do |t|
       t.integer :intvl, unsigned: true, null: false
       t.column :start_time, :timestamp, null: false
       t.column :end_time, :timestamp, null: false
 
-      t.column :open, :positive_8, null: false 
-      t.column :close, :positive_8, null: false
-      t.column :high, :positive_8, null: false
-      t.column :low, :positive_8, null: false
+      t.column :open, :decimal, precision: 38, scale: 8, null: false
+      t.column :close, :decimal, precision: 38, scale: 8, null: false
+      t.column :high, :decimal, precision: 38, scale: 8, null: false
+      t.column :low, :decimal, precision: 38, scale: 8, null: false
 
       t.timestamps
     end
@@ -39,7 +36,7 @@ class CreateEosRamPriceHistories < ActiveRecord::Migration[5.2]
     execute "ALTER TABLE eos_ram_price_histories ADD CONSTRAINT low_correct CHECK( (least(open, close, high, low) = low) AND (low > 0) )"
 
     # A helper function for dealing with price histories.
-    execute "CREATE OR REPLACE FUNCTION upsert_eos_ram_price_histories(a_exec_at timestamp, a_price positive_8) RETURNS void AS $$
+    execute "CREATE OR REPLACE FUNCTION upsert_eos_ram_price_histories(a_exec_at timestamp, a_price decimal) RETURNS void AS $$
       DECLARE
         v_intvl integer;
       BEGIN
