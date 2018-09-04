@@ -108,6 +108,8 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.12.2)
+    composite_primary_keys (11.0.3)
+      activerecord (~> 5.2.0)
     concurrent-ruby (1.0.5)
     connection_pool (2.2.2)
     crass (1.0.4)
@@ -328,6 +330,7 @@ DEPENDENCIES
   cancan
   capybara (>= 2.15, < 4.0)
   chromedriver-helper
+  composite_primary_keys (= 11.0.3)
   devise
   dotenv-rails
   jbuilder (~> 2.5)

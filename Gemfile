@@ -86,3 +86,6 @@ gem 'cancan'
 
 gem 'sidekiq'
 gem 'sidekiq-cron'
+
+# For active record 5.2.0.
+gem 'composite_primary_keys', '=11.0.3'
