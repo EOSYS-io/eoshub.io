@@ -17,6 +17,7 @@ Alpha: [![Build Status](https://travis-ci.org/EOSYS-io/eoshub.io.svg?branch=alph
   # To have launchd start postgresql at login:
   brew services start postgresql
   ```
+- Redis - https://redis.io/topics/quickstart
 
 ## Setup
 ```
@@ -44,6 +45,9 @@ rails s(erver)
 ```
 ```
 bin/webpack-dev-server # for development
+```
+```
+bundle exec sidekiq RAILS_ENV=<env> # execute sidekiq for a cron job.
 ```
 
 ## Test

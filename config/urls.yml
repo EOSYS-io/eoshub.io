@@ -4,6 +4,12 @@ default: &default
   eos_account_url: /account
   account_create_email_confirmed_url: /account/email_confirmed
   account_create_email_confirm_failure_url: /account/email_confirm_failure
+  eos_rpc_urls:
+    - https://rpc.eosys.io
+    - https://api.eosnewyork.io  # Thanks eos newyork!
+    - http://mainnet.eoscalgary.io  # Thanks eos calgary!
+  eos_get_table_url: /v1/chain/get_table_rows
+  redis_host: redis://localhost:6379/0
 
 development:
   <<: *default
@@ -15,6 +21,7 @@ alpha:
   <<: *default
   host_url: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com
   eos_wallet_node_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:5000
+  redis_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:6379/0
 
 production:
   <<: *default

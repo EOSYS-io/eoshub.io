@@ -1,0 +1,36 @@
+# == Schema Information
+#
+# Table name: eos_ram_price_histories
+#
+#  id         :bigint(8)        not null, primary key
+#  close      :decimal(38, 8)   not null
+#  end_time   :datetime         not null
+#  high       :decimal(38, 8)   not null
+#  intvl      :integer          not null
+#  low        :decimal(38, 8)   not null
+#  open       :decimal(38, 8)   not null
+#  start_time :datetime         not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+# Indexes
+#
+#  index_eos_ram_price_histories_on_intvl_and_start_time  (intvl,start_time) UNIQUE
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined. If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: 
+  open: 0.13500000
+  close: 0.12000000
+  low: 0.11000000
+  high: 0.15000000
+  intvl: 60
+  start_time: 2018-09-03 04:23:00
+  end_time: 2018-09-03 04:24:00
+  created_at: 2018-09-03 04:23:23.524187
+  updated_at: 2018-09-03 04:23:52.524187

@@ -83,3 +83,6 @@ gem 'activeadmin'
 gem 'activeadmin_addons'
 gem 'arctic_admin'
 gem 'cancan'
+
+gem 'sidekiq'
+gem 'sidekiq-cron'
