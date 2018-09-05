@@ -51,9 +51,7 @@ class EosRamPriceHistory < ApplicationRecord
     intvls.each do | intvl_record | 
       intvl = intvl_record.seconds
       start = Time.at((Time.now.to_i/intvl).floor * intvl).to_datetime
-      record = find_or_create_by(intvl: intvl, start_time: start) do | record |
-        record.intvl = intvl
-        record.start_time = start
+      record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
         record.end_time = Time.at(start.to_i + intvl).to_datetime
         record.open = price
         record.close = price
