@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(version: 2018_08_30_094048) do
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
   end
 
-  create_table "eos_ram_price_histories", primary_key: ["intvl", "start_time"], force: :cascade do |t|
+  create_table "eos_ram_price_histories", force: :cascade do |t|
     t.integer "intvl", null: false
     t.datetime "start_time", null: false
     t.datetime "end_time", null: false
@@ -61,6 +61,7 @@ ActiveRecord::Schema.define(version: 2018_08_30_094048) do
     t.decimal "low", precision: 38, scale: 8, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["intvl", "start_time"], name: "index_eos_ram_price_histories_on_intvl_and_start_time", unique: true
   end
 
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|

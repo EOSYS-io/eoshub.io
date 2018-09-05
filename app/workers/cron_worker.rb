@@ -22,7 +22,7 @@ class CronWorker
           numerator = response_json["rows"][0]["quote"]["balance"][0...-4].to_f
 
           ram_price_per_kb = ((numerator/denominator)*1024).round(8)
-          ActiveRecord::Base.connection.execute("SELECT upsert_eos_ram_price_histories('#{Time.now}', #{ram_price_per_kb})")
+          EosRamPriceHistory.upsert_eos_ram_price_histories(ram_price_per_kb)
           break
         end
       end
