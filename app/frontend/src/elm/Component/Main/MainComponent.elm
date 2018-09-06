@@ -37,6 +37,7 @@ import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Voting as Voting
+import Component.Main.Page.Rammarket as Rammarket
 import Component.Main.Sidebar as Sidebar
 import Port
 import Route exposing (Route(..), parseLocation)
@@ -57,6 +58,7 @@ type Page
     | TransferPage Transfer.Model
     | ResourcePage Resource.Model
     | VotingPage Voting.Model
+    | RammarketPage
     | NotFoundPage
 
 
@@ -213,6 +215,9 @@ view { page, header, notification, sidebar } =
 
                 IndexPage ->
                     Html.map IndexMessage (Index.view language)
+
+                RammarketPage ->
+                    Rammarket.view language
 
                 _ ->
                     NotFound.view language
@@ -564,6 +569,9 @@ getPage location =
 
             IndexRoute ->
                 IndexPage
+
+            RammarketRoute ->
+                RammarketPage
 
             NotFoundRoute ->
                 NotFoundPage
