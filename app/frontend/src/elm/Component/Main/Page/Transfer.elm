@@ -81,7 +81,7 @@ view : Language -> Model -> String -> Html Message
 view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
-        , p [] [ text "원하시는 수량만큼 토큰을 전송하세요 :)" ]
+        , p [] [ text (translate language TransferDesc) ]
         , div [ class "container" ]
             [ div [ class "wallet status" ]
                 [ p []
@@ -120,7 +120,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                         , li [ class "eos" ]
                             [ input
                                 [ type_ "number"
-                                , placeholder "전송하실 수량을 입력하세요."
+                                , placeholder (translate language TransferAmount)
                                 , step ".0001"
                                 , onInput <| SetTransferMessageField Quantity
                                 , value quantity
@@ -166,13 +166,13 @@ accountWarningSpan accountStatus language =
         ( classAddedValue, textValue ) =
             case accountStatus of
                 EmptyAccount ->
-                    ( "", "계정이름 예시: eoshubby" )
+                    ( "", translate language AccountExample )
 
                 InvalidAccount ->
                     ( " false", translate language CheckAccountName )
 
                 ValidAccount ->
-                    ( " true", "계정이름 예시: eoshubby" )
+                    ( " true", translate language AccountExample )
     in
         span [ class ("validate description" ++ classAddedValue) ]
             [ text textValue ]
@@ -190,10 +190,10 @@ quantityWarningSpan quantityStatus language =
                     ( " false", translate language OverTransferableAmount )
 
                 ValidQuantity ->
-                    ( " true", "전송가능한 수량만큼 전송가능합니다." )
+                    ( " true", translate language Transferable )
 
                 EmptyQuantity ->
-                    ( "", "전송가능한 수량만큼 전송가능합니다." )
+                    ( "", translate language TransferableAmountDesc )
     in
         span [ class ("validate description" ++ classAddedValue) ]
             [ text textValue ]
