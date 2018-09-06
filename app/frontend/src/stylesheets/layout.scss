@@ -79,7 +79,9 @@ section.content {
 	main.index,
 	main.transfer,
 	main.search,
-	main.ram_market {
+	main.ram_market,
+	main.vote,
+	main.resource_management {
 		height:inherit;
 		box-sizing:border-box;
 		padding:42px;
@@ -105,7 +107,9 @@ section.content {
 
 	main.transfer,
 	main.search,
-	main.ram_market	{
+	main.ram_market,
+	main.vote,
+	main.resource_management {
 		width:965px;
 	}
 
@@ -139,7 +143,9 @@ aside {
 main.index,
 main.transfer,
 main.search,
-main.ram_market {
+main.ram_market,
+main.vote,
+main.resource_management {
 	transition:margin 0.4s;
 }
 
@@ -151,7 +157,9 @@ aside.shrink {
 	+ main.index,
 	+ main.transfer,
 	+ main.search,
-	+ main.ram_market {
+	+ main.ram_market,
+	+ main.vote,
+	+ main.resource_management {
 		margin-left:0;
 	}
 
@@ -375,7 +383,10 @@ aside.shrink {
 		height:350px;
 		overflow-x:hidden;
 		overflow:auto;
-		button {
+
+
+		// case :: tokenlist in transfer
+		.tokenlist & button {
 			width:100%;
 
 			display:flex;
@@ -412,7 +423,8 @@ aside.shrink {
 				margin-top:0;
 			}
 		}
-	}
+	 }
+
 
 	button.close {
 		position:absolute;
@@ -485,6 +497,43 @@ aside.shrink {
 	}
 
 }
+
+// dcase type
+.modal.popup.rental_account .result.list {
+	ul,li,p {
+		margin:0;
+		padding:0;
+		list-style-type:none;
+	}
+
+	li {
+		font-size:$x-small;
+		background-color:$xx-dark-gray;
+		padding:16px;
+		position:relative;
+
+		h3 {
+			margin-bottom:8px;
+		}
+
+		p {
+			line-height:1.5;
+		}
+
+		button {
+			color:$red;
+			position:absolute;
+			right:16px;
+			top:50%;
+			transform:translateY(-50%);
+		}
+
+		margin-top:8px;
+		&:first-child {
+			margin-top:0;
+		}
+	}
+}
 // type case
 .modal.popup.buy_ram {
 	form {
@@ -502,6 +551,179 @@ aside.shrink {
 		margin:43px 32px 0;
 		button {
 			width:100%;
+		}
+	}
+}
+
+.modal.popup.set_division_manual {
+	.wrapper {
+		background-color:$xx-dark-gray;
+		padding:0 0 32px 0;
+	}
+
+	h2 {
+		@include screen_reader();
+	}
+
+	.token.status {
+		padding:32px;
+		background-color:$xxx-dark-gray;
+		position:relative;
+
+		h3 {
+			font-size:$small;
+			strong {
+				display:block;
+				margin-top:8px;
+				font-weight:100;
+				font-size:$xx-large;
+			}
+		}
+
+		button.auto.set {
+			position:absolute;
+			right:32px;
+			top:32px;
+
+			padding-right:26px;
+
+			&:after {
+				content:'';
+				displayL:block;
+				width:22px;
+				height:22px;
+
+				position:absolute;
+				top:50%;
+				right:0;
+				margin-top:-11px;
+				background:url('../image/icon-refresh.svg') right center no-repeat;
+
+				transition:transform 1s, color 1s;
+			}
+
+			&:hover {
+				color:$white;
+				&:after {
+					transform:rotate(180deg);
+				}
+			}
+		}
+	}
+
+	.form.container {
+		padding:32px 32px 0;
+
+		h3,p {
+			font-size:$small;
+			margin:0;
+		}
+
+		p {
+			margin:4px 0 8px;
+		}
+
+		form {
+			margin:0;
+			padding:0;
+			display:block;
+			position:relative;
+
+			input {
+				background-color:#232323;
+				border:0;
+				border-bottom:1px solid $dark-gray;
+				line-height:48px;
+				height:48px;
+				background:none;
+				padding:0 8px;
+				box-sizing:border-box;
+				width:100%;
+
+				&[data-validate='true'] {
+					border-color:$green;
+				}
+
+				&[data-validate='false'],
+				&:invalid {
+					border-color:$red;
+				}
+			}
+
+			span {
+				margin-right:8px;
+				font-size:$small;
+
+				position:absolute;
+				top:50%;
+				right:0;
+
+				transform:translateY(-50%);
+
+			}
+		}
+	}
+
+	p.validate.description {
+		text-align:center;
+		font-size:$small;
+		margin:32px 0;
+
+		&.false {
+			color:$red;
+		}
+
+		&.true {
+			color:$green;
+		}
+	}
+
+	.btn_area {
+		margin:0 32px;
+		display:flex;
+
+		button {
+			flex:1;
+			&:last-child {
+				margin-left:8px;
+			}
+		}
+	}
+}
+
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+
+
+// tab view
+div.tab {
+
+	// basement
+	box-sizing:border-box;
+	display:flex;
+
+	a,
+	button {
+		flex:1 0 50%;
+		height:52px;
+		line-height:52px;
+		background-color:$xx-dark-gray;
+		box-sizing:border-box;
+
+		padding:0 35px;
+
+		text-align:center;
+		border-radius:0;
+
+		&.ing {
+			border-top:2px solid $pink;
+			background-color:$xxxx-dark-gray;
 		}
 	}
 }

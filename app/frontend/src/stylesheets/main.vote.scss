@@ -1,0 +1,272 @@
+// vote :: voting, proxy
+
+main.vote {
+	// namespace
+}
+
+main.vote {
+	div.tab {
+		display:inline-block;
+		font-size:0;
+		margin:8px 0 2px;
+
+		button {
+			border-width:1px;
+			border-radius:0;
+		}
+	}
+
+	.container {
+		padding:32px;
+		background-color:$xx-dark-gray;
+	}
+
+	section.summary.vote {
+		position:relative;
+
+		background:url('../image/bi-hubby-cutted.svg') calc(100% + 9px) calc(36px) no-repeat;
+		background-size:176px 136px;
+		background-color:$xxx-dark-gray;
+		padding:32px;
+		margin-bottom:32px;
+
+		h3  {
+			margin:0;
+			font-size:$normal;
+
+			+ p {
+				font-size:$x-large;
+				font-weight:$light;
+				color:$white;
+				margin:8px 0 0 0;
+			}
+		}
+
+		dl {
+			margin-top:1em;
+			font-size:$x-small;
+			color:$gray;
+
+			&:after {
+				@include clear;
+			}
+
+			dt,dd {
+				float:left;
+				line-height:1.5;
+			}
+
+			dt:nth-of-type(2n) {
+				clear:left;
+			}
+
+			dt:after {
+				content:':';
+			}
+		}
+
+		p:last-child {
+			margin:0;
+			position:absolute;
+			bottom:32px;
+			right:176px;
+			height: 16px;
+			font-size: 16px;
+			color: #ffffff;
+			&:first-letter {
+				text-transform:uppercase;
+			}
+		}
+
+	}
+
+
+	section.bp.list {
+		// reset
+		th,td {
+			font-size:$x-small;
+		}
+
+		// checkbox
+		input[type="checkbox"] + label {
+			@include ir ();
+
+			display:inline-block;
+			text-indent:999em;
+			position:relative;
+			width:18px;
+			height:18px;
+
+			&:before {
+				position:absolute;
+				top:0;
+				left:0;
+			}
+		}
+
+		td strong {
+			font-size:$normal;
+			color:#fff;
+			font-weight:$light;
+			display:block;
+		}
+
+		// set cell width
+		// important cell align for table!
+		tr {
+			> *:nth-child(1) {
+				padding-left:32px;
+				padding-right:0;
+				width:3em;
+				text-align:left;
+			}
+			> *:nth-child(2) {
+				width:4em;
+				padding:0;
+			}
+		}
+
+
+		// setting background-color for special
+		thead tr,
+		tr.buy.korea {
+			background-color:$xxxx-dark-gray;
+		}
+
+		// detail
+		thead {
+			th {
+				position:sticky;
+				top:$header_height;
+				z-index:10;
+			}
+
+			th:nth-of-type(2) {
+				@include ir();
+			}
+
+			th:nth-of-type(3) {
+				form {
+					justify-content:space-between;
+					align-items:center;
+					display:flex;
+					box-sizing:border-box;
+					padding:0 16px;
+					background-color:$xx-dark-gray;
+					height:32px;
+					border-radius:16px;
+
+					input {
+						outline:0;
+						flex:1;
+					}
+				}
+			}
+
+			th.search {
+				form button[type='submit'] {
+					@include ir();
+					width:16px;
+					height:16px;
+					background:url('../image/icon-search.svg') center center no-repeat;
+					background-size:16px;
+				}
+			}
+
+			th:last-child {
+				text-align:right;
+				button {
+					height:32px;
+					line-height:30px;
+					width:67px;
+				}
+				span {
+					margin-right:35px;
+				}
+			}
+		}
+
+		tbody {
+			// 순위
+			tr td:first-child {
+				color:$white;
+				font-size:$normal;
+			}
+
+			// 투표하기
+			td:last-child {
+				text-align:right;
+				padding-right:33px;
+
+				*::selection {
+					background-color:transparent;
+					color:transparent;
+				}
+			}
+
+			tr td:nth-of-type(3) {
+				overflow:hidden;
+			}
+
+			// display grade
+			tr td:nth-of-type(2) {
+				span {
+					text-indent:-999em;
+					display:inline-block;
+					position:relative;
+					min-width:16px;
+
+					&:before {
+						position:absolute;
+						content:'';
+						display:block;
+						height:1px;
+						background-color:$x-dark-gray;
+						top:50%;
+						left:0;
+						right:0;
+					}
+
+					&.down,
+					&.up {
+						text-indent:0;
+						padding-left:12px;
+
+						&:before {
+							width:8px;
+							height:8px;
+							top:50%;
+							transform:translateY(-50%);
+							left:0;
+							background-position:center center;
+							background-repeat:no-repeat;
+							background-color:transparent;
+							background-size:cover;
+						}
+					}
+
+					&.down:before {
+						background-image:url('../image/triangle.svg#red')
+					}
+
+					&.up:before {
+						background-image:url('../image/triangle.svg#green')
+					}
+
+				}
+			}
+
+			td span.bp.bi {
+				margin-right:12px;
+				line-height:1;
+				float:left;
+				width:48px;
+				height:48px;
+				border-radius:100%;
+				background-color:$xxxx-dark-gray;
+			}
+
+		}
+	}
+}
+
