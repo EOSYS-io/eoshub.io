@@ -155,27 +155,6 @@ main.ram_market {
 					order:3;
 				}
 
-				div.tab {
-					box-sizing:border-box;
-					display:flex;
-
-					button {
-						flex:1 0 50%;
-						height:52px;
-						background-color:$xx-dark-gray;
-						box-sizing:border-box;
-
-						height:inherit;
-						text-align:center;
-						border-radius:0;
-
-						&.ing {
-							border-top:2px solid $pink;
-							background-color:transparent;
-						}
-					}
-				}
-
 				div.target {
 					margin:0 32px 12px;
 					font-size:$small;

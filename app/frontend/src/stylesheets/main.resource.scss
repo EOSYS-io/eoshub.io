@@ -1,0 +1,388 @@
+// manage resource
+
+main.resource_management {
+	// namespace
+}
+
+main.resource_management {
+
+	// common
+	h3 {
+		color:#fff;
+		color:inherit;
+		font-size:$small;
+	}
+
+	h3 ~ p {
+		font-size:$small;
+		margin:5px 0 0 0;
+	}
+
+	div.tab {
+		margin-top:38px;
+		display:block;
+		font-size:0;
+
+		a {
+			font-size:$small;
+			display:inline-block;
+			flex-basis:auto;
+			border-width:1px;
+			min-width:124px;
+			padding:0;
+			height:50px;
+			line-height:50px;
+		}
+	}
+
+	.container {
+		background:$xx-dark-gray;
+		padding:32px 0;
+		margin-top:1px;
+	}
+
+	.description {
+		font-size:$x-small;
+
+		&.validate {
+			&.false {
+				color:$red;
+			}
+
+			&.true {
+				color:$green;
+			}
+		}
+	}
+
+	input + span.description {
+		margin-top:5px;
+		display:block;
+		font-size: $x-small;
+		line-height: 1.54;
+		color: $gray;
+	}
+
+	// superset ::input box component
+	div.input.field {
+		min-width:236px;
+		position:relative;
+		font-size:0;
+		// input과 span이 달려있는 형태
+
+		// common
+		input[type="text"],
+		input[type="number"] {
+			color: $white;
+			width:100%;
+			border:0;
+			&:focus {
+				outline:0;
+			}
+		}
+
+		label {
+			position:absolute;
+			top:calc(-1em - 4px);
+			font-size:$x-small;
+			color:$white;
+		}
+
+		span.unit {
+			font-size:$small;
+			position:absolute;
+			right:0;
+			top:15px + 15px;
+			color:$dark-gray;
+		}
+
+		button[type="button"] {
+			flex:1;
+			padding:0 12px;
+			min-width:56px;
+			font-size:$small;
+			height:28px;
+			border:1px solid $x-dark-gray;
+			border-radius:2px;
+			margin-left:4px;
+			color:$dark-gray;
+			box-sizing:border-box;
+
+			&:nth-of-type(1) {
+				margin-left:0;
+			}
+
+			&.clicked {
+				color:$white;
+				background-color:$x-dark-gray;
+				border-color:$x-dark-gray;
+			}
+		}
+		// --------------------------------------------------------------------------------
+
+		//case type:: input view normal
+		input[type="text"],
+		input[type="number"] {
+			font-size:$small;
+			border-bottom:1px solid $dark-gray;
+			padding:18px 0;
+			margin-bottom:12px;
+
+			&:valid {
+				border-color:$green;
+			}
+
+			&[data-validate="false"],
+			&:invalid {
+				border-color:$red;
+			}
+
+			&:placeholder-shown:valid {
+	 			border-color:$gray;
+			}
+
+			&[data-validate="true"] {
+				border-color:$green !important;
+			}
+
+			&[data-validate="false"] {
+				border-color:$red !important;
+			}
+		}
+
+		// case type :: input view large
+		input[type="text"].size.large,
+		input[type="number"].size.large {
+			width:100%;
+			font-size: $xx-large;
+			font-weight:$light;
+			border-bottom:0;
+			padding:0;
+			margin-bottom:0;
+
+			&:focus::placeholder {
+				transition:color 0.4s;
+				color:$light-gray
+			}
+
+			&:invalid + span.validate {
+				color:$red;
+			}
+
+			&:valid + span.validate {
+				color:$green;
+			}
+
+			&:placeholder-shown + span.description {
+				color:inherit;
+			}
+		}
+
+		input.size.large + span.description ~ button {
+			margin-top:37px;
+		}
+
+	}
+
+
+
+	// ram,net total
+	div.my.resource {
+		margin:0 32px;
+		display:flex;
+
+		> div {
+			flex:1;
+			border-radius: 2px;
+			background-color: $xxxx-dark-gray;
+
+			box-sizing:border-box;
+			padding:28px;
+
+			&:first-child {
+				margin-right:8px;
+			}
+
+			h3 {
+				strong {
+					display:block;
+					font-size:$large;
+					font-weight:100;
+					color:$white;
+					margin-top:4px;
+				}
+			}
+
+			p:nth-of-type(1) {
+				margin-top:14px;
+				color:#fff;
+			}
+
+			// circle wave graph
+			position:relative;
+			.status {
+				position:absolute;
+				top:50%;
+				transform:translateY(-50%);
+				right:32px;
+				width:73px;
+				height:73px;
+
+				border-radius:100%;
+				background-color:$xx-dark-gray;
+
+				display:flex;
+				align-items:center;
+				justify-content:center;
+
+				font-size:$small;
+				font-weight:100;
+				color:$white;
+
+				overflow:hidden;
+				text-shadow:0 1px 6px rgba(0,0,0,0.6);
+
+				span {
+					content:'';
+					position:absolute;
+					bottom:0;
+					left:0;
+					right:0;
+					z-index:-1;
+
+					&.fine {
+						background-color:#536dfe;
+					}
+
+					&.good {
+						background-color:#79c720;
+					}
+
+					&.bad {
+						background-color:#f5cb23;
+					}
+
+					&.hell {
+						background-color:#ff6b64;
+					}
+				}
+			}
+		}
+	}
+
+	section {
+		margin:8px 32px;
+		padding:32px;
+		background-color:$xxxx-dark-gray;
+
+		position:relative;
+
+		.wallet.status {
+			position:relative;
+
+			p {
+				margin:4px 0 0 0;
+			}
+
+			a,p:last-child {
+				font-size:$small;
+				position:absolute;
+				top:0;
+				right:0;
+				color:$white;
+				text-decoration:underline;
+			}
+
+			p:last-child {
+				margin-top:0;
+				text-decoration:none;
+				color:$gray;
+			}
+		}
+	}
+
+	section {
+		display:flex;
+		flex-direction:column;
+
+		.btn_area {
+			position:absolute;
+			right:32px;
+			bottom:32px;
+
+			button {
+				width: 136px;
+				height: 52px;
+				border-radius: 2px;
+				border: solid 1px #5d5d5d;
+			}
+		}
+	}
+}
+
+// typecase :: stake
+main.resource_management
+	.stake.container {
+		.input.field {
+			margin-top:45px;
+		}
+	}
+
+// typecase :: unstake,rental
+main.resource_management {
+	.unstake.container,
+	.rental.container {
+		.field.group {
+			margin-top:82px;
+			width:236px * 2 + 36px;
+			display:flex;
+		}
+
+		.field.group > .input.field:last-child {
+			margin-left:35px;
+		}
+	}
+}
+
+
+// typecase :: rental
+main.resource_management {
+	.rental.container {
+
+		.container {
+		}
+
+		.available.status {
+			margin:0 32px 32px;
+
+			h3 {
+				color:$gray;
+				font-size:$small;
+
+				strong {
+					display:block;
+					font-size:$xx-large;
+					color:$white;
+					font-weight:$light;
+					margin-top:4px;
+				}
+			}
+
+			position:relative;
+
+			a {
+				position:absolute;
+				top:2px;
+				right:0;
+				text-decoration:underline;
+				font-size:$small;
+				color:$white;
+				font-weight:$light;
+			}
+		}
+
+		section {
+			padding:30px 32px;
+		}
+	}
+}
