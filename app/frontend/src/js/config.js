@@ -18,4 +18,21 @@ const chartConfig = {
   supports_group_request: false,
 };
 
-export { scatterConfig, eosjsConfig, chartConfig };
+function getEoshubHost() {
+  if (process.env.NODE_ENV === 'alpha') {
+    return 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com';
+  }
+  if (process.env.NODE_ENV === 'production') {
+    return '';
+  }
+  return 'http://localhost:3000';
+}
+
+const eoshubHost = getEoshubHost();
+
+export {
+  scatterConfig,
+  eosjsConfig,
+  chartConfig,
+  eoshubHost,
+};
