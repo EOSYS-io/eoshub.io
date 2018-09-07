@@ -35,6 +35,7 @@ import Component.Main.Page.NotFound as NotFound
 import Component.Main.Page.Search as Search
 import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
+import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Voting as Voting
 import Component.Main.Sidebar as Sidebar
 import Port
@@ -54,6 +55,7 @@ type Page
     | SearchPage Search.Model
     | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
+    | ResourcePage Resource.Model
     | VotingPage Voting.Model
     | NotFoundPage
 
@@ -99,6 +101,7 @@ type Message
     | SearchKeyMessage SearchKey.Message
     | VotingMessage Voting.Message
     | TransferMessage Transfer.Message
+    | ResourceMessage Resource.Message
     | IndexMessage Index.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
@@ -197,6 +200,16 @@ view { page, header, notification, sidebar } =
                         (Transfer.view
                             language
                             subModel
+                            sidebar.account.coreLiquidBalance
+                        )
+
+                ResourcePage subModel ->
+                    Html.map ResourceMessage
+                        (Resource.view
+                            language
+                            subModel
+                            sidebar.account.totalResources
+                            sidebar.account.selfDelegatedBandwidth
                             sidebar.account.coreLiquidBalance
                         )
 
@@ -389,6 +402,18 @@ update message ({ page, notification, header, sidebar } as model) =
             in
                 ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
+        ( ResourceMessage subMessage, ResourcePage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    Resource.update
+                        subMessage
+                        subModel
+                        sidebar.account.totalResources
+                        sidebar.account.selfDelegatedBandwidth
+                        sidebar.account.coreLiquidBalance
+            in
+                ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
+
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
                 newPage =
@@ -537,6 +562,9 @@ getPage location =
 
             TransferRoute ->
                 TransferPage Transfer.initModel
+
+            ResourceRoute ->
+                ResourcePage Resource.initModel
 
             IndexRoute ->
                 IndexPage
