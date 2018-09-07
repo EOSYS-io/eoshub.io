@@ -4,6 +4,8 @@ import '../stylesheets/style.scss';
 
 import eos from 'eosjs';
 import ecc from 'eosjs-ecc';
+import loadTV from './TradingView/loader';
+
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
 import {
@@ -119,8 +121,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.execCommand('copy');
   });
 
+  app.ports.loadChart.subscribe(async () => {
+    loadTV();
+  });
+
   updateElm(app);
 });
+
 
 document.addEventListener('scatterLoaded', () => {
   const { scatter } = window;

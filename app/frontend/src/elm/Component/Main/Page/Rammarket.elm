@@ -1,5 +1,6 @@
-module Component.Main.Page.Rammarket exposing (view)
+module Component.Main.Page.Rammarket exposing (..)
 
+import Port
 import Html
     exposing
         ( Html
@@ -30,6 +31,12 @@ import Html.Attributes
 import Translation exposing (Language, I18n(..), translate)
 
 
+initCmd : Cmd message
+initCmd =
+    Port.loadChart ()
+
+
+
 -- VIEW
 
 
@@ -48,7 +55,7 @@ view language =
                     [ h3 [] [ text "램 점유율" ]
                     , p [] [ text "46.44/66.36GB (69.97%)" ]
                     ]
-                , div [ class "graph", id "tv_chart_container" ] []
+                , div [ class "graph", id "tv-chart-container" ] []
                 ]
             , div [ class "my status" ]
                 [ div [ class "summary" ]

@@ -172,6 +172,9 @@ pageCmd page location =
                 in
                     Cmd.map SearchKeyMessage subInitCmd
 
+            RammarketRoute ->
+                Rammarket.initCmd
+
             _ ->
                 Cmd.none
 

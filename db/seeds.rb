@@ -9,7 +9,7 @@ AdminUser.create!(email: 'admin@example.com', password: 'password', password_con
 
 # 1m, 5m, 30m, 1h, 4h, 1d, 1w.
 price_intvl_list_as_seconds = [
-  60, 300, 1800, 3600, 14400, 86400, 604800
+  60, 300, 900, 1800, 3600, 14400, 86400, 604800
 ]
 
 price_intvl_list_as_seconds.each do | intvl | 
