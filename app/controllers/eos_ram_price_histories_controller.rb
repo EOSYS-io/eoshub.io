@@ -1,6 +1,6 @@
 class EosRamPriceHistoriesController < ApiController
   def data
-    unless PriceHistoryIntvl.find_by(seconds: params[:intvl]).present?
+    unless PriceHistoryIntvl.exists?(seconds: params[:intvl])
       render json: { msg: I18n.t('eos_ram_price_histores.unsupported_interval') }, status: :bad_request and return
     end
 
