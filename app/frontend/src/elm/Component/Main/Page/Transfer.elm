@@ -4,11 +4,9 @@ import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Navigation
 import Port
-import Regex exposing (regex, contains)
-import String.UTF8 as UTF8
 import Translation exposing (Language, translate, I18n(..))
+import Util.Validation as Validation exposing (AccountStatus(..), QuantityStatus(..), MemoStatus(..), validateAccount, validateQuantity, validateMemo)
 
 
 -- MODEL
@@ -21,25 +19,6 @@ type alias Model =
     , memoValidation : MemoStatus
     , isFormValid : Bool
     }
-
-
-type AccountStatus
-    = EmptyAccount
-    | ValidAccount
-    | InvalidAccount
-
-
-type QuantityStatus
-    = EmptyQuantity
-    | OverTransferableQuantity
-    | InvalidQuantity
-    | ValidQuantity
-
-
-type MemoStatus
-    = MemoTooLong
-    | EmptyMemo
-    | ValidMemo
 
 
 initModel : Model
@@ -204,7 +183,7 @@ memoWarningSpan memoStatus language =
     let
         ( classAddedValue, textValue ) =
             case memoStatus of
-                MemoTooLong ->
+                Validation.MemoTooLong ->
                     ( " false", translate language Translation.MemoTooLong )
 
                 EmptyMemo ->
@@ -265,39 +244,14 @@ validate ({ transfer } as model) eosLiquidAmount =
             transfer
 
         accountValidation =
-            if to == "" then
-                EmptyAccount
-            else if contains (regex "^[a-z\\.1-5]{1,12}$") to then
-                ValidAccount
-            else
-                InvalidAccount
+            validateAccount to
 
         -- Change the limit to user's balance.
         quantityValidation =
-            if quantity == "" then
-                EmptyQuantity
-            else
-                let
-                    maybeQuantity =
-                        String.toFloat quantity
-                in
-                    case maybeQuantity of
-                        Ok quantity ->
-                            if quantity <= 0 then
-                                InvalidQuantity
-                            else if quantity > eosLiquidAmount then
-                                OverTransferableQuantity
-                            else
-                                ValidQuantity
-
-                        _ ->
-                            InvalidQuantity
+            validateQuantity quantity eosLiquidAmount
 
         memoValidation =
-            if UTF8.length memo > 256 then
-                MemoTooLong
-            else
-                ValidMemo
+            validateMemo memo
 
         isFormValid =
             (accountValidation == ValidAccount)

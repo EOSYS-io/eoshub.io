@@ -3,6 +3,7 @@ module Test.Component.Main.Page.Transfer exposing (..)
 import Expect
 import Json.Encode as JE
 import Component.Main.Page.Transfer exposing (..)
+import Util.Validation exposing (AccountStatus(..), QuantityStatus(..), MemoStatus(..))
 import Port
 import Test exposing (..)
 

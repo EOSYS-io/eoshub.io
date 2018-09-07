@@ -1,6 +1,6 @@
 module Component.Main.Page.Resource.Stake exposing (..)
 
-import Component.Main.Page.Transfer exposing (QuantityStatus(..))
+import Util.Validation exposing (QuantityStatus(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
