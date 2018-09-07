@@ -24,7 +24,7 @@
 # model remove the '{}' from the fixture names and add the columns immediately
 # below each fixture, per the syntax in the comments below
 #
-one: 
+interval_60_1: 
   open: 0.13500000
   close: 0.12000000
   low: 0.11000000
@@ -34,3 +34,14 @@ one:
   end_time: 2018-09-03 04:24:00
   created_at: 2018-09-03 04:23:23.524187
   updated_at: 2018-09-03 04:23:52.524187
+
+interval_60_2: 
+  open: 0.16000000
+  close: 0.11000000
+  low: 0.10500000
+  high: 0.17000000
+  intvl: 60
+  start_time: 2018-09-03 04:24:00
+  end_time: 2018-09-03 04:25:00
+  created_at: 2018-09-03 04:24:23.524187
+  updated_at: 2018-09-03 04:24:52.524187

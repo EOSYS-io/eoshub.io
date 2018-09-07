@@ -11,6 +11,10 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :eos_ram_price_histories do
+    get 'data'
+  end
+
   devise_scope :admin_user do
     patch "/admin/confirmation" => "admin/admin_users/confirmations#confirm", as: :confirm_admin_user_confirmation
   end
