@@ -6,7 +6,15 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Port
 import Translation exposing (Language, translate, I18n(..))
-import Util.Validation as Validation exposing (AccountStatus(..), QuantityStatus(..), MemoStatus(..), validateAccount, validateQuantity, validateMemo)
+import Util.Validation as Validation
+    exposing
+        ( AccountStatus(..)
+        , QuantityStatus(..)
+        , MemoStatus(..)
+        , validateAccount
+        , validateQuantity
+        , validateMemo
+        )
 
 
 -- MODEL

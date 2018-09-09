@@ -33,6 +33,20 @@ eosStringToFloat str =
                 0
 
 
+eosStringAdd : String -> String -> String
+eosStringAdd a b =
+    (+) (eosStringToFloat a)
+        (eosStringToFloat b)
+        |> eosFloatToString
+
+
+eosStringSubtract : String -> String -> String
+eosStringSubtract a b =
+    (-) (eosStringToFloat a)
+        (eosStringToFloat b)
+        |> eosFloatToString
+
+
 unitConverterRound4 : Int -> Int -> String
 unitConverterRound4 value unit =
     Round.round 4 (toFloat value / toFloat unit)

@@ -16,6 +16,7 @@ import Data.Account
         , getUnstakingAmount
         , getResource
         )
+import Util.Formatter exposing (eosStringAdd, eosStringSubtract)
 
 
 -- MODEL
@@ -39,8 +40,8 @@ type Message
     = InputUnstakeAmount String
 
 
-update : Message -> Model -> ResourceInEos -> ResourceInEos -> String -> ( Model, Cmd Message )
-update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     case message of
         InputUnstakeAmount value ->
             ( { model | unstakeInput = value }, Cmd.none )
@@ -50,20 +51,20 @@ update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
 -- VIEW
 
 
-view : Language -> Model -> ResourceInEos -> ResourceInEos -> String -> Html Message
-view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
+view : Language -> Model -> Account -> Html Message
+view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     div [ class "unstake container" ]
         [ div [ class "my resource" ]
             [ div []
                 [ h3 []
                     [ text "CPU 총량"
                     , strong []
-                        [ text "18 EOS" ]
+                        [ text totalResources.cpuWeight ]
                     ]
                 , p []
-                    [ text "내가 스테이크한 토큰 : 8 EOS" ]
+                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
                 , p []
-                    [ text "임대받은 토큰 : 4 EOS" ]
+                    [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight)) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []
@@ -74,12 +75,12 @@ view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
                 [ h3 []
                     [ text "NET 총량"
                     , strong []
-                        [ text "18 EOS" ]
+                        [ text totalResources.netWeight ]
                     ]
                 , p []
-                    [ text "내가 스테이크한 토큰 : 8 EOS" ]
+                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
                 , p []
-                    [ text "임대받은 토큰 : 4 EOS" ]
+                    [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight)) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []

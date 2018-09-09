@@ -1,9 +1,9 @@
 module Component.Main.Page.Resource exposing (..)
 
-import Component.Main.Page.Resource.Stake as Stake exposing (..)
-import Component.Main.Page.Resource.Unstake as Unstake exposing (..)
-import Component.Main.Page.Resource.Delegate as Delegate exposing (..)
-import Component.Main.Page.Resource.Undelegate as Undelegate exposing (..)
+import Component.Main.Page.Resource.Stake as StakeTab
+import Component.Main.Page.Resource.Unstake as UnstakeTab
+import Component.Main.Page.Resource.Delegate as DelegateTab
+import Component.Main.Page.Resource.Undelegate as UndelegateTab
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
@@ -27,7 +27,7 @@ import Data.Account
 
 
 type alias Model =
-    { selectedTab : String
+    { selectedTab : SelectedTab
     , tab : ResourceTab
     , isStakeAmountModalOpened : Bool
     , isDelegateListModalOpened : Bool
@@ -35,16 +35,23 @@ type alias Model =
 
 
 type ResourceTab
-    = Stake Stake.Model
-    | Unstake Unstake.Model
-    | Delegate Delegate.Model
-    | Undelegate Undelegate.Model
+    = Stake StakeTab.Model
+    | Unstake UnstakeTab.Model
+    | Delegate DelegateTab.Model
+    | Undelegate UndelegateTab.Model
+
+
+type SelectedTab
+    = StakeSelected
+    | UnstakeSelected
+    | DelegateSelected
+    | UndelegateSelected
 
 
 initModel : Model
 initModel =
-    { selectedTab = "stake"
-    , tab = Stake Stake.initModel
+    { selectedTab = StakeSelected
+    , tab = Stake StakeTab.initModel
     , isStakeAmountModalOpened = False
     , isDelegateListModalOpened = False
     }
@@ -55,93 +62,85 @@ initModel =
 
 
 type Message
-    = StakeMessage Stake.Message
-    | UnstakeMessage Unstake.Message
-    | DelegateMessage Delegate.Message
-    | UndelegateMessage Undelegate.Message
+    = StakeMessage StakeTab.Message
+    | UnstakeMessage UnstakeTab.Message
+    | DelegateMessage DelegateTab.Message
+    | UndelegateMessage UndelegateTab.Message
     | ChangeTab ResourceTab
     | CloseModal
 
 
-update : Message -> Model -> ResourceInEos -> ResourceInEos -> String -> ( Model, Cmd Message )
-update message ({ tab } as model) totalResources selfDelegatedBandwidth coreLiquidBalance =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     case ( message, tab ) of
         ( StakeMessage stakeMessage, Stake stakeModel ) ->
             case stakeMessage of
-                OpenStakeAmountModal ->
+                StakeTab.OpenStakeAmountModal ->
                     ( { model | isStakeAmountModalOpened = True }, Cmd.none )
 
                 _ ->
                     let
-                        ( newModel, subCmd ) =
-                            Stake.update
+                        ( newModel, _ ) =
+                            StakeTab.update
                                 stakeMessage
                                 stakeModel
-                                totalResources
-                                selfDelegatedBandwidth
-                                coreLiquidBalance
+                                account
                     in
                         ( { model | tab = Stake newModel }, Cmd.none )
 
         ( UnstakeMessage unstakeMessage, Unstake unstakeModel ) ->
             let
-                ( newModel, subCmd ) =
-                    Unstake.update
+                ( newModel, _ ) =
+                    UnstakeTab.update
                         unstakeMessage
                         unstakeModel
-                        totalResources
-                        selfDelegatedBandwidth
-                        coreLiquidBalance
+                        account
             in
                 ( { model | tab = Unstake newModel }, Cmd.none )
 
-        ( ChangeTab newTab, _ ) ->
-            case newTab of
-                Stake stakeModel ->
-                    ( { model | tab = newTab, selectedTab = "stake" }, Cmd.none )
-
-                Unstake unstakeModel ->
-                    ( { model | tab = newTab, selectedTab = "unstake" }, Cmd.none )
-
-                Delegate delegateModel ->
-                    ( { model | tab = newTab, selectedTab = "delegate" }, Cmd.none )
-
-                Undelegate undelegateModel ->
-                    ( { model | tab = newTab, selectedTab = "undelegate" }, Cmd.none )
-
         ( DelegateMessage delegateMessage, Delegate delegateModel ) ->
             case delegateMessage of
-                Delegate.OpenDelegateListModal ->
+                DelegateTab.OpenDelegateListModal ->
                     ( { model | isDelegateListModalOpened = True }, Cmd.none )
 
                 _ ->
                     let
-                        ( newModel, subCmd ) =
-                            Delegate.update
+                        ( newModel, _ ) =
+                            DelegateTab.update
                                 delegateMessage
                                 delegateModel
-                                totalResources
-                                selfDelegatedBandwidth
-                                coreLiquidBalance
+                                account
                     in
                         ( { model | tab = Delegate newModel }, Cmd.none )
 
         ( UndelegateMessage undelegateMessage, Undelegate undelegateModel ) ->
             case undelegateMessage of
-                Undelegate.OpenDelegateListModal ->
+                UndelegateTab.OpenDelegateListModal ->
                     ( { model | isDelegateListModalOpened = True }, Cmd.none )
 
                 _ ->
                     let
-                        ( newModel, subCmd ) =
-                            Undelegate.update
+                        ( newModel, _ ) =
+                            UndelegateTab.update
                                 undelegateMessage
                                 undelegateModel
-                                totalResources
-                                selfDelegatedBandwidth
-                                coreLiquidBalance
+                                account
                     in
                         ( { model | tab = Undelegate newModel }, Cmd.none )
+
+        ( ChangeTab newTab, _ ) ->
+            case newTab of
+                Stake stakeModel ->
+                    ( { model | tab = newTab, selectedTab = StakeSelected }, Cmd.none )
+
+                Unstake unstakeModel ->
+                    ( { model | tab = newTab, selectedTab = UnstakeSelected }, Cmd.none )
+
+                Delegate delegateModel ->
+                    ( { model | tab = newTab, selectedTab = DelegateSelected }, Cmd.none )
+
+                Undelegate undelegateModel ->
+                    ( { model | tab = newTab, selectedTab = UndelegateSelected }, Cmd.none )
 
         ( CloseModal, _ ) ->
             ( { model | isStakeAmountModalOpened = False, isDelegateListModalOpened = False }, Cmd.none )
@@ -154,22 +153,22 @@ update message ({ tab } as model) totalResources selfDelegatedBandwidth coreLiqu
 -- VIEW
 
 
-view : Language -> Model -> ResourceInEos -> ResourceInEos -> String -> Html Message
-view language ({ selectedTab, tab, isStakeAmountModalOpened, isDelegateListModalOpened } as model) totalResources selfDelegatedBandwidth coreLiquidBalance =
+view : Language -> Model -> Account -> Html Message
+view language ({ selectedTab, tab, isStakeAmountModalOpened, isDelegateListModalOpened } as model) account =
     let
         tabHtml =
             case tab of
                 Stake stakeModel ->
-                    Html.map StakeMessage (Stake.view language Stake.initModel totalResources selfDelegatedBandwidth coreLiquidBalance)
+                    Html.map StakeMessage (StakeTab.view language StakeTab.initModel account)
 
                 Unstake unstakeModel ->
-                    Html.map UnstakeMessage (Unstake.view language Unstake.initModel totalResources selfDelegatedBandwidth coreLiquidBalance)
+                    Html.map UnstakeMessage (UnstakeTab.view language UnstakeTab.initModel account)
 
                 Delegate delegateModel ->
-                    Html.map DelegateMessage (Delegate.view language Delegate.initModel totalResources selfDelegatedBandwidth coreLiquidBalance)
+                    Html.map DelegateMessage (DelegateTab.view language DelegateTab.initModel account)
 
                 Undelegate undelegateModel ->
-                    Html.map UndelegateMessage (Undelegate.view language Undelegate.initModel totalResources selfDelegatedBandwidth coreLiquidBalance)
+                    Html.map UndelegateMessage (UndelegateTab.view language UndelegateTab.initModel account)
     in
         div []
             [ main_ [ class "resource_management" ]
@@ -178,52 +177,59 @@ view language ({ selectedTab, tab, isStakeAmountModalOpened, isDelegateListModal
                 , p []
                     [ text "EOS 네트워크를 활용하기 위한 리소스 관리 페이지입니다." ]
                 , div [ class "tab" ]
-                    [ a
-                        [ class
-                            (if (selectedTab == "stake") then
-                                "ing"
-                             else
-                                ""
-                            )
-                        , onClick (ChangeTab (Stake Stake.initModel))
-                        ]
-                        [ text "스테이크" ]
-                    , a
-                        [ class
-                            (if (selectedTab == "unstake") then
-                                "ing"
-                             else
-                                ""
-                            )
-                        , onClick (ChangeTab (Unstake Unstake.initModel))
-                        ]
-                        [ text "언스테이크" ]
-                    , a
-                        [ class
-                            (if (selectedTab == "delegate") then
-                                "ing"
-                             else
-                                ""
-                            )
-                        , onClick (ChangeTab (Delegate Delegate.initModel))
-                        ]
-                        [ text "임대해주기" ]
-                    , a
-                        [ class
-                            (if (selectedTab == "undelegate") then
-                                "ing"
-                             else
-                                ""
-                            )
-                        , onClick (ChangeTab (Undelegate Undelegate.initModel))
-                        ]
-                        [ text "임대취소하기" ]
+                    [ resourceTabA model StakeSelected
+                    , resourceTabA model UnstakeSelected
+                    , resourceTabA model DelegateSelected
+                    , resourceTabA model UndelegateSelected
                     ]
                 , tabHtml
                 ]
             , viewStakeAmountModal isStakeAmountModalOpened
             , viewDelegateListModal isDelegateListModalOpened
             ]
+
+
+resourceTabA : Model -> SelectedTab -> Html Message
+resourceTabA ({ selectedTab } as model) selected =
+    let
+        aText =
+            case selected of
+                StakeSelected ->
+                    "스테이크"
+
+                UnstakeSelected ->
+                    "언스테이크"
+
+                DelegateSelected ->
+                    "임대해주기"
+
+                UndelegateSelected ->
+                    "임대취소하기"
+
+        resourceTab =
+            case selected of
+                StakeSelected ->
+                    Stake StakeTab.initModel
+
+                UnstakeSelected ->
+                    Unstake UnstakeTab.initModel
+
+                DelegateSelected ->
+                    Delegate DelegateTab.initModel
+
+                UndelegateSelected ->
+                    Undelegate UndelegateTab.initModel
+    in
+        a
+            [ class
+                (if (selectedTab == selected) then
+                    "ing"
+                 else
+                    ""
+                )
+            , onClick (ChangeTab resourceTab)
+            ]
+            [ text aText ]
 
 
 viewStakeAmountModal : Bool -> Html Message

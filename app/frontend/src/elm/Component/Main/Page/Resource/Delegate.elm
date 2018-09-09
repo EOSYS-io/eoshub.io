@@ -41,8 +41,8 @@ type Message
     | OpenDelegateListModal -- This is controlled at Resource module
 
 
-update : Message -> Model -> ResourceInEos -> ResourceInEos -> String -> ( Model, Cmd Message )
-update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     case message of
         InputDelegateAmount value ->
             ( { model | delegateInput = value }, Cmd.none )
@@ -55,8 +55,8 @@ update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
 -- VIEW
 
 
-view : Language -> Model -> ResourceInEos -> ResourceInEos -> String -> Html Message
-view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
+view : Language -> Model -> Account -> Html Message
+view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
             [ h3 []
@@ -69,7 +69,16 @@ view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
             ]
         , section []
             [ div [ class "input field" ]
-                [ input [ attribute "autofocus" "", class "size large", attribute "maxlength" "12", pattern "[\\w\\d]+", placeholder "임대해줄 계정의 이름을 입력하세요", attribute "required" "", type_ "text" ]
+                -- TODO(boseok) Change it to Elm code
+                [ input
+                    [ attribute "autofocus" ""
+                    , class "size large"
+                    , attribute "maxlength" "12"
+                    , pattern "[\\w\\d]+"
+                    , placeholder "임대해줄 계정의 이름을 입력하세요"
+                    , attribute "required" ""
+                    , type_ "text"
+                    ]
                     []
                 , span [ class "validate description" ]
                     [ text "계정이름 예시:eoshubby" ]
@@ -84,7 +93,17 @@ view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
                 [ div [ class "input field" ]
                     [ label [ for "cpu" ]
                         [ text "CPU" ]
-                    , input [ id "cpu", Html.Attributes.max "1000000000", Html.Attributes.min "0.0001", pattern "\\d+(\\.\\d{1,4})?", placeholder "0", step "0.0001", type_ "number" ]
+
+                    -- TODO(boseok) Change it to Elm code
+                    , input
+                        [ id "cpu"
+                        , Html.Attributes.max "1000000000"
+                        , Html.Attributes.min "0.0001"
+                        , pattern "\\d+(\\.\\d{1,4})?"
+                        , placeholder "0"
+                        , step "0.0001"
+                        , type_ "number"
+                        ]
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]

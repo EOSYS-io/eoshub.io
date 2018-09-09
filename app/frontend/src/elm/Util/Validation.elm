@@ -1,6 +1,6 @@
 module Util.Validation exposing (..)
 
-import Regex exposing (regex, contains)
+import Regex exposing (..)
 import String.UTF8 as UTF8
 
 
@@ -52,6 +52,10 @@ validateAccount accountName =
         InvalidAccount
 
 
+
+-- NOTE(boseok): "1.0000", "1.0000 EOS" both cases can be validated
+
+
 validateQuantity : String -> Float -> QuantityStatus
 validateQuantity quantity eosLiquidAmount =
     if quantity == "" then
@@ -59,13 +63,16 @@ validateQuantity quantity eosLiquidAmount =
     else
         let
             maybeQuantity =
-                String.toFloat quantity
+                quantity
+                    |> replace All (regex " EOS") (\_ -> "")
+                    |> String.toFloat
         in
             case maybeQuantity of
                 Ok quantity ->
                     if quantity <= 0 then
                         InvalidQuantity
                     else if quantity > eosLiquidAmount then
+                        -- NOTE(boseok): Change the name to OverValidQuantity, OverProperQuantity
                         OverTransferableQuantity
                     else
                         ValidQuantity

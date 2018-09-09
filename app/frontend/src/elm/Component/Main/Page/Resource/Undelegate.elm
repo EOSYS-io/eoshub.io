@@ -41,8 +41,8 @@ type Message
     | OpenDelegateListModal -- This is controlled at Resource module
 
 
-update : Message -> Model -> ResourceInEos -> ResourceInEos -> String -> ( Model, Cmd Message )
-update message model totalResources selfUndelegatedBandwidth coreLiquidBalance =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     case message of
         InputUndelegateAmount value ->
             ( { model | undelegateInput = value }, Cmd.none )
@@ -55,8 +55,8 @@ update message model totalResources selfUndelegatedBandwidth coreLiquidBalance =
 -- VIEW
 
 
-view : Language -> Model -> ResourceInEos -> ResourceInEos -> String -> Html Message
-view language model totalResources selfUndelegatedBandwidth coreLiquidBalance =
+view : Language -> Model -> Account -> Html Message
+view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
             [ h3 []

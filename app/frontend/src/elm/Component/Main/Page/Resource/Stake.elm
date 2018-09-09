@@ -1,10 +1,19 @@
 module Component.Main.Page.Resource.Stake exposing (..)
 
-import Util.Validation exposing (QuantityStatus(..))
+import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Translation exposing (I18n(..), Language, translate)
+import Util.Validation as Validation
+    exposing
+        ( AccountStatus(..)
+        , QuantityStatus(..)
+        , MemoStatus(..)
+        , validateAccount
+        , validateQuantity
+        , validateMemo
+        )
 import Data.Account
     exposing
         ( Account
@@ -18,22 +27,29 @@ import Data.Account
         , getUnstakingAmount
         , getResource
         )
+import Util.Formatter exposing (eosStringAdd, eosStringSubtract, eosFloatToString, larimerToEos)
 
 
 -- MODEL
 
 
 type alias Model =
-    { stakeInput : String
-    , quantityValidation : QuantityStatus
+    { delegatebw : DelegatebwParameters
+    , totalQuantity : String
+    , totalQuantityValidation : QuantityStatus
+    , cpuQuantityValidation : QuantityStatus
+    , netQuantityValidation : QuantityStatus
     , isFormValid : Bool
     }
 
 
 initModel : Model
 initModel =
-    { stakeInput = ""
-    , quantityValidation = EmptyQuantity
+    { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 1 }
+    , totalQuantity = ""
+    , totalQuantityValidation = EmptyQuantity
+    , cpuQuantityValidation = EmptyQuantity
+    , netQuantityValidation = EmptyQuantity
     , isFormValid = False
     }
 
@@ -43,20 +59,20 @@ initModel =
 
 
 type Message
-    = InputStakeAmount String
+    = TotalAmountInput String
     | OpenStakeAmountModal -- This is controlled at Resource module
     | StakePercentage Float
 
 
-update : Message -> Model -> ResourceInEos -> ResourceInEos -> String -> ( Model, Cmd Message )
-update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakeAbleAmount =
             coreLiquidBalance
     in
         case message of
-            InputStakeAmount value ->
-                ( { model | stakeInput = value }, Cmd.none )
+            TotalAmountInput value ->
+                ( { model | totalQuantity = value }, Cmd.none )
 
             StakePercentage percentage ->
                 ( model, Cmd.none )
@@ -69,74 +85,103 @@ update message model totalResources selfDelegatedBandwidth coreLiquidBalance =
 -- VIEW
 
 
-view : Language -> Model -> ResourceInEos -> ResourceInEos -> String -> Html Message
-view language model totalResources selfDelegatedBandwidth coreLiquidBalance =
-    div [ class "stake container" ]
-        [ div [ class "my resource" ]
-            [ div []
-                [ h3 []
-                    [ text "CPU 총량"
-                    , strong []
-                        [ text "18 EOS" ]
+view : Language -> Model -> Account -> Html Message
+view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+    let
+        stakedAmount =
+            eosFloatToString (larimerToEos account.voterInfo.staked)
+
+        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
+            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
+
+        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
+            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
+    in
+        div [ class "stake container" ]
+            [ div [ class "my resource" ]
+                [ div []
+                    [ h3 []
+                        [ text "CPU 총량"
+                        , strong []
+                            [ text totalResources.cpuWeight ]
+                        ]
+                    , p []
+                        [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
+                    , p []
+                        [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight)) ]
+                    , div [ class "graph status" ]
+                        [ span [ class "hell", attribute "style" "height:10%" ]
+                            []
+                        , text "10%"
+                        ]
                     ]
-                , p []
-                    [ text "내가 스테이크한 토큰 : 8 EOS" ]
-                , p []
-                    [ text "임대받은 토큰 : 4 EOS" ]
-                , div [ class "graph status" ]
-                    [ span [ class "hell", attribute "style" "height:10%" ]
-                        []
-                    , text "10%"
+                , div []
+                    [ h3 []
+                        [ text "NET 총량"
+                        , strong []
+                            [ text totalResources.netWeight ]
+                        ]
+                    , p []
+                        [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
+                    , p []
+                        [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight)) ]
+                    , div [ class "graph status" ]
+                        [ span [ class "hell", attribute "style" "height:10%" ]
+                            []
+                        , text "10%"
+                        ]
                     ]
                 ]
-            , div []
-                [ h3 []
-                    [ text "NET 총량"
-                    , strong []
-                        [ text "18 EOS" ]
+            , section []
+                [ div [ class "wallet status" ]
+                    [ h3 []
+                        [ text "스테이크 가능한 토큰" ]
+                    , p []
+                        [ text coreLiquidBalance ]
+                    , a [ id "setDirect", onClick (OpenStakeAmountModal) ]
+                        [ text "직접설정" ]
                     ]
-                , p []
-                    [ text "내가 스테이크한 토큰 : 8 EOS" ]
-                , p []
-                    [ text "임대받은 토큰 : 4 EOS" ]
-                , div [ class "graph status" ]
-                    [ span [ class "hell", attribute "style" "height:10%" ]
+                , div [ class "input field" ]
+                    [ label [ for "eos" ]
+                        [ text "EOS" ]
+
+                    -- TODO(boseok) Change it to Elm code
+                    , input
+                        [ attribute "autofocus" ""
+                        , class "size large"
+                        , id "EOS"
+                        , Html.Attributes.max "1000000000"
+                        , Html.Attributes.min "0.0001"
+                        , pattern "\\d+(\\.\\d{1,4})?"
+                        , placeholder "수량을 입력하세요"
+                        , step "0.0001"
+                        , type_ "number"
+                        , onInput (TotalAmountInput)
+                        ]
                         []
-                    , text "10%"
+                    , span [ class "validate description" ]
+                        [ text "보유한 수량만큼 스테이크 할 수 있습니다." ]
+
+                    -- TODO(boseok): this should be applied to new design
+                    , p [ class "validate description" ]
+                        [ text "cpu" ]
+                    , p [ class "validate description" ]
+                        [ text "net" ]
+                    , button [ type_ "button", onClick (StakePercentage 0.1) ]
+                        [ text "10%" ]
+                    , button [ type_ "button", onClick (StakePercentage 0.5) ]
+                        [ text "50%" ]
+                    , button [ type_ "button", onClick (StakePercentage 0.7) ]
+                        [ text "70%" ]
+                    , button [ type_ "button", onClick (StakePercentage 1) ]
+                        [ text "최대" ]
+                    ]
+                , div [ class "btn_area" ]
+                    [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                        [ text "확인" ]
                     ]
                 ]
             ]
-        , section []
-            [ div [ class "wallet status" ]
-                [ h3 []
-                    [ text "스테이크 가능한 토큰" ]
-                , p []
-                    [ text "100 EOS" ]
-                , a [ id "setDirect", onClick (OpenStakeAmountModal) ]
-                    [ text "직접설정" ]
-                ]
-            , div [ class "input field" ]
-                [ label [ for "eos" ]
-                    [ text "EOS" ]
-                , input [ attribute "autofocus" "", class "size large", id "EOS", Html.Attributes.max "1000000000", Html.Attributes.min "0.0001", pattern "\\d+(\\.\\d{1,4})?", placeholder "수량을 입력하세요", step "0.0001", type_ "number" ]
-                    []
-                , span [ class "validate description" ]
-                    [ text "보유한 수량만큼 스테이크 할 수 있습니다." ]
-                , button [ type_ "button", onClick (StakePercentage 0.1) ]
-                    [ text "10%" ]
-                , button [ type_ "button", onClick (StakePercentage 0.5) ]
-                    [ text "50%" ]
-                , button [ type_ "button", onClick (StakePercentage 0.7) ]
-                    [ text "70%" ]
-                , button [ type_ "button", onClick (StakePercentage 1) ]
-                    [ text "최대" ]
-                ]
-            , div [ class "btn_area" ]
-                [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
-                    [ text "확인" ]
-                ]
-            ]
-        ]
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Html Message
@@ -158,3 +203,33 @@ quantityWarningSpan quantityStatus language =
     in
         span [ class ("validate description" ++ classAddedValue) ]
             [ text textValue ]
+
+
+validate : Model -> Float -> Model
+validate ({ delegatebw } as model) eosLiquidAmount =
+    let
+        { from, receiver, stakeNetQuantity, stakeCpuQuantity, transfer } =
+            delegatebw
+
+        totalQuantity =
+            eosStringAdd stakeNetQuantity stakeCpuQuantity
+
+        netQuantityValidation =
+            validateQuantity stakeNetQuantity eosLiquidAmount
+
+        cpuQuantityValidation =
+            validateQuantity stakeCpuQuantity eosLiquidAmount
+
+        totalQuantityValidation =
+            validateQuantity totalQuantity eosLiquidAmount
+
+        isFormValid =
+            (netQuantityValidation == ValidQuantity)
+                && (cpuQuantityValidation == ValidQuantity)
+    in
+        { model
+            | totalQuantityValidation = netQuantityValidation
+            , cpuQuantityValidation = cpuQuantityValidation
+            , netQuantityValidation = netQuantityValidation
+            , isFormValid = isFormValid
+        }

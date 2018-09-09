@@ -208,9 +208,7 @@ view { page, header, notification, sidebar } =
                         (Resource.view
                             language
                             subModel
-                            sidebar.account.totalResources
-                            sidebar.account.selfDelegatedBandwidth
-                            sidebar.account.coreLiquidBalance
+                            sidebar.account
                         )
 
                 IndexPage ->
@@ -408,9 +406,7 @@ update message ({ page, notification, header, sidebar } as model) =
                     Resource.update
                         subMessage
                         subModel
-                        sidebar.account.totalResources
-                        sidebar.account.selfDelegatedBandwidth
-                        sidebar.account.coreLiquidBalance
+                        sidebar.account
             in
                 ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
