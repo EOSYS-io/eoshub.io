@@ -1,23 +1,24 @@
 module Component.Account.Page.Created exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, button, div, h1, text, ol, li, h1, br, p, article, img, a)
-import Html.Attributes exposing (class, attribute, alt, src, href)
+import Html exposing (Html, a, article, br, button, div, h1, img, li, ol, p, text)
+import Html.Attributes exposing (alt, attribute, class, href, src)
 import Html.Events exposing (onClick)
 import Navigation
 import Translation
     exposing
-        ( Language
-        , I18n
-            ( AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
+        ( I18n
+            ( AccountCreationCongratulation
+            , AccountCreationGoHome
             , AccountCreationProgressCreateNew
-            , AccountCreationCongratulation
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
             , AccountCreationWelcome
             , AccountCreationYouCanSignIn
-            , AccountCreationGoHome
             )
+        , Language
         )
 import View.I18nViews exposing (textViewI18n)
+
 
 
 -- MODEL
@@ -44,7 +45,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
         Home ->
-            ( model, Navigation.newUrl ("/") )
+            ( model, Navigation.newUrl "/" )
 
 
 

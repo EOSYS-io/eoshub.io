@@ -1,4 +1,11 @@
-module Translation exposing (Language(Korean, English, Chinese), I18n(..), translate, getMessages, toLanguage, toLocale)
+module Translation exposing
+    ( I18n(..)
+    , Language(Chinese, English, Korean)
+    , getMessages
+    , toLanguage
+    , toLocale
+    , translate
+    )
 
 
 type Language
@@ -157,15 +164,15 @@ translate language i18n =
         { english, korean, chinese } =
             getMessages i18n
     in
-        case language of
-            English ->
-                english
+    case language of
+        English ->
+            english
 
-            Korean ->
-                korean
+        Korean ->
+            korean
 
-            Chinese ->
-                chinese
+        Chinese ->
+            chinese
 
 
 

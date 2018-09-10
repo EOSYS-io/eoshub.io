@@ -1,11 +1,11 @@
-module Test.Component.Account.Page.Create exposing (..)
+module Test.Component.Account.Page.Create exposing (model, tests)
 
+import Component.Account.Page.Create exposing (..)
 import Expect
 import Http
-import Component.Account.Page.Create exposing (..)
 import Test exposing (..)
-import View.Notification as Notification
 import Translation exposing (I18n(EmptyMessage))
+import View.Notification as Notification
 
 
 model : Model
@@ -27,7 +27,7 @@ tests =
                 expectedJson =
                     "{\"account_name\":\"" ++ model.accountName ++ "\",\"pubkey\":\"" ++ model.pubkey ++ "\"}"
               in
-                test "createEosAccountBodyParams" <|
-                    \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createEosAccountBodyParams model)
+              test "createEosAccountBodyParams" <|
+                \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createEosAccountBodyParams model)
             ]
         ]

@@ -1,11 +1,23 @@
-module Main exposing (..)
+module Main exposing
+    ( Component(..)
+    , Message(..)
+    , Model
+    , init
+    , initComponent
+    , main
+    , subscriptions
+    , update
+    , updateComponent
+    , view
+    )
 
+import Component.Account.AccountComponent as AccountComponent
+import Component.Main.MainComponent as MainComponent
 import Html
 import Navigation exposing (Location)
-import Component.Main.MainComponent as MainComponent
-import Component.Account.AccountComponent as AccountComponent
-import Util.Flags exposing (Flags)
 import Route exposing (getComponentRoute)
+import Util.Flags exposing (Flags)
+
 
 
 -- MODEL
@@ -42,11 +54,11 @@ init flags location =
         ( newComponent, cmd ) =
             initComponent location
     in
-        ( { currentComponent = newComponent
-          , flags = flags
-          }
-        , cmd
-        )
+    ( { currentComponent = newComponent
+      , flags = flags
+      }
+    , cmd
+    )
 
 
 
@@ -78,7 +90,7 @@ update message ({ currentComponent, flags } as model) =
                 newComponent =
                     MainComponent newComponentModel
             in
-                ( { model | currentComponent = newComponent }, Cmd.map MainComponentMessage newCmd )
+            ( { model | currentComponent = newComponent }, Cmd.map MainComponentMessage newCmd )
 
         ( AccountComponentMessage accountComponentMessage, AccountComponent subModel ) ->
             let
@@ -88,14 +100,14 @@ update message ({ currentComponent, flags } as model) =
                 newComponent =
                     AccountComponent newComponentModel
             in
-                ( { model | currentComponent = newComponent }, Cmd.map AccountComponentMessage newCmd )
+            ( { model | currentComponent = newComponent }, Cmd.map AccountComponentMessage newCmd )
 
         ( OnLocationChange location, _ ) ->
             let
                 ( newComponent, cmd ) =
                     updateComponent currentComponent location flags
             in
-                ( { model | currentComponent = newComponent }, cmd )
+            ( { model | currentComponent = newComponent }, cmd )
 
         ( _, _ ) ->
             ( model, Cmd.none )
@@ -141,26 +153,26 @@ initComponent location =
         componentRoute =
             getComponentRoute location
     in
-        case componentRoute of
-            Route.MainComponentRoute ->
-                let
-                    componentModel =
-                        MainComponent.initModel location
+    case componentRoute of
+        Route.MainComponentRoute ->
+            let
+                componentModel =
+                    MainComponent.initModel location
 
-                    componentCmd =
-                        MainComponent.initCmd componentModel location
-                in
-                    ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
+                componentCmd =
+                    MainComponent.initCmd componentModel location
+            in
+            ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
 
-            Route.AccountComponentRoute ->
-                let
-                    componentModel =
-                        AccountComponent.initModel location
+        Route.AccountComponentRoute ->
+            let
+                componentModel =
+                    AccountComponent.initModel location
 
-                    componentCmd =
-                        AccountComponent.initCmd componentModel
-                in
-                    ( AccountComponent componentModel, Cmd.map AccountComponentMessage componentCmd )
+                componentCmd =
+                    AccountComponent.initCmd componentModel
+            in
+            ( AccountComponent componentModel, Cmd.map AccountComponentMessage componentCmd )
 
 
 updateComponent : Component -> Location -> Flags -> ( Component, Cmd Message )
@@ -169,30 +181,30 @@ updateComponent currentComponent location flags =
         componentRoute =
             getComponentRoute location
     in
-        case componentRoute of
-            Route.MainComponentRoute ->
-                let
-                    ( newComponentModel, componentCmd ) =
-                        case currentComponent of
-                            MainComponent subModel ->
-                                subModel |> MainComponent.update (MainComponent.OnLocationChange location False)
+    case componentRoute of
+        Route.MainComponentRoute ->
+            let
+                ( newComponentModel, componentCmd ) =
+                    case currentComponent of
+                        MainComponent subModel ->
+                            subModel |> MainComponent.update (MainComponent.OnLocationChange location False)
 
-                            _ ->
-                                MainComponent.initModel location |> MainComponent.update (MainComponent.OnLocationChange location True)
-                in
-                    ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
+                        _ ->
+                            MainComponent.initModel location |> MainComponent.update (MainComponent.OnLocationChange location True)
+            in
+            ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
 
-            Route.AccountComponentRoute ->
-                let
-                    componentModel =
-                        case currentComponent of
-                            AccountComponent subModel ->
-                                subModel
+        Route.AccountComponentRoute ->
+            let
+                componentModel =
+                    case currentComponent of
+                        AccountComponent subModel ->
+                            subModel
 
-                            _ ->
-                                AccountComponent.initModel location
+                        _ ->
+                            AccountComponent.initModel location
 
-                    ( newComponentModel, componentCmd ) =
-                        AccountComponent.update (AccountComponent.OnLocationChange location) componentModel flags
-                in
-                    ( AccountComponent newComponentModel, Cmd.map AccountComponentMessage componentCmd )
+                ( newComponentModel, componentCmd ) =
+                    AccountComponent.update (AccountComponent.OnLocationChange location) componentModel flags
+            in
+            ( AccountComponent newComponentModel, Cmd.map AccountComponentMessage componentCmd )

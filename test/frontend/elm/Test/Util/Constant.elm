@@ -1,8 +1,8 @@
-module Test.Util.Constant exposing (..)
+module Test.Util.Constant exposing (tests)
 
-import Util.Constant exposing (..)
 import Expect
 import Test exposing (..)
+import Util.Constant exposing (..)
 
 
 tests : Test

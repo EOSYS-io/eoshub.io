@@ -1,26 +1,27 @@
-module Component.Main.Page.Resource exposing (..)
+module Component.Main.Page.Resource exposing (Message(..), Model, ResourceTab(..), SelectedTab(..), initModel, resourceTabA, update, view, viewDelegateListModal, viewStakeAmountModal)
 
-import Component.Main.Page.Resource.Stake as StakeTab
-import Component.Main.Page.Resource.Unstake as UnstakeTab
 import Component.Main.Page.Resource.Delegate as DelegateTab
+import Component.Main.Page.Resource.Stake as StakeTab
 import Component.Main.Page.Resource.Undelegate as UndelegateTab
+import Component.Main.Page.Resource.Unstake as UnstakeTab
+import Data.Account
+    exposing
+        ( Account
+        , Refund
+        , Resource
+        , ResourceInEos
+        , accountDecoder
+        , defaultAccount
+        , getResource
+        , getTotalAmount
+        , getUnstakingAmount
+        , keyAccountsDecoder
+        )
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
-import Data.Account
-    exposing
-        ( Account
-        , ResourceInEos
-        , Resource
-        , Refund
-        , accountDecoder
-        , defaultAccount
-        , keyAccountsDecoder
-        , getTotalAmount
-        , getUnstakingAmount
-        , getResource
-        )
+
 
 
 -- MODEL
@@ -86,7 +87,7 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
                                 stakeModel
                                 account
                     in
-                        ( { model | tab = Stake newModel }, Cmd.none )
+                    ( { model | tab = Stake newModel }, Cmd.none )
 
         ( UnstakeMessage unstakeMessage, Unstake unstakeModel ) ->
             let
@@ -96,7 +97,7 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
                         unstakeModel
                         account
             in
-                ( { model | tab = Unstake newModel }, Cmd.none )
+            ( { model | tab = Unstake newModel }, Cmd.none )
 
         ( DelegateMessage delegateMessage, Delegate delegateModel ) ->
             case delegateMessage of
@@ -111,7 +112,7 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
                                 delegateModel
                                 account
                     in
-                        ( { model | tab = Delegate newModel }, Cmd.none )
+                    ( { model | tab = Delegate newModel }, Cmd.none )
 
         ( UndelegateMessage undelegateMessage, Undelegate undelegateModel ) ->
             case undelegateMessage of
@@ -126,7 +127,7 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
                                 undelegateModel
                                 account
                     in
-                        ( { model | tab = Undelegate newModel }, Cmd.none )
+                    ( { model | tab = Undelegate newModel }, Cmd.none )
 
         ( ChangeTab newTab, _ ) ->
             case newTab of
@@ -170,23 +171,23 @@ view language ({ selectedTab, tab, isStakeAmountModalOpened, isDelegateListModal
                 Undelegate undelegateModel ->
                     Html.map UndelegateMessage (UndelegateTab.view language UndelegateTab.initModel account)
     in
-        div []
-            [ main_ [ class "resource_management" ]
-                [ h2 []
-                    [ text "리소스 관리" ]
-                , p []
-                    [ text "EOS 네트워크를 활용하기 위한 리소스 관리 페이지입니다." ]
-                , div [ class "tab" ]
-                    [ resourceTabA model StakeSelected
-                    , resourceTabA model UnstakeSelected
-                    , resourceTabA model DelegateSelected
-                    , resourceTabA model UndelegateSelected
-                    ]
-                , tabHtml
+    div []
+        [ main_ [ class "resource_management" ]
+            [ h2 []
+                [ text "리소스 관리" ]
+            , p []
+                [ text "EOS 네트워크를 활용하기 위한 리소스 관리 페이지입니다." ]
+            , div [ class "tab" ]
+                [ resourceTabA model StakeSelected
+                , resourceTabA model UnstakeSelected
+                , resourceTabA model DelegateSelected
+                , resourceTabA model UndelegateSelected
                 ]
-            , viewStakeAmountModal isStakeAmountModalOpened
-            , viewDelegateListModal isDelegateListModalOpened
+            , tabHtml
             ]
+        , viewStakeAmountModal isStakeAmountModalOpened
+        , viewDelegateListModal isDelegateListModalOpened
+        ]
 
 
 resourceTabA : Model -> SelectedTab -> Html Message
@@ -220,16 +221,17 @@ resourceTabA ({ selectedTab } as model) selected =
                 UndelegateSelected ->
                     Undelegate UndelegateTab.initModel
     in
-        a
-            [ class
-                (if (selectedTab == selected) then
-                    "ing"
-                 else
-                    ""
-                )
-            , onClick (ChangeTab resourceTab)
-            ]
-            [ text aText ]
+    a
+        [ class
+            (if selectedTab == selected then
+                "ing"
+
+             else
+                ""
+            )
+        , onClick (ChangeTab resourceTab)
+        ]
+        [ text aText ]
 
 
 viewStakeAmountModal : Bool -> Html Message
@@ -240,6 +242,7 @@ viewStakeAmountModal opened =
             ("set_division_manual modal popup"
                 ++ (if opened then
                         " viewing"
+
                     else
                         ""
                    )
@@ -286,7 +289,7 @@ viewStakeAmountModal opened =
             , p [ class "validate description" ]
                 [ text "7:3 비율로 스테이킹 하는 것이 가장 좋습니다." ]
             , div [ class "btn_area" ]
-                [ button [ class "undo button", type_ "button", onClick (CloseModal) ]
+                [ button [ class "undo button", type_ "button", onClick CloseModal ]
                     [ text "취소" ]
                 , button [ class "ok button", attribute "disabled" "", type_ "button" ]
                     [ text "확인" ]
@@ -303,6 +306,7 @@ viewDelegateListModal opened =
             ("rental_account modal popup"
                 ++ (if opened then
                         " viewing"
+
                     else
                         ""
                    )
@@ -363,7 +367,7 @@ viewDelegateListModal opened =
                         ]
                     ]
                 ]
-            , button [ class "close", id "closePopup", type_ "button", onClick (CloseModal) ]
+            , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
                 [ text "닫기" ]
             ]
         ]

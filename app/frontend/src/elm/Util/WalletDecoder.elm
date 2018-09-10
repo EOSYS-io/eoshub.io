@@ -1,16 +1,27 @@
-module Util.WalletDecoder
-    exposing
-        ( PushActionResponse
-        , Wallet
-        , WalletStatus(..)
-        , WalletResponse
-        , decodePushActionResponse
-        , decodeWalletResponse
-        )
+module Util.WalletDecoder exposing
+    ( PushActionResponse
+    , Wallet
+    , WalletResponse
+    , WalletStatus(..)
+    , decodePushActionResponse
+    , decodeWalletResponse
+    )
 
 import Dict exposing (Dict, fromList)
-import Translation exposing (I18n(EmptyMessage, DebugMessage, TransferSucceeded, TransferFailed, UnknownError, CheckDetail, CheckError))
+import Translation
+    exposing
+        ( I18n
+            ( CheckDetail
+            , CheckError
+            , DebugMessage
+            , EmptyMessage
+            , TransferFailed
+            , TransferSucceeded
+            , UnknownError
+            )
+        )
 import View.Notification as Notification
+
 
 
 -- This type should be expanded as Wallet Response.
@@ -62,37 +73,37 @@ decodePushActionResponse { code, type_, message, action } i18nParam =
                 value =
                     Dict.get action actionSuccessMessages
             in
-                case value of
-                    Just messageFunction ->
-                        Notification.Ok
-                            { message = i18nParam |> messageFunction
-                            , detail = CheckDetail
-                            }
+            case value of
+                Just messageFunction ->
+                    Notification.Ok
+                        { message = i18nParam |> messageFunction
+                        , detail = CheckDetail
+                        }
 
-                    -- This case should not happen!
-                    Nothing ->
-                        Notification.Error
-                            { message = UnknownError
-                            , detail = CheckError
-                            }
+                -- This case should not happen!
+                Nothing ->
+                    Notification.Error
+                        { message = UnknownError
+                        , detail = CheckError
+                        }
 
         _ ->
             let
                 value =
                     Dict.get action actionFailMessages
             in
-                case value of
-                    Just messageFunction ->
-                        Notification.Error
-                            { message = messageFunction (toString code)
-                            , detail = DebugMessage (type_ ++ "\n" ++ message)
-                            }
+            case value of
+                Just messageFunction ->
+                    Notification.Error
+                        { message = messageFunction (toString code)
+                        , detail = DebugMessage (type_ ++ "\n" ++ message)
+                        }
 
-                    Nothing ->
-                        Notification.Error
-                            { message = UnknownError
-                            , detail = CheckError
-                            }
+                Nothing ->
+                    Notification.Error
+                        { message = UnknownError
+                        , detail = CheckError
+                        }
 
 
 walletStatuses : Dict String WalletStatus
@@ -109,15 +120,15 @@ decodeWalletResponse { status, account, authority } =
         value =
             Dict.get status walletStatuses
     in
-        case value of
-            Just walletStatus ->
-                { status = walletStatus
-                , account = account
-                , authority = authority
-                }
+    case value of
+        Just walletStatus ->
+            { status = walletStatus
+            , account = account
+            , authority = authority
+            }
 
-            Nothing ->
-                { status = NotFound
-                , account = ""
-                , authority = ""
-                }
+        Nothing ->
+            { status = NotFound
+            , account = ""
+            , authority = ""
+            }

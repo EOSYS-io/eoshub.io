@@ -2,8 +2,9 @@ module Component.Account.Page.EmailConfirmFailure exposing (Message(..), Model, 
 
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)
-import Translation exposing (Language, I18n(AccountCreationEmailConfirmFailure))
+import Translation exposing (I18n(AccountCreationEmailConfirmFailure), Language)
 import View.I18nViews exposing (textViewI18n)
+
 
 
 -- MODEL

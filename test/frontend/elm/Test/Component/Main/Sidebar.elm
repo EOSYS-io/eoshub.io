@@ -1,9 +1,9 @@
 module Test.Component.Main.Sidebar exposing (tests)
 
+import Component.Main.Sidebar exposing (Message(..), State(..), initModel, update)
 import Expect
 import Navigation
 import Port
-import Component.Main.Sidebar exposing (Message(..), State(..), initModel, update)
 import Test exposing (..)
 import Translation exposing (Language(Korean))
 import Util.WalletDecoder exposing (WalletStatus(..))
@@ -38,7 +38,7 @@ tests =
                                For now, this test handles only expected model
                             -}
                         in
-                            Expect.equal expectedModel (Tuple.first (update message initModel))
+                        Expect.equal expectedModel (Tuple.first (update message initModel))
                 , test "loaded should change state to SignIn" <|
                     \() ->
                         let
@@ -59,7 +59,7 @@ tests =
                                     , state = SignIn
                                 }
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
+                        Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
                 , test "notfound should change state to SignIn" <|
                     \() ->
                         let
@@ -80,7 +80,7 @@ tests =
                                     , state = SignIn
                                 }
                         in
-                            Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
+                        Expect.equal ( expectedModel, Cmd.none ) (update message initModel)
                 ]
             , describe "Other Messages"
                 [ test "CheckWalletStatus" <|
@@ -114,9 +114,9 @@ tests =
                             url =
                                 "transfer"
                         in
-                            Expect.equal
-                                ( initModel, Navigation.newUrl url )
-                                (update (ChangeUrl url) initModel)
+                        Expect.equal
+                            ( initModel, Navigation.newUrl url )
+                            (update (ChangeUrl url) initModel)
                 , test "SetConfigPanel" <|
                     \() ->
                         Expect.equal

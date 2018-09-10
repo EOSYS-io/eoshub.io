@@ -1,17 +1,31 @@
-module Data.Account exposing (..)
+module Data.Account exposing
+    ( Account
+    , Refund
+    , Resource
+    , ResourceInEos
+    , VoterInfo
+    , accountDecoder
+    , defaultAccount
+    , getResource
+    , getTotalAmount
+    , getUnstakingAmount
+    , intOrStringDecoder
+    , integerStringDecoder
+    , keyAccountsDecoder
+    )
 
 import Json.Decode as JD exposing (Decoder, at, oneOf)
-import Json.Decode.Pipeline exposing (decode, required, optional)
+import Json.Decode.Pipeline exposing (decode, optional, required)
+import Round
 import Util.Formatter
     exposing
-        ( larimerToEos
-        , eosFloatToString
+        ( eosFloatToString
         , eosStringToFloat
-        , unitConverterRound4
-        , resourceUnitConverter
+        , larimerToEos
         , percentageConverter
+        , resourceUnitConverter
+        , unitConverterRound4
         )
-import Round
 
 
 type alias Account =
@@ -152,7 +166,7 @@ integerStringDecoder : Decoder Int
 integerStringDecoder =
     JD.map
         (\str ->
-            case (String.toInt str) of
+            case String.toInt str of
                 Ok value ->
                     value
 
@@ -190,6 +204,7 @@ getResource resourceType used available max =
         availableMinusCase =
             if available < 0 then
                 -1
+
             else
                 available
 
@@ -230,10 +245,11 @@ getResource resourceType used available max =
                         value =
                             (percentageConverter available max |> Round.round 2) ++ "%"
                     in
-                        if value == "100.00%" then
-                            "100%"
-                        else
-                            value
+                    if value == "100.00%" then
+                        "100%"
+
+                    else
+                        value
 
         color =
             case max of
@@ -248,13 +264,16 @@ getResource resourceType used available max =
                         percentage =
                             percentageConverter available max
                     in
-                        if percentage < 10 then
-                            "hell"
-                        else if percentage >= 10 && percentage < 30 then
-                            "bad"
-                        else if percentage >= 30 && percentage < 100 then
-                            "good"
-                        else
-                            "fine"
+                    if percentage < 10 then
+                        "hell"
+
+                    else if percentage >= 10 && percentage < 30 then
+                        "bad"
+
+                    else if percentage >= 30 && percentage < 100 then
+                        "good"
+
+                    else
+                        "fine"
     in
-        ( usedString, availableString, totalString, avaliablePercent, color )
+    ( usedString, availableString, totalString, avaliablePercent, color )

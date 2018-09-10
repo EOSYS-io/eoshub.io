@@ -1,4 +1,4 @@
-module Util.HttpRequest exposing (..)
+module Util.HttpRequest exposing (getFullPath, post)
 
 import Http
 import Json.Decode as JD exposing (Decoder)

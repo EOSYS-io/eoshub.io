@@ -2,7 +2,7 @@ module Test.Util.WalletDecoder exposing (tests)
 
 import Expect
 import Test exposing (..)
-import Translation exposing (I18n(TransferSucceeded, TransferFailed, UnknownError, CheckDetail, CheckError, DebugMessage))
+import Translation exposing (I18n(CheckDetail, CheckError, DebugMessage, TransferFailed, TransferSucceeded, UnknownError))
 import Util.WalletDecoder exposing (..)
 import View.Notification
 
@@ -26,76 +26,76 @@ tests =
             , memo = "memo"
             }
     in
-        describe "Util.WalletDecoder module"
-            [ describe "decodePushActionResponse"
-                [ describe "transfer"
-                    [ test "200" <|
-                        \() ->
-                            Expect.equal
-                                (View.Notification.Ok { message = TransferSucceeded transfer.to, detail = CheckDetail })
-                                (decodePushActionResponse response transfer.to)
-                    , test "500 on unknownAction" <|
-                        \() ->
-                            Expect.equal
-                                (View.Notification.Error { message = UnknownError, detail = CheckError })
-                                (decodePushActionResponse { response | action = "unknown" } transfer.to)
-                    , test "402" <|
-                        \() ->
-                            Expect.equal
-                                (View.Notification.Error
-                                    { message = TransferFailed "402"
-                                    , detail = DebugMessage "account_missing\nMissing required accounts, repull the identity"
-                                    }
-                                )
-                                (decodePushActionResponse
-                                    { response
-                                        | code = 402
-                                        , type_ = "account_missing"
-                                        , message = "Missing required accounts, repull the identity"
-                                    }
-                                    transfer.to
-                                )
-                    ]
-                ]
-            , describe "decodeWalletResponse"
-                [ test "authenticated" <|
+    describe "Util.WalletDecoder module"
+        [ describe "decodePushActionResponse"
+            [ describe "transfer"
+                [ test "200" <|
                     \() ->
                         Expect.equal
-                            { status = Authenticated
-                            , account = "ACCOUNT"
-                            , authority = "AUTHORITY"
-                            }
-                            (decodeWalletResponse
-                                { status = "WALLET_STATUS_AUTHENTICATED"
-                                , account = "ACCOUNT"
-                                , authority = "AUTHORITY"
+                            (View.Notification.Ok { message = TransferSucceeded transfer.to, detail = CheckDetail })
+                            (decodePushActionResponse response transfer.to)
+                , test "500 on unknownAction" <|
+                    \() ->
+                        Expect.equal
+                            (View.Notification.Error { message = UnknownError, detail = CheckError })
+                            (decodePushActionResponse { response | action = "unknown" } transfer.to)
+                , test "402" <|
+                    \() ->
+                        Expect.equal
+                            (View.Notification.Error
+                                { message = TransferFailed "402"
+                                , detail = DebugMessage "account_missing\nMissing required accounts, repull the identity"
                                 }
                             )
-                , test "loaded" <|
-                    \() ->
-                        Expect.equal
-                            { status = Loaded
-                            , account = ""
-                            , authority = ""
-                            }
-                            (decodeWalletResponse
-                                { status = "WALLET_STATUS_LOADED"
-                                , account = ""
-                                , authority = ""
+                            (decodePushActionResponse
+                                { response
+                                    | code = 402
+                                    , type_ = "account_missing"
+                                    , message = "Missing required accounts, repull the identity"
                                 }
-                            )
-                , test "notFound" <|
-                    \() ->
-                        Expect.equal
-                            { status = NotFound
-                            , account = ""
-                            , authority = ""
-                            }
-                            (decodeWalletResponse
-                                { status = "WALLET_STATUS_NOT_FOUND"
-                                , account = ""
-                                , authority = ""
-                                }
+                                transfer.to
                             )
                 ]
             ]
+        , describe "decodeWalletResponse"
+            [ test "authenticated" <|
+                \() ->
+                    Expect.equal
+                        { status = Authenticated
+                        , account = "ACCOUNT"
+                        , authority = "AUTHORITY"
+                        }
+                        (decodeWalletResponse
+                            { status = "WALLET_STATUS_AUTHENTICATED"
+                            , account = "ACCOUNT"
+                            , authority = "AUTHORITY"
+                            }
+                        )
+            , test "loaded" <|
+                \() ->
+                    Expect.equal
+                        { status = Loaded
+                        , account = ""
+                        , authority = ""
+                        }
+                        (decodeWalletResponse
+                            { status = "WALLET_STATUS_LOADED"
+                            , account = ""
+                            , authority = ""
+                            }
+                        )
+            , test "notFound" <|
+                \() ->
+                    Expect.equal
+                        { status = NotFound
+                        , account = ""
+                        , authority = ""
+                        }
+                        (decodeWalletResponse
+                            { status = "WALLET_STATUS_NOT_FOUND"
+                            , account = ""
+                            , authority = ""
+                            }
+                        )
+            ]
+        ]

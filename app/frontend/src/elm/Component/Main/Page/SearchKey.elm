@@ -1,14 +1,24 @@
-module Component.Main.Page.SearchKey exposing (..)
+module Component.Main.Page.SearchKey exposing
+    ( Message(..)
+    , Model
+    , initCmd
+    , initModel
+    , update
+    , view
+    , viewAccountCard
+    , viewAccountCardList
+    )
 
-import Translation exposing (I18n(..), Language, translate)
+import Data.Account exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Util.HttpRequest exposing (..)
 import Json.Encode as JE
-import Data.Account exposing (..)
 import Navigation exposing (..)
+import Translation exposing (I18n(..), Language, translate)
+import Util.HttpRequest exposing (..)
+
 
 
 -- MODEL
@@ -37,10 +47,10 @@ initCmd query =
                         [ ( "public_key", JE.string query ) ]
                         |> Http.jsonBody
             in
-                post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder
-                    |> (Http.send OnFetchKeyAccounts)
+            post (getFullPath "/v1/history/get_key_accounts") body keyAccountsDecoder
+                |> Http.send OnFetchKeyAccounts
     in
-        newCmd
+    newCmd
 
 
 
@@ -97,7 +107,7 @@ viewAccountCardList language accounts =
 viewAccountCard : Language -> Int -> String -> Html Message
 viewAccountCard language index account =
     div []
-        [ span [] [ text <| (translate language Translation.Account) ++ " " ++ (toString (index + 1)) ]
+        [ span [] [ text <| translate language Translation.Account ++ " " ++ toString (index + 1) ]
         , strong
             [ title account ]
             [ text account ]

@@ -1,10 +1,10 @@
-module Test.Util.Formatter exposing (..)
+module Test.Util.Formatter exposing (tests)
 
-import Translation exposing (Language(..))
-import Util.Formatter exposing (..)
-import Util.Constant exposing (..)
 import Expect
 import Test exposing (..)
+import Translation exposing (Language(..))
+import Util.Constant exposing (..)
+import Util.Formatter exposing (..)
 
 
 tests : Test

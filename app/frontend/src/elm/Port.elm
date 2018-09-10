@@ -1,7 +1,20 @@
-port module Port exposing (..)
+port module Port exposing
+    ( KeyPair
+    , authenticateAccount
+    , checkWalletStatus
+    , copy
+    , generateKeys
+    , invalidateAccount
+    , loadChart
+    , pushAction
+    , receiveKeys
+    , receivePushActionResponse
+    , receiveWalletStatus
+    )
 
 import Json.Encode as JE
 import Util.WalletDecoder exposing (PushActionResponse, WalletResponse)
+
 
 
 -- A port for asking status of Wallet in JS.

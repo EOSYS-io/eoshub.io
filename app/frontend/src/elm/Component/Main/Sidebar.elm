@@ -1,10 +1,10 @@
-module Component.Main.Sidebar exposing (..)
+module Component.Main.Sidebar exposing (Message(..), Model, State(..), accountInfoView, deleteFromBack, initCmd, initModel, loadingView, pairWalletView, signInView, subscriptions, update, view)
 
 import Data.Account
     exposing
         ( Account
-        , defaultAccount
         , accountDecoder
+        , defaultAccount
         , getTotalAmount
         , getUnstakingAmount
         )
@@ -15,7 +15,12 @@ import Http
 import Json.Encode as Encode
 import Navigation
 import Port
-import Translation exposing (Language(..), I18n(..), translate, toLocale)
+import Translation exposing (I18n(..), Language(..), toLocale, translate)
+import Util.Formatter
+    exposing
+        ( eosFloatToString
+        , larimerToEos
+        )
 import Util.HttpRequest exposing (getFullPath, post)
 import Util.WalletDecoder
     exposing
@@ -24,11 +29,7 @@ import Util.WalletDecoder
         , WalletStatus(Authenticated, NotFound)
         , decodeWalletResponse
         )
-import Util.Formatter
-    exposing
-        ( larimerToEos
-        , eosFloatToString
-        )
+
 
 
 -- MODEL
@@ -110,10 +111,11 @@ view ({ state, fold } as model) language =
         sidebarClass =
             if fold then
                 baseClass ++ " shrink"
+
             else
                 baseClass
     in
-        aside [ class sidebarClass ] htmlContent
+    aside [ class sidebarClass ] htmlContent
 
 
 signInView : Language -> List (Html Message)
@@ -206,65 +208,66 @@ accountInfoView { wallet, account, configPanelOpen } language =
                 ("config panel"
                     ++ (if configPanelOpen then
                             " expand"
+
                         else
                             ""
                        )
                 )
     in
-        [ h2 []
-            [ text wallet.account
-            , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
-            ]
-        , div [ configPanelClass ]
-            [ button
-                [ type_ "button"
-                , class "icon gear button"
-                , attribute "wai-aria" "hidden"
-                , onClick (OpenConfigPanel (not configPanelOpen))
-                ]
-                [ text "option" ]
-            , div [ class "menu_list" ]
-                [ a
-                    [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
-                    ]
-                    [ text (translate language ChangeWallet) ]
-                , a
-                    [ onClick
-                        (AndThen (OpenConfigPanel False)
-                            (ChangeUrl ("search?query=" ++ wallet.account))
-                        )
-                    ]
-                    [ text (translate language MyAccount) ]
-                , a
-                    [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
-                    ]
-                    [ text (translate language SignOut) ]
-                ]
-            ]
-        , ul [ class "wallet status" ]
-            [ li []
-                [ span [ class "title" ] [ text "total" ]
-                , span [ class "amount" ] [ text (deleteFromBack 4 totalAmount) ]
-                ]
-            , li []
-                [ span [ class "title" ] [ text "stake" ]
-                , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
-                , span [ class "status available" ] [ text (translate language TransactionPossible) ]
-
-                -- span [ class "status unavailable" ] [ text "" ]
-                ]
-            , li []
-                [ span [ class "title" ] [ text "refunding" ]
-                , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
-                , span [ class "remaining time" ] [ text "72.3 hours" ]
-                ]
-            ]
-        , button
-            [ type_ "button"
-            , class "resource management"
-            ]
-            [ text (translate language ManageStaking) ]
+    [ h2 []
+        [ text wallet.account
+        , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
         ]
+    , div [ configPanelClass ]
+        [ button
+            [ type_ "button"
+            , class "icon gear button"
+            , attribute "wai-aria" "hidden"
+            , onClick (OpenConfigPanel (not configPanelOpen))
+            ]
+            [ text "option" ]
+        , div [ class "menu_list" ]
+            [ a
+                [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
+                ]
+                [ text (translate language ChangeWallet) ]
+            , a
+                [ onClick
+                    (AndThen (OpenConfigPanel False)
+                        (ChangeUrl ("search?query=" ++ wallet.account))
+                    )
+                ]
+                [ text (translate language MyAccount) ]
+            , a
+                [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
+                ]
+                [ text (translate language SignOut) ]
+            ]
+        ]
+    , ul [ class "wallet status" ]
+        [ li []
+            [ span [ class "title" ] [ text "total" ]
+            , span [ class "amount" ] [ text (deleteFromBack 4 totalAmount) ]
+            ]
+        , li []
+            [ span [ class "title" ] [ text "stake" ]
+            , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
+            , span [ class "status available" ] [ text (translate language TransactionPossible) ]
+
+            -- span [ class "status unavailable" ] [ text "" ]
+            ]
+        , li []
+            [ span [ class "title" ] [ text "refunding" ]
+            , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
+            , span [ class "remaining time" ] [ text "72.3 hours" ]
+            ]
+        ]
+    , button
+        [ type_ "button"
+        , class "resource management"
+        ]
+        [ text (translate language ManageStaking) ]
+    ]
 
 
 loadingView : Language -> List (Html Message)
@@ -302,15 +305,15 @@ update message ({ fold, wallet } as model) =
                                         [ ( "account_name", Encode.string wallet.account ) ]
                                         |> Http.jsonBody
                             in
-                                post (getFullPath "/v1/chain/get_account")
-                                    body
-                                    accountDecoder
-                                    |> (Http.send OnFetchAccount)
+                            post (getFullPath "/v1/chain/get_account")
+                                body
+                                accountDecoder
+                                |> Http.send OnFetchAccount
 
                         _ ->
                             Cmd.none
             in
-                ( { model | state = state }, newCmd )
+            ( { model | state = state }, newCmd )
 
         UpdateWalletStatus resp ->
             let
@@ -325,7 +328,7 @@ update message ({ fold, wallet } as model) =
                         _ ->
                             SignIn
             in
-                update (UpdateState newState) { model | wallet = newWallet }
+            update (UpdateState newState) { model | wallet = newWallet }
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
@@ -341,7 +344,7 @@ update message ({ fold, wallet } as model) =
                 ( secondModel, secondCmd ) =
                     update secondMessage firstModel
             in
-                ( secondModel, Cmd.batch [ firstCmd, secondCmd ] )
+            ( secondModel, Cmd.batch [ firstCmd, secondCmd ] )
 
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
