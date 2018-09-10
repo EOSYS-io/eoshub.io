@@ -3,6 +3,7 @@ module Test.Component.Main.Page.Transfer exposing (..)
 import Expect
 import Json.Encode as JE
 import Component.Main.Page.Transfer exposing (..)
+import Util.Validation exposing (AccountStatus(..), QuantityStatus(..), MemoStatus(..))
 import Port
 import Test exposing (..)
 
@@ -83,7 +84,7 @@ tests =
                             { model
                                 | transfer = { transfer | quantity = "0.1" }
                                 , accountValidation = ValidAccount
-                                , quantityValidation = OverTransferableQuantity
+                                , quantityValidation = OverValidQuantity
                                 , isFormValid = False
                             }
                             (setTransferMessageField Quantity "0.1" model 0.0)
@@ -175,12 +176,12 @@ tests =
                                     }
                                     balance
                                 )
-                    , test "OverTransferableQuantity" <|
+                    , test "OverValidQuantity" <|
                         \() ->
                             Expect.equal
                                 { model
                                     | transfer = { transfer | quantity = "301.0" }
-                                    , quantityValidation = OverTransferableQuantity
+                                    , quantityValidation = OverValidQuantity
                                     , isFormValid = False
                                 }
                                 (validate

@@ -233,25 +233,25 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
     let
         totalAmount =
             getTotalAmount
-                account.core_liquid_balance
-                account.voter_info.staked
-                account.refund_request.net_amount
-                account.refund_request.cpu_amount
+                account.coreLiquidBalance
+                account.voterInfo.staked
+                account.refundRequest.netAmount
+                account.refundRequest.cpuAmount
 
         unstakingAmount =
-            getUnstakingAmount account.refund_request.net_amount account.refund_request.cpu_amount
+            getUnstakingAmount account.refundRequest.netAmount account.refundRequest.cpuAmount
 
         stakedAmount =
-            eosFloatToString (larimerToEos account.voter_info.staked)
+            eosFloatToString (larimerToEos account.voterInfo.staked)
 
         ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
-            getResource "cpu" account.cpu_limit.used account.cpu_limit.available account.cpu_limit.max
+            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
 
         ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
-            getResource "net" account.net_limit.used account.net_limit.available account.net_limit.max
+            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
         ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
-            getResource "ram" account.ram_usage (account.ram_quota - account.ram_usage) account.ram_quota
+            getResource "ram" account.ramUsage (account.ramQuota - account.ramUsage) account.ramQuota
     in
         main_ [ class "search" ]
             [ h2 []
@@ -264,7 +264,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                         [ dt []
                             [ text (translate language Translation.Account) ]
                         , dd []
-                            [ text account.account_name ]
+                            [ text account.accountName ]
                         , dt []
                             [ text (translate language TotalAmount) ]
                         , dd []
@@ -275,8 +275,8 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                     [ div [ class "wrapper" ]
                         [ div []
                             [ text "Unstaked"
-                            , strong [ title account.core_liquid_balance ]
-                                [ text account.core_liquid_balance ]
+                            , strong [ title account.coreLiquidBalance ]
+                                [ text account.coreLiquidBalance ]
                             ]
                         , div []
                             [ text "staked"
@@ -376,7 +376,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                                 ]
                             ]
                         , tbody []
-                            (viewActionList language selectedActionCategory account.account_name openedActionSeq actions)
+                            (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
                         ]
                     , div [ class "btn_area" ]
                         [ button [ type_ "button", class "view_more button", onClick ShowMore ]

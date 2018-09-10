@@ -69,7 +69,7 @@ type I18n
     | ManageStaking
     | WhatIsStaking
     | Transfer
-    | TransferDesc
+    | TransferHereDesc
     | Vote
     | VoteDesc
     | RamMarket
@@ -89,11 +89,16 @@ type I18n
     | TransferInfo1
     | TransferInfo2
     | TransferHelp
+    | TransferDesc
     | TransferableAmount
     | CheckAccountName
     | ReceiverAccountName
+    | AccountExample
+    | TransferAmount
     | InvalidAmount
     | OverTransferableAmount
+    | Transferable
+    | TransferableAmountDesc
     | Memo
     | MemoTooLong
     | MemoNotMandatory
@@ -321,7 +326,7 @@ getMessages i18n =
             , chinese = "传送"
             }
 
-        TransferDesc ->
+        TransferHereDesc ->
             { korean = "여기서 토큰을 보내실 수 있어요"
             , english = "Send tokens here"
             , chinese = "去传送代币"
@@ -441,6 +446,12 @@ getMessages i18n =
             , chinese = "您是第一次进行传送的吗?"
             }
 
+        TransferDesc ->
+            { korean = "원하시는 수량만큼 토큰을 전송하세요 :)"
+            , english = "Transfer Tokens"
+            , chinese = "去传送代币"
+            }
+
         TransferableAmount ->
             { korean = "전송 가능한 수량"
             , english = "Transferable amount"
@@ -454,9 +465,21 @@ getMessages i18n =
             }
 
         ReceiverAccountName ->
-            { korean = "전송하실 계정의 이름을 입력하세요"
+            { korean = "전송하실 계정의 이름을 입력하세요."
             , english = "Receiver's Account Name"
-            , chinese = "接受账户"
+            , chinese = "请输入被传送的账户名"
+            }
+
+        AccountExample ->
+            { korean = "계정이름 예시: eoshubby"
+            , english = "Example: eoshubby"
+            , chinese = "例子: eoshubby"
+            }
+
+        TransferAmount ->
+            { korean = "전송하실 수량을 입력하세요"
+            , english = "Type in the amount to send"
+            , chinese = "请输入要传送的数量"
             }
 
         InvalidAmount ->
@@ -469,6 +492,18 @@ getMessages i18n =
             { korean = "전송 가능한 수량보다 많아요!"
             , english = "Over transferable amount!"
             , chinese = "多于能够传送的数量！"
+            }
+
+        Transferable ->
+            { korean = "전송 가능한 수량입니다."
+            , english = "Transferable amount"
+            , chinese = "可传送的数量"
+            }
+
+        TransferableAmountDesc ->
+            { korean = "최대 전송가능한 수량만큼 입력 가능합니다."
+            , english = "Type in up to the transferable amount"
+            , chinese = "只能输入可传送的数量范围内"
             }
 
         Memo ->

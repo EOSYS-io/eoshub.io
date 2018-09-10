@@ -16,6 +16,7 @@ type Route
     | SearchKeyRoute (Maybe String)
     | VotingRoute
     | TransferRoute
+    | ResourceRoute
     | NotFoundRoute
 
 
@@ -33,6 +34,7 @@ matchRoute =
         , map SearchKeyRoute (s "searchkey" <?> stringParam "query")
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")
+        , map ResourceRoute (s "resource")
         ]
 
 
