@@ -173,7 +173,7 @@ quantityWarningSpan quantityStatus language =
                 InvalidQuantity ->
                     ( " false", translate language InvalidAmount )
 
-                OverTransferableQuantity ->
+                OverValidQuantity ->
                     ( " false", translate language OverTransferableAmount )
 
                 ValidQuantity ->

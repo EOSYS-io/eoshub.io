@@ -110,9 +110,9 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                     , p []
                         [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight)) ]
                     , div [ class "graph status" ]
-                        [ span [ class "hell", attribute "style" "height:10%" ]
+                        [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
                             []
-                        , text "10%"
+                        , text (cpuPercent)
                         ]
                     ]
                 , div []
@@ -126,9 +126,9 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                     , p []
                         [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight)) ]
                     , div [ class "graph status" ]
-                        [ span [ class "hell", attribute "style" "height:10%" ]
+                        [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
                             []
-                        , text "10%"
+                        , text netPercent
                         ]
                     ]
                 ]
@@ -192,7 +192,7 @@ quantityWarningSpan quantityStatus language =
                 InvalidQuantity ->
                     ( " false", translate language InvalidAmount )
 
-                OverTransferableQuantity ->
+                OverValidQuantity ->
                     ( " false", translate language OverTransferableAmount )
 
                 ValidQuantity ->

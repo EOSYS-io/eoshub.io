@@ -31,7 +31,7 @@ type AccountStatus
 
 type QuantityStatus
     = EmptyQuantity
-    | OverTransferableQuantity
+    | OverValidQuantity
     | InvalidQuantity
     | ValidQuantity
 
@@ -73,7 +73,7 @@ validateQuantity quantity eosLiquidAmount =
                         InvalidQuantity
                     else if quantity > eosLiquidAmount then
                         -- NOTE(boseok): Change the name to OverValidQuantity, OverProperQuantity
-                        OverTransferableQuantity
+                        OverValidQuantity
                     else
                         ValidQuantity
 
