@@ -72,14 +72,6 @@ export default async function loadTV() {
   };
 
   // Lazy import.
-  // if (window.tvWidget) {
-  //   console.log(window.tvWidget.onChartReady);
-  //   fireDOMContentLoadedEvent();
-  //   window.tvWidget.onChartReady(() => {
-  //     window.tvWidget.setSymbol('');
-  //   });
-  //   console.log('this');
-  // } else {
   window.tradingView = await System.import('charting_library.min'); // eslint-disable-line no-undef
   const tvWidget = new window.tradingView.widget(widgetOptions); // eslint-disable-line
 }
