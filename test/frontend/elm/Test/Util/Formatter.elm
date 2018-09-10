@@ -34,7 +34,7 @@ tests =
             [ test "1/100 * 100 = 1%" <|
                 \() ->
                     Expect.equal 1.0 (percentageConverter 1 100)
-            , describe "timeForƒmatter"
+            , describe "timeFormatter"
                 [ test "English, AM, Ok" <|
                     \() ->
                         Expect.equal "2:16:21 AM, August 17, 2018" (timeFormatter English "2018-08-17T02:16:21.500")
