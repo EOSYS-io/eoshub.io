@@ -22,5 +22,6 @@ module EoshubIo
     config.assets.configure do |env|
       env.cache = ActiveSupport::Cache.lookup_store(:null_store)
     end
+    config.assets.precompile += %w(charting_library/charting_library.min.js charting_library/static/*)
   end
 end
