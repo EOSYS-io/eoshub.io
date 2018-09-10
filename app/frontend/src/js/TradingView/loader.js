@@ -81,8 +81,5 @@ export default async function loadTV() {
   //   console.log('this');
   // } else {
   window.tradingView = await System.import('charting_library.min'); // eslint-disable-line no-undef
-  const tvWidget = new window.tradingView.widget(widgetOptions); // eslint-disable-line new-cap
-  window.tradingView.onready(() => {
-    console.log(tvWidget);
-  });
+  const tvWidget = new window.tradingView.widget(widgetOptions); // eslint-disable-line
 }
