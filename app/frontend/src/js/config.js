@@ -13,9 +13,9 @@ const eosjsConfig = {
 
 const chartConfig = {
   supportedResolutions: ['1', '3', '5', '15', '30', '60', '240', 'D', 'W'],
-  supports_marks: false,
-  supports_search: false,
-  supports_group_request: false,
+  supportsMarks: false,
+  supportsSearch: false,
+  supportsGroupRequest: false,
 };
 
 function getEoshubHost() {

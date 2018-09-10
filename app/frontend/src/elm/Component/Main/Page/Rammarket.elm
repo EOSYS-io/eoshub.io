@@ -1,34 +1,34 @@
-module Component.Main.Page.Rammarket exposing (..)
+module Component.Main.Page.Rammarket exposing (initCmd, view)
 
-import Port
 import Html
     exposing
         ( Html
-        , div
-        , h2
-        , h3
-        , text
-        , main_
-        , section
-        , i
-        , form
-        , input
         , a
         , button
+        , div
+        , form
+        , h2
+        , h3
+        , i
+        , input
+        , main_
         , p
+        , section
         , span
+        , text
         )
 import Html.Attributes
     exposing
-        ( class
-        , style
-        , type_
-        , placeholder
-        , attribute
+        ( attribute
+        , class
         , disabled
         , id
+        , placeholder
+        , style
+        , type_
         )
-import Translation exposing (Language, I18n(..), translate)
+import Port
+import Translation exposing (I18n(..), Language, translate)
 
 
 initCmd : Cmd message

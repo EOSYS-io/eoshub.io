@@ -5,7 +5,6 @@ let state = {
     account: '',
     authority: '',
   },
-  elm: null,
 };
 
 function getScatter() {
@@ -19,20 +18,8 @@ function updateScatter(newScatter) {
   };
 }
 
-function getElm() {
-  return state.elm;
-}
-
-function updateElm(elm) {
-  state = {
-    ...state,
-    elm,
-  };
-}
 
 export {
-  getElm,
   getScatter,
-  updateElm,
   updateScatter,
 };

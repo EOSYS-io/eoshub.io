@@ -24,10 +24,9 @@ function getBars(symbolInfo, resolution, from, to, firstDataReq) {
     params: {
       intvl,
       from,
-      to: firstDataReq ? new Date().getTime() : to,
+      to: firstDataReq ? Math.round(new Date().getTime() / 1000) : to * 1000,
     },
   }).then(({ status, data }) => {
-    console.log(data);
     if (status !== 200) {
       console.log('API Error: ', data.msg);
       return [];
@@ -36,6 +35,7 @@ function getBars(symbolInfo, resolution, from, to, firstDataReq) {
     return _.map(data, (elem) => {
       const {
         start_time, // eslint-disable-line
+        end_time, // eslint-disable-line
         open,
         close,
         high,
@@ -43,7 +43,7 @@ function getBars(symbolInfo, resolution, from, to, firstDataReq) {
       } = elem;
 
       return {
-        time: new Date(start_time).getTime() * 1000,
+        time: (new Date(start_time).getTime() + new Date(end_time).getTime()) / 2,
         high,
         low,
         open,

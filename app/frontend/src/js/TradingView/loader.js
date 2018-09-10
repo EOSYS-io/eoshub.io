@@ -72,7 +72,17 @@ export default async function loadTV() {
   };
 
   // Lazy import.
-  const { widget } = await System.import('charting_library.min'); // eslint-disable-line no-undef
-  const tvWidget = new widget(widgetOptions); // eslint-disable-line new-cap
-  tvWidget.onChartReady(() => console.log('Chart has loaded'));
+  // if (window.tvWidget) {
+  //   console.log(window.tvWidget.onChartReady);
+  //   fireDOMContentLoadedEvent();
+  //   window.tvWidget.onChartReady(() => {
+  //     window.tvWidget.setSymbol('');
+  //   });
+  //   console.log('this');
+  // } else {
+  window.tradingView = await System.import('charting_library.min'); // eslint-disable-line no-undef
+  const tvWidget = new window.tradingView.widget(widgetOptions); // eslint-disable-line new-cap
+  window.tradingView.onready(() => {
+    console.log(tvWidget);
+  });
 }
