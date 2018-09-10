@@ -1,8 +1,26 @@
-module Component.Main.MainComponent exposing (AccountQuery, Header, Message(..), Model, Page(..), PublicKeyQuery, Query(..), getPage, initCmd, initModel, pageCmd, parseQuery, subscriptions, update, updateCmd, view)
+module Component.Main.MainComponent exposing
+    ( AccountQuery
+    , Header
+    , Message(..)
+    , Model
+    , Page(..)
+    , PublicKeyQuery
+    , Query(..)
+    , getPage
+    , initCmd
+    , initModel
+    , pageCmd
+    , parseQuery
+    , subscriptions
+    , update
+    , updateCmd
+    , view
+    )
 
 import Component.Main.Page.Index as Index
 import Component.Main.Page.NotFound as NotFound
 import Component.Main.Page.Rammarket as Rammarket
+import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Search as Search
 import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
@@ -38,27 +56,6 @@ import Html.Attributes
         )
 import Html.Events exposing (on, onClick, onInput, onSubmit)
 import Navigation exposing (Location)
-<<<<<<< HEAD
-import Component.Main.Page.Index as Index
-import Component.Main.Page.NotFound as NotFound
-import Component.Main.Page.Search as Search
-import Component.Main.Page.SearchKey as SearchKey
-import Component.Main.Page.Transfer as Transfer
-import Component.Main.Page.Resource as Resource
-import Component.Main.Page.Voting as Voting
-import Component.Main.Page.Rammarket as Rammarket
-import Component.Main.Sidebar as Sidebar
-||||||| merged common ancestors
-import Component.Main.Page.Index as Index
-import Component.Main.Page.NotFound as NotFound
-import Component.Main.Page.Search as Search
-import Component.Main.Page.SearchKey as SearchKey
-import Component.Main.Page.Transfer as Transfer
-import Component.Main.Page.Voting as Voting
-import Component.Main.Page.Rammarket as Rammarket
-import Component.Main.Sidebar as Sidebar
-=======
->>>>>>> Implement ram history chart.
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), Language(..), translate)
@@ -439,7 +436,7 @@ update message ({ page, notification, header, sidebar } as model) =
                         subModel
                         sidebar.account
             in
-                ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
+            ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
