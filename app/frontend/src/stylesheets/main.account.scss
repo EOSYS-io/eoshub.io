@@ -1,0 +1,164 @@
+main.create.account,
+main.change.account.key {
+	// namespace
+}
+
+main.create.account,
+main.change.account.key {
+	.container {
+		margin-top:32px;
+		background-color:$xx-dark-gray;
+	}
+
+	.summary.account {
+		padding:32px;
+		border-bottom:1px solid $x-dark-gray;
+
+		h3 {
+			font-size:$small;
+			color:$gray;
+			strong {
+				color:#fff;
+				font-size:$large;
+				display:block;
+				font-weight:$light;
+				margin-top:8px;
+			}
+		}
+	}
+
+	form {
+		padding:32px 32px 16px;
+		// reset
+		ul,li {
+			margin:0;
+			padding:0;
+			list-style-type:none;
+		}
+
+		li {
+			margin-top:4px;
+			background:$xxx-dark-gray;
+			padding:32px;
+
+			&:first-child {
+				margin-top:initial;
+			}
+		}
+
+		input[type="text"],
+		input[type="number"] {
+			border:0;
+			width:100%;
+			height: 28px;
+			font-size: 28px;
+			font-weight: 100;
+			color: $white;
+			transition:border-color 0.4s;
+
+			&:focus {
+				border-color:$white;
+				outline:0;
+			}
+
+			&:focus::placeholder {
+				transition:color 0.4s;
+				color:$light-gray
+			}
+
+			+ span.description {
+				margin-top:12px;
+				display:block;
+				font-size: $x-small;
+				line-height: 1.54;
+				color: $gray;
+			}
+
+			&:invalid + span.validate,
+			& + span.false.validate.description {
+				color:$red;
+			}
+
+			&:valid + span.validate,
+			& + span.true.validate.description {
+				color:$green;
+			}
+
+			&:placeholder-shown + span.description {
+				color:inherit;
+			}
+
+		}
+	}
+
+	.btn_area {
+		padding:0 32px;
+		text-align:right;
+
+		button {
+			margin-left:4px;
+			width:157px;
+		}
+	}
+
+	.account.list {
+		margin-top:32px;
+		padding:32px;
+
+		h3 {
+			padding-bottom:24px;
+		}
+
+		th,
+		td {
+			text-align:left;
+			padding-left:16px;
+			padding-right:16px;
+		}
+
+		> div.btn_area {
+			text-align:center;
+			padding:32px 32px 0;
+		}
+	}
+
+	// notice, alert
+	div.notice.alert {
+		margin:32px;
+		padding:28px 32px;
+		background-color:$xxxx-dark-gray;
+
+		display:flex;
+		align-items:center;
+
+		color:$red;
+
+		h3 {
+			color:inherit;
+			font-size:$x-large;
+			white-space:nowrap;
+			padding-left:24px;
+
+			background:url('../image/icon-alert.svg') center left no-repeat transparent;
+		}
+
+		p {
+			font-size:$small;
+			padding-left:36px;
+			margin:0;
+			margin-left:36px;
+			border-left:1px solid $xx-dark-gray;
+		}
+
+	}
+
+}
+
+
+
+// type case
+main.change.account.key {
+	.btn_area {
+		padding-bottom:32px;
+	}
+}

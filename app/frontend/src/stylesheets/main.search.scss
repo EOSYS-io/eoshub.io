@@ -161,6 +161,7 @@ main.search {
 						left:0;
 						right:0;
 						z-index:-1;
+						overflow:hidden;
 
 						&.fine {
 							background-color:#536dfe;
@@ -176,6 +177,70 @@ main.search {
 
 						&.hell {
 							background-color:#ff6b64;
+						}
+
+						// 기포로 변경하자
+						&:before,
+						&:after {
+							opacity:0.2;
+							content:'';
+							display:block;
+							position:absolute;
+							width:50px;
+							height:50px;
+							top:0;
+							background-image:
+								radial-gradient(
+									circle at 90% 70%,
+									$white 0,
+									$white 0px,
+									transparent 1px
+								),
+								radial-gradient(
+									circle at 25px 30px,
+									$white 0,
+									$white 1px,
+									transparent 2px
+								),
+								radial-gradient(
+									circle at 35px 10px,
+									$white 0,
+									$white 1px,
+									transparent 3px
+								),
+								radial-gradient(
+									circle at 5px 40px,
+									$white 0,
+									$white 2px,
+									transparent 3px
+								),
+								radial-gradient(
+									circle at 10px 20px,
+									$white 0,
+									$white 2px,
+									transparent 4px
+								),
+						}
+
+						&:before {
+							left:0;
+							animation:bubble 1s linear infinite;
+						}
+
+						&:after {
+							right:0;
+							animation:bubble 1s linear infinite;
+							animation-delay:0.5s;
+						}
+
+						@keyframes bubble {
+							0% {
+								transform:translateY(100%);
+							}
+
+							100% {
+								transform:translateY(-100%);
+							}
 						}
 					}
 				}
