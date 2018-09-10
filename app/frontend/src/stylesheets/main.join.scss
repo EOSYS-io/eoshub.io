@@ -260,6 +260,7 @@ main.join {
 			align-items:center;
 
 			button.button {
+				flex:1;
 				height:36px;
 				line-height:34px;
 				max-width:96px;
@@ -283,6 +284,7 @@ main.join {
 			}
 
 			button.button  {
+				flex:1;
 				max-width:136px;
 			}
 
@@ -310,6 +312,13 @@ main.join {
 	article[data-step="done"] {
 		background:url('../image/bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
 		background-size:61px 67px;
+
+		.button {
+			flex:1;
+			&:last-child {
+				margin-left:4px;
+			}
+		}
 	}
 }
 

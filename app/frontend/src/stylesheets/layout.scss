@@ -81,7 +81,8 @@ section.content {
 	main.search,
 	main.ram_market,
 	main.vote,
-	main.resource_management {
+	main.resource_management,
+	main.account {
 		height:inherit;
 		box-sizing:border-box;
 		padding:42px;
@@ -109,7 +110,8 @@ section.content {
 	main.search,
 	main.ram_market,
 	main.vote,
-	main.resource_management {
+	main.resource_management,
+	main.account {
 		width:965px;
 	}
 
@@ -120,6 +122,8 @@ section.content {
 		left:$lnb_width;
 		top:$header_height;
 		bottom:0;
+		z-index:10;
+
 		max-width:300px;
 		min-width:240px;
 		width:18.75vw;
@@ -145,7 +149,8 @@ main.transfer,
 main.search,
 main.ram_market,
 main.vote,
-main.resource_management {
+main.resource_management ,
+main.account {
 	transition:margin 0.4s;
 }
 
@@ -159,7 +164,8 @@ aside.shrink {
 	+ main.search,
 	+ main.ram_market,
 	+ main.vote,
-	+ main.resource_management {
+	+ main.resource_management ,
+	+ main.account {
 		margin-left:0;
 	}
 
@@ -498,7 +504,22 @@ aside.shrink {
 
 }
 
-// dcase type
+// type case
+.resource_management .modal.popup {
+	@include media ('>1600px') {
+		left:300px;
+	}
+	@include media ('>1280px','<=1600px') {
+		left:18.75vw;
+	}
+	@include media ('<=1280px') {
+		left:240px;
+	}
+}
+
+
+
+// type case
 .modal.popup.rental_account .result.list {
 	ul,li,p {
 		margin:0;
@@ -620,7 +641,7 @@ aside.shrink {
 		}
 
 		p {
-			margin:4px 0 8px;
+			margin:8px 0 12px;
 		}
 
 		form {
@@ -628,9 +649,9 @@ aside.shrink {
 			padding:0;
 			display:block;
 			position:relative;
+			background-color:#232323;
 
 			input {
-				background-color:#232323;
 				border:0;
 				border-bottom:1px solid $dark-gray;
 				line-height:48px;
@@ -689,6 +710,72 @@ aside.shrink {
 			}
 		}
 	}
+}
+
+
+// 계정생성시 출력되는 팝업
+.modal.popup.create_account {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+
+	h2 + p {
+		margin-top:16px;
+		line-height:1.6;
+		max-width:20em;
+	}
+
+	dl {
+		margin:24px 32px 8px;
+		display:grid;
+		grid-template-columns:110px 1fr;
+		grid-template-rows:repeat(3,65px);
+		text-align:center;
+
+		dt, dd {
+			display:flex;
+			justify-content:center;
+			align-items:center;
+			margin:1px;
+		}
+
+		dt {
+			font-size:$small;
+			vertical-align:middle;
+			background-color:$xxxx-dark-gray;
+		}
+
+		dd {
+			font-size:$x-small;
+			background-color:$xxx-dark-gray;
+		}
+	}
+
+	dl ~ .btn_area {
+		margin-left:32px;
+		margin-right:32px;
+
+		margin-top:24px;
+		button {
+			width:100%;
+		}
+	}
+
+	dl + .btn_area {
+		margin-top:16px;
+		margin-bottom:0px;
+		display:flex;
+		button {
+			height:36px;
+			line-height:34px;
+			flex:1;
+			&:first-child {
+				margin-right:8px;
+			}
+		}
+	}
+
 }
 
 
