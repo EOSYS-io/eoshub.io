@@ -160,16 +160,16 @@ view language ({ selectedTab, tab, isStakeAmountModalOpened, isDelegateListModal
         tabHtml =
             case tab of
                 Stake stakeModel ->
-                    Html.map StakeMessage (StakeTab.view language StakeTab.initModel account)
+                    Html.map StakeMessage (StakeTab.view language stakeModel account)
 
                 Unstake unstakeModel ->
-                    Html.map UnstakeMessage (UnstakeTab.view language UnstakeTab.initModel account)
+                    Html.map UnstakeMessage (UnstakeTab.view language unstakeModel account)
 
                 Delegate delegateModel ->
-                    Html.map DelegateMessage (DelegateTab.view language DelegateTab.initModel account)
+                    Html.map DelegateMessage (DelegateTab.view language delegateModel account)
 
                 Undelegate undelegateModel ->
-                    Html.map UndelegateMessage (UndelegateTab.view language UndelegateTab.initModel account)
+                    Html.map UndelegateMessage (UndelegateTab.view language undelegateModel account)
     in
     div []
         [ main_ [ class "resource_management" ]
