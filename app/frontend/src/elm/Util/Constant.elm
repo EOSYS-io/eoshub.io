@@ -1,4 +1,4 @@
-module Util.Constant exposing (..)
+module Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
 
 -- module for collect unit constants
 -- [time]

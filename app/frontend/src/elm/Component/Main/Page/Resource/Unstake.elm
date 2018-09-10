@@ -1,22 +1,23 @@
-module Component.Main.Page.Resource.Unstake exposing (..)
+module Component.Main.Page.Resource.Unstake exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Translation exposing (I18n(..), Language, translate)
 import Data.Account
     exposing
         ( Account
-        , ResourceInEos
-        , Resource
         , Refund
+        , Resource
+        , ResourceInEos
         , accountDecoder
         , defaultAccount
-        , keyAccountsDecoder
+        , getResource
         , getTotalAmount
         , getUnstakingAmount
-        , getResource
+        , keyAccountsDecoder
         )
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter exposing (eosStringAdd, eosStringSubtract)
+
 
 
 -- MODEL
@@ -64,7 +65,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
                 , p []
-                    [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight)) ]
+                    [ text ("임대받은 토큰 : " ++ eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []
@@ -80,7 +81,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
                 , p []
-                    [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight)) ]
+                    [ text ("임대받은 토큰 : " ++ eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []

@@ -1,20 +1,20 @@
 {- This module is a so-called viewModel -}
 
 
-module View.Notification
-    exposing
-        ( ErrorDetail
-        , Message(..)
-        , Model
-        , Content(..)
-        , initModel
-        , view
-        )
+module View.Notification exposing
+    ( Content(..)
+    , ErrorDetail
+    , Message(..)
+    , Model
+    , initModel
+    , view
+    )
 
-import Html exposing (Html, div, text, p, a, button)
-import Html.Attributes exposing (class, type_, id)
+import Html exposing (Html, a, button, div, p, text)
+import Html.Attributes exposing (class, id, type_)
 import Html.Events exposing (onClick)
-import Translation exposing (Language, translate, I18n(Close))
+import Translation exposing (I18n(Close), Language, translate)
+
 
 
 -- MESSAGE
@@ -86,14 +86,15 @@ view { content, open } language =
         viewing =
             if open then
                 " viewing"
+
             else
                 ""
     in
-        div
-            [ id "notification"
-            , class ("notification panel" ++ viewing)
-            ]
-            [ messageBox texts language ]
+    div
+        [ id "notification"
+        , class ("notification panel" ++ viewing)
+        ]
+        [ messageBox texts language ]
 
 
 messageBox : ( String, String, String ) -> Language -> Html Message
@@ -103,6 +104,7 @@ messageBox ( mainText, classText, detailText ) language =
             [ messageBoxMainText mainText
             , messageBoxButton language
             ]
+
          else
             [ messageBoxMainText mainText
             , messageBoxDetailText detailText

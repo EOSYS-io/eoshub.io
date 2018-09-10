@@ -1,78 +1,78 @@
-module Component.Main.Page.Search exposing (..)
+module Component.Main.Page.Search exposing (Message(..), Model, Pagination, SelectedActionCategory, actionHidden, getActions, initCmd, initModel, update, view, viewAction, viewActionList)
 
-import Html
-    exposing
-        ( Html
-        , section
-        , div
-        , input
-        , button
-        , text
-        , p
-        , ul
-        , li
-        , text
-        , strong
-        , h3
-        , h4
-        , span
-        , table
-        , thead
-        , tr
-        , th
-        , tbody
-        , td
-        , node
-        , main_
-        , h2
-        , dl
-        , dt
-        , dd
-        , br
-        , select
-        , option
-        , em
-        , caption
-        )
-import Html.Attributes
-    exposing
-        ( placeholder
-        , class
-        , title
-        , attribute
-        , type_
-        , scope
-        , hidden
-        , name
-        , value
-        , id
-        )
-import Html.Events exposing (on, onClick, targetValue)
-import Translation exposing (I18n(..), Language, translate)
-import Http
-import Util.HttpRequest exposing (getFullPath, post)
-import Json.Decode as Decode
-import Json.Encode as Encode
-import Data.Action exposing (Message(..), Action, actionsDecoder, refineAction, viewActionInfo)
 import Data.Account
     exposing
         ( Account
-        , ResourceInEos
-        , Resource
         , Refund
+        , Resource
+        , ResourceInEos
         , accountDecoder
         , defaultAccount
-        , keyAccountsDecoder
+        , getResource
         , getTotalAmount
         , getUnstakingAmount
-        , getResource
+        , keyAccountsDecoder
         )
+import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
+import Html
+    exposing
+        ( Html
+        , br
+        , button
+        , caption
+        , dd
+        , div
+        , dl
+        , dt
+        , em
+        , h2
+        , h3
+        , h4
+        , input
+        , li
+        , main_
+        , node
+        , option
+        , p
+        , section
+        , select
+        , span
+        , strong
+        , table
+        , tbody
+        , td
+        , text
+        , th
+        , thead
+        , tr
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , hidden
+        , id
+        , name
+        , placeholder
+        , scope
+        , title
+        , type_
+        , value
+        )
+import Html.Events exposing (on, onClick, targetValue)
+import Http
+import Json.Decode as Decode
+import Json.Encode as Encode
+import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( larimerToEos
-        , eosFloatToString
+        ( eosFloatToString
+        , larimerToEos
         , timeFormatter
         )
+import Util.HttpRequest exposing (getFullPath, post)
+
 
 
 -- MODEL
@@ -132,13 +132,13 @@ initCmd query { pagination } =
                         [ ( "account_name", Encode.string query ) ]
                         |> Http.jsonBody
             in
-                post (getFullPath "/v1/chain/get_account") body accountDecoder
-                    |> (Http.send OnFetchAccount)
+            post (getFullPath "/v1/chain/get_account") body accountDecoder
+                |> Http.send OnFetchAccount
 
         actionsCmd =
             getActions query pagination.nextPos pagination.offset
     in
-        Cmd.batch [ accountCmd, actionsCmd ]
+    Cmd.batch [ accountCmd, actionsCmd ]
 
 
 getActions : String -> Int -> Int -> Cmd Message
@@ -152,8 +152,8 @@ getActions query nextPos offset =
                 ]
                 |> Http.jsonBody
     in
-        post (getFullPath "/v1/history/get_actions") body actionsDecoder
-            |> (Http.send OnFetchActions)
+    post (getFullPath "/v1/history/get_actions") body actionsDecoder
+        |> Http.send OnFetchActions
 
 
 
@@ -190,11 +190,12 @@ update message ({ query, account, actions, pagination, openedActionSeq } as mode
                         Nothing ->
                             -1
             in
-                if smallestActionSeq > 0 then
-                    ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
-                else
-                    -- no more action to load
-                    ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+            if smallestActionSeq > 0 then
+                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+
+            else
+                -- no more action to load
+                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
 
         OnFetchActions (Err error) ->
             ( model, Cmd.none )
@@ -207,21 +208,23 @@ update message ({ query, account, actions, pagination, openedActionSeq } as mode
                 actionsCmd =
                     getActions query pagination.nextPos pagination.offset
             in
-                if not pagination.isEnd then
-                    ( model, actionsCmd )
-                else
-                    -- TODO(boseok): alert it is the end of records
-                    ( model, Cmd.none )
+            if not pagination.isEnd then
+                ( model, actionsCmd )
+
+            else
+                -- TODO(boseok): alert it is the end of records
+                ( model, Cmd.none )
 
         ActionMessage (ShowMemo clickedActionSeq) ->
             let
                 newOpenedActionSeq =
                     if openedActionSeq == clickedActionSeq then
                         -1
+
                     else
                         clickedActionSeq
             in
-                ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
+            ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
 
 
 
@@ -253,138 +256,138 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
         ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
             getResource "ram" account.ramUsage (account.ramQuota - account.ramUsage) account.ramQuota
     in
-        main_ [ class "search" ]
-            [ h2 []
-                [ text (translate language TotalAmount) ]
-            , p []
-                [ text (translate language SearchResultAccount) ]
-            , div [ class "container" ]
-                [ section [ class "summary" ]
-                    [ dl []
-                        [ dt []
-                            [ text (translate language Translation.Account) ]
-                        , dd []
-                            [ text account.accountName ]
-                        , dt []
-                            [ text (translate language TotalAmount) ]
-                        , dd []
-                            [ text totalAmount ]
-                        ]
+    main_ [ class "search" ]
+        [ h2 []
+            [ text (translate language TotalAmount) ]
+        , p []
+            [ text (translate language SearchResultAccount) ]
+        , div [ class "container" ]
+            [ section [ class "summary" ]
+                [ dl []
+                    [ dt []
+                        [ text (translate language Translation.Account) ]
+                    , dd []
+                        [ text account.accountName ]
+                    , dt []
+                        [ text (translate language TotalAmount) ]
+                    , dd []
+                        [ text totalAmount ]
                     ]
-                , section [ class "account status" ]
-                    [ div [ class "wrapper" ]
-                        [ div []
-                            [ text "Unstaked"
-                            , strong [ title account.coreLiquidBalance ]
-                                [ text account.coreLiquidBalance ]
-                            ]
-                        , div []
-                            [ text "staked"
-                            , strong [ title stakedAmount ]
-                                [ text stakedAmount ]
-                            ]
-                        , div []
-                            [ text "refunding"
-                            , strong [ title unstakingAmount ]
-                                [ text unstakingAmount ]
-                            ]
+                ]
+            , section [ class "account status" ]
+                [ div [ class "wrapper" ]
+                    [ div []
+                        [ text "Unstaked"
+                        , strong [ title account.coreLiquidBalance ]
+                            [ text account.coreLiquidBalance ]
                         ]
-                    ]
-                , section [ class "resource" ]
-                    [ h3 []
-                        [ text (translate language Translation.Resource) ]
-                    , div [ class "wrapper" ]
-                        [ div []
-                            [ h4 []
-                                [ text "CPU"
-                                ]
-                            , p []
-                                [ text ("Total: " ++ cpuTotal)
-                                , br []
-                                    []
-                                , text ("Used: " ++ cpuUsed)
-                                , br []
-                                    []
-                                , text ("Available: " ++ cpuAvailable)
-                                ]
-                            , div [ class "status" ]
-                                [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
-                                    []
-                                , text cpuPercent
-                                ]
-                            ]
-                        , div []
-                            [ h4 []
-                                [ text "NET"
-                                ]
-                            , p []
-                                [ text ("Total: " ++ netTotal)
-                                , br []
-                                    []
-                                , text ("Used: " ++ netUsed)
-                                , br []
-                                    []
-                                , text ("Available: " ++ netAvailable)
-                                ]
-                            , div [ class "status" ]
-                                [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
-                                    []
-                                , text netPercent
-                                ]
-                            ]
-                        , div []
-                            [ h4 []
-                                [ text "RAM"
-                                ]
-                            , p []
-                                [ text ("Total: " ++ ramTotal)
-                                , br []
-                                    []
-                                , text ("Used: " ++ ramUsed)
-                                , br []
-                                    []
-                                , text ("Available: " ++ ramAvailable)
-                                ]
-                            , div [ class "status" ]
-                                [ span [ class ramColor, attribute "style" ("height:" ++ ramPercent) ]
-                                    []
-                                , text ramPercent
-                                ]
-                            ]
+                    , div []
+                        [ text "staked"
+                        , strong [ title stakedAmount ]
+                            [ text stakedAmount ]
                         ]
-                    ]
-                , section [ class "transaction history" ]
-                    [ h3 []
-                        [ text (translate language Transactions) ]
-                    , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
-                        [ option [ value "all" ]
-                            [ text (translate language All) ]
-                        , option [ value "transfer" ]
-                            [ text (translate language Transfer) ]
-                        ]
-                    , table []
-                        [ thead []
-                            [ tr []
-                                [ th [ scope "col" ]
-                                    [ text (translate language Number) ]
-                                , th [ scope "col" ]
-                                    [ text (translate language Type) ]
-                                , th [ scope "col" ]
-                                    [ text (translate language Time) ]
-                                , th [ scope "col" ]
-                                    [ text (translate language Info) ]
-                                ]
-                            ]
-                        , tbody []
-                            (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
-                        ]
-                    , div [ class "btn_area" ]
-                        [ button [ type_ "button", class "view_more button", onClick ShowMore ]
-                            [ text (translate language Translation.ShowMore) ]
+                    , div []
+                        [ text "refunding"
+                        , strong [ title unstakingAmount ]
+                            [ text unstakingAmount ]
                         ]
                     ]
                 ]
+            , section [ class "resource" ]
+                [ h3 []
+                    [ text (translate language Translation.Resource) ]
+                , div [ class "wrapper" ]
+                    [ div []
+                        [ h4 []
+                            [ text "CPU"
+                            ]
+                        , p []
+                            [ text ("Total: " ++ cpuTotal)
+                            , br []
+                                []
+                            , text ("Used: " ++ cpuUsed)
+                            , br []
+                                []
+                            , text ("Available: " ++ cpuAvailable)
+                            ]
+                        , div [ class "status" ]
+                            [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
+                                []
+                            , text cpuPercent
+                            ]
+                        ]
+                    , div []
+                        [ h4 []
+                            [ text "NET"
+                            ]
+                        , p []
+                            [ text ("Total: " ++ netTotal)
+                            , br []
+                                []
+                            , text ("Used: " ++ netUsed)
+                            , br []
+                                []
+                            , text ("Available: " ++ netAvailable)
+                            ]
+                        , div [ class "status" ]
+                            [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
+                                []
+                            , text netPercent
+                            ]
+                        ]
+                    , div []
+                        [ h4 []
+                            [ text "RAM"
+                            ]
+                        , p []
+                            [ text ("Total: " ++ ramTotal)
+                            , br []
+                                []
+                            , text ("Used: " ++ ramUsed)
+                            , br []
+                                []
+                            , text ("Available: " ++ ramAvailable)
+                            ]
+                        , div [ class "status" ]
+                            [ span [ class ramColor, attribute "style" ("height:" ++ ramPercent) ]
+                                []
+                            , text ramPercent
+                            ]
+                        ]
+                    ]
+                ]
+            , section [ class "transaction history" ]
+                [ h3 []
+                    [ text (translate language Transactions) ]
+                , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
+                    [ option [ value "all" ]
+                        [ text (translate language All) ]
+                    , option [ value "transfer" ]
+                        [ text (translate language Transfer) ]
+                    ]
+                , table []
+                    [ thead []
+                        [ tr []
+                            [ th [ scope "col" ]
+                                [ text (translate language Number) ]
+                            , th [ scope "col" ]
+                                [ text (translate language Type) ]
+                            , th [ scope "col" ]
+                                [ text (translate language Time) ]
+                            , th [ scope "col" ]
+                                [ text (translate language Info) ]
+                            ]
+                        ]
+                    , tbody []
+                        (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
+                    ]
+                , div [ class "btn_area" ]
+                    [ button [ type_ "button", class "view_more button", onClick ShowMore ]
+                        [ text (translate language Translation.ShowMore) ]
+                    ]
+                ]
             ]
+        ]
 
 
 viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
@@ -415,5 +418,6 @@ actionHidden selectedActionCategory currentAction =
         _ ->
             if currentAction == selectedActionCategory then
                 False
+
             else
                 True

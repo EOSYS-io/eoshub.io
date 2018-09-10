@@ -1,25 +1,26 @@
 module Component.Account.Page.CreateKeys exposing (Message(..), Model, initModel, subscriptions, update, view)
 
-import Html exposing (Html, button, div, h1, p, text, ol, li, article, img, dl, dt, dd, textarea, node)
-import Html.Attributes exposing (class, attribute, alt, src, id, type_)
+import Html exposing (Html, article, button, dd, div, dl, dt, h1, img, li, node, ol, p, text, textarea)
+import Html.Attributes exposing (alt, attribute, class, id, src, type_)
 import Html.Events exposing (onClick)
 import Navigation
 import Port exposing (KeyPair)
-import View.I18nViews exposing (textViewI18n)
 import Translation
     exposing
-        ( Language
-        , I18n
-            ( AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
-            , AccountCreationProgressCreateNew
+        ( I18n
+            ( AccountCreationKeypairCaution
             , AccountCreationKeypairGenerated
-            , AccountCreationKeypairCaution
-            , PublicKey
-            , PrivateKey
+            , AccountCreationProgressCreateNew
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
             , CopyAll
+            , PrivateKey
+            , PublicKey
             )
+        , Language
         )
+import View.I18nViews exposing (textViewI18n)
+
 
 
 -- MODEL
@@ -106,6 +107,7 @@ view model language =
                 , attribute
                     (if model.nextEnabled then
                         "enabled"
+
                      else
                         "disabled"
                     )

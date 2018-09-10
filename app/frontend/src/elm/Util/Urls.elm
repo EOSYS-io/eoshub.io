@@ -1,4 +1,4 @@
-module Util.Urls exposing (usersApiUrl, createEosAccountUrl, mainnetRpcUrl)
+module Util.Urls exposing (createEosAccountUrl, mainnetRpcUrl, usersApiUrl)
 
 import Util.Flags exposing (Flags)
 
@@ -7,12 +7,16 @@ eoshubHost : Flags -> String
 eoshubHost flags =
     if flags.node_env == "development" then
         "http://localhost:3000"
+
     else if flags.node_env == "test" then
         "http://localhost:3000"
+
     else if flags.node_env == "alpha" then
         "http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com"
+
     else if flags.node_env == "production" then
         ""
+
     else
         "http://localhost:3000"
 

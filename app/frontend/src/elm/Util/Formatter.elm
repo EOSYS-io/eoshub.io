@@ -1,20 +1,31 @@
-module Util.Formatter exposing (..)
+module Util.Formatter exposing
+    ( eosFloatToString
+    , eosStringAdd
+    , eosStringSubtract
+    , eosStringToFloat
+    , formatEosQuantity
+    , larimerToEos
+    , percentageConverter
+    , resourceUnitConverter
+    , timeFormatter
+    , unitConverterRound4
+    )
 
-import Translation exposing (Language(..))
-import Round
-import Regex exposing (..)
 import Date.Extra as Date
-import Util.Constant exposing (second, minute, hour, day, kilo, mega, giga, tera)
+import Regex exposing (..)
+import Round
+import Translation exposing (Language(..))
+import Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
 
 
 larimerToEos : Int -> Float
 larimerToEos valInt =
-    (toFloat valInt) * 0.0001
+    toFloat valInt * 0.0001
 
 
 eosFloatToString : Float -> String
 eosFloatToString valFloat =
-    (Round.round 4 valFloat) ++ " EOS"
+    Round.round 4 valFloat ++ " EOS"
 
 
 eosStringToFloat : String -> Float
@@ -25,12 +36,12 @@ eosStringToFloat str =
                 |> replace All (regex " EOS") (\_ -> "")
                 |> String.toFloat
     in
-        case result of
-            Ok val ->
-                val
+    case result of
+        Ok val ->
+            val
 
-            Err _ ->
-                0
+        Err _ ->
+            0
 
 
 eosStringAdd : String -> String -> String
@@ -60,15 +71,19 @@ resourceUnitConverter resourceType value =
             if value < kilo then
                 toString value ++ " bytes"
                 -- KB
+
             else if (value >= kilo) && (value < mega) then
                 unitConverterRound4 value kilo ++ " KB"
                 -- MB
+
             else if (value >= mega) && (value < giga) then
                 unitConverterRound4 value mega ++ " MB"
                 -- GB
+
             else if (value >= giga) && (value < tera) then
                 unitConverterRound4 value giga ++ " GB"
                 -- TB
+
             else
                 unitConverterRound4 value tera ++ " TB"
 
@@ -77,15 +92,19 @@ resourceUnitConverter resourceType value =
             if value < second then
                 toString value ++ " ms"
                 -- second
+
             else if (value >= second) && (value < minute) then
                 unitConverterRound4 value second ++ " s"
                 -- minute
+
             else if (value >= minute) && (value < hour) then
                 unitConverterRound4 value minute ++ " min"
                 -- hour
+
             else if (value >= hour) && (value < day) then
                 unitConverterRound4 value hour ++ " hour"
                 -- day
+
             else
                 unitConverterRound4 value day ++ " day"
 
@@ -94,15 +113,19 @@ resourceUnitConverter resourceType value =
             if value < 1024 then
                 toString value ++ " bytes"
                 -- KB
+
             else if (value >= kilo) && (value < mega) then
                 unitConverterRound4 value kilo ++ " KB"
                 -- MB
+
             else if (value >= mega) && (value < giga) then
                 unitConverterRound4 value mega ++ " MB"
                 -- GB
+
             else if (value >= giga) && (value < tera) then
                 unitConverterRound4 value giga ++ " GB"
                 -- TB
+
             else
                 unitConverterRound4 value tera ++ " TB"
 

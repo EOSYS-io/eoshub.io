@@ -1,39 +1,40 @@
 module Component.Account.Page.ConfirmEmail exposing (Message(..), Model, createUserBodyParams, initModel, update, view)
 
-import Html exposing (Html, button, div, input, li, p, text, ul, ol, article, h1, img, a, form, span, node)
-import Html.Attributes exposing (placeholder, class, alt, src, action, href, attribute, type_, rel)
+import Html exposing (Html, a, article, button, div, form, h1, img, input, li, node, ol, p, span, text, ul)
+import Html.Attributes exposing (action, alt, attribute, class, href, placeholder, rel, src, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, string, decodeString)
+import Json.Decode exposing (Decoder, decodeString, string)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
+import Navigation as Navigation
+import Translation
+    exposing
+        ( I18n
+            ( AccountCreationAlreadyHaveAccount
+            , AccountCreationClickConfirmLink
+            , AccountCreationConfirmEmail
+            , AccountCreationEmailInvalid
+            , AccountCreationEmailSend
+            , AccountCreationEmailValid
+            , AccountCreationLoginLink
+            , AccountCreationProgressCreateNew
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , ConfirmEmailSent
+            , DebugMessage
+            , EmptyMessage
+            , UnknownError
+            )
+        , Language
+        , toLocale
+        )
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
 import Validate exposing (isValidEmail)
-import View.Notification as Notification
-import Translation
-    exposing
-        ( Language
-        , toLocale
-        , I18n
-            ( EmptyMessage
-            , ConfirmEmailSent
-            , DebugMessage
-            , UnknownError
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
-            , AccountCreationProgressCreateNew
-            , AccountCreationConfirmEmail
-            , AccountCreationClickConfirmLink
-            , AccountCreationEmailValid
-            , AccountCreationEmailInvalid
-            , AccountCreationEmailSend
-            , AccountCreationAlreadyHaveAccount
-            , AccountCreationLoginLink
-            )
-        )
-import Navigation as Navigation
 import View.I18nViews exposing (textViewI18n)
+import View.Notification as Notification
+
 
 
 -- MODEL
@@ -83,16 +84,18 @@ update msg ({ notification } as model) flags language =
                 ( validationMsg, emailValid ) =
                     if String.isEmpty email then
                         ( EmptyMessage, False )
+
                     else
                         validation newModel
 
                 inputValid =
                     if emailValid then
                         "valid"
+
                     else
                         "invalid"
             in
-                ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
+            ( { newModel | validationMsg = validationMsg, emailValid = emailValid, inputValid = inputValid }, Cmd.none )
 
         CreateUser ->
             ( { model | requested = True }, createUserRequest model flags language )
@@ -196,6 +199,7 @@ emailForm : Model -> Language -> List (Html Message)
 emailForm ({ inputValid, validationMsg } as model) language =
     if validationMsg == EmptyMessage then
         [ emailInput model ]
+
     else
         [ emailInput model
         , span [ class "validate" ]
@@ -228,6 +232,7 @@ view ({ validationMsg, requested, emailValid, inputValid, notification } as mode
                 , attribute
                     (if not requested && emailValid then
                         "enabled"
+
                      else
                         "disabled"
                     )
@@ -284,5 +289,6 @@ validation : Model -> ( I18n, Bool )
 validation { email } =
     if isValidEmail email then
         ( AccountCreationEmailValid, True )
+
     else
         ( AccountCreationEmailInvalid, False )

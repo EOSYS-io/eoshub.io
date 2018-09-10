@@ -1,39 +1,40 @@
 module Component.Account.Page.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
-import Html exposing (Html, button, div, input, li, p, text, ul, ol, h1, img, text, br, form, article, span)
-import Html.Attributes exposing (placeholder, class, attribute, alt, src, type_, style, action)
+import Html exposing (Html, article, br, button, div, form, h1, img, input, li, ol, p, span, text, ul)
+import Html.Attributes exposing (action, alt, attribute, class, placeholder, src, style, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
-import Util.Flags exposing (Flags)
-import Util.Urls as Urls
 import Navigation
-import Util.Validation exposing (checkAccountName)
-import View.Notification as Notification
 import Translation
     exposing
-        ( Language
-        , toLocale
-        , translate
-        , I18n
-            ( EmptyMessage
-            , DebugMessage
-            , Next
-            , AccountCreationFailure
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
-            , AccountCreationProgressCreateNew
-            , AccountCreationNameValid
-            , AccountCreationNameInvalid
-            , AccountCreationTypeName
+        ( I18n
+            ( AccountCreationFailure
             , AccountCreationNameCondition
             , AccountCreationNameConditionExample
+            , AccountCreationNameInvalid
             , AccountCreationNamePlaceholder
+            , AccountCreationNameValid
+            , AccountCreationProgressCreateNew
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationTypeName
+            , DebugMessage
+            , EmptyMessage
+            , Next
             )
+        , Language
+        , toLocale
+        , translate
         )
+import Util.Flags exposing (Flags)
+import Util.Urls as Urls
+import Util.Validation exposing (checkAccountName)
 import View.I18nViews exposing (textViewI18n)
+import View.Notification as Notification
+
 
 
 -- MODEL
@@ -82,16 +83,17 @@ update msg ({ notification } as model) flags confirmToken language =
                 ( validateMsg, validate ) =
                     if checkAccountName accountName then
                         ( AccountCreationNameValid, True )
+
                     else
                         ( AccountCreationNameInvalid, False )
             in
-                ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
+            ( { newModel | validation = validate, validationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
             ( model, createEosAccountRequest model flags confirmToken language )
 
         NewUser (Ok res) ->
-            ( { model | requestSuccess = True }, Navigation.newUrl ("/account/created") )
+            ( { model | requestSuccess = True }, Navigation.newUrl "/account/created" )
 
         NewUser (Err error) ->
             case error of
@@ -169,6 +171,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                     , attribute
                         (if validation then
                             "valid"
+
                          else
                             "invalid"
                         )
@@ -182,6 +185,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                         [ ( "visibility"
                           , if String.isEmpty accountName then
                                 "hidden"
+
                             else
                                 "visible"
                           )
@@ -196,6 +200,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                 , attribute
                     (if validation && not requestSuccess then
                         "enabled"
+
                      else
                         "disabled"
                     )
@@ -241,7 +246,7 @@ postCreateEosAccount model flags confirmToken language =
         params =
             createEosAccountBodyParams model
     in
-        Http.post url params responseDecoder
+    Http.post url params responseDecoder
 
 
 createEosAccountRequest : Model -> Flags -> String -> Language -> Cmd Message

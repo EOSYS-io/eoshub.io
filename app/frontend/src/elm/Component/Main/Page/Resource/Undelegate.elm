@@ -1,22 +1,23 @@
-module Component.Main.Page.Resource.Undelegate exposing (..)
+module Component.Main.Page.Resource.Undelegate exposing (Message(..), Model, initModel, update, view)
 
+import Data.Account
+    exposing
+        ( Account
+        , Refund
+        , Resource
+        , ResourceInEos
+        , accountDecoder
+        , defaultAccount
+        , getResource
+        , getTotalAmount
+        , getUnstakingAmount
+        , keyAccountsDecoder
+        )
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Translation exposing (I18n(..), Language, translate)
-import Data.Account
-    exposing
-        ( Account
-        , ResourceInEos
-        , Resource
-        , Refund
-        , accountDecoder
-        , defaultAccount
-        , keyAccountsDecoder
-        , getTotalAmount
-        , getUnstakingAmount
-        , getResource
-        )
+
 
 
 -- MODEL
@@ -64,7 +65,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , strong []
                     [ text "8 EOS" ]
                 ]
-            , a [ id "viewRentalListAccount", onClick (OpenDelegateListModal) ]
+            , a [ id "viewRentalListAccount", onClick OpenDelegateListModal ]
                 [ text "임대해준 계정 리스트 보기" ]
             ]
         , section []

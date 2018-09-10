@@ -1,10 +1,10 @@
-module Test.Util.Formatter exposing (..)
+module Test.Util.Formatter exposing (tests)
 
-import Translation exposing (Language(..))
-import Util.Formatter exposing (..)
-import Util.Constant exposing (..)
 import Expect
 import Test exposing (..)
+import Translation exposing (Language(..))
+import Util.Constant exposing (..)
+import Util.Formatter exposing (..)
 
 
 tests : Test
@@ -34,7 +34,7 @@ tests =
             [ test "1/100 * 100 = 1%" <|
                 \() ->
                     Expect.equal 1.0 (percentageConverter 1 100)
-            , describe "timeFormatter"
+            , describe "timeForƒmatter"
                 [ test "English, AM, Ok" <|
                     \() ->
                         Expect.equal "2:16:21 AM, August 17, 2018" (timeFormatter English "2018-08-17T02:16:21.500")

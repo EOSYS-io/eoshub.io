@@ -1,11 +1,11 @@
-module Test.Component.Account.Page.ConfirmEmail exposing (..)
+module Test.Component.Account.Page.ConfirmEmail exposing (model, tests)
 
+import Component.Account.Page.ConfirmEmail exposing (..)
 import Expect
 import Http
-import Component.Account.Page.ConfirmEmail exposing (..)
 import Test exposing (..)
-import View.Notification as Notification
 import Translation exposing (I18n(EmptyMessage))
+import View.Notification as Notification
 
 
 model : Model
@@ -27,7 +27,7 @@ tests =
                 expectedJson =
                     "{\"email\":\"" ++ model.email ++ "\"}"
               in
-                test "createUserBodyParams" <|
-                    \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createUserBodyParams model)
+              test "createUserBodyParams" <|
+                \() -> Expect.equal (Http.stringBody "application/json" expectedJson) (createUserBodyParams model)
             ]
         ]

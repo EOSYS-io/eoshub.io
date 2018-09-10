@@ -1,8 +1,8 @@
 module Test.Translation exposing (tests)
 
 import Expect
-import Translation exposing (Language(Korean, English, Chinese), I18n(Hello), translate, getMessages)
 import Test exposing (..)
+import Translation exposing (I18n(Hello), Language(Chinese, English, Korean), getMessages, translate)
 
 
 tests : Test

@@ -1,4 +1,14 @@
-module Util.Validation exposing (..)
+module Util.Validation exposing
+    ( AccountStatus(..)
+    , MemoStatus(..)
+    , QuantityStatus(..)
+    , checkAccountName
+    , isAccount
+    , isPublicKey
+    , validateAccount
+    , validateMemo
+    , validateQuantity
+    )
 
 import Regex exposing (..)
 import String.UTF8 as UTF8
@@ -46,8 +56,10 @@ validateAccount : String -> AccountStatus
 validateAccount accountName =
     if accountName == "" then
         EmptyAccount
+
     else if isAccount accountName then
         ValidAccount
+
     else
         InvalidAccount
 
@@ -60,6 +72,7 @@ validateQuantity : String -> Float -> QuantityStatus
 validateQuantity quantity eosLiquidAmount =
     if quantity == "" then
         EmptyQuantity
+
     else
         let
             maybeQuantity =
@@ -67,23 +80,26 @@ validateQuantity quantity eosLiquidAmount =
                     |> replace All (regex " EOS") (\_ -> "")
                     |> String.toFloat
         in
-            case maybeQuantity of
-                Ok quantity ->
-                    if quantity <= 0 then
-                        InvalidQuantity
-                    else if quantity > eosLiquidAmount then
-                        -- NOTE(boseok): Change the name to OverValidQuantity, OverProperQuantity
-                        OverValidQuantity
-                    else
-                        ValidQuantity
-
-                _ ->
+        case maybeQuantity of
+            Ok quantity ->
+                if quantity <= 0 then
                     InvalidQuantity
+
+                else if quantity > eosLiquidAmount then
+                    -- NOTE(boseok): Change the name to OverValidQuantity, OverProperQuantity
+                    OverValidQuantity
+
+                else
+                    ValidQuantity
+
+            _ ->
+                InvalidQuantity
 
 
 validateMemo : String -> MemoStatus
 validateMemo memo =
     if UTF8.length memo > 256 then
         MemoTooLong
+
     else
         ValidMemo

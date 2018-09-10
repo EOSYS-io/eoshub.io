@@ -1,4 +1,4 @@
-module Util.Flags exposing (..)
+module Util.Flags exposing (Flags)
 
 
 type alias Flags =

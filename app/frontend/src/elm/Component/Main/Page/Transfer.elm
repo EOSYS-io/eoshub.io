@@ -1,20 +1,21 @@
-module Component.Main.Page.Transfer exposing (..)
+module Component.Main.Page.Transfer exposing (Message(..), Model, TransferMessageFormField(..), accountWarningSpan, initModel, memoWarningSpan, quantityWarningSpan, setTransferMessageField, update, validate, view)
 
 import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Port
-import Translation exposing (Language, translate, I18n(..))
+import Translation exposing (I18n(..), Language, translate)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
-        , QuantityStatus(..)
         , MemoStatus(..)
+        , QuantityStatus(..)
         , validateAccount
-        , validateQuantity
         , validateMemo
+        , validateQuantity
         )
+
 
 
 -- MODEL
@@ -91,42 +92,42 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                 memoWarning =
                     memoWarningSpan memoValidation language
               in
-                Html.form []
-                    [ ul []
-                        [ li []
-                            [ input
-                                [ type_ "text"
-                                , placeholder (translate language ReceiverAccountName)
-                                , autofocus True
-                                , onInput <| SetTransferMessageField To
-                                , value to
-                                ]
-                                []
-                            , accountWarning
+              Html.form []
+                [ ul []
+                    [ li []
+                        [ input
+                            [ type_ "text"
+                            , placeholder (translate language ReceiverAccountName)
+                            , autofocus True
+                            , onInput <| SetTransferMessageField To
+                            , value to
                             ]
-                        , li [ class "eos" ]
-                            [ input
-                                [ type_ "number"
-                                , placeholder (translate language TransferAmount)
-                                , step ".0001"
-                                , onInput <| SetTransferMessageField Quantity
-                                , value quantity
-                                ]
-                                []
-                            , quantityWarning
+                            []
+                        , accountWarning
+                        ]
+                    , li [ class "eos" ]
+                        [ input
+                            [ type_ "number"
+                            , placeholder (translate language TransferAmount)
+                            , step ".0001"
+                            , onInput <| SetTransferMessageField Quantity
+                            , value quantity
                             ]
-                        , li [ class "memo" ]
-                            [ input
-                                [ type_ "text"
-                                , placeholder (translate language Translation.Memo)
-                                , onInput <| SetTransferMessageField Memo
-                                , value memo
-                                ]
-                                []
-                            , memoWarning
+                            []
+                        , quantityWarning
+                        ]
+                    , li [ class "memo" ]
+                        [ input
+                            [ type_ "text"
+                            , placeholder (translate language Translation.Memo)
+                            , onInput <| SetTransferMessageField Memo
+                            , value memo
                             ]
+                            []
+                        , memoWarning
                         ]
                     ]
+                ]
             , div
                 [ class "btn_area" ]
                 [ button
@@ -161,8 +162,8 @@ accountWarningSpan accountStatus language =
                 ValidAccount ->
                     ( " true", translate language AccountExample )
     in
-        span [ class ("validate description" ++ classAddedValue) ]
-            [ text textValue ]
+    span [ class ("validate description" ++ classAddedValue) ]
+        [ text textValue ]
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Html Message
@@ -182,8 +183,8 @@ quantityWarningSpan quantityStatus language =
                 EmptyQuantity ->
                     ( "", translate language TransferableAmountDesc )
     in
-        span [ class ("validate description" ++ classAddedValue) ]
-            [ text textValue ]
+    span [ class ("validate description" ++ classAddedValue) ]
+        [ text textValue ]
 
 
 memoWarningSpan : MemoStatus -> Language -> Html Message
@@ -200,8 +201,8 @@ memoWarningSpan memoStatus language =
                 ValidMemo ->
                     ( " true", translate language MemoNotMandatory )
     in
-        span [ class ("validate description" ++ classAddedValue) ]
-            [ text textValue ]
+    span [ class ("validate description" ++ classAddedValue) ]
+        [ text textValue ]
 
 
 
@@ -216,7 +217,7 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
                 cmd =
                     { transfer | from = accountName } |> Action.Transfer |> encodeAction |> Port.pushAction
             in
-                ( model, cmd )
+            ( model, cmd )
 
         SetTransferMessageField field value ->
             ( setTransferMessageField field value model eosLiquidAmount, Cmd.none )
@@ -266,9 +267,9 @@ validate ({ transfer } as model) eosLiquidAmount =
                 && (quantityValidation == ValidQuantity)
                 && (memoValidation == ValidMemo)
     in
-        { model
-            | accountValidation = accountValidation
-            , quantityValidation = quantityValidation
-            , memoValidation = memoValidation
-            , isFormValid = isFormValid
-        }
+    { model
+        | accountValidation = accountValidation
+        , quantityValidation = quantityValidation
+        , memoValidation = memoValidation
+        , isFormValid = isFormValid
+    }

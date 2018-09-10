@@ -1,30 +1,63 @@
-module Data.Action exposing (..)
+module Data.Action exposing
+    ( Action
+    , ActionParameters(..)
+    , BuyramParameters
+    , BuyrambytesParameters
+    , ClaimrewardsParameters
+    , DelegatebwParameters
+    , LetOpen
+    , Message(..)
+    , NewaccountParameters
+    , OpenedActionSeq
+    , RegproxyParameters
+    , SellramParameters
+    , TransferParameters
+    , UndelegatebwParameters
+    , VoteproducerParameters
+    , actionParametersDecoder
+    , actionsDecoder
+    , buyramDecoder
+    , buyrambytesDecoder
+    , claimrewardsDecoder
+    , delegatebwDecoder
+    , encodeAction
+    , errorDecoder
+    , newaccountDecoder
+    , refineAction
+    , regproxyDecoder
+    , sellramDecoder
+    , transferDecoder
+    , transferParametersToValue
+    , undelegatebwDecoder
+    , viewActionInfo
+    , voteproducerDecoder
+    )
 
 import Html
     exposing
         ( Html
         , button
-        , text
-        , text
-        , strong
-        , span
-        , td
         , em
         , node
+        , span
+        , strong
+        , td
+        , text
         )
 import Html.Attributes
     exposing
-        ( class
-        , title
-        , attribute
-        , type_
+        ( attribute
+        , class
         , name
+        , title
+        , type_
         )
 import Html.Events exposing (onClick)
-import Json.Decode as Decode exposing (Decoder, oneOf, decodeString)
+import Json.Decode as Decode exposing (Decoder, decodeString, oneOf)
+import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
-import Json.Decode.Pipeline exposing (decode, required, optional, requiredAt, hardcoded)
 import Util.Formatter exposing (formatEosQuantity)
+
 
 
 -- the reason why it uses actionTag field separated with actionName is
@@ -296,12 +329,14 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     if accountName == params.to then
                                         "Received"
+
                                     else if accountName == params.from then
                                         "Sent"
+
                                     else
                                         "exceptional case"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -313,7 +348,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "Sell Ram"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -325,7 +360,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "Buy Ram"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -337,7 +372,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "Buy Ram Bytes"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -349,7 +384,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "Delegate"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -361,7 +396,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "Undelegate"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -374,10 +409,11 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     if params.isproxy == 1 then
                                         "Register Proxy"
+
                                     else
                                         "Unregister Proxy"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -388,12 +424,13 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                             let
                                 -- isproxy - true if proxy wishes to vote on behalf of others, false otherwise
                                 actionTag =
-                                    if (String.length params.proxy) == 0 then
+                                    if String.length params.proxy == 0 then
                                         "Vote"
+
                                     else
                                         "Vote though proxy"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -405,7 +442,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                 actionTag =
                                     "New Account"
                             in
-                                { model | actionTag = actionTag }
+                            { model | actionTag = actionTag }
 
                         _ ->
                             model
@@ -443,6 +480,7 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                                         ("memo popup"
                                             ++ (if accountActionSeq == openedActionSeq then
                                                     " viewing"
+
                                                 else
                                                     ""
                                                )
@@ -469,7 +507,7 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                             td [ class "info" ]
                                 [ em []
                                     [ text params.account ]
-                                , text (" sold " ++ (toString params.bytes) ++ " bytes RAM")
+                                , text (" sold " ++ toString params.bytes ++ " bytes RAM")
                                 ]
 
                         _ ->
@@ -520,6 +558,7 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                                         ++ " for CPU "
                                         ++ (if params.transfer == 1 then
                                                 "(transfer)"
+
                                             else
                                                 ""
                                            )
@@ -559,6 +598,7 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                                 , text
                                     (if params.isproxy == 1 then
                                         " registered as voting proxy"
+
                                      else
                                         " unregistered as voting proxy"
                                     )
@@ -574,15 +614,17 @@ viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, dat
                                 [ em []
                                     [ text params.voter ]
                                 , text
-                                    (if (String.length params.proxy) == 0 then
-                                        (" voted for block producers " ++ toString params.producers)
+                                    (if String.length params.proxy == 0 then
+                                        " voted for block producers " ++ toString params.producers
+
                                      else
                                         " voted through "
                                     )
                                 , em []
                                     [ text
-                                        (if (String.length params.proxy) == 0 then
+                                        (if String.length params.proxy == 0 then
                                             ""
+
                                          else
                                             params.proxy
                                         )
