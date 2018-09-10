@@ -108,7 +108,14 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                     , p []
                         [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
                     , p []
-                        [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight)) ]
+                        [ text
+                            ("임대받은 토큰 : "
+                                ++ (eosStringSubtract
+                                        totalResources.cpuWeight
+                                        selfDelegatedBandwidth.cpuWeight
+                                   )
+                            )
+                        ]
                     , div [ class "graph status" ]
                         [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
                             []
@@ -124,7 +131,14 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                     , p []
                         [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
                     , p []
-                        [ text ("임대받은 토큰 : " ++ (eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight)) ]
+                        [ text
+                            ("임대받은 토큰 : "
+                                ++ (eosStringSubtract
+                                        totalResources.netWeight
+                                        selfDelegatedBandwidth.netWeight
+                                   )
+                            )
+                        ]
                     , div [ class "graph status" ]
                         [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
                             []
@@ -138,7 +152,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                         [ text "스테이크 가능한 토큰" ]
                     , p []
                         [ text coreLiquidBalance ]
-                    , a [ id "setDirect", onClick (OpenStakeAmountModal) ]
+                    , a [ onClick (OpenStakeAmountModal) ]
                         [ text "직접설정" ]
                     ]
                 , div [ class "input field" ]
@@ -208,7 +222,7 @@ quantityWarningSpan quantityStatus language =
 validate : Model -> Float -> Model
 validate ({ delegatebw } as model) eosLiquidAmount =
     let
-        { from, receiver, stakeNetQuantity, stakeCpuQuantity, transfer } =
+        { from, receiver, stakeNetQuantity, stakeCpuQuantity } =
             delegatebw
 
         totalQuantity =
