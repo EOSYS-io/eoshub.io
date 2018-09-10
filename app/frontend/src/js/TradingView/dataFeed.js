@@ -11,11 +11,9 @@ function searchSymbols() {}
 
 function resolveSymbol(symbolName, onSymbolResolvedCallback) {
   // expects a symbolInfo object in response
-  // console.log('resolveSymbol:',{symbolName})
   const splitData = symbolName.split(/[:/]/);
   const name = `${symbolName[1]}/${symbolName[2]}`;
   const { supportedResolutions } = chartConfig;
-  // console.log({split_data})
   const symbolStub = {
     name,
     description: 'Eos ram prices per kilo bytes',

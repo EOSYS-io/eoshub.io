@@ -7,7 +7,7 @@
 #   Character.create(name: 'Luke', movie: movies.first)
 AdminUser.create!(email: 'admin@example.com', password: 'password', password_confirmation: 'password') if Rails.env.development?
 
-# 1m, 5m, 30m, 1h, 4h, 1d, 1w.
+# 1m, 3m, 5m, 15m, 30m, 1h, 4h, 1d, 1w.
 price_intvl_list_as_seconds = [
   60, 180, 300, 900, 1800, 3600, 14400, 86400, 604800
 ]
