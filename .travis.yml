@@ -42,7 +42,9 @@ jobs:
         - yarn run elm-test
     - stage: Build and push docker image
       if: type != pull_request
-      language: bash
+      language: python
+      python:
+        - "3.6"
       services:
         - docker
       before_install:
