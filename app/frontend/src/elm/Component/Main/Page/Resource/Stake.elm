@@ -1,4 +1,4 @@
-module Component.Main.Page.Resource.Stake exposing (Message(..), Model, initModel, quantityWarningSpan, update, validate, view)
+module Component.Main.Page.Resource.Stake exposing (Message(..), Model, PercentageOfLiquid(..), distributeCpuNet, initModel, percentageButton, quantityWarningSpan, update, validate, view, viewStakeAmountModal)
 
 import Data.Account
     exposing
@@ -43,6 +43,7 @@ type alias Model =
     , cpuQuantityValidation : QuantityStatus
     , netQuantityValidation : QuantityStatus
     , isFormValid : Bool
+    , isStakeAmountModalOpened : Bool
     }
 
 
@@ -63,6 +64,7 @@ initModel =
     , cpuQuantityValidation = EmptyQuantity
     , netQuantityValidation = EmptyQuantity
     , isFormValid = False
+    , isStakeAmountModalOpened = False
     }
 
 
@@ -72,8 +74,9 @@ initModel =
 
 type Message
     = TotalAmountInput String
-    | OpenStakeAmountModal -- This is controlled at Resource module
     | StakePercentage Float
+    | OpenStakeAmountModal
+    | CloseModal
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
@@ -133,8 +136,11 @@ update message ({ delegatebw, totalQuantity } as model) ({ totalResources, selfD
             , Cmd.none
             )
 
-        _ ->
-            ( model, Cmd.none )
+        OpenStakeAmountModal ->
+            ( { model | isStakeAmountModalOpened = True }, Cmd.none )
+
+        CloseModal ->
+            ( { model | isStakeAmountModalOpened = False }, Cmd.none )
 
 
 
@@ -142,7 +148,7 @@ update message ({ delegatebw, totalQuantity } as model) ({ totalResources, selfD
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delegatebw, totalQuantity } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delegatebw, totalQuantity, percentageOfLiquid, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakedAmount =
             eosFloatToString (larimerToEos account.voterInfo.staked)
@@ -225,6 +231,7 @@ view language ({ delegatebw, totalQuantity } as model) ({ totalResources, selfDe
                     , step "0.0001"
                     , type_ "number"
                     , onInput TotalAmountInput
+                    , value totalQuantity
                     ]
                     []
                 , span [ class "validate description" ]
@@ -235,21 +242,90 @@ view language ({ delegatebw, totalQuantity } as model) ({ totalResources, selfDe
                     [ text ("cpu : " ++ delegatebw.stakeCpuQuantity) ]
                 , p [ class "validate description" ]
                     [ text ("net : " ++ delegatebw.stakeNetQuantity) ]
-                , percentageButton 0.1
-                , percentageButton 0.5
-                , percentageButton 0.7
-                , percentageButton 1
+                , percentageButton percentageOfLiquid Percentage10 0.1
+                , percentageButton percentageOfLiquid Percentage50 0.5
+                , percentageButton percentageOfLiquid Percentage70 0.7
+                , percentageButton percentageOfLiquid Percentage100 1
                 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
                     [ text "확인" ]
                 ]
             ]
+        , viewStakeAmountModal isStakeAmountModalOpened
         ]
 
 
-percentageButton : Float -> Html Message
-percentageButton ratio =
+viewStakeAmountModal : Bool -> Html Message
+viewStakeAmountModal opened =
+    section
+        [ attribute "aria-live" "true"
+        , class
+            ("set_division_manual modal popup"
+                ++ (if opened then
+                        " viewing"
+
+                    else
+                        ""
+                   )
+            )
+        , id "popup"
+        , attribute "role" "alert"
+        ]
+        [ div [ class "wrapper" ]
+            [ h2 []
+                [ text "토큰 스테이크 수량 직접 설정" ]
+            , div [ class "token status" ]
+                [ h3 []
+                    [ text "스테이크할 토큰"
+                    , strong []
+                        [ text "10 EOS" ]
+                    ]
+                , button [ class "set auto button", type_ "button" ]
+                    [ text "자동 분배" ]
+                ]
+            , div [ class "form container" ]
+                [ h3 []
+                    [ text "CPU" ]
+                , p []
+                    [ text "Staked : 18 EOS" ]
+                , Html.form [ action "", class "true validate" ]
+                    [ input [ class "user", attribute "data-validate" "false", id "", name "", placeholder "스테이크할 수량을 설정하세요", type_ "text" ]
+                        []
+                    , span []
+                        [ text "EOS" ]
+                    ]
+                ]
+            , div [ class "form container" ]
+                [ h3 []
+                    [ text "NET" ]
+                , p []
+                    [ text "Staked : 18 EOS" ]
+                , Html.form [ action "" ]
+                    [ input [ class "user", attribute "data-validate" "true", id "", name "", placeholder "스테이크할 수량을 설정하세요", type_ "text" ]
+                        []
+                    , span []
+                        [ text "EOS" ]
+                    ]
+                ]
+            , div [ class "btn_area" ]
+                [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                    [ text "확인" ]
+                ]
+            , p [ class "validate description" ]
+                [ text "7:3 비율로 스테이킹 하는 것이 가장 좋습니다." ]
+            , div [ class "btn_area" ]
+                [ button [ class "undo button", type_ "button", onClick CloseModal ]
+                    [ text "취소" ]
+                , button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                    [ text "확인" ]
+                ]
+            ]
+        ]
+
+
+percentageButton : PercentageOfLiquid -> PercentageOfLiquid -> Float -> Html Message
+percentageButton percentageOfLiquid thisPercentageOfLiquid ratio =
     let
         buttonText =
             if ratio < 1 then
@@ -258,7 +334,17 @@ percentageButton ratio =
             else
                 "최대"
     in
-    button [ type_ "button", onClick (StakePercentage ratio) ]
+    button
+        [ type_ "button"
+        , class
+            (if percentageOfLiquid == thisPercentageOfLiquid then
+                "clicked"
+
+             else
+                ""
+            )
+        , onClick (StakePercentage ratio)
+        ]
         [ text buttonText ]
 
 

@@ -1,5 +1,10 @@
-module Component.Main.Page.Resource.Delegate exposing (Message(..), Model, initModel, update, view)
+module Component.Main.Page.Resource.Delegate exposing (Message(..), Modal(..), Model, initModel, update, view)
 
+import Component.Main.Page.Resource.Modal.DelegateList as DelegateList
+    exposing
+        ( Message(..)
+        , viewDelegateListModal
+        )
 import Data.Account
     exposing
         ( Account
@@ -25,12 +30,19 @@ import Translation exposing (I18n(..), Language, translate)
 
 type alias Model =
     { delegateInput : String
+    , modal : Modal
     }
+
+
+type Modal
+    = DelegateListModal DelegateList.Model
 
 
 initModel : Model
 initModel =
-    { delegateInput = "" }
+    { delegateInput = ""
+    , modal = DelegateListModal DelegateList.initModel
+    }
 
 
 
@@ -39,17 +51,35 @@ initModel =
 
 type Message
     = InputDelegateAmount String
-    | OpenDelegateListModal -- This is controlled at Resource module
+    | OpenDelegateListModal
+    | DelegateListMessage DelegateList.Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
-    case message of
-        InputDelegateAmount value ->
+update message ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+    case ( message, modal ) of
+        ( InputDelegateAmount value, _ ) ->
             ( { model | delegateInput = value }, Cmd.none )
 
-        _ ->
-            ( model, Cmd.none )
+        ( OpenDelegateListModal, _ ) ->
+            case modal of
+                DelegateListModal modalModel ->
+                    ( { model
+                        | modal =
+                            DelegateListModal
+                                { modalModel
+                                    | isDelegateListModalOpened = True
+                                }
+                      }
+                    , Cmd.none
+                    )
+
+        ( DelegateListMessage subMessage, DelegateListModal subModel ) ->
+            let
+                ( newModel, _ ) =
+                    DelegateList.update subMessage subModel
+            in
+            ( { model | modal = DelegateListModal newModel }, Cmd.none )
 
 
 
@@ -57,7 +87,13 @@ update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalanc
 
 
 view : Language -> Model -> Account -> Html Message
-view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+    let
+        modalHtml =
+            case modal of
+                DelegateListModal subModel ->
+                    Html.map DelegateListMessage (viewDelegateListModal language subModel)
+    in
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
             [ h3 []
@@ -139,4 +175,5 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                     [ text "확인" ]
                 ]
             ]
+        , modalHtml
         ]
