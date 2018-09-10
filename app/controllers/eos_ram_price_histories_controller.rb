@@ -7,7 +7,7 @@ class EosRamPriceHistoriesController < ApiController
     price_histories = EosRamPriceHistory.where(
       intvl: params[:intvl],
       start_time: (Time.at(params[:from].to_i).to_datetime)..(Time.at(params[:to].to_i).to_datetime)
-    )
+    ).order(:start_time)
     
     render json: price_histories
   end

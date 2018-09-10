@@ -1,7 +1,7 @@
-module Route exposing (..)
+module Route exposing (ComponentRoute(..), Route(..), getComponentRoute, matchRoute, parseLocation)
 
 import Navigation exposing (Location)
-import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, string, top, stringParam)
+import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, string, stringParam, top)
 
 
 type Route
@@ -18,6 +18,7 @@ type Route
     | TransferRoute
     | ResourceRoute
     | NotFoundRoute
+    | RammarketRoute
 
 
 matchRoute : Parser (Route -> a) a
@@ -35,6 +36,7 @@ matchRoute =
         , map VotingRoute (s "voting")
         , map TransferRoute (s "transfer")
         , map ResourceRoute (s "resource")
+        , map RammarketRoute (s "rammarket")
         ]
 
 
@@ -57,5 +59,6 @@ getComponentRoute : Location -> ComponentRoute
 getComponentRoute location =
     if String.startsWith "/account/" location.pathname then
         AccountComponentRoute
+
     else
         MainComponentRoute

@@ -1,50 +1,69 @@
-module Component.Main.MainComponent exposing (..)
+module Component.Main.MainComponent exposing
+    ( AccountQuery
+    , Header
+    , Message(..)
+    , Model
+    , Page(..)
+    , PublicKeyQuery
+    , Query(..)
+    , getPage
+    , initCmd
+    , initModel
+    , pageCmd
+    , parseQuery
+    , subscriptions
+    , update
+    , updateCmd
+    , view
+    )
 
-import Html
-    exposing
-        ( Html
-        , div
-        , section
-        , form
-        , input
-        , button
-        , text
-        , a
-        , h1
-        , nav
-        , ul
-        , li
-        , span
-        , footer
-        )
-import Html.Attributes
-    exposing
-        ( placeholder
-        , class
-        , attribute
-        , type_
-        , style
-        , id
-        , rel
-        , href
-        )
-import Html.Events exposing (on, onInput, onClick, onSubmit)
-import Navigation exposing (Location)
 import Component.Main.Page.Index as Index
 import Component.Main.Page.NotFound as NotFound
+import Component.Main.Page.Rammarket as Rammarket
+import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Search as Search
 import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
-import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Voting as Voting
 import Component.Main.Sidebar as Sidebar
+import Html
+    exposing
+        ( Html
+        , a
+        , button
+        , div
+        , footer
+        , form
+        , h1
+        , input
+        , li
+        , nav
+        , section
+        , span
+        , text
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , href
+        , id
+        , placeholder
+        , rel
+        , style
+        , type_
+        )
+import Html.Events exposing (on, onClick, onInput, onSubmit)
+import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (Language(..), I18n(..), translate)
-import Util.WalletDecoder exposing (Wallet, PushActionResponse, decodePushActionResponse)
-import View.Notification as Notification
-import Util.Validation exposing (isAccount, isPublicKey)
+import Translation exposing (I18n(..), Language(..), translate)
 import Util.Formatter exposing (eosStringToFloat)
+import Util.Validation exposing (isAccount, isPublicKey)
+import Util.WalletDecoder exposing (PushActionResponse, Wallet, decodePushActionResponse)
+import View.Notification as Notification
+
 
 
 -- MODEL
@@ -57,6 +76,7 @@ type Page
     | TransferPage Transfer.Model
     | ResourcePage Resource.Model
     | VotingPage Voting.Model
+    | RammarketPage
     | NotFoundPage
 
 
@@ -145,33 +165,36 @@ pageCmd page location =
         route =
             location |> parseLocation
     in
-        case route of
-            SearchRoute query ->
-                let
-                    subInitCmd =
-                        case query of
-                            Just str ->
-                                Search.initCmd str (Search.initModel str)
+    case route of
+        SearchRoute query ->
+            let
+                subInitCmd =
+                    case query of
+                        Just str ->
+                            Search.initCmd str (Search.initModel str)
 
-                            Nothing ->
-                                Cmd.none
-                in
-                    Cmd.map SearchMessage subInitCmd
+                        Nothing ->
+                            Cmd.none
+            in
+            Cmd.map SearchMessage subInitCmd
 
-            SearchKeyRoute query ->
-                let
-                    subInitCmd =
-                        case query of
-                            Just str ->
-                                SearchKey.initCmd str
+        SearchKeyRoute query ->
+            let
+                subInitCmd =
+                    case query of
+                        Just str ->
+                            SearchKey.initCmd str
 
-                            Nothing ->
-                                Cmd.none
-                in
-                    Cmd.map SearchKeyMessage subInitCmd
+                        Nothing ->
+                            Cmd.none
+            in
+            Cmd.map SearchKeyMessage subInitCmd
 
-            _ ->
-                Cmd.none
+        RammarketRoute ->
+            Rammarket.initCmd
+
+        _ ->
+            Cmd.none
 
 
 
@@ -214,18 +237,23 @@ view { page, header, notification, sidebar } =
                 IndexPage ->
                     Html.map IndexMessage (Index.view language)
 
+                RammarketPage ->
+                    Rammarket.view language
+
                 _ ->
                     NotFound.view language
 
         getLanguageClass lang =
             if lang == language then
                 class "selected"
+
             else
                 class ""
 
         sidebarButtonClass =
             if sidebar.fold then
                 class "toggle dashboard shrink"
+
             else
                 class "toggle dashboard"
 
@@ -309,7 +337,7 @@ view { page, header, notification, sidebar } =
                         [ a
                             [ rel "nofollow"
                             , class "ram_market"
-                            , onClick (ChangeUrl "/ram-market")
+                            , onClick (ChangeUrl "/rammarket")
                             ]
                             [ text (translate language Translation.RamMarket) ]
                         , span [ class "tooltip", attribute "aria-hidden" "true" ]
@@ -352,20 +380,20 @@ view { page, header, notification, sidebar } =
                     ]
                 ]
     in
-        div []
-            [ headerView
-            , navigationView
-            , section [ class "content" ]
-                [ Html.map SidebarMessage (Sidebar.view sidebar language)
-                , newContentHtml
-                , Html.map NotificationMessage
-                    (Notification.view
-                        notification
-                        language
-                    )
-                ]
-            , footerView
+    div []
+        [ headerView
+        , navigationView
+        , section [ class "content" ]
+            [ Html.map SidebarMessage (Sidebar.view sidebar language)
+            , newContentHtml
+            , Html.map NotificationMessage
+                (Notification.view
+                    notification
+                    language
+                )
             ]
+        , footerView
+        ]
 
 
 
@@ -380,14 +408,14 @@ update message ({ page, notification, header, sidebar } as model) =
                 ( newPage, subCmd ) =
                     Search.update subMessage subModel
             in
-                ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
+            ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
 
         ( SearchKeyMessage subMessage, SearchKeyPage subModel ) ->
             let
                 ( newPage, subCmd ) =
                     SearchKey.update subMessage subModel
             in
-                ( { model | page = newPage |> SearchKeyPage }, Cmd.map SearchKeyMessage subCmd )
+            ( { model | page = newPage |> SearchKeyPage }, Cmd.map SearchKeyMessage subCmd )
 
         ( TransferMessage subMessage, TransferPage subModel ) ->
             let
@@ -398,7 +426,7 @@ update message ({ page, notification, header, sidebar } as model) =
                         sidebar.wallet.account
                         (eosStringToFloat sidebar.account.coreLiquidBalance)
             in
-                ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
+            ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
         ( ResourceMessage subMessage, ResourcePage subModel ) ->
             let
@@ -408,14 +436,14 @@ update message ({ page, notification, header, sidebar } as model) =
                         subModel
                         sidebar.account
             in
-                ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
+            ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
         ( VotingMessage subMessage, VotingPage subModel ) ->
             let
                 newPage =
                     Voting.update subMessage subModel
             in
-                ( { model | page = newPage |> VotingPage }, Cmd.none )
+            ( { model | page = newPage |> VotingPage }, Cmd.none )
 
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
@@ -430,14 +458,14 @@ update message ({ page, notification, header, sidebar } as model) =
                         _ ->
                             ""
             in
-                ( { model
-                    | notification =
-                        { content = decodePushActionResponse resp notificationParameter
-                        , open = True
-                        }
-                  }
-                , Cmd.none
-                )
+            ( { model
+                | notification =
+                    { content = decodePushActionResponse resp notificationParameter
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
 
         ( OnLocationChange location newComponent, _ ) ->
             let
@@ -445,14 +473,13 @@ update message ({ page, notification, header, sidebar } as model) =
                     getPage location
 
                 cmd =
-                    case newComponent of
-                        True ->
-                            initCmd model location
+                    if newComponent then
+                        initCmd model location
 
-                        False ->
-                            updateCmd model location
+                    else
+                        updateCmd model location
             in
-                ( { model | page = newPage }, cmd )
+            ( { model | page = newPage }, cmd )
 
         ( InputSearch value, _ ) ->
             ( { model | header = { header | searchInput = value } }, Cmd.none )
@@ -473,7 +500,7 @@ update message ({ page, notification, header, sidebar } as model) =
                         Err _ ->
                             Cmd.none
             in
-                ( model, newCmd )
+            ( model, newCmd )
 
         ( NotificationMessage Notification.CloseNotification, _ ) ->
             ( { model
@@ -488,7 +515,7 @@ update message ({ page, notification, header, sidebar } as model) =
                 ( newSidebar, newCmd ) =
                     Sidebar.update sidebarMessage sidebar
             in
-                ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
+            ( { model | sidebar = newSidebar }, Cmd.map SidebarMessage newCmd )
 
         ( ChangeUrl url, _ ) ->
             ( model, Navigation.newUrl url )
@@ -506,8 +533,10 @@ parseQuery query =
     -- EOS public key's length is 53 letters
     if isAccount query then
         Ok AccountQuery
+
     else if isPublicKey query then
         Ok PublicKeyQuery
+
     else
         Err "invalid input"
 
@@ -534,39 +563,42 @@ getPage location =
         route =
             location |> parseLocation
     in
-        case route of
-            SearchRoute query ->
-                case query of
-                    Just str ->
-                        SearchPage (Search.initModel str)
+    case route of
+        SearchRoute query ->
+            case query of
+                Just str ->
+                    SearchPage (Search.initModel str)
 
-                    Nothing ->
-                        -- it needs no result page. it shows NotFoundPage temporarily
-                        NotFoundPage
+                Nothing ->
+                    -- it needs no result page. it shows NotFoundPage temporarily
+                    NotFoundPage
 
-            SearchKeyRoute query ->
-                case query of
-                    Just str ->
-                        SearchKeyPage (SearchKey.initModel str)
+        SearchKeyRoute query ->
+            case query of
+                Just str ->
+                    SearchKeyPage (SearchKey.initModel str)
 
-                    Nothing ->
-                        -- it needs no result page. it shows NotFoundPage temporarily
-                        NotFoundPage
+                Nothing ->
+                    -- it needs no result page. it shows NotFoundPage temporarily
+                    NotFoundPage
 
-            VotingRoute ->
-                VotingPage Voting.initModel
+        VotingRoute ->
+            VotingPage Voting.initModel
 
-            TransferRoute ->
-                TransferPage Transfer.initModel
+        TransferRoute ->
+            TransferPage Transfer.initModel
 
-            ResourceRoute ->
-                ResourcePage Resource.initModel
+        ResourceRoute ->
+            ResourcePage Resource.initModel
 
-            IndexRoute ->
-                IndexPage
+        IndexRoute ->
+            IndexPage
 
-            NotFoundRoute ->
-                NotFoundPage
+        RammarketRoute ->
+            RammarketPage
 
-            _ ->
-                NotFoundPage
+        NotFoundRoute ->
+            NotFoundPage
+
+        _ ->
+            NotFoundPage

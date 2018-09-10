@@ -49,7 +49,7 @@ view language =
                     , p [] [ text (translate language TransferHereDesc) ]
                     ]
                 , a
-                    [ onClick (ChangeUrl "/ram-market")
+                    [ onClick (ChangeUrl "/rammarket")
                     , class "card ram_market"
                     ]
                     [ h3 [] [ text (translate language RamMarket) ]
