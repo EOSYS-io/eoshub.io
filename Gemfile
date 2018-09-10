@@ -86,3 +86,4 @@ gem 'cancan'
 
 gem 'sidekiq'
 gem 'sidekiq-cron'
+
