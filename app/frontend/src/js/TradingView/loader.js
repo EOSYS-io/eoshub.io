@@ -59,7 +59,7 @@ export default async function loadTV() {
     datafeed: dataFeed,
     interval: '15',
     container_id: 'tv-chart-container',
-    library_path: 'assets/charting_library/',
+    library_path: 'assets/packs/charting_library/',
     locale: 'ko',
     timezone: 'Asia/Seoul',
     disabled_features: disabledFeatures,
