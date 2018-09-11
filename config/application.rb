@@ -17,11 +17,9 @@ module EoshubIo
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
-    config.assets.paths << Rails.root.join("vendor", "assets", "charting_library")
     # Disable asset cache
     config.assets.configure do |env|
       env.cache = ActiveSupport::Cache.lookup_store(:null_store)
     end
-    config.assets.precompile += %w(charting_library/charting_library.min.js charting_library/static/*)
   end
 end
