@@ -76,7 +76,7 @@ jobs:
         # DB migration
         - aws ecs run-task --cluster eosys --task-definition eoshub-db-migration-$DEPLOYMENT_ENV
         # update an AWS ECS service with the new image
-        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$DEPLOYMENT_ENV -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 600
+        - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$DEPLOYMENT_ENV -i $DOCKER_HUB_REPO:$DOCKER_TAG -t 900
 
 notifications:
   email: false
