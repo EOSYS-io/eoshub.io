@@ -21,7 +21,7 @@ alpha:
   <<: *default
   host_url: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com
   eos_wallet_node_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:5000
-  redis_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:6379/0
+  redis_host: redis://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:6379/0
 
 production:
   <<: *default
