@@ -117,7 +117,7 @@ type StakeAmountMessage
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ delegatebw, totalQuantity, distributionRatio } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakeAbleAmount =
             coreLiquidBalance
@@ -184,10 +184,40 @@ update message ({ delegatebw, totalQuantity, distributionRatio } as model) ({ to
         ModalMessage stakeAmountMessage ->
             case stakeAmountMessage of
                 CpuAmountInput value ->
-                    ( model, Cmd.none )
+                    let
+                        newTotalQuantity =
+                            eosStringAdd value stakeAmountModal.netQuantity
+                                |> eosStringToFloat
+                                |> toString
+
+                        toBeValidatedModel =
+                            { model
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = newTotalQuantity
+                                        , cpuQuantity = value
+                                    }
+                            }
+                    in
+                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) True, Cmd.none )
 
                 NetAmountInput value ->
-                    ( model, Cmd.none )
+                    let
+                        newTotalQuantity =
+                            eosStringAdd stakeAmountModal.cpuQuantity value
+                                |> eosStringToFloat
+                                |> toString
+
+                        toBeValidatedModel =
+                            { model
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = newTotalQuantity
+                                        , netQuantity = value
+                                    }
+                            }
+                    in
+                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) True, Cmd.none )
 
                 CloseModal ->
                     ( { model | isStakeAmountModalOpened = False }, Cmd.none )
@@ -303,32 +333,10 @@ viewStakeAmountModal : Language -> Model -> Account -> Bool -> Html StakeAmountM
 viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model) ({ totalResources } as account) opened =
     let
         cpuValidateAttr =
-            case stakeAmountModal.cpuQuantityValidation of
-                InvalidQuantity ->
-                    "false"
-
-                OverValidQuantity ->
-                    "false"
-
-                ValidQuantity ->
-                    "true"
-
-                EmptyQuantity ->
-                    ""
+            modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.cpuQuantityValidation
 
         netValidateAttr =
-            case stakeAmountModal.netQuantityValidation of
-                InvalidQuantity ->
-                    "false"
-
-                OverValidQuantity ->
-                    "false"
-
-                ValidQuantity ->
-                    "true"
-
-                EmptyQuantity ->
-                    ""
+            modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.netQuantityValidation
     in
     section
         [ attribute "aria-live" "true"
@@ -397,7 +405,18 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
             , div [ class "btn_area" ]
                 [ button [ class "undo button", type_ "button", onClick CloseModal ]
                     [ text "취소" ]
-                , button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                , button
+                    [ class "ok button"
+                    , attribute
+                        (if stakeAmountModal.isFormValid then
+                            "no_op"
+
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    ]
                     [ text "확인" ]
                 ]
             ]
@@ -460,17 +479,21 @@ quantityWarningSpan quantityStatus language ({ delegatebw, isMenual } as model) 
 validate : Model -> Float -> Bool -> Model
 validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
     let
-        { from, receiver, stakeNetQuantity, stakeCpuQuantity } =
-            delegatebw
+        ( cpuQuantity, netQuantity ) =
+            if not isModal then
+                ( delegatebw.stakeNetQuantity, delegatebw.stakeCpuQuantity )
+
+            else
+                ( stakeAmountModal.cpuQuantity, stakeAmountModal.netQuantity )
 
         totalQuantity =
-            eosStringAdd stakeNetQuantity stakeCpuQuantity
+            eosStringAdd netQuantity cpuQuantity
 
         netQuantityValidation =
-            validateQuantity stakeNetQuantity eosLiquidAmount
+            validateQuantity netQuantity eosLiquidAmount
 
         cpuQuantityValidation =
-            validateQuantity stakeCpuQuantity eosLiquidAmount
+            validateQuantity cpuQuantity eosLiquidAmount
 
         totalQuantityValidation =
             validateQuantity totalQuantity eosLiquidAmount
@@ -517,3 +540,23 @@ distributeCpuNet totalQuantity a b =
             eosStringSubtract totalQuantity cpuQuantity
     in
     ( cpuQuantity, netQuantity )
+
+
+modalValidateAttr : QuantityStatus -> QuantityStatus -> String
+modalValidateAttr totalQuantityStatus resourceQuantityStatus =
+    case resourceQuantityStatus of
+        InvalidQuantity ->
+            "false"
+
+        OverValidQuantity ->
+            "false"
+
+        ValidQuantity ->
+            if totalQuantityStatus == ValidQuantity then
+                "true"
+
+            else
+                "false"
+
+        EmptyQuantity ->
+            ""
