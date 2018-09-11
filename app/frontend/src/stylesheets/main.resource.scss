@@ -164,18 +164,6 @@ main.resource_management {
 				transition:color 0.4s;
 				color:$light-gray
 			}
-
-			&:invalid + span.validate {
-				color:$red;
-			}
-
-			&:valid + span.validate {
-				color:$green;
-			}
-
-			&:placeholder-shown + span.description {
-				color:inherit;
-			}
 		}
 
 		input.size.large + span.description ~ button {
