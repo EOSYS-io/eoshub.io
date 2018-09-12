@@ -55,7 +55,7 @@ type alias Model =
     , totalQuantityValidation : QuantityStatus
     , cpuQuantityValidation : QuantityStatus
     , netQuantityValidation : QuantityStatus
-    , isManual : Bool
+    , manuallySet : Bool
     , isFormValid : Bool
     , isStakeAmountModalOpened : Bool
     , stakeAmountModal : StakeAmountModal
@@ -96,7 +96,7 @@ initModel =
     , totalQuantityValidation = EmptyQuantity
     , cpuQuantityValidation = EmptyQuantity
     , netQuantityValidation = EmptyQuantity
-    , isManual = False
+    , manuallySet = False
     , isFormValid = False
     , isStakeAmountModalOpened = False
     , stakeAmountModal =
@@ -140,16 +140,16 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                 ( cpuQuantity, netQuantity ) =
                     distributeCpuNet value distributionRatio.cpu distributionRatio.net
 
-                toBeValidatedModel =
+                newModel =
                     { model
                         | totalQuantity = value
                         , delegatebw =
                             { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
                         , percentageOfLiquid = NoOp
-                        , isManual = False
+                        , manuallySet = False
                     }
             in
-            ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened
+            ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened
             , Cmd.none
             )
 
@@ -171,7 +171,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                 , delegatebw =
                     { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
                 , percentageOfLiquid = percentageOfLiquid
-                , isManual = False
+                , manuallySet = False
               }
             , Cmd.none
             )
@@ -188,7 +188,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                 |> eosStringToFloat
                                 |> toString
 
-                        toBeValidatedModel =
+                        newModel =
                             { model
                                 | stakeAmountModal =
                                     { stakeAmountModal
@@ -197,7 +197,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                    ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 NetAmountInput value ->
                     let
@@ -206,7 +206,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                 |> eosStringToFloat
                                 |> toString
 
-                        toBeValidatedModel =
+                        newModel =
                             { model
                                 | stakeAmountModal =
                                     { stakeAmountModal
@@ -215,7 +215,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                    ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 CloseModal ->
                     ( { model | isStakeAmountModalOpened = False }, Cmd.none )
@@ -468,11 +468,11 @@ getPercentageOfLiquid percentageOfLiquid =
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
-quantityWarningSpan quantityStatus language ({ delegatebw, isManual } as model) =
+quantityWarningSpan quantityStatus language ({ delegatebw, manuallySet } as model) =
     let
         -- TODO(boseok): it needs to be translated
         manualText =
-            if isManual then
+            if manuallySet then
                 "직접설정"
 
             else

@@ -30,14 +30,14 @@ import Translation exposing (I18n(..), Language, translate)
 
 type alias Model =
     { undelegateInput : String
-    , modal : DelegateList.Model
+    , delegateListModal : DelegateList.Model
     }
 
 
 initModel : Model
 initModel =
     { undelegateInput = ""
-    , modal = DelegateList.initModel
+    , delegateListModal = DelegateList.initModel
     }
 
 
@@ -52,15 +52,15 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ delegateListModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     case message of
         InputUndelegateAmount value ->
             ( { model | undelegateInput = value }, Cmd.none )
 
         OpenDelegateListModal ->
             ( { model
-                | modal =
-                    { modal
+                | delegateListModal =
+                    { delegateListModal
                         | isDelegateListModalOpened = True
                     }
               }
@@ -70,9 +70,9 @@ update message ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, c
         DelegateListMessage subMessage ->
             let
                 ( newModel, _ ) =
-                    DelegateList.update subMessage modal
+                    DelegateList.update subMessage delegateListModal
             in
-            ( { model | modal = newModel }, Cmd.none )
+            ( { model | delegateListModal = newModel }, Cmd.none )
 
 
 
@@ -80,10 +80,10 @@ update message ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, c
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ modal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delegateListModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         modalHtml =
-            Html.map DelegateListMessage (viewDelegateListModal language modal)
+            Html.map DelegateListMessage (viewDelegateListModal language delegateListModal)
     in
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
