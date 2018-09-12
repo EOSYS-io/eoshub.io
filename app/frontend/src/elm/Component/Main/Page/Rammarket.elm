@@ -97,7 +97,7 @@ update message model =
             { model | actions = actions }
 
         OnFetchActions (Err error) ->
-            Debug.log "" model
+            model
 
 
 
