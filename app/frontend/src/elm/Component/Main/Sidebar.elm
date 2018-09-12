@@ -259,6 +259,8 @@ accountInfoView { wallet, account, configPanelOpen } language =
         , li []
             [ span [ class "title" ] [ text "refunding" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
+
+            -- TODO(boseok): 72.3 hours hard coding should be changed
             , span [ class "remaining time" ] [ text "72.3 hours" ]
             ]
         ]
@@ -292,7 +294,14 @@ update message ({ fold, wallet } as model) =
             ( { model | fold = not fold }, Cmd.none )
 
         InvalidateAccount ->
-            ( model, Port.invalidateAccount () )
+            let
+                cmds =
+                    Cmd.batch
+                        [ Port.invalidateAccount ()
+                        , Navigation.reload
+                        ]
+            in
+            ( model, cmds )
 
         UpdateState state ->
             let
