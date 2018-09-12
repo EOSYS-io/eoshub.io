@@ -15,15 +15,25 @@ tests =
                 \() ->
                     Expect.equal 1.0 (larimerToEos 10000)
             ]
-        , describe "eosFloatToString"
+        , describe "floatToAsset"
             [ test "0.1 -> \"0.1000 EOS\"" <|
                 \() ->
-                    Expect.equal "0.1000 EOS" (eosFloatToString 0.1)
+                    Expect.equal "0.1000 EOS" (floatToAsset 0.1)
             ]
-        , describe "eosStringToFloat"
+        , describe "assetToFloat"
             [ test "\"0.1 EOS\" -> 0.1" <|
                 \() ->
-                    Expect.equal 0.1 (eosStringToFloat "0.1 EOS")
+                    Expect.equal 0.1 (assetToFloat "0.1 EOS")
+            ]
+        , describe "assetAdd"
+            [ test "\"0.5000 EOS\" + \"0.5000 EOS\"" <|
+                \() ->
+                    Expect.equal "1.0000 EOS" (assetAdd "0.5000 EOS" "0.5000 EOS")
+            ]
+        , describe "assetSubtract"
+            [ test "\"1.0000 EOS\" - \"0.5000 EOS\"" <|
+                \() ->
+                    Expect.equal "0.5000 EOS" (assetSubtract "1.0000 EOS" "0.5000 EOS")
             ]
         , describe "unitConverterRound4"
             [ test "1024 -> 1k" <|
@@ -34,25 +44,25 @@ tests =
             [ test "1/100 * 100 = 1%" <|
                 \() ->
                     Expect.equal 1.0 (percentageConverter 1 100)
-            , describe "timeFormatter"
-                [ test "English, AM, Ok" <|
-                    \() ->
-                        Expect.equal "2:16:21 AM, August 17, 2018" (timeFormatter English "2018-08-17T02:16:21.500")
-                , test "English, PM, Ok" <|
-                    \() ->
-                        Expect.equal "5:16:21 PM, August 17, 2018" (timeFormatter English "2018-08-17T17:16:21.500")
-                , test "Korean, AM, Ok" <|
-                    \() ->
-                        Expect.equal "2018년, 8월 17일, 2:16:21 AM" (timeFormatter Korean "2018-08-17T02:16:21.500")
-                , test "Korean, PM, Ok" <|
-                    \() ->
-                        Expect.equal "2018년, 8월 17일, 5:16:21 PM" (timeFormatter Korean "2018-08-17T17:16:21.500")
-                , test "invalid time, Err" <|
-                    \() ->
-                        Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500': Invalid ISO 8601 format" (timeFormatter English "2018-108-17T17:16:21.500")
-                , test "no time, Err" <|
-                    \() ->
-                        Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter English "")
-                ]
+            ]
+        , describe "timeFormatter"
+            [ test "English, AM, Ok" <|
+                \() ->
+                    Expect.equal "2:16:21 AM, August 17, 2018" (timeFormatter English "2018-08-17T02:16:21.500")
+            , test "English, PM, Ok" <|
+                \() ->
+                    Expect.equal "5:16:21 PM, August 17, 2018" (timeFormatter English "2018-08-17T17:16:21.500")
+            , test "Korean, AM, Ok" <|
+                \() ->
+                    Expect.equal "2018년, 8월 17일, 2:16:21 AM" (timeFormatter Korean "2018-08-17T02:16:21.500")
+            , test "Korean, PM, Ok" <|
+                \() ->
+                    Expect.equal "2018년, 8월 17일, 5:16:21 PM" (timeFormatter Korean "2018-08-17T17:16:21.500")
+            , test "invalid time, Err" <|
+                \() ->
+                    Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500': Invalid ISO 8601 format" (timeFormatter English "2018-108-17T17:16:21.500")
+            , test "no time, Err" <|
+                \() ->
+                    Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter English "")
             ]
         ]

@@ -16,7 +16,7 @@ import Data.Account
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (eosStringAdd, eosStringSubtract)
+import Util.Formatter exposing (assetAdd, assetSubtract)
 
 
 
@@ -65,7 +65,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
                 , p []
-                    [ text ("임대받은 토큰 : " ++ eosStringSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
+                    [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []
@@ -81,7 +81,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
                 , p []
-                    [ text ("임대받은 토큰 : " ++ eosStringSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
+                    [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
                 , div [ class "graph status" ]
                     [ span [ class "hell", attribute "style" "height:10%" ]
                         []

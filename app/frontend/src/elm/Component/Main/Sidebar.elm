@@ -32,7 +32,7 @@ import Port
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
 import Util.Formatter
     exposing
-        ( eosFloatToString
+        ( floatToAsset
         , larimerToEos
         )
 import Util.HttpRequest exposing (getFullPath, post)
@@ -215,7 +215,7 @@ accountInfoView { wallet, account, configPanelOpen } language =
             getUnstakingAmount refundRequest.netAmount refundRequest.cpuAmount
 
         stakedAmount =
-            eosFloatToString (larimerToEos voterInfo.staked)
+            floatToAsset (larimerToEos voterInfo.staked)
 
         configPanelClass =
             class

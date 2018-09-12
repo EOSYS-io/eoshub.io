@@ -1,9 +1,14 @@
 module Component.Main.Page.Resource.Stake exposing
-    ( Message(..)
+    ( DistributionRatio
+    , Message(..)
     , Model
     , PercentageOfLiquid(..)
+    , StakeAmountMessage(..)
+    , StakeAmountModal
     , distributeCpuNet
+    , getPercentageOfLiquid
     , initModel
+    , modalValidateAttr
     , percentageButton
     , quantityWarningSpan
     , update
@@ -31,7 +36,7 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (eosFloatToString, eosStringAdd, eosStringSubtract, eosStringToFloat, larimerToEos)
+import Util.Formatter exposing (assetAdd, assetSubtract, assetToFloat, floatToAsset, larimerToEos)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -149,7 +154,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                         , manuallySet = False
                     }
             in
-            ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened
+            ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened
             , Cmd.none
             )
 
@@ -159,7 +164,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                     getPercentageOfLiquid percentageOfLiquid
 
                 value =
-                    eosStringToFloat coreLiquidBalance
+                    assetToFloat coreLiquidBalance
                         * ratio
                         |> Round.round 4
 
@@ -184,8 +189,8 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                 CpuAmountInput value ->
                     let
                         newTotalQuantity =
-                            eosStringAdd value stakeAmountModal.netQuantity
-                                |> eosStringToFloat
+                            assetAdd value stakeAmountModal.netQuantity
+                                |> assetToFloat
                                 |> toString
 
                         newModel =
@@ -197,13 +202,13 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 NetAmountInput value ->
                     let
                         newTotalQuantity =
-                            eosStringAdd stakeAmountModal.cpuQuantity value
-                                |> eosStringToFloat
+                            assetAdd stakeAmountModal.cpuQuantity value
+                                |> assetToFloat
                                 |> toString
 
                         newModel =
@@ -215,7 +220,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate newModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 CloseModal ->
                     ( { model | isStakeAmountModalOpened = False }, Cmd.none )
@@ -229,7 +234,7 @@ view : Language -> Model -> Account -> Html Message
 view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakedAmount =
-            eosFloatToString (larimerToEos account.voterInfo.staked)
+            floatToAsset (larimerToEos account.voterInfo.staked)
 
         ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
@@ -250,7 +255,7 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                 , p []
                     [ text
                         ("임대받은 토큰 : "
-                            ++ eosStringSubtract
+                            ++ assetSubtract
                                 totalResources.cpuWeight
                                 selfDelegatedBandwidth.cpuWeight
                         )
@@ -272,7 +277,7 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                 , p []
                     [ text
                         ("임대받은 토큰 : "
-                            ++ eosStringSubtract
+                            ++ assetSubtract
                                 totalResources.netWeight
                                 selfDelegatedBandwidth.netWeight
                         )
@@ -514,7 +519,7 @@ validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
                 ( stakeAmountModal.cpuQuantity, stakeAmountModal.netQuantity )
 
         totalQuantity =
-            eosStringAdd netQuantity cpuQuantity
+            assetAdd netQuantity cpuQuantity
 
         netQuantityValidation =
             validateQuantity netQuantity eosLiquidAmount
@@ -561,10 +566,10 @@ distributeCpuNet : String -> Float -> Float -> ( String, String )
 distributeCpuNet totalQuantity a b =
     let
         cpuQuantity =
-            eosFloatToString <| eosStringToFloat totalQuantity * (a / (a + b))
+            floatToAsset <| assetToFloat totalQuantity * (a / (a + b))
 
         netQuantity =
-            eosStringSubtract totalQuantity cpuQuantity
+            assetSubtract totalQuantity cpuQuantity
     in
     ( cpuQuantity, netQuantity )
 

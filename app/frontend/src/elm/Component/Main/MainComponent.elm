@@ -59,7 +59,7 @@ import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), Language(..), translate)
-import Util.Formatter exposing (eosStringToFloat)
+import Util.Formatter exposing (assetToFloat)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, Wallet, decodePushActionResponse)
 import View.Notification as Notification
@@ -424,7 +424,7 @@ update message ({ page, notification, header, sidebar } as model) =
                         subMessage
                         subModel
                         sidebar.wallet.account
-                        (eosStringToFloat sidebar.account.coreLiquidBalance)
+                        (assetToFloat sidebar.account.coreLiquidBalance)
             in
             ( { model | page = newPage |> TransferPage }, Cmd.map TransferMessage subCmd )
 
