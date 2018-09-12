@@ -72,8 +72,8 @@ type alias Action =
     , contractAccount : String
     , actionName : String
     , data : Result String ActionParameters
+    , trxId : String
     , actionTag : String
-    , trx_id : String
     }
 
 
