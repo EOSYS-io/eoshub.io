@@ -38,6 +38,7 @@ import Html.Attributes
         , title
         , type_
         )
+import Html.Events exposing (onClick)
 import Http
 import Json.Encode as Encode
 import Port
@@ -51,12 +52,14 @@ import Util.HttpRequest exposing (getFullPath, post)
 
 type alias Model =
     { actions : List Action
+    , expandActions : Bool
     }
 
 
 initModel : Model
 initModel =
     { actions = []
+    , expandActions = False
     }
 
 
@@ -66,6 +69,7 @@ initModel =
 
 type Message
     = OnFetchActions (Result Http.Error (List Action))
+    | ExpandActions
 
 
 initCmd : Cmd Message
@@ -74,7 +78,7 @@ initCmd =
         requestBody =
             [ ( "account_name", "eosio.ram" |> Encode.string )
             , ( "pos", -1 |> Encode.int )
-            , ( "offset", -100 |> Encode.int )
+            , ( "offset", -80 |> Encode.int )
             ]
                 |> Encode.object
                 |> Http.jsonBody
@@ -99,13 +103,16 @@ update message model =
         OnFetchActions (Err error) ->
             model
 
+        ExpandActions ->
+            { model | expandActions = True }
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Html Message
-view language { actions } =
+view language { actions, expandActions } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -162,7 +169,22 @@ view language { actions } =
                         ]
                     ]
                 ]
-            , section [ class "history list" ]
+            , let
+                ( actionTableRows, viewMoreButton ) =
+                    if expandActions then
+                        ( actions |> List.map actionToTableRow
+                        , div [] []
+                        )
+
+                    else
+                        ( actions |> List.take 2 |> List.map actionToTableRow
+                        , div [ class "btn_area" ]
+                            [ button [ type_ "button", class "view_more button", onClick ExpandActions ]
+                                [ text "더 보기" ]
+                            ]
+                        )
+              in
+              section [ class "history list" ]
                 [ table []
                     [ caption []
                         [ text "구매/판매 거래내역" ]
@@ -180,12 +202,9 @@ view language { actions } =
                                 [ text "Tx ID" ]
                             ]
                         ]
-                    , tbody [] (List.map actionToTableRow actions)
+                    , tbody [] actionTableRows
                     ]
-                , div [ class "btn_area" ]
-                    [ button [ class "view_more button", type_ "button" ]
-                        [ text "더 보기" ]
-                    ]
+                , viewMoreButton
                 ]
             ]
         ]
@@ -196,7 +215,7 @@ actionToTableRow { blockTime, data, trxId } =
     case data of
         Ok (Data.Action.Transfer { from, to, quantity }) ->
             let
-                ( class_, type_, account ) =
+                ( actionClass, actionType, account ) =
                     if from == "eosio.ram" then
                         ( "log buy", "판매", to )
 
@@ -212,8 +231,8 @@ actionToTableRow { blockTime, data, trxId } =
                         _ ->
                             blockTime
             in
-            tr [ class class_ ]
-                [ td [] [ text type_ ]
+            tr [ class actionClass ]
+                [ td [] [ text actionType ]
                 , td [] [ text quantity ]
                 , td [] [ text account ]
                 , td [] [ text formattedDateTime ]
