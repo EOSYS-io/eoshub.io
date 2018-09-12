@@ -1,4 +1,18 @@
-module Component.Main.Sidebar exposing (Message(..), Model, State(..), accountInfoView, deleteFromBack, initCmd, initModel, loadingView, pairWalletView, signInView, subscriptions, update, view)
+module Component.Main.Sidebar exposing
+    ( Message(..)
+    , Model
+    , State(..)
+    , accountInfoView
+    , deleteFromBack
+    , initCmd
+    , initModel
+    , loadingView
+    , pairWalletView
+    , signInView
+    , subscriptions
+    , update
+    , view
+    )
 
 import Data.Account
     exposing

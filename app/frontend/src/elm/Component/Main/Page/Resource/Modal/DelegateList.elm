@@ -1,4 +1,10 @@
-module Component.Main.Page.Resource.Modal.DelegateList exposing (Message(..), Model, initModel, update, viewDelegateListModal)
+module Component.Main.Page.Resource.Modal.DelegateList exposing
+    ( Message(..)
+    , Model
+    , initModel
+    , update
+    , viewDelegateListModal
+    )
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

@@ -1,4 +1,13 @@
-module Component.Main.Page.Resource exposing (Message(..), Model, ResourceTab(..), SelectedTab(..), initModel, resourceTabA, update, view)
+module Component.Main.Page.Resource exposing
+    ( Message(..)
+    , Model
+    , ResourceTab(..)
+    , SelectedTab(..)
+    , initModel
+    , resourceTabA
+    , update
+    , view
+    )
 
 import Component.Main.Page.Resource.Delegate as DelegateTab
 import Component.Main.Page.Resource.Stake as StakeTab

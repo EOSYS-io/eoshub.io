@@ -1,4 +1,16 @@
-module Component.Main.Page.Resource.Stake exposing (Message(..), Model, PercentageOfLiquid(..), distributeCpuNet, initModel, percentageButton, quantityWarningSpan, update, validate, view, viewStakeAmountModal)
+module Component.Main.Page.Resource.Stake exposing
+    ( Message(..)
+    , Model
+    , PercentageOfLiquid(..)
+    , distributeCpuNet
+    , initModel
+    , percentageButton
+    , quantityWarningSpan
+    , update
+    , validate
+    , view
+    , viewStakeAmountModal
+    )
 
 import Data.Account
     exposing
@@ -43,7 +55,7 @@ type alias Model =
     , totalQuantityValidation : QuantityStatus
     , cpuQuantityValidation : QuantityStatus
     , netQuantityValidation : QuantityStatus
-    , isMenual : Bool
+    , isManual : Bool
     , isFormValid : Bool
     , isStakeAmountModalOpened : Bool
     , stakeAmountModal : StakeAmountModal
@@ -84,7 +96,7 @@ initModel =
     , totalQuantityValidation = EmptyQuantity
     , cpuQuantityValidation = EmptyQuantity
     , netQuantityValidation = EmptyQuantity
-    , isMenual = False
+    , isManual = False
     , isFormValid = False
     , isStakeAmountModalOpened = False
     , stakeAmountModal =
@@ -105,7 +117,7 @@ initModel =
 
 type Message
     = TotalAmountInput String
-    | StakePercentage Float
+    | StakePercentage PercentageOfLiquid
     | OpenStakeAmountModal
     | ModalMessage StakeAmountMessage
 
@@ -117,7 +129,7 @@ type StakeAmountMessage
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakeAbleAmount =
             coreLiquidBalance
@@ -134,36 +146,22 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                         , delegatebw =
                             { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
                         , percentageOfLiquid = NoOp
-                        , isMenual = False
+                        , isManual = False
                     }
             in
-            ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) False
+            ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened
             , Cmd.none
             )
 
-        StakePercentage ratio ->
+        StakePercentage percentageOfLiquid ->
             let
+                ratio =
+                    getPercentageOfLiquid percentageOfLiquid
+
                 value =
                     eosStringToFloat coreLiquidBalance
                         * ratio
                         |> Round.round 4
-
-                percentageOfLiquid =
-                    case ratio of
-                        0.1 ->
-                            Percentage10
-
-                        0.5 ->
-                            Percentage50
-
-                        0.7 ->
-                            Percentage70
-
-                        1 ->
-                            Percentage100
-
-                        _ ->
-                            NoOp
 
                 ( cpuQuantity, netQuantity ) =
                     distributeCpuNet value distributionRatio.cpu distributionRatio.net
@@ -173,7 +171,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                 , delegatebw =
                     { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
                 , percentageOfLiquid = percentageOfLiquid
-                , isMenual = False
+                , isManual = False
               }
             , Cmd.none
             )
@@ -199,7 +197,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) True, Cmd.none )
+                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 NetAmountInput value ->
                     let
@@ -217,7 +215,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                                     }
                             }
                     in
-                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) True, Cmd.none )
+                    ( validate toBeValidatedModel (eosStringToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
                 CloseModal ->
                     ( { model | isStakeAmountModalOpened = False }, Cmd.none )
@@ -315,10 +313,10 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                     [ text ("cpu : " ++ delegatebw.stakeCpuQuantity) ]
                 , p [ class "validate description" ]
                     [ text ("net : " ++ delegatebw.stakeNetQuantity) ]
-                , percentageButton percentageOfLiquid Percentage10 0.1
-                , percentageButton percentageOfLiquid Percentage50 0.5
-                , percentageButton percentageOfLiquid Percentage70 0.7
-                , percentageButton percentageOfLiquid Percentage100 1
+                , percentageButton percentageOfLiquid Percentage10
+                , percentageButton percentageOfLiquid Percentage50
+                , percentageButton percentageOfLiquid Percentage70
+                , percentageButton percentageOfLiquid Percentage100
                 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
@@ -423,9 +421,12 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
         ]
 
 
-percentageButton : PercentageOfLiquid -> PercentageOfLiquid -> Float -> Html Message
-percentageButton percentageOfLiquid thisPercentageOfLiquid ratio =
+percentageButton : PercentageOfLiquid -> PercentageOfLiquid -> Html Message
+percentageButton modelPercentageOfLiquid thisPercentageOfLiquid =
     let
+        ratio =
+            getPercentageOfLiquid thisPercentageOfLiquid
+
         buttonText =
             if ratio < 1 then
                 Round.round 0 (ratio * 100) ++ "%"
@@ -436,23 +437,42 @@ percentageButton percentageOfLiquid thisPercentageOfLiquid ratio =
     button
         [ type_ "button"
         , class
-            (if percentageOfLiquid == thisPercentageOfLiquid then
+            (if modelPercentageOfLiquid == thisPercentageOfLiquid then
                 "clicked"
 
              else
                 ""
             )
-        , onClick (StakePercentage ratio)
+        , onClick (StakePercentage thisPercentageOfLiquid)
         ]
         [ text buttonText ]
 
 
+getPercentageOfLiquid : PercentageOfLiquid -> Float
+getPercentageOfLiquid percentageOfLiquid =
+    case percentageOfLiquid of
+        Percentage10 ->
+            0.1
+
+        Percentage50 ->
+            0.5
+
+        Percentage70 ->
+            0.7
+
+        Percentage100 ->
+            1
+
+        _ ->
+            0
+
+
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
-quantityWarningSpan quantityStatus language ({ delegatebw, isMenual } as model) =
+quantityWarningSpan quantityStatus language ({ delegatebw, isManual } as model) =
     let
         -- TODO(boseok): it needs to be translated
-        menualText =
-            if isMenual then
+        manualText =
+            if isManual then
                 "직접설정"
 
             else
@@ -467,7 +487,14 @@ quantityWarningSpan quantityStatus language ({ delegatebw, isMenual } as model) 
                     ( " false", translate language OverStakeAbleAmount )
 
                 ValidQuantity ->
-                    ( " true", menualText ++ translate language (StakeAble delegatebw.stakeCpuQuantity delegatebw.stakeNetQuantity) )
+                    ( " true"
+                    , manualText
+                        ++ translate language
+                            (StakeAble
+                                delegatebw.stakeCpuQuantity
+                                delegatebw.stakeNetQuantity
+                            )
+                    )
 
                 EmptyQuantity ->
                     ( "", translate language StakeAbleAmountDesc )
