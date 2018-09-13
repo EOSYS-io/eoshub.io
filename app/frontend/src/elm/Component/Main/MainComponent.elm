@@ -239,7 +239,7 @@ view { page, header, notification, sidebar } =
                     Html.map IndexMessage (Index.view language)
 
                 RammarketPage subModel ->
-                    Html.map RammarketMessage (Rammarket.view language subModel)
+                    Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
 
                 _ ->
                     NotFound.view language

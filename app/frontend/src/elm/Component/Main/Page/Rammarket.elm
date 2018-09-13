@@ -10,6 +10,7 @@ module Component.Main.Page.Rammarket exposing
     , view
     )
 
+import Data.Account exposing (Account, getResource)
 import Data.Action exposing (Action, actionsDecoder)
 import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
@@ -56,7 +57,7 @@ import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
-import Util.Formatter exposing (deleteFromBack, timeFormatter)
+import Util.Formatter exposing (deleteFromBack, resourceUnitConverter, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
 
@@ -162,8 +163,8 @@ update message model =
 -- VIEW
 
 
-view : Language -> Model -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable } =
+view : Language -> Model -> Account -> Html Message
+view language { actions, expandActions, rammarketTable, globalTable } { ramQuota, ramUsage } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -180,13 +181,28 @@ view language { actions, expandActions, rammarketTable, globalTable } =
                         ]
                     , div [ class "graph", id "tv-chart-container" ] []
                     ]
-                , div [ class "my status" ]
+                , let
+                    ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
+                        getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
+                  in
+                  div [ class "my status" ]
                     [ div [ class "summary" ]
-                        [ h3 [] [ text "나의 램" ]
-                        , p [] [ text "사용가능한 용량이 53% 남았어요" ]
+                        [ h3 []
+                            [ text "나의 램"
+                            , span []
+                                [ text (resourceUnitConverter "ram" ramQuota) ]
+                            ]
+                        , p []
+                            [ text
+                                ("사용가능한 용량이 "
+                                    ++ ramPercent
+                                    ++ " 남았어요"
+                                )
+                            ]
                         , div [ class "status" ]
-                            [ span [ class "hell", style [ ( "height", "10%" ) ] ] []
-                            , text "10%"
+                            [ span [ class ramColor, style [ ( "height", ramPercent ) ] ]
+                                []
+                            , text ramPercent
                             ]
                         ]
                     , div [ class "sell_buy" ]
