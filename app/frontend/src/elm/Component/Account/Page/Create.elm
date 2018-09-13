@@ -1,6 +1,6 @@
 module Component.Account.Page.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
-import Html exposing (Html, article, br, button, div, form, h1, img, input, li, ol, p, span, text, ul)
+import Html exposing (Html, article, br, button, div, form, h2, img, input, li, main_, ol, p, span, text, ul)
 import Html.Attributes exposing (action, alt, attribute, class, placeholder, src, style, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
@@ -145,28 +145,18 @@ update msg ({ notification } as model) flags confirmToken language =
 
 view : Model -> Language -> Html Message
 view { validation, accountName, validationMsg, requestSuccess, notification } language =
-    div [ class "container join" ]
-        [ ol [ class "progress bar" ]
-            [ li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressEmail ]
-            , li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressKeypair ]
-            , li [ class "ing" ]
-                [ textViewI18n language AccountCreationProgressCreateNew ]
-            ]
-        , article [ attribute "data-step" "4" ]
-            [ h1 []
+    main_ [ class "join" ]
+        [ article [ attribute "data-step" "make-account" ]
+            [ span [ class "progress", attribute "data-progress" "01" ]
+                [ text "01" ]
+            , h2 []
                 [ textViewI18n language AccountCreationTypeName ]
             , p []
-                [ textViewI18n language AccountCreationNameCondition
-                , br []
-                    []
-                , textViewI18n language AccountCreationNameConditionExample
-                ]
-            , form [ onSubmit CreateEosAccount ]
+                [ textViewI18n language AccountCreationNameCondition ]
+            , form []
                 [ input
                     [ class "account_name"
-                    , placeholder (translate language AccountCreationNamePlaceholder)
+                    , placeholder (translate language AccountCreationNameConditionExample)
                     , attribute "required" ""
                     , attribute
                         (if validation then
@@ -180,37 +170,25 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                     , onInput ValidateAccountName
                     ]
                     []
-                , span
-                    [ style
-                        [ ( "visibility"
-                          , if String.isEmpty accountName then
-                                "hidden"
+                ]
+            , div [ class "btn_area" ]
+                [ button
+                    [ class "ok button"
+                    , attribute
+                        (if validation && not requestSuccess then
+                            "enabled"
 
-                            else
-                                "visible"
-                          )
-                        ]
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    , onClick CreateEosAccount
                     ]
-                    [ textViewI18n language validationMsg ]
+                    [ text "다음" ]
                 ]
+            , Html.map NotificationMessage (Notification.view notification language)
             ]
-        , div [ class "btn_area" ]
-            [ button
-                [ class "middle blue_white button"
-                , attribute
-                    (if validation && not requestSuccess then
-                        "enabled"
-
-                     else
-                        "disabled"
-                    )
-                    ""
-                , type_ "button"
-                , onClick CreateEosAccount
-                ]
-                [ textViewI18n language Next ]
-            ]
-        , Html.map NotificationMessage (Notification.view notification language)
         ]
 
 

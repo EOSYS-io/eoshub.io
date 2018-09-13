@@ -1,6 +1,6 @@
 module Component.Account.Page.Created exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, a, article, br, button, div, h1, img, li, ol, p, text)
+import Html exposing (Html, a, article, br, button, dd, div, dl, dt, h2, img, li, main_, ol, p, text)
 import Html.Attributes exposing (alt, attribute, class, href, src)
 import Html.Events exposing (onClick)
 import Navigation
@@ -54,17 +54,9 @@ update msg model =
 
 view : Model -> Language -> Html Message
 view model language =
-    div [ class "container join" ]
-        [ ol [ class "progress bar" ]
-            [ li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressEmail ]
-            , li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressKeypair ]
-            , li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressCreateNew ]
-            ]
-        , article [ attribute "data-step" "5" ]
-            [ h1 [ class "finished" ]
+    main_ [ class "join" ]
+        [ article [ attribute "data-step" "done" ]
+            [ h2 []
                 [ textViewI18n language AccountCreationCongratulation
                 , br []
                     []
@@ -72,9 +64,19 @@ view model language =
                 ]
             , p []
                 [ textViewI18n language AccountCreationYouCanSignIn ]
-            ]
-        , div [ class "btn_area" ]
-            [ a [ class "middle button blue_white", onClick Home ]
-                [ textViewI18n language AccountCreationGoHome ]
+            , dl [ class "keybox" ]
+                [ dt []
+                    [ text "계정" ]
+                , dd []
+                    [ text "eosyskoreabp" ]
+                , dt []
+                    [ text "공개키" ]
+                , dd []
+                    [ text "EOS55bzfeUCMvJuDZM4hxZbApSMsrdavAR18VuodiyYN5ARVVJBLy" ]
+                ]
+            , div [ class "btn_area" ]
+                [ a [ class "go main button", onClick Home ]
+                    [ textViewI18n language AccountCreationGoHome ]
+                ]
             ]
         ]

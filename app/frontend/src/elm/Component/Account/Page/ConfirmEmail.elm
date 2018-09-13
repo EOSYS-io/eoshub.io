@@ -1,6 +1,6 @@
 module Component.Account.Page.ConfirmEmail exposing (Message(..), Model, createUserBodyParams, initModel, update, view)
 
-import Html exposing (Html, a, article, button, div, form, h1, img, input, li, node, ol, p, span, text, ul)
+import Html exposing (Html, a, article, button, div, form, h2, img, input, li, main_, node, ol, p, span, text, ul)
 import Html.Attributes exposing (action, alt, attribute, class, href, placeholder, rel, src, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
@@ -209,45 +209,38 @@ emailForm ({ inputValid, validationMsg } as model) language =
 
 view : Model -> Language -> Html Message
 view ({ validationMsg, requested, emailValid, inputValid, notification } as model) language =
-    div [ class "container join" ]
-        [ ol [ class "progress bar" ]
-            [ li [ class "ing" ]
-                [ textViewI18n language AccountCreationProgressEmail ]
-            , li []
-                [ textViewI18n language AccountCreationProgressKeypair ]
-            , li []
-                [ textViewI18n language AccountCreationProgressCreateNew ]
-            ]
-        , article [ attribute "data-step" "1" ]
-            [ h1 []
+    main_ [ class "join" ]
+        [ article [ attribute "data-step" "validate-email" ]
+            [ h2 []
                 [ textViewI18n language AccountCreationConfirmEmail ]
             , p []
                 [ textViewI18n language AccountCreationClickConfirmLink ]
             , form [ onSubmit CreateUser ]
                 (emailForm model language)
-            ]
-        , div [ class "btn_area" ]
-            [ button
-                [ class "middle white_blue send_email button"
-                , attribute
-                    (if not requested && emailValid then
-                        "enabled"
+            , div [ class "btn_area" ]
+                [ button
+                    [ type_ "button"
+                    , class "send_email ok button"
+                    , attribute
+                        (if not requested && emailValid then
+                            "enabled"
 
-                     else
-                        "disabled"
-                    )
-                    ""
-                , type_ "button"
-                , onClick CreateUser
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    , onClick CreateUser
+                    ]
+                    [ textViewI18n language AccountCreationEmailSend ]
                 ]
-                [ textViewI18n language AccountCreationEmailSend ]
+            , p [ class "exist_account" ]
+                [ textViewI18n language AccountCreationAlreadyHaveAccount
+                , a [ onClick (ChangeUrl "/") ]
+                    [ textViewI18n language AccountCreationLoginLink ]
+                ]
+            , Html.map NotificationMessage (Notification.view notification language)
             ]
-        , p [ class "exist_account" ]
-            [ textViewI18n language AccountCreationAlreadyHaveAccount
-            , a [ onClick (ChangeUrl "/") ]
-                [ textViewI18n language AccountCreationLoginLink ]
-            ]
-        , Html.map NotificationMessage (Notification.view notification language)
         ]
 
 

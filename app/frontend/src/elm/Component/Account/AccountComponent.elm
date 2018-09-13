@@ -21,6 +21,7 @@ import Html
         , text
         , ul
         )
+import Html.Attributes exposing (class)
 import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language)
@@ -148,7 +149,8 @@ view { language, page } =
                 _ ->
                     NotFound.view language
     in
-    newContentHtml
+    section [ class "content" ]
+        [ newContentHtml ]
 
 
 
