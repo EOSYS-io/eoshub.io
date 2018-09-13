@@ -1,7 +1,7 @@
 module Component.Main.Page.Rammarket exposing (Message, Model, initCmd, initModel, subscriptions, update, view)
 
 import Data.Action exposing (Action, actionsDecoder)
-import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields, rowsDecoder)
+import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
     exposing
         ( Html
@@ -45,7 +45,7 @@ import Port
 import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter exposing (timeFormatter)
-import Util.HttpRequest exposing (getFullPath, post)
+import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
 
 
@@ -98,33 +98,13 @@ getActions =
 
 getRammarketTable : Cmd Message
 getRammarketTable =
-    let
-        requestBody =
-            [ ( "scope", "eosio" |> Encode.string )
-            , ( "code", "eosio" |> Encode.string )
-            , ( "table", "rammarket" |> Encode.string )
-            , ( "json", True |> Encode.bool )
-            ]
-                |> Encode.object
-                |> Http.jsonBody
-    in
-    post ("/v1/chain/get_table_rows" |> getFullPath) requestBody rowsDecoder
+    getTableRows "eosio" "eosio" "rammarket"
         |> Http.send OnFetchRammarketRows
 
 
 getGlobalTable : Cmd Message
 getGlobalTable =
-    let
-        requestBody =
-            [ ( "scope", "eosio" |> Encode.string )
-            , ( "code", "eosio" |> Encode.string )
-            , ( "table", "global" |> Encode.string )
-            , ( "json", True |> Encode.bool )
-            ]
-                |> Encode.object
-                |> Http.jsonBody
-    in
-    post ("/v1/chain/get_table_rows" |> getFullPath) requestBody rowsDecoder
+    getTableRows "eosio" "eosio" "global"
         |> Http.send OnFetchGlobalRows
 
 

@@ -1,7 +1,9 @@
-module Util.HttpRequest exposing (getFullPath, post)
+module Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
+import Data.Table exposing (Row, rowsDecoder)
 import Http
-import Json.Decode as JD exposing (Decoder)
+import Json.Decode exposing (Decoder)
+import Json.Encode as Encode
 import Util.Urls exposing (mainnetRpcUrl)
 
 
@@ -21,3 +23,18 @@ post url body decoder =
         , timeout = Nothing
         , withCredentials = False
         }
+
+
+getTableRows : String -> String -> String -> Http.Request (List Row)
+getTableRows scope code table =
+    let
+        requestBody =
+            [ ( "scope", scope |> Encode.string )
+            , ( "code", code |> Encode.string )
+            , ( "table", table |> Encode.string )
+            , ( "json", True |> Encode.bool )
+            ]
+                |> Encode.object
+                |> Http.jsonBody
+    in
+    post ("/v1/chain/get_table_rows" |> getFullPath) requestBody rowsDecoder

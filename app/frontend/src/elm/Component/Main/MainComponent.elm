@@ -554,11 +554,16 @@ parseQuery query =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar } =
+subscriptions { sidebar, page } =
     Sub.batch
         [ Port.receivePushActionResponse UpdatePushActionResponse
         , Sub.map SidebarMessage Sidebar.subscriptions
-        , Sub.map RammarketMessage Rammarket.subscriptions
+        , case page of
+            RammarketPage _ ->
+                Sub.map RammarketMessage Rammarket.subscriptions
+
+            _ ->
+                Sub.none
         ]
 
 
