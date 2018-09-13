@@ -2,6 +2,7 @@ module Util.Formatter exposing
     ( assetAdd
     , assetSubtract
     , assetToFloat
+    , deleteFromBack
     , floatToAsset
     , formatEosQuantity
     , larimerToEos
@@ -164,3 +165,23 @@ timeFormatter language time =
 
         Err str ->
             str
+
+
+
+-- If the length of input string is less than digit, then return empty string.
+
+
+deleteFromBack : Int -> String -> String
+deleteFromBack digit string =
+    let
+        len =
+            string |> String.length
+
+        end =
+            if digit > len then
+                0
+
+            else
+                len - digit
+    in
+    String.slice 0 end string

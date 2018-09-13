@@ -9,6 +9,8 @@ module Data.Table exposing
     , Table
     , balanceWeightDecoder
     , globalDecoder
+    , initGlobalFields
+    , initRammarketFields
     , rammarketDecoder
     , rowDecoder
     , rowsDecoder
@@ -39,6 +41,20 @@ type alias RammarketFields =
     { supply : String
     , base : BalanceWeight
     , quote : BalanceWeight
+    }
+
+
+initRammarketFields : RammarketFields
+initRammarketFields =
+    { supply = ""
+    , base =
+        { balance = ""
+        , weight = ""
+        }
+    , quote =
+        { balance = ""
+        , weight = ""
+        }
     }
 
 
@@ -73,6 +89,41 @@ type alias GlobalFields =
     , lastProducerScheduleSize : Int
     , totalProducerVoteWeight : String
     , lastNameClose : String
+    }
+
+
+initGlobalFields : GlobalFields
+initGlobalFields =
+    { maxBlockNetUsage = 0
+    , targetBlockNetUsagePct = 0
+    , maxTransactionNetUsage = 0
+    , basePerTransactionNetUsage = 0
+    , netUsageLeeway = 0
+    , contextFreeDiscountNetUsageNum = 0
+    , contextFreeDiscountNetUsageDen = 0
+    , maxBlockCpuUsage = 0
+    , targetBlockCpuUsagePct = 0
+    , maxTransactionCpuUsage = 0
+    , minTransactionCpuUsage = 0
+    , maxTransactionLifetime = 0
+    , deferredTrxExpirationWindow = 0
+    , maxTransactionDelay = 0
+    , maxInlineActionSize = 0
+    , maxInlineActionDepth = 0
+    , maxAuthorityDepth = 0
+    , maxRamSize = ""
+    , totalRamBytesReserved = ""
+    , totalRamStake = ""
+    , lastProducerScheduleUpdate = ""
+    , lastPervoteBucketFill = ""
+    , pervoteBucket = 0
+    , perblockBucket = 0
+    , totalUnpaidBlocks = 0
+    , totalActivatedStake = ""
+    , threshActivatedStakeTime = ""
+    , lastProducerScheduleSize = 0
+    , totalProducerVoteWeight = ""
+    , lastNameClose = ""
     }
 
 

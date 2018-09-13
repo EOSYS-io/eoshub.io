@@ -3,7 +3,6 @@ module Component.Main.Sidebar exposing
     , Model
     , State(..)
     , accountInfoView
-    , deleteFromBack
     , initCmd
     , initModel
     , loadingView
@@ -32,7 +31,8 @@ import Port
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
 import Util.Formatter
     exposing
-        ( floatToAsset
+        ( deleteFromBack
+        , floatToAsset
         , larimerToEos
         )
 import Util.HttpRequest exposing (getFullPath, post)
@@ -371,15 +371,6 @@ update message ({ fold, wallet } as model) =
 -- SUBSCRIPTIONS
 
 
-subscriptions : Model -> Sub Message
-subscriptions _ =
+subscriptions : Sub Message
+subscriptions =
     Port.receiveWalletStatus UpdateWalletStatus
-
-
-
--- Utility functions
-
-
-deleteFromBack : Int -> String -> String
-deleteFromBack digit string =
-    String.slice 0 ((string |> String.length) - digit) string

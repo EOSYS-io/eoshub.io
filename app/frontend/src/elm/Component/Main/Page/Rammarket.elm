@@ -1,7 +1,17 @@
-module Component.Main.Page.Rammarket exposing (Message, Model, initCmd, initModel, update, view)
+module Component.Main.Page.Rammarket exposing
+    ( Message
+    , Model
+    , calculateEosRamPrice
+    , calculateEosRamYield
+    , initCmd
+    , initModel
+    , subscriptions
+    , update
+    , view
+    )
 
 import Data.Action exposing (Action, actionsDecoder)
-import Date.Extra as Date
+import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
     exposing
         ( Html
@@ -42,9 +52,12 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Encode as Encode
 import Port
+import Round
+import Time
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (timeFormatter)
-import Util.HttpRequest exposing (getFullPath, post)
+import Util.Constant exposing (giga)
+import Util.Formatter exposing (deleteFromBack, timeFormatter)
+import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
 
 
@@ -53,6 +66,8 @@ import Util.HttpRequest exposing (getFullPath, post)
 
 type alias Model =
     { actions : List Action
+    , rammarketTable : RammarketFields
+    , globalTable : GlobalFields
     , expandActions : Bool
     }
 
@@ -60,6 +75,8 @@ type alias Model =
 initModel : Model
 initModel =
     { actions = []
+    , rammarketTable = initRammarketFields
+    , globalTable = initGlobalFields
     , expandActions = False
     }
 
@@ -70,11 +87,13 @@ initModel =
 
 type Message
     = OnFetchActions (Result Http.Error (List Action))
+    | OnFetchTableRows (Result Http.Error (List Row))
     | ExpandActions
+    | UpdateChainData Time.Time
 
 
-initCmd : Cmd Message
-initCmd =
+getActions : Cmd Message
+getActions =
     let
         requestBody =
             [ ( "account_name", "eosio.ram" |> Encode.string )
@@ -83,29 +102,60 @@ initCmd =
             ]
                 |> Encode.object
                 |> Http.jsonBody
-
-        getActionsCmd =
-            post ("/v1/history/get_actions" |> getFullPath) requestBody actionsDecoder
-                |> Http.send OnFetchActions
     in
-    Cmd.batch [ Port.loadChart (), getActionsCmd ]
+    post ("/v1/history/get_actions" |> getFullPath) requestBody actionsDecoder
+        |> Http.send OnFetchActions
+
+
+getRammarketTable : Cmd Message
+getRammarketTable =
+    getTableRows "eosio" "eosio" "rammarket"
+        |> Http.send OnFetchTableRows
+
+
+getGlobalTable : Cmd Message
+getGlobalTable =
+    getTableRows "eosio" "eosio" "global"
+        |> Http.send OnFetchTableRows
+
+
+initCmd : Cmd Message
+initCmd =
+    Cmd.batch [ Port.loadChart (), getActions, getRammarketTable, getGlobalTable ]
 
 
 
 -- UPDATE
 
 
-update : Message -> Model -> Model
+update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         OnFetchActions (Ok actions) ->
-            { model | actions = actions }
+            ( { model | actions = actions |> List.reverse }, Cmd.none )
 
         OnFetchActions (Err error) ->
-            model
+            ( model, Cmd.none )
+
+        OnFetchTableRows (Ok rows) ->
+            case rows of
+                (Data.Table.Rammarket fields) :: [] ->
+                    ( { model | rammarketTable = fields }, Cmd.none )
+
+                (Data.Table.Global fields) :: [] ->
+                    ( { model | globalTable = fields }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnFetchTableRows (Err error) ->
+            ( model, Cmd.none )
 
         ExpandActions ->
-            { model | expandActions = True }
+            ( { model | expandActions = True }, Cmd.none )
+
+        UpdateChainData _ ->
+            ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
 
 
 
@@ -113,7 +163,7 @@ update message model =
 
 
 view : Language -> Model -> Html Message
-view language { actions, expandActions } =
+view language { actions, expandActions, rammarketTable, globalTable } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -122,11 +172,11 @@ view language { actions, expandActions } =
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
                         [ h3 [] [ text "이오스 램 가격" ]
-                        , p [] [ text "0.15793210 EOS/kb" ]
+                        , p [] [ text (rammarketTable |> calculateEosRamPrice) ]
                         ]
                     , div [ class "wrapper" ]
                         [ h3 [] [ text "램 점유율" ]
-                        , p [] [ text "46.44/66.36GB (69.97%)" ]
+                        , p [] [ text (globalTable |> calculateEosRamYield) ]
                         ]
                     , div [ class "graph", id "tv-chart-container" ] []
                     ]
@@ -236,3 +286,72 @@ actionToTableRow language { blockTime, data, trxId } =
 
         _ ->
             tr [] []
+
+
+calculateEosRamPrice : RammarketFields -> String
+calculateEosRamPrice { base, quote } =
+    let
+        denominator =
+            case base.balance |> deleteFromBack 4 |> String.toFloat of
+                Ok baseFloat ->
+                    baseFloat
+
+                _ ->
+                    -1.0
+
+        numerator =
+            case quote.balance |> deleteFromBack 4 |> String.toFloat of
+                Ok quoteFloat ->
+                    quoteFloat
+
+                _ ->
+                    -1.0
+    in
+    -- This case means no data loaded yet.
+    if denominator < 0 || numerator < 0 then
+        "Loading..."
+
+    else
+        ((numerator / denominator) * 1024 |> Round.round 8) ++ " EOS/KB"
+
+
+calculateEosRamYield : GlobalFields -> String
+calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
+    let
+        denominator =
+            case maxRamSize |> String.toFloat of
+                Ok baseFloat ->
+                    baseFloat
+
+                _ ->
+                    -1.0
+
+        numerator =
+            case totalRamBytesReserved |> String.toFloat of
+                Ok quoteFloat ->
+                    quoteFloat
+
+                _ ->
+                    -1.0
+    in
+    -- This case means no data loaded yet.
+    if denominator < 0 || numerator < 0 then
+        "Loading..."
+
+    else
+        Round.round 2 (numerator / (giga |> toFloat))
+            ++ "/"
+            ++ Round.round 2 (denominator / (giga |> toFloat))
+            ++ "GB ("
+            ++ Round.round 2 ((numerator * 100) / denominator)
+            ++ "%)"
+
+
+
+-- SUBSCRIPTIONS
+-- The interval needs to be adjusted. Now, it is set to 2 secs.
+
+
+subscriptions : Sub Message
+subscriptions =
+    Time.every (2 * Time.second) UpdateChainData
