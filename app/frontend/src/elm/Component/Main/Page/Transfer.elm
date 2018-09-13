@@ -1,4 +1,16 @@
-module Component.Main.Page.Transfer exposing (Message(..), Model, TransferMessageFormField(..), accountWarningSpan, initModel, memoWarningSpan, quantityWarningSpan, setTransferMessageField, update, validate, view)
+module Component.Main.Page.Transfer exposing
+    ( Message(..)
+    , Model
+    , TransferMessageFormField(..)
+    , accountWarningSpan
+    , initModel
+    , memoWarningSpan
+    , quantityWarningSpan
+    , setTransferMessageField
+    , update
+    , validate
+    , view
+    )
 
 import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)

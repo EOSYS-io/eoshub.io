@@ -2,6 +2,7 @@ module Util.Formatter exposing
     ( assetAdd
     , assetSubtract
     , assetToFloat
+    , deleteFromBack
     , floatToAsset
     , formatEosQuantity
     , larimerToEos
@@ -164,3 +165,8 @@ timeFormatter language time =
 
         Err str ->
             str
+
+
+deleteFromBack : Int -> String -> String
+deleteFromBack digit string =
+    String.slice 0 ((string |> String.length) - digit) string

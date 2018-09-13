@@ -42,9 +42,10 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Encode as Encode
 import Port
+import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (timeFormatter)
+import Util.Formatter exposing (deleteFromBack, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
 
@@ -160,7 +161,7 @@ update message model =
 
 
 view : Language -> Model -> Html Message
-view language { actions, expandActions } =
+view language { actions, expandActions, rammarketTable, globalTable } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -169,11 +170,11 @@ view language { actions, expandActions } =
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
                         [ h3 [] [ text "이오스 램 가격" ]
-                        , p [] [ text "0.15793210 EOS/kb" ]
+                        , p [] [ text (rammarketTable |> calculateEosRamPrice) ]
                         ]
                     , div [ class "wrapper" ]
                         [ h3 [] [ text "램 점유율" ]
-                        , p [] [ text "46.44/66.36GB (69.97%)" ]
+                        , p [] [ text (globalTable |> calculateEosRamYield) ]
                         ]
                     , div [ class "graph", id "tv-chart-container" ] []
                     ]
@@ -285,9 +286,68 @@ actionToTableRow language { blockTime, data, trxId } =
             tr [] []
 
 
+calculateEosRamPrice : RammarketFields -> String
+calculateEosRamPrice { base, quote } =
+    let
+        denominator =
+            case base.balance |> deleteFromBack 4 |> String.toFloat of
+                Ok baseFloat ->
+                    baseFloat
+
+                _ ->
+                    -1.0
+
+        numerator =
+            case quote.balance |> deleteFromBack 4 |> String.toFloat of
+                Ok quoteFloat ->
+                    quoteFloat
+
+                _ ->
+                    -1.0
+    in
+    -- This case should not happen.
+    if denominator < 0 || numerator < 0 then
+        "ERROR!"
+
+    else
+        ((numerator / denominator) * 1024 |> Round.round 8) ++ " EOS/KB"
+
+
+calculateEosRamYield : GlobalFields -> String
+calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
+    let
+        denominator =
+            case maxRamSize |> String.toFloat of
+                Ok baseFloat ->
+                    baseFloat
+
+                _ ->
+                    -1.0
+
+        numerator =
+            case totalRamBytesReserved |> String.toFloat of
+                Ok quoteFloat ->
+                    quoteFloat
+
+                _ ->
+                    -1.0
+    in
+    -- This case should not happen.
+    if denominator < 0 || numerator < 0 then
+        "ERROR!"
+
+    else
+        Round.round 2 (numerator / (1024 * 1024 * 1024))
+            ++ "/"
+            ++ Round.round 2 (denominator / (1024 * 1024 * 1024))
+            ++ "GB ("
+            ++ Round.round 2 ((numerator * 100) / denominator)
+            ++ "%)"
+
+
 
 -- SUBSCRIPTIONS
--- The interval needs to be adjusted. Now, it follows eosio block interval.
+-- The interval needs to be adjusted. Now, it is set to 2 secs.
 
 
 subscriptions : Sub Message
