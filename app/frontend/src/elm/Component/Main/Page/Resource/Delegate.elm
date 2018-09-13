@@ -18,6 +18,7 @@ import Data.Account
         , getUnstakingAmount
         , keyAccountsDecoder
         )
+import Data.Action as Action exposing (DelegatebwParameters)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
@@ -29,14 +30,16 @@ import Translation exposing (I18n(..), Language, translate)
 
 
 type alias Model =
-    { delegateInput : String
+    { delegatebw : DelegatebwParameters
+    , delegateInput : String
     , delegateListModal : DelegateList.Model
     }
 
 
 initModel : Model
 initModel =
-    { delegateInput = ""
+    { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 0 }
+    , delegateInput = ""
     , delegateListModal = DelegateList.initModel
     }
 

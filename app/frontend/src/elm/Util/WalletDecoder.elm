@@ -19,6 +19,8 @@ import Translation
             , EmptyMessage
             , TransferFailed
             , TransferSucceeded
+            , UndelegatebwFailed
+            , UndelegatebwSucceeded
             , UnknownError
             )
         )
@@ -62,6 +64,7 @@ actionSuccessMessages =
     fromList
         [ ( "transfer", TransferSucceeded )
         , ( "delegatebw", DelegatebwSucceeded )
+        , ( "undelegatebw", UndelegatebwSucceeded )
         ]
 
 
@@ -70,6 +73,7 @@ actionFailMessages =
     fromList
         [ ( "transfer", TransferFailed )
         , ( "delegatebw", DelegatebwFailed )
+        , ( "undelegatebw", UndelegatebwFailed )
         ]
 
 

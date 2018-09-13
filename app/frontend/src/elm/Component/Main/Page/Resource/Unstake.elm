@@ -13,6 +13,7 @@ import Data.Account
         , getUnstakingAmount
         , keyAccountsDecoder
         )
+import Data.Action exposing (UndelegatebwParameters)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Translation exposing (I18n(..), Language, translate)
@@ -24,13 +25,16 @@ import Util.Formatter exposing (assetAdd, assetSubtract)
 
 
 type alias Model =
-    { unstakeInput : String
+    { undelegatebw : UndelegatebwParameters
+    , unstakeInput : String
     }
 
 
 initModel : Model
 initModel =
-    { unstakeInput = "" }
+    { undelegatebw = { from = "", receiver = "", unstakeNetQuantity = "", unstakeCpuQuantity = "" }
+    , unstakeInput = ""
+    }
 
 
 

@@ -460,6 +460,15 @@ update message ({ page, notification, header, sidebar } as model) =
                                 Resource.Stake { delegatebw } ->
                                     delegatebw.receiver
 
+                                Resource.Unstake { undelegatebw } ->
+                                    undelegatebw.receiver
+
+                                Resource.Delegate { delegatebw } ->
+                                    delegatebw.receiver
+
+                                Resource.Undelegate { undelegatebw } ->
+                                    undelegatebw.receiver
+
                                 _ ->
                                     ""
 

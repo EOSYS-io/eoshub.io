@@ -161,6 +161,8 @@ type I18n
     | OverStakeAbleAmount
     | DelegatebwSucceeded String
     | DelegatebwFailed String
+    | UndelegatebwSucceeded String
+    | UndelegatebwFailed String
 
 
 translate : Language -> I18n -> String
@@ -844,6 +846,18 @@ getMessages i18n =
 
         DelegatebwFailed code ->
             { korean = code ++ " 코드오류로 스테이크 실패"
+            , english = "Failed with error code " ++ code
+            , chinese = ""
+            }
+
+        UndelegatebwSucceeded receiver ->
+            { korean = receiver ++ "으로 언스테이크 완료!"
+            , english = ""
+            , chinese = ""
+            }
+
+        UndelegatebwFailed code ->
+            { korean = code ++ " 코드오류로 언스테이크 실패"
             , english = "Failed with error code " ++ code
             , chinese = ""
             }
