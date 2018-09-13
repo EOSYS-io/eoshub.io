@@ -1,8 +1,8 @@
 module Util.Formatter exposing
-    ( eosFloatToString
-    , eosStringAdd
-    , eosStringSubtract
-    , eosStringToFloat
+    ( assetAdd
+    , assetSubtract
+    , assetToFloat
+    , floatToAsset
     , formatEosQuantity
     , larimerToEos
     , percentageConverter
@@ -23,13 +23,13 @@ larimerToEos valInt =
     toFloat valInt * 0.0001
 
 
-eosFloatToString : Float -> String
-eosFloatToString valFloat =
+floatToAsset : Float -> String
+floatToAsset valFloat =
     Round.round 4 valFloat ++ " EOS"
 
 
-eosStringToFloat : String -> Float
-eosStringToFloat str =
+assetToFloat : String -> Float
+assetToFloat str =
     let
         result =
             str
@@ -44,18 +44,18 @@ eosStringToFloat str =
             0
 
 
-eosStringAdd : String -> String -> String
-eosStringAdd a b =
-    (+) (eosStringToFloat a)
-        (eosStringToFloat b)
-        |> eosFloatToString
+assetAdd : String -> String -> String
+assetAdd a b =
+    (+) (assetToFloat a)
+        (assetToFloat b)
+        |> floatToAsset
 
 
-eosStringSubtract : String -> String -> String
-eosStringSubtract a b =
-    (-) (eosStringToFloat a)
-        (eosStringToFloat b)
-        |> eosFloatToString
+assetSubtract : String -> String -> String
+assetSubtract a b =
+    (-) (assetToFloat a)
+        (assetToFloat b)
+        |> floatToAsset
 
 
 unitConverterRound4 : Int -> Int -> String

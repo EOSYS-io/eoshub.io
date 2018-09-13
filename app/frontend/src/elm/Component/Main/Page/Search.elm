@@ -67,7 +67,7 @@ import Json.Encode as Encode
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( eosFloatToString
+        ( floatToAsset
         , larimerToEos
         , timeFormatter
         )
@@ -245,7 +245,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
             getUnstakingAmount account.refundRequest.netAmount account.refundRequest.cpuAmount
 
         stakedAmount =
-            eosFloatToString (larimerToEos account.voterInfo.staked)
+            floatToAsset (larimerToEos account.voterInfo.staked)
 
         ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max

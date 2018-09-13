@@ -1,4 +1,21 @@
-module Component.Main.Page.Resource.Stake exposing (Message(..), Model, initModel, quantityWarningSpan, update, validate, view)
+module Component.Main.Page.Resource.Stake exposing
+    ( DistributionRatio
+    , Message(..)
+    , Model
+    , PercentageOfLiquid(..)
+    , StakeAmountMessage(..)
+    , StakeAmountModal
+    , distributeCpuNet
+    , getPercentageOfLiquid
+    , initModel
+    , modalValidateAttr
+    , percentageButton
+    , quantityWarningSpan
+    , update
+    , validate
+    , view
+    , viewStakeAmountModal
+    )
 
 import Data.Account
     exposing
@@ -17,8 +34,9 @@ import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (eosFloatToString, eosStringAdd, eosStringSubtract, larimerToEos)
+import Util.Formatter exposing (assetAdd, assetSubtract, assetToFloat, floatToAsset, larimerToEos)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -37,6 +55,36 @@ import Util.Validation as Validation
 type alias Model =
     { delegatebw : DelegatebwParameters
     , totalQuantity : String
+    , percentageOfLiquid : PercentageOfLiquid
+    , distributionRatio : DistributionRatio
+    , totalQuantityValidation : QuantityStatus
+    , cpuQuantityValidation : QuantityStatus
+    , netQuantityValidation : QuantityStatus
+    , manuallySet : Bool
+    , isFormValid : Bool
+    , isStakeAmountModalOpened : Bool
+    , stakeAmountModal : StakeAmountModal
+    }
+
+
+type PercentageOfLiquid
+    = NoOp
+    | Percentage10
+    | Percentage50
+    | Percentage70
+    | Percentage100
+
+
+type alias DistributionRatio =
+    { cpu : Float
+    , net : Float
+    }
+
+
+type alias StakeAmountModal =
+    { totalQuantity : String
+    , cpuQuantity : String
+    , netQuantity : String
     , totalQuantityValidation : QuantityStatus
     , cpuQuantityValidation : QuantityStatus
     , netQuantityValidation : QuantityStatus
@@ -48,10 +96,23 @@ initModel : Model
 initModel =
     { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 1 }
     , totalQuantity = ""
+    , percentageOfLiquid = NoOp
+    , distributionRatio = { cpu = 4, net = 1 }
     , totalQuantityValidation = EmptyQuantity
     , cpuQuantityValidation = EmptyQuantity
     , netQuantityValidation = EmptyQuantity
+    , manuallySet = False
     , isFormValid = False
+    , isStakeAmountModalOpened = False
+    , stakeAmountModal =
+        { totalQuantity = "0"
+        , cpuQuantity = ""
+        , netQuantity = ""
+        , totalQuantityValidation = EmptyQuantity
+        , cpuQuantityValidation = EmptyQuantity
+        , netQuantityValidation = EmptyQuantity
+        , isFormValid = False
+        }
     }
 
 
@@ -61,25 +122,108 @@ initModel =
 
 type Message
     = TotalAmountInput String
-    | OpenStakeAmountModal -- This is controlled at Resource module
-    | StakePercentage Float
+    | StakePercentage PercentageOfLiquid
+    | OpenStakeAmountModal
+    | ModalMessage StakeAmountMessage
+
+
+type StakeAmountMessage
+    = CpuAmountInput String
+    | NetAmountInput String
+    | CloseModal
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakeAbleAmount =
             coreLiquidBalance
     in
     case message of
         TotalAmountInput value ->
-            ( { model | totalQuantity = value }, Cmd.none )
+            let
+                ( cpuQuantity, netQuantity ) =
+                    distributeCpuNet value distributionRatio.cpu distributionRatio.net
 
-        StakePercentage percentage ->
-            ( model, Cmd.none )
+                newModel =
+                    { model
+                        | totalQuantity = value
+                        , delegatebw =
+                            { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
+                        , percentageOfLiquid = NoOp
+                        , manuallySet = False
+                    }
+            in
+            ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened
+            , Cmd.none
+            )
 
-        _ ->
-            ( model, Cmd.none )
+        StakePercentage percentageOfLiquid ->
+            let
+                ratio =
+                    getPercentageOfLiquid percentageOfLiquid
+
+                value =
+                    assetToFloat coreLiquidBalance
+                        * ratio
+                        |> Round.round 4
+
+                ( cpuQuantity, netQuantity ) =
+                    distributeCpuNet value distributionRatio.cpu distributionRatio.net
+            in
+            ( { model
+                | totalQuantity = value
+                , delegatebw =
+                    { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
+                , percentageOfLiquid = percentageOfLiquid
+                , manuallySet = False
+              }
+            , Cmd.none
+            )
+
+        OpenStakeAmountModal ->
+            ( { model | isStakeAmountModalOpened = True }, Cmd.none )
+
+        ModalMessage stakeAmountMessage ->
+            case stakeAmountMessage of
+                CpuAmountInput value ->
+                    let
+                        newTotalQuantity =
+                            assetAdd value stakeAmountModal.netQuantity
+                                |> assetToFloat
+                                |> toString
+
+                        newModel =
+                            { model
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = newTotalQuantity
+                                        , cpuQuantity = value
+                                    }
+                            }
+                    in
+                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+
+                NetAmountInput value ->
+                    let
+                        newTotalQuantity =
+                            assetAdd stakeAmountModal.cpuQuantity value
+                                |> assetToFloat
+                                |> toString
+
+                        newModel =
+                            { model
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = newTotalQuantity
+                                        , netQuantity = value
+                                    }
+                            }
+                    in
+                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+
+                CloseModal ->
+                    ( { model | isStakeAmountModalOpened = False }, Cmd.none )
 
 
 
@@ -87,10 +231,10 @@ update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalanc
 
 
 view : Language -> Model -> Account -> Html Message
-view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         stakedAmount =
-            eosFloatToString (larimerToEos account.voterInfo.staked)
+            floatToAsset (larimerToEos account.voterInfo.staked)
 
         ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
@@ -111,7 +255,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text
                         ("임대받은 토큰 : "
-                            ++ eosStringSubtract
+                            ++ assetSubtract
                                 totalResources.cpuWeight
                                 selfDelegatedBandwidth.cpuWeight
                         )
@@ -133,7 +277,7 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text
                         ("임대받은 토큰 : "
-                            ++ eosStringSubtract
+                            ++ assetSubtract
                                 totalResources.netWeight
                                 selfDelegatedBandwidth.netWeight
                         )
@@ -157,92 +301,294 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
             , div [ class "input field" ]
                 [ label [ for "eos" ]
                     [ text "EOS" ]
-
-                -- TODO(boseok) Change it to Elm code
                 , input
                     [ attribute "autofocus" ""
                     , class "size large"
-                    , id "EOS"
-                    , Html.Attributes.max "1000000000"
-                    , Html.Attributes.min "0.0001"
-                    , pattern "\\d+(\\.\\d{1,4})?"
                     , placeholder "수량을 입력하세요"
                     , step "0.0001"
                     , type_ "number"
                     , onInput TotalAmountInput
+                    , value totalQuantity
                     ]
                     []
-                , span [ class "validate description" ]
-                    [ text "보유한 수량만큼 스테이크 할 수 있습니다." ]
+                , quantityWarningSpan totalQuantityValidation language model
 
                 -- TODO(boseok): this should be applied to new design
                 , p [ class "validate description" ]
-                    [ text "cpu" ]
+                    [ text ("cpu : " ++ delegatebw.stakeCpuQuantity) ]
                 , p [ class "validate description" ]
-                    [ text "net" ]
-                , button [ type_ "button", onClick (StakePercentage 0.1) ]
-                    [ text "10%" ]
-                , button [ type_ "button", onClick (StakePercentage 0.5) ]
-                    [ text "50%" ]
-                , button [ type_ "button", onClick (StakePercentage 0.7) ]
-                    [ text "70%" ]
-                , button [ type_ "button", onClick (StakePercentage 1) ]
-                    [ text "최대" ]
+                    [ text ("net : " ++ delegatebw.stakeNetQuantity) ]
+                , percentageButton percentageOfLiquid Percentage10
+                , percentageButton percentageOfLiquid Percentage50
+                , percentageButton percentageOfLiquid Percentage70
+                , percentageButton percentageOfLiquid Percentage100
                 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
                     [ text "확인" ]
                 ]
             ]
+        , Html.map ModalMessage (viewStakeAmountModal language model account isStakeAmountModalOpened)
         ]
 
 
-quantityWarningSpan : QuantityStatus -> Language -> Html Message
-quantityWarningSpan quantityStatus language =
+viewStakeAmountModal : Language -> Model -> Account -> Bool -> Html StakeAmountMessage
+viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model) ({ totalResources } as account) opened =
     let
+        cpuValidateAttr =
+            modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.cpuQuantityValidation
+
+        netValidateAttr =
+            modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.netQuantityValidation
+    in
+    section
+        [ attribute "aria-live" "true"
+        , class
+            ("set_division_manual modal popup"
+                ++ (if opened then
+                        " viewing"
+
+                    else
+                        ""
+                   )
+            )
+        , id "popup"
+        , attribute "role" "alert"
+        ]
+        [ div [ class "wrapper" ]
+            [ h2 []
+                [ text "토큰 스테이크 수량 직접 설정" ]
+            , div [ class "token status" ]
+                [ h3 []
+                    [ text "총 스테이크할 토큰"
+                    , strong []
+                        [ text (stakeAmountModal.totalQuantity ++ " EOS") ]
+                    ]
+                , button [ class "set auto button", type_ "button" ]
+                    [ text "자동 분배" ]
+                ]
+            , div [ class "form container" ]
+                [ h3 []
+                    [ text "CPU" ]
+                , p []
+                    [ text ("Staked : " ++ totalResources.cpuWeight) ]
+                , Html.form [ action "", class "true validate" ]
+                    [ input
+                        [ class "user"
+                        , attribute "data-validate" cpuValidateAttr
+                        , placeholder "스테이크할 수량을 설정하세요"
+                        , type_ "text"
+                        , onInput CpuAmountInput
+                        ]
+                        []
+                    , span []
+                        [ text "EOS" ]
+                    ]
+                ]
+            , div [ class "form container" ]
+                [ h3 []
+                    [ text "NET" ]
+                , p []
+                    [ text ("Staked : " ++ totalResources.netWeight) ]
+                , Html.form [ action "" ]
+                    [ input
+                        [ class "user"
+                        , attribute "data-validate" netValidateAttr
+                        , placeholder "스테이크할 수량을 설정하세요"
+                        , type_ "text"
+                        , onInput NetAmountInput
+                        ]
+                        []
+                    , span []
+                        [ text "EOS" ]
+                    ]
+                ]
+            , p [ class "validate description" ]
+                [ text (toString distributionRatio.cpu ++ ":" ++ toString distributionRatio.net ++ " 비율로 스테이킹 하는 것이 가장 좋습니다.") ]
+            , div [ class "btn_area" ]
+                [ button [ class "undo button", type_ "button", onClick CloseModal ]
+                    [ text "취소" ]
+                , button
+                    [ class "ok button"
+                    , attribute
+                        (if stakeAmountModal.isFormValid then
+                            "no_op"
+
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    ]
+                    [ text "확인" ]
+                ]
+            ]
+        ]
+
+
+percentageButton : PercentageOfLiquid -> PercentageOfLiquid -> Html Message
+percentageButton modelPercentageOfLiquid thisPercentageOfLiquid =
+    let
+        ratio =
+            getPercentageOfLiquid thisPercentageOfLiquid
+
+        buttonText =
+            if ratio < 1 then
+                Round.round 0 (ratio * 100) ++ "%"
+
+            else
+                "최대"
+    in
+    button
+        [ type_ "button"
+        , class
+            (if modelPercentageOfLiquid == thisPercentageOfLiquid then
+                "clicked"
+
+             else
+                ""
+            )
+        , onClick (StakePercentage thisPercentageOfLiquid)
+        ]
+        [ text buttonText ]
+
+
+getPercentageOfLiquid : PercentageOfLiquid -> Float
+getPercentageOfLiquid percentageOfLiquid =
+    case percentageOfLiquid of
+        Percentage10 ->
+            0.1
+
+        Percentage50 ->
+            0.5
+
+        Percentage70 ->
+            0.7
+
+        Percentage100 ->
+            1
+
+        _ ->
+            0
+
+
+quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
+quantityWarningSpan quantityStatus language ({ delegatebw, manuallySet } as model) =
+    let
+        -- TODO(boseok): it needs to be translated
+        manualText =
+            if manuallySet then
+                "직접설정"
+
+            else
+                "자동설정"
+
         ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
                     ( " false", translate language InvalidAmount )
 
                 OverValidQuantity ->
-                    ( " false", translate language OverTransferableAmount )
+                    ( " false", translate language OverStakeAbleAmount )
 
                 ValidQuantity ->
-                    ( " true", translate language Transferable )
+                    ( " true"
+                    , manualText
+                        ++ translate language
+                            (StakeAble
+                                delegatebw.stakeCpuQuantity
+                                delegatebw.stakeNetQuantity
+                            )
+                    )
 
                 EmptyQuantity ->
-                    ( "", translate language TransferableAmountDesc )
+                    ( "", translate language StakeAbleAmountDesc )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]
 
 
-validate : Model -> Float -> Model
-validate ({ delegatebw } as model) eosLiquidAmount =
+validate : Model -> Float -> Bool -> Model
+validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
     let
-        { from, receiver, stakeNetQuantity, stakeCpuQuantity } =
-            delegatebw
+        ( cpuQuantity, netQuantity ) =
+            if not isModal then
+                ( delegatebw.stakeNetQuantity, delegatebw.stakeCpuQuantity )
+
+            else
+                ( stakeAmountModal.cpuQuantity, stakeAmountModal.netQuantity )
 
         totalQuantity =
-            eosStringAdd stakeNetQuantity stakeCpuQuantity
+            assetAdd netQuantity cpuQuantity
 
         netQuantityValidation =
-            validateQuantity stakeNetQuantity eosLiquidAmount
+            validateQuantity netQuantity eosLiquidAmount
 
         cpuQuantityValidation =
-            validateQuantity stakeCpuQuantity eosLiquidAmount
+            validateQuantity cpuQuantity eosLiquidAmount
 
         totalQuantityValidation =
             validateQuantity totalQuantity eosLiquidAmount
 
+        isCpuValid =
+            (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
+
+        isNetValid =
+            (netQuantityValidation == ValidQuantity) || (netQuantityValidation == EmptyQuantity)
+
         isFormValid =
-            (netQuantityValidation == ValidQuantity)
-                && (cpuQuantityValidation == ValidQuantity)
+            isCpuValid
+                && isCpuValid
+                && isNetValid
+                && (totalQuantityValidation == ValidQuantity)
     in
-    { model
-        | totalQuantityValidation = netQuantityValidation
-        , cpuQuantityValidation = cpuQuantityValidation
-        , netQuantityValidation = netQuantityValidation
-        , isFormValid = isFormValid
-    }
+    if not isModal then
+        { model
+            | totalQuantityValidation = totalQuantityValidation
+            , cpuQuantityValidation = cpuQuantityValidation
+            , netQuantityValidation = netQuantityValidation
+            , isFormValid = isFormValid
+        }
+
+    else
+        { model
+            | stakeAmountModal =
+                { stakeAmountModal
+                    | totalQuantityValidation = totalQuantityValidation
+                    , cpuQuantityValidation = cpuQuantityValidation
+                    , netQuantityValidation = netQuantityValidation
+                    , isFormValid = isFormValid
+                }
+        }
+
+
+distributeCpuNet : String -> Float -> Float -> ( String, String )
+distributeCpuNet totalQuantity a b =
+    let
+        cpuQuantity =
+            floatToAsset <| assetToFloat totalQuantity * (a / (a + b))
+
+        netQuantity =
+            assetSubtract totalQuantity cpuQuantity
+    in
+    ( cpuQuantity, netQuantity )
+
+
+modalValidateAttr : QuantityStatus -> QuantityStatus -> String
+modalValidateAttr totalQuantityStatus resourceQuantityStatus =
+    case resourceQuantityStatus of
+        InvalidQuantity ->
+            "false"
+
+        OverValidQuantity ->
+            "false"
+
+        ValidQuantity ->
+            if totalQuantityStatus == ValidQuantity then
+                "true"
+
+            else
+                "false"
+
+        EmptyQuantity ->
+            ""

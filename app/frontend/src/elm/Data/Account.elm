@@ -19,8 +19,8 @@ import Json.Decode.Pipeline exposing (decode, optional, required)
 import Round
 import Util.Formatter
     exposing
-        ( eosFloatToString
-        , eosStringToFloat
+        ( floatToAsset
+        , assetToFloat
         , larimerToEos
         , percentageConverter
         , resourceUnitConverter
@@ -182,10 +182,10 @@ integerStringDecoder =
 
 getTotalAmount : String -> Int -> String -> String -> String
 getTotalAmount coreLiquidBalance staked unstakingNetAmount unstakingCpuAmount =
-    (eosStringToFloat coreLiquidBalance
+    (assetToFloat coreLiquidBalance
         + larimerToEos staked
-        + eosStringToFloat unstakingNetAmount
-        + eosStringToFloat unstakingCpuAmount
+        + assetToFloat unstakingNetAmount
+        + assetToFloat unstakingCpuAmount
         |> Round.round 4
     )
         ++ " EOS"
@@ -193,7 +193,7 @@ getTotalAmount coreLiquidBalance staked unstakingNetAmount unstakingCpuAmount =
 
 getUnstakingAmount : String -> String -> String
 getUnstakingAmount unstakingNetAmount unstakingCpuAmount =
-    eosFloatToString (eosStringToFloat unstakingNetAmount + eosStringToFloat unstakingCpuAmount)
+    floatToAsset (assetToFloat unstakingNetAmount + assetToFloat unstakingCpuAmount)
 
 
 getResource : String -> Int -> Int -> Int -> ( String, String, String, String, String )

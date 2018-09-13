@@ -156,6 +156,9 @@ type I18n
     | ShowMore
     | SearchPublicKey
     | SearchResultPublicKey
+    | StakeAble String String
+    | StakeAbleAmountDesc
+    | OverStakeAbleAmount
 
 
 translate : Language -> I18n -> String
@@ -811,4 +814,22 @@ getMessages i18n =
             { korean = "검색하신 공개 키에 대한 정보입니다 :)"
             , english = "Search result of the public key"
             , chinese = "如下为查询到的公匙信息"
+            }
+
+        StakeAble cpu net ->
+            { korean = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
+            , english = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
+            , chinese = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
+            }
+
+        StakeAbleAmountDesc ->
+            { korean = "보유한 수량만큼 스테이크 할 수 있습니다."
+            , english = ""
+            , chinese = ""
+            }
+
+        OverStakeAbleAmount ->
+            { korean = "스테이크 가능한 수량보다 많습니다."
+            , english = ""
+            , chinese = ""
             }
