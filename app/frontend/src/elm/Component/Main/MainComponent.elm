@@ -458,22 +458,25 @@ update message ({ page, notification, header, sidebar } as model) =
                         ResourcePage { tab } ->
                             case tab of
                                 Resource.Stake { delegatebw } ->
-                                    Debug.log ""
-                                        delegatebw.receiver
+                                    delegatebw.receiver
 
                                 _ ->
                                     ""
 
                         _ ->
                             ""
+
+                ( newSidebar, accoutRefreshCmd ) =
+                    Sidebar.update (Sidebar.UpdateState sidebar.state) sidebar
             in
             ( { model
                 | notification =
                     { content = decodePushActionResponse resp notificationParameter
                     , open = True
                     }
+                , sidebar = newSidebar
               }
-            , Cmd.none
+            , Cmd.map SidebarMessage accoutRefreshCmd
             )
 
         ( OnLocationChange location newComponent, _ ) ->
