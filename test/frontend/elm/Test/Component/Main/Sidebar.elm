@@ -5,7 +5,6 @@ import Expect
 import Navigation
 import Port
 import Test exposing (..)
-import Translation exposing (Language(Korean))
 import Util.WalletDecoder exposing (WalletStatus(..))
 
 
@@ -95,8 +94,15 @@ tests =
                             (update AuthenticateAccount initModel)
                 , test "InvalidateAccount" <|
                     \() ->
+                        let
+                            cmds =
+                                Cmd.batch
+                                    [ Port.invalidateAccount ()
+                                    , Navigation.reload
+                                    ]
+                        in
                         Expect.equal
-                            ( initModel, Port.invalidateAccount () )
+                            ( initModel, cmds )
                             (update InvalidateAccount initModel)
                 , test "UpdateState" <|
                     \() ->

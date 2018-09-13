@@ -34,9 +34,18 @@ import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
+import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (assetAdd, assetSubtract, assetToFloat, floatToAsset, larimerToEos)
+import Util.Formatter
+    exposing
+        ( assetAdd
+        , assetSubtract
+        , assetToFloat
+        , floatToAsset
+        , formatAsset
+        , larimerToEos
+        )
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -94,7 +103,7 @@ type alias StakeAmountModal =
 
 initModel : Model
 initModel =
-    { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 1 }
+    { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 0 }
     , totalQuantity = ""
     , percentageOfLiquid = NoOp
     , distributionRatio = { cpu = 4, net = 1 }
@@ -105,14 +114,19 @@ initModel =
     , isFormValid = False
     , isStakeAmountModalOpened = False
     , stakeAmountModal =
-        { totalQuantity = "0"
-        , cpuQuantity = ""
-        , netQuantity = ""
-        , totalQuantityValidation = EmptyQuantity
-        , cpuQuantityValidation = EmptyQuantity
-        , netQuantityValidation = EmptyQuantity
-        , isFormValid = False
-        }
+        initStakeAmountModal
+    }
+
+
+initStakeAmountModal : StakeAmountModal
+initStakeAmountModal =
+    { totalQuantity = "0"
+    , cpuQuantity = ""
+    , netQuantity = ""
+    , totalQuantityValidation = EmptyQuantity
+    , cpuQuantityValidation = EmptyQuantity
+    , netQuantityValidation = EmptyQuantity
+    , isFormValid = False
     }
 
 
@@ -124,17 +138,19 @@ type Message
     = TotalAmountInput String
     | StakePercentage PercentageOfLiquid
     | OpenStakeAmountModal
+    | SubmitAction
     | ModalMessage StakeAmountMessage
 
 
 type StakeAmountMessage
     = CpuAmountInput String
     | NetAmountInput String
+    | ClickOk
     | CloseModal
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
     let
         stakeAbleAmount =
             coreLiquidBalance
@@ -184,6 +200,16 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
         OpenStakeAmountModal ->
             ( { model | isStakeAmountModalOpened = True }, Cmd.none )
 
+        SubmitAction ->
+            let
+                cmd =
+                    { delegatebw | from = accountName, receiver = accountName }
+                        |> Action.Delegatebw
+                        |> encodeAction
+                        |> Port.pushAction
+            in
+            ( model, cmd )
+
         ModalMessage stakeAmountMessage ->
             case stakeAmountMessage of
                 CpuAmountInput value ->
@@ -222,8 +248,35 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                     in
                     ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
+                ClickOk ->
+                    ( { model
+                        | delegatebw =
+                            { delegatebw
+                                | stakeCpuQuantity =
+                                    stakeAmountModal.cpuQuantity |> formatAsset
+                                , stakeNetQuantity =
+                                    stakeAmountModal.netQuantity |> formatAsset
+                            }
+                        , percentageOfLiquid = NoOp
+                        , totalQuantity = stakeAmountModal.totalQuantity
+                        , totalQuantityValidation = stakeAmountModal.totalQuantityValidation
+                        , cpuQuantityValidation = stakeAmountModal.cpuQuantityValidation
+                        , netQuantityValidation = stakeAmountModal.netQuantityValidation
+                        , manuallySet = True
+                        , isFormValid = stakeAmountModal.isFormValid
+                        , isStakeAmountModalOpened = False
+                      }
+                    , Cmd.none
+                    )
+
                 CloseModal ->
-                    ( { model | isStakeAmountModalOpened = False }, Cmd.none )
+                    ( { model
+                        | isStakeAmountModalOpened = False
+                        , stakeAmountModal =
+                            initStakeAmountModal
+                      }
+                    , Cmd.none
+                    )
 
 
 
@@ -324,7 +377,19 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                 , percentageButton percentageOfLiquid Percentage100
                 ]
             , div [ class "btn_area" ]
-                [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                [ button
+                    [ class "ok button"
+                    , attribute
+                        (if model.isFormValid then
+                            "no_op"
+
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    , onClick SubmitAction
+                    ]
                     [ text "확인" ]
                 ]
             ]
@@ -419,6 +484,7 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
                         )
                         ""
                     , type_ "button"
+                    , onClick ClickOk
                     ]
                     [ text "확인" ]
                 ]
