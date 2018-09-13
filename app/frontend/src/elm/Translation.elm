@@ -637,9 +637,9 @@ getMessages i18n =
             }
 
         AccountCreationKeypairGenerated ->
-            { korean = "키 쌍을 만들었어요. 꼭 안전한 곳에 복사해두세요!"
-            , english = "A key pair is generated. Please copy and save!"
-            , chinese = "我做了一对钥匙。 确保将其复制到安全的地方！"
+            { korean = "키 쌍을 꼭 안전한 곳에 복사해두세요!"
+            , english = "Please copy and save key pair!"
+            , chinese = "确保将密钥对复制到安全的地方！"
             }
 
         AccountCreationKeypairCaution ->
@@ -661,7 +661,7 @@ getMessages i18n =
             }
 
         CopyAll ->
-            { korean = "한 번에 복사하기"
+            { korean = "한번에 복사하기"
             , english = "Copy All"
             , chinese = "立即复制"
             }
@@ -703,25 +703,25 @@ getMessages i18n =
             }
 
         AccountCreationCongratulation ->
-            { korean = "축하합니다! 새로운 계정을 만들었어요!"
-            , english = "Congratulations! A new account is created!"
-            , chinese = "恭喜！ 我创建了一个新帐户！"
+            { korean = "축하합니다!"
+            , english = "Congratulations!"
+            , chinese = "恭喜！"
             }
 
         AccountCreationWelcome ->
-            { korean = "정식 주민이 된 것을 환영합니다!"
-            , english = "Welcome aboard to EOS blockchain!"
-            , chinese = "欢迎登陆EOS区块链！"
+            { korean = "새로운 계정을 만들었어요."
+            , english = "A new account is created"
+            , chinese = "我创建了一个新帐户"
             }
 
         AccountCreationYouCanSignIn ->
-            { korean = "이제 홈에서 로그인하실 수 있어요!"
-            , english = "Now you can Sign In!"
-            , chinese = "现在你可以登录了！"
+            { korean = "이제 홈에서 로그인하실 수 있습니다."
+            , english = "Now you can Sign In"
+            , chinese = "现在你可以登录了"
             }
 
         AccountCreationGoHome ->
-            { korean = "홈 화면 바로가기"
+            { korean = "메인으로 가기"
             , english = "Go Home"
             , chinese = "回家"
             }

@@ -1,6 +1,6 @@
 module Component.Account.Page.CreateKeys exposing (Message(..), Model, initModel, subscriptions, update, view)
 
-import Html exposing (Html, article, button, dd, div, dl, dt, h1, img, li, node, ol, p, text, textarea)
+import Html exposing (Html, article, button, dd, div, dl, dt, h2, img, li, main_, node, ol, p, span, text, textarea)
 import Html.Attributes exposing (alt, attribute, class, id, src, type_)
 import Html.Events exposing (onClick)
 import Navigation
@@ -72,17 +72,11 @@ update msg model =
 
 view : Model -> Language -> Html Message
 view model language =
-    div [ class "container join" ]
-        [ ol [ class "progress bar" ]
-            [ li [ class "done" ]
-                [ textViewI18n language AccountCreationProgressEmail ]
-            , li [ class "ing" ]
-                [ textViewI18n language AccountCreationProgressKeypair ]
-            , li []
-                [ textViewI18n language AccountCreationProgressCreateNew ]
-            ]
-        , article [ attribute "data-step" "3" ]
-            [ h1 []
+    main_ [ class "join" ]
+        [ article [ attribute "data-step" "copy-key-pair" ]
+            [ span [ class "progress", attribute "data-progress" "02" ]
+                [ text "02" ]
+            , h2 []
                 [ textViewI18n language AccountCreationKeypairGenerated ]
             , p []
                 [ textViewI18n language AccountCreationKeypairCaution ]
@@ -96,27 +90,27 @@ view model language =
                 , dd []
                     [ text model.keys.privateKey ]
                 ]
+            , div [ class "btn_area" ]
+                [ button [ class "button undo", id "copy", type_ "button", onClick Copy ]
+                    [ textViewI18n language CopyAll ]
+                , button
+                    [ class "ok button"
+                    , attribute
+                        (if model.nextEnabled then
+                            "enabled"
+
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , id "next"
+                    , type_ "button"
+                    , onClick Next
+                    ]
+                    [ textViewI18n language Translation.Next ]
+                ]
             , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
                 [ text ("PublicKey:" ++ model.keys.publicKey ++ "\nPrivateKey:" ++ model.keys.privateKey) ]
-            , button [ class "button middle copy blue_white", id "copy", type_ "button", onClick Copy ]
-                [ textViewI18n language CopyAll ]
-            ]
-        , div [ class "btn_area" ]
-            [ button
-                [ class "middle white_blue button"
-                , attribute
-                    (if model.nextEnabled then
-                        "enabled"
-
-                     else
-                        "disabled"
-                    )
-                    ""
-                , id "next"
-                , type_ "button"
-                , onClick Next
-                ]
-                [ textViewI18n language Translation.Next ]
             ]
         ]
 
