@@ -186,14 +186,17 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
 
                 ( cpuQuantity, netQuantity ) =
                     distributeCpuNet value distributionRatio.cpu distributionRatio.net
+
+                newModel =
+                    { model
+                        | totalQuantity = value
+                        , delegatebw =
+                            { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
+                        , percentageOfLiquid = percentageOfLiquid
+                        , manuallySet = False
+                    }
             in
-            ( { model
-                | totalQuantity = value
-                , delegatebw =
-                    { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
-                , percentageOfLiquid = percentageOfLiquid
-                , manuallySet = False
-              }
+            ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened
             , Cmd.none
             )
 
