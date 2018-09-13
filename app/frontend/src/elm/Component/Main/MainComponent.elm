@@ -76,7 +76,7 @@ type Page
     | TransferPage Transfer.Model
     | ResourcePage Resource.Model
     | VotingPage Voting.Model
-    | RammarketPage
+    | RammarketPage Rammarket.Model
     | NotFoundPage
 
 
@@ -123,6 +123,7 @@ type Message
     | TransferMessage Transfer.Message
     | ResourceMessage Resource.Message
     | IndexMessage Index.Message
+    | RammarketMessage Rammarket.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
@@ -191,7 +192,7 @@ pageCmd page location =
             Cmd.map SearchKeyMessage subInitCmd
 
         RammarketRoute ->
-            Rammarket.initCmd
+            Cmd.map RammarketMessage Rammarket.initCmd
 
         _ ->
             Cmd.none
@@ -237,8 +238,8 @@ view { page, header, notification, sidebar } =
                 IndexPage ->
                     Html.map IndexMessage (Index.view language)
 
-                RammarketPage ->
-                    Rammarket.view language
+                RammarketPage subModel ->
+                    Html.map RammarketMessage (Rammarket.view language subModel)
 
                 _ ->
                     NotFound.view language
@@ -448,6 +449,13 @@ update message ({ page, notification, header, sidebar } as model) =
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
 
+        ( RammarketMessage subMessage, RammarketPage subModel ) ->
+            let
+                newPage =
+                    Rammarket.update subMessage subModel
+            in
+            ( { model | page = newPage |> RammarketPage }, Cmd.none )
+
         ( UpdatePushActionResponse resp, _ ) ->
             let
                 notificationParameter =
@@ -595,7 +603,7 @@ getPage location =
             IndexPage
 
         RammarketRoute ->
-            RammarketPage
+            RammarketPage Rammarket.initModel
 
         NotFoundRoute ->
             NotFoundPage

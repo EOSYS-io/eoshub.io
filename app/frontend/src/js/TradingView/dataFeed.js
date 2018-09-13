@@ -16,7 +16,7 @@ function resolveSymbol(symbolName, onSymbolResolvedCallback) {
   const { supportedResolutions } = chartConfig;
   const symbolStub = {
     name,
-    description: 'Eos ram prices per kilo bytes',
+    description: 'Eos ram prices/KB',
     type: 'crypto',
     session: '24x7',
     timezone: 'Asia/Seoul',

@@ -72,6 +72,7 @@ type alias Action =
     , contractAccount : String
     , actionName : String
     , data : Result String ActionParameters
+    , trxId : String
     , actionTag : String
     }
 
@@ -194,6 +195,7 @@ actionsDecoder =
                 |> requiredAt [ "action_trace", "act", "account" ] Decode.string
                 |> requiredAt [ "action_trace", "act", "name" ] Decode.string
                 |> requiredAt [ "action_trace", "act", "data" ] actionParametersDecoder
+                |> requiredAt [ "action_trace", "trx_id" ] Decode.string
                 |> hardcoded ""
             )
         )
