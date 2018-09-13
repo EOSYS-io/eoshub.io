@@ -85,8 +85,8 @@ rowsDecoder =
 rowDecoder : Decoder Row
 rowDecoder =
     oneOf
-        [ rammarketDecoder
-        , globalDecoder
+        [ Decode.map Rammarket rammarketDecoder
+        , Decode.map Global globalDecoder
         ]
 
 
@@ -97,48 +97,44 @@ balanceWeightDecoder =
         (Decode.field "weight" Decode.string)
 
 
-rammarketDecoder : Decoder Row
+rammarketDecoder : Decoder RammarketFields
 rammarketDecoder =
-    Decode.map Rammarket
-        (Decode.map3 RammarketFields
-            (Decode.field "supply" Decode.string)
-            (Decode.field "base" balanceWeightDecoder)
-            (Decode.field "quote" balanceWeightDecoder)
-        )
+    Decode.map3 RammarketFields
+        (Decode.field "supply" Decode.string)
+        (Decode.field "base" balanceWeightDecoder)
+        (Decode.field "quote" balanceWeightDecoder)
 
 
-globalDecoder : Decoder Row
+globalDecoder : Decoder GlobalFields
 globalDecoder =
-    Decode.map Global
-        (decode GlobalFields
-            |> required "max_block_net_usage" Decode.int
-            |> required "target_block_net_usage_pct" Decode.int
-            |> required "max_transaction_net_usage" Decode.int
-            |> required "base_per_transaction_net_usage" Decode.int
-            |> required "net_usage_leeway" Decode.int
-            |> required "context_free_discount_net_usage_num" Decode.int
-            |> required "context_free_discount_net_usage_den" Decode.int
-            |> required "max_block_cpu_usage" Decode.int
-            |> required "target_block_cpu_usage_pct" Decode.int
-            |> required "max_transaction_cpu_usage" Decode.int
-            |> required "min_transaction_cpu_usage" Decode.int
-            |> required "max_transaction_lifetime" Decode.int
-            |> required "deferred_trx_expiration_window" Decode.int
-            |> required "max_transaction_delay" Decode.int
-            |> required "max_inline_action_size" Decode.int
-            |> required "max_inline_action_depth" Decode.int
-            |> required "max_authority_depth" Decode.int
-            |> required "max_ram_size" Decode.string
-            |> required "total_ram_bytes_reserved" Decode.string
-            |> required "total_ram_stake" Decode.string
-            |> required "last_producer_schedule_update" Decode.string
-            |> required "last_pervote_bucket_fill" Decode.string
-            |> required "pervote_bucket" Decode.int
-            |> required "perblock_bucket" Decode.int
-            |> required "total_unpaid_blocks" Decode.int
-            |> required "total_activated_stake" Decode.string
-            |> required "thresh_activated_stake_time" Decode.string
-            |> required "last_producer_schedule_size" Decode.int
-            |> required "total_producer_vote_weight" Decode.string
-            |> required "last_name_close" Decode.string
-        )
+    decode GlobalFields
+        |> required "max_block_net_usage" Decode.int
+        |> required "target_block_net_usage_pct" Decode.int
+        |> required "max_transaction_net_usage" Decode.int
+        |> required "base_per_transaction_net_usage" Decode.int
+        |> required "net_usage_leeway" Decode.int
+        |> required "context_free_discount_net_usage_num" Decode.int
+        |> required "context_free_discount_net_usage_den" Decode.int
+        |> required "max_block_cpu_usage" Decode.int
+        |> required "target_block_cpu_usage_pct" Decode.int
+        |> required "max_transaction_cpu_usage" Decode.int
+        |> required "min_transaction_cpu_usage" Decode.int
+        |> required "max_transaction_lifetime" Decode.int
+        |> required "deferred_trx_expiration_window" Decode.int
+        |> required "max_transaction_delay" Decode.int
+        |> required "max_inline_action_size" Decode.int
+        |> required "max_inline_action_depth" Decode.int
+        |> required "max_authority_depth" Decode.int
+        |> required "max_ram_size" Decode.string
+        |> required "total_ram_bytes_reserved" Decode.string
+        |> required "total_ram_stake" Decode.string
+        |> required "last_producer_schedule_update" Decode.string
+        |> required "last_pervote_bucket_fill" Decode.string
+        |> required "pervote_bucket" Decode.int
+        |> required "perblock_bucket" Decode.int
+        |> required "total_unpaid_blocks" Decode.int
+        |> required "total_activated_stake" Decode.string
+        |> required "thresh_activated_stake_time" Decode.string
+        |> required "last_producer_schedule_size" Decode.int
+        |> required "total_producer_vote_weight" Decode.string
+        |> required "last_name_close" Decode.string
