@@ -87,8 +87,7 @@ initModel =
 
 type Message
     = OnFetchActions (Result Http.Error (List Action))
-    | OnFetchRammarketRows (Result Http.Error (List Row))
-    | OnFetchGlobalRows (Result Http.Error (List Row))
+    | OnFetchTableRows (Result Http.Error (List Row))
     | ExpandActions
     | UpdateChainData Time.Time
 
@@ -111,13 +110,13 @@ getActions =
 getRammarketTable : Cmd Message
 getRammarketTable =
     getTableRows "eosio" "eosio" "rammarket"
-        |> Http.send OnFetchRammarketRows
+        |> Http.send OnFetchTableRows
 
 
 getGlobalTable : Cmd Message
 getGlobalTable =
     getTableRows "eosio" "eosio" "global"
-        |> Http.send OnFetchGlobalRows
+        |> Http.send OnFetchTableRows
 
 
 initCmd : Cmd Message
@@ -138,26 +137,18 @@ update message model =
         OnFetchActions (Err error) ->
             ( model, Cmd.none )
 
-        OnFetchRammarketRows (Ok rows) ->
+        OnFetchTableRows (Ok rows) ->
             case rows of
                 (Data.Table.Rammarket fields) :: [] ->
                     ( { model | rammarketTable = fields }, Cmd.none )
 
-                _ ->
-                    ( model, Cmd.none )
-
-        OnFetchRammarketRows (Err error) ->
-            ( model, Cmd.none )
-
-        OnFetchGlobalRows (Ok rows) ->
-            case rows of
                 (Data.Table.Global fields) :: [] ->
                     ( { model | globalTable = fields }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
 
-        OnFetchGlobalRows (Err error) ->
+        OnFetchTableRows (Err error) ->
             ( model, Cmd.none )
 
         ExpandActions ->
