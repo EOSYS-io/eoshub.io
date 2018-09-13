@@ -65,4 +65,11 @@ tests =
                 \() ->
                     Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter English "")
             ]
+        , describe "deleteFromBack"
+            [ test "remove 4 characters." <|
+                \() ->
+                    Expect.equal "10.0000" (deleteFromBack 4 "10.0000 EOS")
+            , test "remove characters more than string size" <|
+                \() -> Expect.equal "" (deleteFromBack 4 "abc")
+            ]
         ]

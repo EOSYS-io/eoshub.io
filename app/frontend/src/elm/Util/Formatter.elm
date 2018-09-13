@@ -167,6 +167,21 @@ timeFormatter language time =
             str
 
 
+
+-- If the length of input string is less than digit, then return empty string.
+
+
 deleteFromBack : Int -> String -> String
 deleteFromBack digit string =
-    String.slice 0 ((string |> String.length) - digit) string
+    let
+        len =
+            string |> String.length
+
+        end =
+            if digit > len then
+                0
+
+            else
+                len - digit
+    in
+    String.slice 0 end string
