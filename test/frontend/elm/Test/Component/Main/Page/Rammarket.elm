@@ -16,7 +16,7 @@ tests =
                         Expect.equal
                             "Loading..."
                             (calculateEosRamPrice initRammarketFields)
-                , test "calculate ram." <|
+                , test "calculate ram price." <|
                     \() ->
                         Expect.equal "0.10358351 EOS/KB"
                             (calculateEosRamPrice
@@ -38,7 +38,7 @@ tests =
                         Expect.equal
                             "Loading..."
                             (calculateEosRamYield initGlobalFields)
-                , test "calculate ram." <|
+                , test "calculate ram yield." <|
                     \() ->
                         Expect.equal "43.29/73.47GB (58.92%)"
                             (calculateEosRamYield
