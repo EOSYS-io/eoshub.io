@@ -371,8 +371,8 @@ update message ({ fold, wallet } as model) =
 -- SUBSCRIPTIONS
 
 
-subscriptions : Model -> Sub Message
-subscriptions _ =
+subscriptions : Sub Message
+subscriptions =
     Port.receiveWalletStatus UpdateWalletStatus
 
 

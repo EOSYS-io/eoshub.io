@@ -451,10 +451,10 @@ update message ({ page, notification, header, sidebar } as model) =
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
-                newPage =
+                ( newPage, subCmd ) =
                     Rammarket.update subMessage subModel
             in
-            ( { model | page = newPage |> RammarketPage }, Cmd.none )
+            ( { model | page = newPage |> RammarketPage }, Cmd.map RammarketMessage subCmd )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let
@@ -557,7 +557,8 @@ subscriptions : Model -> Sub Message
 subscriptions { sidebar } =
     Sub.batch
         [ Port.receivePushActionResponse UpdatePushActionResponse
-        , Sub.map SidebarMessage (Sidebar.subscriptions sidebar)
+        , Sub.map SidebarMessage Sidebar.subscriptions
+        , Sub.map RammarketMessage Rammarket.subscriptions
         ]
 
 
