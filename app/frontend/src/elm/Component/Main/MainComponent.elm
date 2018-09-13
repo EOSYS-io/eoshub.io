@@ -455,6 +455,15 @@ update message ({ page, notification, header, sidebar } as model) =
                         TransferPage { transfer } ->
                             transfer.to
 
+                        ResourcePage { tab } ->
+                            case tab of
+                                Resource.Stake { delegatebw } ->
+                                    Debug.log ""
+                                        delegatebw.receiver
+
+                                _ ->
+                                    ""
+
                         _ ->
                             ""
             in

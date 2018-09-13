@@ -208,7 +208,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                         |> encodeAction
                         |> Port.pushAction
             in
-            ( model, cmd )
+            ( { model | delegatebw = { delegatebw | from = accountName, receiver = accountName } }, cmd )
 
         ModalMessage stakeAmountMessage ->
             case stakeAmountMessage of
