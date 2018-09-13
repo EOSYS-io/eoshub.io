@@ -305,9 +305,9 @@ calculateEosRamPrice { base, quote } =
                 _ ->
                     -1.0
     in
-    -- This case should not happen.
+    -- This case means no data loaded yet.
     if denominator < 0 || numerator < 0 then
-        "ERROR!"
+        "Loading..."
 
     else
         ((numerator / denominator) * 1024 |> Round.round 8) ++ " EOS/KB"
@@ -332,9 +332,9 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
                 _ ->
                     -1.0
     in
-    -- This case should not happen.
+    -- This case means no data loaded yet.
     if denominator < 0 || numerator < 0 then
-        "ERROR!"
+        "Loading..."
 
     else
         Round.round 2 (numerator / (1024 * 1024 * 1024))
