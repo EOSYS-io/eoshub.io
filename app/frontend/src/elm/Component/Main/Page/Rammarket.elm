@@ -43,6 +43,7 @@ import Html.Attributes
         , class
         , disabled
         , id
+        , name
         , placeholder
         , scope
         , style
@@ -65,11 +66,18 @@ import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 -- MODEL
 
 
+type ActionType
+    = Buy
+    | Sell
+
+
 type alias Model =
     { actions : List Action
     , rammarketTable : RammarketFields
     , globalTable : GlobalFields
     , expandActions : Bool
+    , actionType : ActionType
+    , modalOpen : Bool
     }
 
 
@@ -79,6 +87,8 @@ initModel =
     , rammarketTable = initRammarketFields
     , globalTable = initGlobalFields
     , expandActions = False
+    , actionType = Buy
+    , modalOpen = False
     }
 
 
@@ -91,6 +101,8 @@ type Message
     | OnFetchTableRows (Result Http.Error (List Row))
     | ExpandActions
     | UpdateChainData Time.Time
+    | SetActionType ActionType
+    | ToggleModal
 
 
 getActions : Cmd Message
@@ -130,7 +142,7 @@ initCmd =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message model =
+update message ({ modalOpen } as model) =
     case message of
         OnFetchActions (Ok actions) ->
             ( { model | actions = actions |> List.reverse }, Cmd.none )
@@ -158,13 +170,19 @@ update message model =
         UpdateChainData _ ->
             ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
 
+        SetActionType buyOrSell ->
+            ( { model | actionType = buyOrSell }, Cmd.none )
+
+        ToggleModal ->
+            ( { model | modalOpen = not modalOpen }, Cmd.none )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Account -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable } { ramQuota, ramUsage } =
+view language { actions, expandActions, rammarketTable, globalTable, actionType, modalOpen } { ramQuota, ramUsage } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -184,6 +202,15 @@ view language { actions, expandActions, rammarketTable, globalTable } { ramQuota
                 , let
                     ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
                         getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
+
+                    ( buyClass, sellClass, buyOthersRamTab ) =
+                        case actionType of
+                            Buy ->
+                                ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
+
+                            Sell ->
+                                -- Produce empty html node with text tag.
+                                ( "", " ing", text "" )
                   in
                   div [ class "my status" ]
                     [ div [ class "summary" ]
@@ -207,8 +234,20 @@ view language { actions, expandActions, rammarketTable, globalTable } { ramQuota
                         ]
                     , div [ class "sell_buy" ]
                         [ div [ class "tab" ]
-                            [ button [ type_ "button", class "buy ing tab button" ] [ text "구매하기" ]
-                            , button [ type_ "button", class "sell ing tab button" ] [ text "판매하기" ]
+                            [ button
+                                [ type_ "button"
+                                , class ("buy tab button" ++ buyClass)
+                                , onClick (SetActionType Buy)
+                                ]
+                                [ text "구매하기"
+                                ]
+                            , button
+                                [ type_ "button"
+                                , class ("sell tab button" ++ sellClass)
+                                , onClick (SetActionType Sell)
+                                ]
+                                [ text "판매하기"
+                                ]
                             ]
                         , div [ class "unit" ]
                             [ div [ class "select period" ]
@@ -216,7 +255,7 @@ view language { actions, expandActions, rammarketTable, globalTable } { ramQuota
                                 , button [ type_ "button", class "prev button" ] [ text "이전 단위 고르기" ]
                                 , button [ type_ "button", class "next button" ] [ text "다음 단위 고르기" ]
                                 ]
-                            , a [] [ text "타계정 구매" ]
+                            , buyOthersRamTab
                             ]
                         , form [ class "input panel" ]
                             [ div []
@@ -272,6 +311,41 @@ view language { actions, expandActions, rammarketTable, globalTable } { ramQuota
                     , tbody [] actionTableRows
                     ]
                 , viewMoreButton
+                ]
+            ]
+        , section
+            [ attribute "aria-live" "true"
+            , class
+                ("buy_ram modal popup"
+                    ++ (if modalOpen then
+                            " viewing"
+
+                        else
+                            ""
+                       )
+                )
+            ]
+            [ div [ class "wrapper" ]
+                [ h2 []
+                    [ text "타계정 구매" ]
+                , p []
+                    [ text "램을 구매해 줄 타계정을 입력하세요." ]
+                , form []
+                    [ input [ class "user", placeholder "ex) eosbpkorea", type_ "text" ]
+                        []
+                    ]
+                , div [ class "container" ]
+                    [ span [ class "true validate description" ]
+                        [ text "존재하지 않는 계정입니다." ]
+                    , span [ class "false validate description" ]
+                        [ text "존재하지 않는 계정입니다." ]
+                    ]
+                , div [ class "btn_area" ]
+                    [ button [ class "ok button", disabled True, type_ "button" ]
+                        [ text "확인" ]
+                    ]
+                , button [ class "close button", type_ "button", onClick ToggleModal ]
+                    [ text "닫기" ]
                 ]
             ]
         ]
