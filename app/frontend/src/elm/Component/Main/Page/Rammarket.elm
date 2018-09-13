@@ -312,4 +312,4 @@ actionToTableRow language { blockTime, data, trxId } =
 
 subscriptions : Sub Message
 subscriptions =
-    Time.every (500 * Time.millisecond) UpdateChainData
+    Time.every (2 * Time.second) UpdateChainData
