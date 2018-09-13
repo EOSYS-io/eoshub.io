@@ -4,6 +4,7 @@ import Component.Main.MainComponent exposing (..)
 import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Voting as Voting
+import Component.Main.Sidebar as Sidebar exposing (accountCmd)
 import Expect
 import Navigation exposing (Location)
 import Test exposing (..)
@@ -55,7 +56,7 @@ tests =
             [ test "UpdatePushActionResponse" <|
                 \() ->
                     let
-                        ({ notification, page } as model) =
+                        ({ notification, page, sidebar } as model) =
                             initModel { location | pathname = "/transfer" }
 
                         notificationParameter =
@@ -85,9 +86,12 @@ tests =
                             , message = ""
                             , action = "transfer"
                             }
+
+                        newCmd =
+                            accountCmd sidebar.state wallet.account
                     in
                     Expect.equal
-                        ( expectedModel, Cmd.none )
+                        ( expectedModel, Cmd.map SidebarMessage newCmd )
                         (update (UpdatePushActionResponse pushActionResponse) model)
             , test "UpdateLanguage" <|
                 \() ->

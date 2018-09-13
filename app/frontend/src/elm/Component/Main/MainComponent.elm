@@ -469,9 +469,6 @@ update message ({ page, notification, header, sidebar } as model) =
                                 Resource.Undelegate { undelegatebw } ->
                                     undelegatebw.receiver
 
-                                _ ->
-                                    ""
-
                         _ ->
                             ""
 
