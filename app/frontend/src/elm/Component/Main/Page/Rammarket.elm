@@ -1,4 +1,14 @@
-module Component.Main.Page.Rammarket exposing (Message, Model, initCmd, initModel, subscriptions, update, view)
+module Component.Main.Page.Rammarket exposing
+    ( Message
+    , Model
+    , calculateEosRamPrice
+    , calculateEosRamYield
+    , initCmd
+    , initModel
+    , subscriptions
+    , update
+    , view
+    )
 
 import Data.Action exposing (Action, actionsDecoder)
 import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
@@ -45,6 +55,7 @@ import Port
 import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
+import Util.Constant exposing (giga)
 import Util.Formatter exposing (deleteFromBack, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
@@ -337,9 +348,9 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
         "Loading..."
 
     else
-        Round.round 2 (numerator / (1024 * 1024 * 1024))
+        Round.round 2 (numerator / (giga |> toFloat))
             ++ "/"
-            ++ Round.round 2 (denominator / (1024 * 1024 * 1024))
+            ++ Round.round 2 (denominator / (giga |> toFloat))
             ++ "GB ("
             ++ Round.round 2 ((numerator * 100) / denominator)
             ++ "%)"
