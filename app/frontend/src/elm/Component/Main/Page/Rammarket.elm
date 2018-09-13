@@ -43,6 +43,7 @@ import Http
 import Json.Encode as Encode
 import Port
 import Translation exposing (I18n(..), Language, translate)
+import Util.Formatter exposing (timeFormatter)
 import Util.HttpRequest exposing (getFullPath, post)
 
 
@@ -172,12 +173,12 @@ view language { actions, expandActions } =
             , let
                 ( actionTableRows, viewMoreButton ) =
                     if expandActions then
-                        ( actions |> List.map actionToTableRow
+                        ( actions |> List.map (actionToTableRow language)
                         , div [] []
                         )
 
                     else
-                        ( actions |> List.take 2 |> List.map actionToTableRow
+                        ( actions |> List.take 2 |> List.map (actionToTableRow language)
                         , div [ class "btn_area" ]
                             [ button [ type_ "button", class "view_more button", onClick ExpandActions ]
                                 [ text "더 보기" ]
@@ -210,8 +211,8 @@ view language { actions, expandActions } =
         ]
 
 
-actionToTableRow : Action -> Html Message
-actionToTableRow { blockTime, data, trxId } =
+actionToTableRow : Language -> Action -> Html Message
+actionToTableRow language { blockTime, data, trxId } =
     case data of
         Ok (Data.Action.Transfer { from, to, quantity }) ->
             let
@@ -223,13 +224,7 @@ actionToTableRow { blockTime, data, trxId } =
                         ( "log sell", "구매", from )
 
                 formattedDateTime =
-                    case blockTime |> Date.fromIsoString of
-                        -- TODO(heejae): use locale-specified pattern.
-                        Ok str ->
-                            str |> Date.toFormattedString "EEEE, MMMM d, y 'at' h:mm a"
-
-                        _ ->
-                            blockTime
+                    blockTime |> timeFormatter language
             in
             tr [ class actionClass ]
                 [ td [] [ text actionType ]
