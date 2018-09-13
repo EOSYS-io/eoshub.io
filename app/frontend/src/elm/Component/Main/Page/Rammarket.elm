@@ -141,7 +141,7 @@ update : Message -> Model -> ( Model, Cmd Message )
 update message model =
     case message of
         OnFetchActions (Ok actions) ->
-            ( { model | actions = actions }, Cmd.none )
+            ( { model | actions = actions |> List.reverse }, Cmd.none )
 
         OnFetchActions (Err error) ->
             ( model, Cmd.none )
