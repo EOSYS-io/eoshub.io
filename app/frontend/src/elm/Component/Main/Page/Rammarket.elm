@@ -55,7 +55,7 @@ import Port
 import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (giga)
+import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (deleteFromBack, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 
@@ -268,10 +268,10 @@ actionToTableRow language { blockTime, data, trxId } =
             let
                 ( actionClass, actionType, account ) =
                     if from == "eosio.ram" then
-                        ( "log buy", "판매", to )
+                        ( "log sell", "판매", to )
 
                     else
-                        ( "log sell", "구매", from )
+                        ( "log buy", "구매", from )
 
                 formattedDateTime =
                     blockTime |> timeFormatter language
@@ -312,7 +312,7 @@ calculateEosRamPrice { base, quote } =
         "Loading..."
 
     else
-        ((numerator / denominator) * 1024 |> Round.round 8) ++ " EOS/KB"
+        ((numerator / denominator) * toFloat kilo |> Round.round 8) ++ " EOS/KB"
 
 
 calculateEosRamYield : GlobalFields -> String
