@@ -39,31 +39,26 @@ tests =
                     Expect.equal 0 (getPercentageOfLiquid NoOp)
             ]
         , describe "validate"
+            -- TODO(boseok): these tests only cover totalQuantity validation and modal open/close validation cases
+            -- rest cases are TODO
             [ test "validate test1. modal closed, total = ValidQuantity" <|
                 \() ->
                     let
+                        defaultModel =
+                            initModel
+
+                        { delegatebw } =
+                            defaultModel
+
                         newModel =
-                            { delegatebw =
-                                { from = "", receiver = "", stakeNetQuantity = "0.0600 EOS", stakeCpuQuantity = "0.2400 EOS", transfer = 1 }
-                            , totalQuantity = "0.3"
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio =
-                                { cpu = 4, net = 1 }
-                            , totalQuantityValidation = InvalidQuantity
-                            , cpuQuantityValidation = InvalidQuantity
-                            , netQuantityValidation = InvalidQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = False
-                            , stakeAmountModal =
-                                { totalQuantity = "0"
-                                , cpuQuantity = ""
-                                , netQuantity = ""
-                                , totalQuantityValidation = EmptyQuantity
-                                , cpuQuantityValidation = EmptyQuantity
-                                , netQuantityValidation = EmptyQuantity
-                                , isFormValid = False
-                                }
+                            { defaultModel
+                                | delegatebw =
+                                    { delegatebw
+                                        | stakeNetQuantity = "0.0600 EOS"
+                                        , stakeCpuQuantity = "0.2400 EOS"
+                                        , transfer = 1
+                                    }
+                                , totalQuantity = "0.3"
                             }
 
                         liquidAmount =
@@ -73,50 +68,32 @@ tests =
                             False
 
                         expectedModel =
-                            { delegatebw =
-                                { from = ""
-                                , receiver = ""
-                                , stakeNetQuantity = "0.0600 EOS"
-                                , stakeCpuQuantity = "0.2400 EOS"
-                                , transfer = 1
-                                }
-                            , totalQuantity = "0.3"
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = ValidQuantity
-                            , cpuQuantityValidation = ValidQuantity
-                            , netQuantityValidation = ValidQuantity
-                            , manuallySet = False
-                            , isFormValid = True
-                            , isStakeAmountModalOpened = False
-                            , stakeAmountModal = { totalQuantity = "0", cpuQuantity = "", netQuantity = "", totalQuantityValidation = EmptyQuantity, cpuQuantityValidation = EmptyQuantity, netQuantityValidation = EmptyQuantity, isFormValid = False }
+                            { newModel
+                                | totalQuantityValidation = ValidQuantity
+                                , cpuQuantityValidation = ValidQuantity
+                                , netQuantityValidation = ValidQuantity
+                                , isFormValid = True
                             }
                     in
                     Expect.equal expectedModel (validate newModel liquidAmount modalOpened)
             , test "validate test2. modal closed, total = OverValidQuantity" <|
                 \() ->
                     let
+                        defaultModel =
+                            initModel
+
+                        { delegatebw } =
+                            defaultModel
+
                         newModel =
-                            { delegatebw = { from = "", receiver = "", stakeNetQuantity = "0.0800 EOS", stakeCpuQuantity = "0.3200 EOS", transfer = 1 }
-                            , totalQuantity = "0.4"
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = InvalidQuantity
-                            , cpuQuantityValidation = InvalidQuantity
-                            , netQuantityValidation = InvalidQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = False
-                            , stakeAmountModal =
-                                { totalQuantity = "0"
-                                , cpuQuantity = ""
-                                , netQuantity = ""
-                                , totalQuantityValidation = EmptyQuantity
-                                , cpuQuantityValidation = EmptyQuantity
-                                , netQuantityValidation = EmptyQuantity
-                                , isFormValid =
-                                    False
-                                }
+                            { defaultModel
+                                | delegatebw =
+                                    { delegatebw
+                                        | stakeNetQuantity = "0.0800 EOS"
+                                        , stakeCpuQuantity = "0.3200 EOS"
+                                        , transfer = 1
+                                    }
+                                , totalQuantity = "0.4"
                             }
 
                         liquidAmount =
@@ -126,51 +103,31 @@ tests =
                             False
 
                         expectedModel =
-                            { delegatebw = { from = "", receiver = "", stakeNetQuantity = "0.0800 EOS", stakeCpuQuantity = "0.3200 EOS", transfer = 1 }
-                            , totalQuantity = "0.4"
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = OverValidQuantity
-                            , cpuQuantityValidation = ValidQuantity
-                            , netQuantityValidation = ValidQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = False
-                            , stakeAmountModal =
-                                { totalQuantity = "0"
-                                , cpuQuantity = ""
-                                , netQuantity = ""
-                                , totalQuantityValidation = EmptyQuantity
-                                , cpuQuantityValidation = EmptyQuantity
-                                , netQuantityValidation = EmptyQuantity
+                            { newModel
+                                | totalQuantityValidation = OverValidQuantity
+                                , cpuQuantityValidation = ValidQuantity
+                                , netQuantityValidation = ValidQuantity
                                 , isFormValid = False
-                                }
                             }
                     in
                     Expect.equal expectedModel (validate newModel liquidAmount modalOpened)
             , test "validate test3. modal opened, cpu + net -> OverValidQuantity" <|
                 \() ->
                     let
+                        defaultModel =
+                            initModel
+
+                        { stakeAmountModal } =
+                            defaultModel
+
                         newModel =
-                            { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 1 }
-                            , totalQuantity = ""
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = EmptyQuantity
-                            , cpuQuantityValidation = EmptyQuantity
-                            , netQuantityValidation = EmptyQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = True
-                            , stakeAmountModal =
-                                { totalQuantity = "0.4"
-                                , cpuQuantity = "0.2"
-                                , netQuantity = "0.2"
-                                , totalQuantityValidation = ValidQuantity
-                                , cpuQuantityValidation = ValidQuantity
-                                , netQuantityValidation = InvalidQuantity
-                                , isFormValid = False
-                                }
+                            { defaultModel
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = "0.4"
+                                        , cpuQuantity = "0.2"
+                                        , netQuantity = "0.2"
+                                    }
                             }
 
                         liquidAmount =
@@ -179,92 +136,59 @@ tests =
                         modalOpened =
                             True
 
+                        newStakeAmountModal =
+                            newModel.stakeAmountModal
+
                         expectedModel =
-                            { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 1 }
-                            , totalQuantity = ""
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = EmptyQuantity
-                            , cpuQuantityValidation = EmptyQuantity
-                            , netQuantityValidation = EmptyQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = True
-                            , stakeAmountModal =
-                                { totalQuantity = "0.4"
-                                , cpuQuantity = "0.2"
-                                , netQuantity = "0.2"
-                                , totalQuantityValidation = OverValidQuantity
-                                , cpuQuantityValidation = ValidQuantity
-                                , netQuantityValidation = ValidQuantity
-                                , isFormValid = False
-                                }
+                            { newModel
+                                | stakeAmountModal =
+                                    { newStakeAmountModal
+                                        | totalQuantityValidation = OverValidQuantity
+                                        , cpuQuantityValidation = ValidQuantity
+                                        , netQuantityValidation = ValidQuantity
+                                        , isFormValid = False
+                                    }
                             }
                     in
                     Expect.equal expectedModel (validate newModel liquidAmount modalOpened)
             , test "validate test4. modal opened, cpu + net -> ValidQuantity" <|
                 \() ->
                     let
+                        defaultModel =
+                            initModel
+
+                        { stakeAmountModal } =
+                            defaultModel
+
                         newModel =
-                            { delegatebw =
-                                { from = ""
-                                , receiver = ""
-                                , stakeNetQuantity = ""
-                                , stakeCpuQuantity = ""
-                                , transfer = 1
-                                }
-                            , totalQuantity = ""
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = EmptyQuantity
-                            , cpuQuantityValidation = EmptyQuantity
-                            , netQuantityValidation = EmptyQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = True
-                            , stakeAmountModal =
-                                { totalQuantity = "0.3"
-                                , cpuQuantity = "0.2"
-                                , netQuantity = "0.1"
-                                , totalQuantityValidation = ValidQuantity
-                                , cpuQuantityValidation = ValidQuantity
-                                , netQuantityValidation = InvalidQuantity
-                                , isFormValid = False
-                                }
+                            { defaultModel
+                                | stakeAmountModal =
+                                    { stakeAmountModal
+                                        | totalQuantity = "0.3"
+                                        , cpuQuantity = "0.2"
+                                        , netQuantity = "0.1"
+                                    }
+                                , isStakeAmountModalOpened = True
                             }
 
                         liquidAmount =
                             0.3532
 
                         modalOpened =
-                            True
+                            newModel.isStakeAmountModalOpened
+
+                        newStakeAmountModal =
+                            newModel.stakeAmountModal
 
                         expectedModel =
-                            { delegatebw =
-                                { from = ""
-                                , receiver = ""
-                                , stakeNetQuantity = ""
-                                , stakeCpuQuantity = ""
-                                , transfer = 1
-                                }
-                            , totalQuantity = ""
-                            , percentageOfLiquid = NoOp
-                            , distributionRatio = { cpu = 4, net = 1 }
-                            , totalQuantityValidation = EmptyQuantity
-                            , cpuQuantityValidation = EmptyQuantity
-                            , netQuantityValidation = EmptyQuantity
-                            , manuallySet = False
-                            , isFormValid = False
-                            , isStakeAmountModalOpened = True
-                            , stakeAmountModal =
-                                { totalQuantity = "0.3"
-                                , cpuQuantity = "0.2"
-                                , netQuantity = "0.1"
-                                , totalQuantityValidation = ValidQuantity
-                                , cpuQuantityValidation = ValidQuantity
-                                , netQuantityValidation = ValidQuantity
-                                , isFormValid = True
-                                }
+                            { newModel
+                                | stakeAmountModal =
+                                    { newStakeAmountModal
+                                        | totalQuantityValidation = ValidQuantity
+                                        , cpuQuantityValidation = ValidQuantity
+                                        , netQuantityValidation = ValidQuantity
+                                        , isFormValid = True
+                                    }
                             }
                     in
                     Expect.equal expectedModel (validate newModel liquidAmount modalOpened)
