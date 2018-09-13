@@ -22,7 +22,7 @@ tests : Test
 tests =
     describe "Page.SearchKey module"
         [ describe "initModel"
-            [ test "delegatebw.transfer always should be 0 when from == receiver" <|
+            [ test "delegatebw.transfer should always be 0 when from == receiver" <|
                 \() ->
                     Expect.equal 0 initModel.delegatebw.transfer
             ]

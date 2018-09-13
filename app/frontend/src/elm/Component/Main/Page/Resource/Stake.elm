@@ -145,7 +145,7 @@ type Message
 type StakeAmountMessage
     = CpuAmountInput String
     | NetAmountInput String
-    | OkButton
+    | ClickOk
     | CloseModal
 
 
@@ -203,7 +203,10 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
         SubmitAction ->
             let
                 cmd =
-                    { delegatebw | from = accountName, receiver = accountName } |> Action.Delegatebw |> encodeAction |> Port.pushAction
+                    { delegatebw | from = accountName, receiver = accountName }
+                        |> Action.Delegatebw
+                        |> encodeAction
+                        |> Port.pushAction
             in
             ( model, cmd )
 
@@ -245,7 +248,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                     in
                     ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
 
-                OkButton ->
+                ClickOk ->
                     ( { model
                         | delegatebw =
                             { delegatebw
@@ -481,7 +484,7 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
                         )
                         ""
                     , type_ "button"
-                    , onClick OkButton
+                    , onClick ClickOk
                     ]
                     [ text "확인" ]
                 ]
