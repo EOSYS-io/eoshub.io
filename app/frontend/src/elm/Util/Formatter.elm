@@ -3,7 +3,7 @@ module Util.Formatter exposing
     , assetSubtract
     , assetToFloat
     , floatToAsset
-    , formatEosQuantity
+    , formatAsset
     , larimerToEos
     , percentageConverter
     , resourceUnitConverter
@@ -138,9 +138,14 @@ percentageConverter numerator denominator =
     toFloat (numerator * 100) / toFloat denominator
 
 
-formatEosQuantity : String -> String
-formatEosQuantity =
-    String.toFloat >> Result.withDefault 0 >> Round.round 4
+formatAsset : String -> String
+formatAsset value =
+    (value
+        |> String.toFloat
+        |> Result.withDefault 0
+        |> Round.round 4
+    )
+        ++ " EOS"
 
 
 

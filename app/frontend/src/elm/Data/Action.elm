@@ -56,7 +56,7 @@ import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, decodeString, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
-import Util.Formatter exposing (formatEosQuantity)
+import Util.Formatter exposing (formatAsset)
 
 
 
@@ -679,6 +679,9 @@ encodeAction action =
         Transfer message ->
             transferParametersToValue message
 
+        Delegatebw message ->
+            delegatebwParametersToValue message
+
         _ ->
             Encode.null
 
@@ -693,8 +696,26 @@ transferParametersToValue { from, to, quantity, memo } =
           , Encode.object
                 [ ( "from", Encode.string from )
                 , ( "to", Encode.string to )
-                , ( "quantity", Encode.string ((quantity |> formatEosQuantity) ++ " EOS") )
+                , ( "quantity", Encode.string (quantity |> formatAsset) )
                 , ( "memo", Encode.string memo )
+                ]
+          )
+        ]
+
+
+delegatebwParametersToValue : DelegatebwParameters -> Encode.Value
+delegatebwParametersToValue { from, receiver, stakeNetQuantity, stakeCpuQuantity, transfer } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "delegatebw" )
+        , ( "payload"
+          , Encode.object
+                [ ( "from", Encode.string from )
+                , ( "receiver", Encode.string receiver )
+                , ( "stake_net_quantity", Encode.string stakeNetQuantity )
+                , ( "stake_cpu_quantity", Encode.string stakeCpuQuantity )
+                , ( "transfer", Encode.int transfer )
                 ]
           )
         ]

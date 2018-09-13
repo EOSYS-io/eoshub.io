@@ -81,13 +81,13 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
     case ( message, tab ) of
         ( StakeMessage stakeMessage, Stake stakeModel ) ->
             let
-                ( newModel, _ ) =
+                ( newModel, subCmd ) =
                     StakeTab.update
                         stakeMessage
                         stakeModel
                         account
             in
-            ( { model | tab = Stake newModel }, Cmd.none )
+            ( { model | tab = Stake newModel }, Cmd.map StakeMessage subCmd )
 
         ( UnstakeMessage unstakeMessage, Unstake unstakeModel ) ->
             let

@@ -21,7 +21,12 @@ import Util.Validation as Validation
 tests : Test
 tests =
     describe "Page.SearchKey module"
-        [ describe "getPercentageOfLiquid"
+        [ describe "initModel"
+            [ test "delegatebw.transfer always should be 0 when from == receiver" <|
+                \() ->
+                    Expect.equal 0 initModel.delegatebw.transfer
+            ]
+        , describe "getPercentageOfLiquid"
             [ test "Percentage10" <|
                 \() ->
                     Expect.equal 0.1 (getPercentageOfLiquid Percentage10)
