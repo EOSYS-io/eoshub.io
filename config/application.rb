@@ -21,5 +21,15 @@ module EoshubIo
     config.assets.configure do |env|
       env.cache = ActiveSupport::Cache.lookup_store(:null_store)
     end
+
+    config.generators do |g|
+      g.javascript_engine :js
+    end
+
+    # Time.now 와 Time.current 일치
+    config.time_zone = 'Seoul'
+    config.active_record.default_timezone = :local
+
+    config.eager_load_paths << "#{Rails.root}/lib/autoloads"
   end
 end
