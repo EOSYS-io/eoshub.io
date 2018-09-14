@@ -704,6 +704,9 @@ encodeAction action =
         Undelegatebw message ->
             undelegatebwParametersToValue message
 
+        Buyram message ->
+            buyramParametersToValue message
+
         _ ->
             Encode.null
 
@@ -755,6 +758,22 @@ undelegatebwParametersToValue { from, receiver, unstakeNetQuantity, unstakeCpuQu
                 , ( "receiver", Encode.string receiver )
                 , ( "unstake_net_quantity", Encode.string unstakeNetQuantity )
                 , ( "unstake_cpu_quantity", Encode.string unstakeCpuQuantity )
+                ]
+          )
+        ]
+
+
+buyramParametersToValue : BuyramParameters -> Encode.Value
+buyramParametersToValue { payer, receiver, quant } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "buyram" )
+        , ( "payload"
+          , Encode.object
+                [ ( "payer", Encode.string payer )
+                , ( "receiver", Encode.string receiver )
+                , ( "quant", Encode.string ((quant |> formatEosQuantity) ++ " EOS") )
                 ]
           )
         ]

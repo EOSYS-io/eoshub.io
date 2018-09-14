@@ -17,6 +17,7 @@ import Data.Action
         , BuyramParameters
         , SellramParameters
         , actionsDecoder
+        , encodeAction
         , initBuyramParameters
         , initSellramParameters
         )
@@ -188,6 +189,7 @@ type Message
     | CancelProxy
     | TypeEosAmount Float String
     | ClickEosDistribution Distribution Float
+    | SubmitAction String
 
 
 getActions : Cmd Message
@@ -319,13 +321,27 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
             , Cmd.none
             )
 
+        SubmitAction accountName ->
+            let
+                { params, proxyBuy } =
+                    buyModel
+
+                newParams =
+                    if proxyBuy then
+                        { params | payer = accountName }
+
+                    else
+                        { params | payer = accountName, receiver = accountName }
+            in
+            ( model, newParams |> Data.Action.Buyram |> encodeAction |> Port.pushAction )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Account -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } { ramQuota, ramUsage, coreLiquidBalance } =
+view language { actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } { ramQuota, ramUsage, coreLiquidBalance, accountName } =
     let
         availableEos =
             coreLiquidBalance |> assetToFloat
@@ -437,6 +453,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                                 [ type_ "button"
                                 , class "ok button"
                                 , disabled (not buyModel.isValid)
+                                , onClick (SubmitAction accountName)
                                 ]
                                 [ text "구매하기" ]
                             ]
