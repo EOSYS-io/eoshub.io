@@ -50,6 +50,7 @@ import Html.Attributes
         ( attribute
         , class
         , disabled
+        , hidden
         , id
         , name
         , placeholder
@@ -58,7 +59,7 @@ import Html.Attributes
         , title
         , type_
         )
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as Encode
 import Port
@@ -66,39 +67,73 @@ import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
-import Util.Formatter exposing (deleteFromBack, resourceUnitConverter, timeFormatter)
+import Util.Formatter exposing (assetToFloat, deleteFromBack, resourceUnitConverter, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
+import Util.Validation
+    exposing
+        ( AccountStatus(..)
+        , QuantityStatus(..)
+        , validateAccount
+        , validateQuantity
+        )
 
 
 
 -- MODEL
 
 
+type Distribution
+    = Manual
+    | Percentage10
+    | Percentage50
+    | Percentage70
+    | Percentage100
+
+
 type alias BuyModel =
     { params : BuyramParameters
+    , proxyBuy : Bool
+    , distribution : Distribution
+    , accountValidation : AccountStatus
+    , quantityValidation : QuantityStatus
+    , isValid : Bool
     }
 
 
-initBuyParameters : BuyModel
-initBuyParameters =
+initBuyModel : BuyModel
+initBuyModel =
     { params = initBuyramParameters
+    , proxyBuy = False
+    , distribution = Manual
+    , accountValidation = EmptyAccount
+    , quantityValidation = EmptyQuantity
+    , isValid = False
     }
+
+
+type ByteUnit
+    = KB
+    | MB
+    | GB
 
 
 type alias SellModel =
     { params : SellramParameters
+    , distribution : Distribution
+    , byteUnit : ByteUnit
+    , quantityValidation : QuantityStatus
+    , isValid : Bool
     }
 
 
-initSellParameters : SellModel
-initSellParameters =
+initSellModel : SellModel
+initSellModel =
     { params = initSellramParameters
+    , distribution = Manual
+    , byteUnit = KB
+    , quantityValidation = EmptyQuantity
+    , isValid = False
     }
-
-
-type RamAction
-    = Buy BuyModel
-    | Sell SellModel
 
 
 type alias Model =
@@ -106,8 +141,10 @@ type alias Model =
     , rammarketTable : RammarketFields
     , globalTable : GlobalFields
     , expandActions : Bool
-    , action : RamAction
+    , buyModel : BuyModel
+    , sellModel : SellModel
     , modalOpen : Bool
+    , isBuyTab : Bool
     }
 
 
@@ -117,8 +154,10 @@ initModel =
     , rammarketTable = initRammarketFields
     , globalTable = initGlobalFields
     , expandActions = False
-    , action = Buy initBuyParameters
     , modalOpen = False
+    , buyModel = initBuyModel
+    , sellModel = initSellModel
+    , isBuyTab = True
     }
 
 
@@ -126,13 +165,26 @@ initModel =
 -- MESSAGE
 
 
+type BuyFormField
+    = BuyQuantity
+    | ProxyAccount
+
+
+type SellFormField
+    = SellRamBytes
+
+
 type Message
     = OnFetchActions (Result Http.Error (List Action))
     | OnFetchTableRows (Result Http.Error (List Row))
     | ExpandActions
     | UpdateChainData Time.Time
-    | SetAction RamAction
+    | SwitchTab
     | ToggleModal
+    | SetBuyFormField BuyFormField Float String
+      -- | SetSellFormField SellFormField Int String
+    | SetProxyBuy
+    | CancelProxy
 
 
 getActions : Cmd Message
@@ -172,7 +224,7 @@ initCmd =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ modalOpen } as model) =
+update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
     case message of
         OnFetchActions (Ok actions) ->
             ( { model | actions = actions |> List.reverse }, Cmd.none )
@@ -200,11 +252,39 @@ update message ({ modalOpen } as model) =
         UpdateChainData _ ->
             ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
 
-        SetAction buyOrSell ->
-            ( { model | action = buyOrSell }, Cmd.none )
+        SwitchTab ->
+            ( { model | isBuyTab = not isBuyTab }, Cmd.none )
 
         ToggleModal ->
             ( { model | modalOpen = not modalOpen }, Cmd.none )
+
+        SetBuyFormField field availableEos value ->
+            ( { model | buyModel = setBuyFormField field buyModel availableEos value }
+            , Cmd.none
+            )
+
+        SetProxyBuy ->
+            let
+                newModel =
+                    { model | buyModel = { buyModel | proxyBuy = True } }
+            in
+            update ToggleModal newModel
+
+        CancelProxy ->
+            let
+                { params } =
+                    buyModel
+            in
+            ( { model
+                | buyModel =
+                    { buyModel
+                        | proxyBuy = False
+                        , params = { params | receiver = "" }
+                        , accountValidation = EmptyAccount
+                    }
+              }
+            , Cmd.none
+            )
 
 
 
@@ -212,7 +292,7 @@ update message ({ modalOpen } as model) =
 
 
 view : Language -> Model -> Account -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable, action, modalOpen } { ramQuota, ramUsage } =
+view language { actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } { ramQuota, ramUsage, coreLiquidBalance } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -234,13 +314,12 @@ view language { actions, expandActions, rammarketTable, globalTable, action, mod
                         getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
 
                     ( buyClass, sellClass, buyOthersRamTab ) =
-                        case action of
-                            Buy _ ->
-                                ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
+                        if isBuyTab then
+                            ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
 
-                            Sell _ ->
-                                -- Produce empty html node with text tag.
-                                ( "", " ing", text "" )
+                        else
+                            -- Produce empty html node with text tag.
+                            ( "", " ing", text "" )
                   in
                   div [ class "my status" ]
                     [ div [ class "summary" ]
@@ -267,14 +346,14 @@ view language { actions, expandActions, rammarketTable, globalTable, action, mod
                             [ button
                                 [ type_ "button"
                                 , class ("buy tab button" ++ buyClass)
-                                , onClick (SetAction (Buy initBuyParameters))
+                                , onClick SwitchTab
                                 ]
                                 [ text "구매하기"
                                 ]
                             , button
                                 [ type_ "button"
                                 , class ("sell tab button" ++ sellClass)
-                                , onClick (SetAction (Sell initSellParameters))
+                                , onClick SwitchTab
                                 ]
                                 [ text "판매하기"
                                 ]
@@ -287,6 +366,16 @@ view language { actions, expandActions, rammarketTable, globalTable, action, mod
                                 -- , button [ type_ "button", class "next button" ] [ text "다음 단위 고르기" ]
                                 ]
                             , buyOthersRamTab
+                            ]
+                        , div [ class "target", hidden (not buyModel.proxyBuy) ]
+                            [ text (buyModel.params.receiver ++ " 에게")
+                            , button
+                                [ type_ "button"
+                                , title "타 계정의 구매를 하지 않습니다."
+                                , onClick CancelProxy
+                                , class "close button"
+                                ]
+                                [ text "타 계정의 구매를 하지 않습니다." ]
                             ]
                         , form [ class "input panel" ]
                             [ div []
@@ -356,30 +445,63 @@ view language { actions, expandActions, rammarketTable, globalTable, action, mod
                        )
                 )
             ]
-            [ div [ class "wrapper" ]
+            (let
+                ( spanClass, message ) =
+                    case buyModel.accountValidation of
+                        ValidAccount ->
+                            ( "false validate description", "올바른 계정입니다." )
+
+                        InvalidAccount ->
+                            ( "true validate description", "올바르지 않은 계정입니다." )
+
+                        _ ->
+                            ( "", "" )
+             in
+             [ div [ class "wrapper" ]
                 [ h2 []
                     [ text "타계정 구매" ]
                 , p []
                     [ text "램을 구매해 줄 타계정을 입력하세요." ]
                 , form []
-                    [ input [ class "user", placeholder "ex) eosbpkorea", type_ "text" ]
+                    [ input
+                        [ class "user"
+                        , placeholder "ex) eosio"
+                        , type_ "text"
+                        , onInput <| SetBuyFormField ProxyAccount (coreLiquidBalance |> assetToFloat)
+                        ]
                         []
                     ]
                 , div [ class "container" ]
-                    [ span [ class "true validate description" ]
-                        [ text "존재하지 않는 계정입니다." ]
-                    , span [ class "false validate description" ]
-                        [ text "존재하지 않는 계정입니다." ]
-                    ]
+                    [ span [ class spanClass ] [ text message ] ]
                 , div [ class "btn_area" ]
-                    [ button [ class "ok button", disabled True, type_ "button" ]
+                    [ button
+                        [ class "ok button"
+                        , disabled (not (buyModel.accountValidation == ValidAccount))
+                        , type_ "button"
+                        , onClick SetProxyBuy
+                        ]
                         [ text "확인" ]
                     ]
                 , button [ class "close button", type_ "button", onClick ToggleModal ]
                     [ text "닫기" ]
                 ]
-            ]
+             ]
+            )
         ]
+
+
+
+-- SUBSCRIPTIONS
+-- The interval needs to be adjusted. Now, it is set to 2 secs.
+
+
+subscriptions : Sub Message
+subscriptions =
+    Time.every (2 * Time.second) UpdateChainData
+
+
+
+-- Utility Functions
 
 
 actionToTableRow : Language -> Action -> Html Message
@@ -468,11 +590,52 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
             ++ "%)"
 
 
+setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> BuyModel
+setBuyFormField field ({ params } as buyModel) availableQuantity value =
+    case field of
+        BuyQuantity ->
+            validateBuy
+                { buyModel | params = { params | quant = value } }
+                availableQuantity
 
--- SUBSCRIPTIONS
--- The interval needs to be adjusted. Now, it is set to 2 secs.
+        ProxyAccount ->
+            validateBuy
+                { buyModel | params = { params | receiver = value } }
+                availableQuantity
 
 
-subscriptions : Sub Message
-subscriptions =
-    Time.every (2 * Time.second) UpdateChainData
+
+-- setSellField : SellFormField -> SellModel -> Int -> String -> SellModel
+-- setSellField field ({params} as sellModel) availableRam value =
+--     case field of
+--       SellRamBytes = validate
+--                 (Sell { sellModel | params = { params | bytes = intValue } })
+--                 (toFloat availableRam)
+
+
+validateBuy : BuyModel -> Float -> BuyModel
+validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
+    let
+        { receiver, quant } =
+            params
+
+        accountValidation =
+            validateAccount receiver
+
+        quantityValidation =
+            validateQuantity quant availableQuantity
+
+        isValid =
+            (if proxyBuy then
+                accountValidation == ValidAccount
+
+             else
+                accountValidation == EmptyAccount
+            )
+                && (quantityValidation == ValidQuantity)
+    in
+    { buyModel
+        | accountValidation = accountValidation
+        , quantityValidation = quantityValidation
+        , isValid = isValid
+    }
