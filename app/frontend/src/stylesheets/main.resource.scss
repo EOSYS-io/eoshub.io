@@ -46,11 +46,11 @@ main.resource_management {
 
 		&.validate {
 			&.false {
-				color:$red;
+				color:$red !important;
 			}
 
 			&.true {
-				color:$green;
+				color:$green !important;
 			}
 		}
 	}
@@ -329,6 +329,17 @@ main.resource_management {
 		.field.group > .input.field:last-child {
 			margin-left:35px;
 		}
+
+		.field.group {
+			input {
+				padding:16px 0;
+			}
+
+			span.unit {
+				top:16px;
+			}
+		}
+
 	}
 }
 
