@@ -11,6 +11,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :orders, only: [:create]
+
   namespace :eos_ram_price_histories do
     get 'data'
   end

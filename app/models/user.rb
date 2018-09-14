@@ -18,6 +18,8 @@
 class User < ApplicationRecord
   include AASM
 
+  has_many :orders
+
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, presence: true
   before_create :confirmation_token
 
