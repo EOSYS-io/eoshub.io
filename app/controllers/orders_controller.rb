@@ -2,6 +2,7 @@ class OrdersController < ApiController
   def create
     order_params = order_create_params
     raise Exceptions::DefaultError, Exceptions::MISSING_PARAMETER if order_params.blank?
+    raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if helpers.eos_account_exist?(order_params[:eos_account])
 
     order_no = Order.generate_order_no
     

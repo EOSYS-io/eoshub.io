@@ -2,7 +2,8 @@
 module Exceptions
   # Error Codes
   ## General
-  MISSING_PARAMETER = { msg: I18n.t('errors.parameter_missing'), error_code: 1, status_code: 400 }.freeze
+  MISSING_PARAMETER = { message: I18n.t('errors.parameter_missing'), error_code: 1, status_code: 400 }.freeze
+  DUPLICATE_EOS_ACCOUNT = { message: I18n.t('users.eos_account_already_exist'), error_code: 2, status_code: :conflict }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects
@@ -17,15 +18,15 @@ module Exceptions
           }
       }
 
-      msg = hash.key?(:msg) ? hash[:msg] : I18n.t('errors.unexpected_error')
-      msg += " cause: #{hash[:cause].message}" if (!Rails.env.production? && !Rails.env.alpha?) && hash[:cause].present?
-      super(msg)
+      message = hash.key?(:message) ? hash[:message] : I18n.t('errors.unexpected_error')
+      message += " cause: #{hash[:cause].message}" if (!Rails.env.production? && !Rails.env.alpha?) && hash[:cause].present?
+      super(message)
 
       self.set_backtrace(hash[:cause].backtrace) if hash[:cause].present?
     end
 
     def as_json(options = nil)
-      { error: message, code: error_code, objects: objects, cause: cause&.as_json }
+      { message: message, code: error_code, objects: objects, cause: cause&.as_json }
     end
   end
 end
