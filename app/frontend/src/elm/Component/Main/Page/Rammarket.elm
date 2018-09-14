@@ -11,7 +11,15 @@ module Component.Main.Page.Rammarket exposing
     )
 
 import Data.Account exposing (Account, getResource)
-import Data.Action exposing (Action, actionsDecoder)
+import Data.Action
+    exposing
+        ( Action
+        , BuyramParameters
+        , SellramParameters
+        , actionsDecoder
+        , initBuyramParameters
+        , initSellramParameters
+        )
 import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
     exposing
@@ -66,9 +74,31 @@ import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 -- MODEL
 
 
-type ActionType
-    = Buy
-    | Sell
+type alias BuyModel =
+    { params : BuyramParameters
+    }
+
+
+initBuyParameters : BuyModel
+initBuyParameters =
+    { params = initBuyramParameters
+    }
+
+
+type alias SellModel =
+    { params : SellramParameters
+    }
+
+
+initSellParameters : SellModel
+initSellParameters =
+    { params = initSellramParameters
+    }
+
+
+type RamAction
+    = Buy BuyModel
+    | Sell SellModel
 
 
 type alias Model =
@@ -76,7 +106,7 @@ type alias Model =
     , rammarketTable : RammarketFields
     , globalTable : GlobalFields
     , expandActions : Bool
-    , actionType : ActionType
+    , action : RamAction
     , modalOpen : Bool
     }
 
@@ -87,7 +117,7 @@ initModel =
     , rammarketTable = initRammarketFields
     , globalTable = initGlobalFields
     , expandActions = False
-    , actionType = Buy
+    , action = Buy initBuyParameters
     , modalOpen = False
     }
 
@@ -101,7 +131,7 @@ type Message
     | OnFetchTableRows (Result Http.Error (List Row))
     | ExpandActions
     | UpdateChainData Time.Time
-    | SetActionType ActionType
+    | SetAction RamAction
     | ToggleModal
 
 
@@ -170,8 +200,8 @@ update message ({ modalOpen } as model) =
         UpdateChainData _ ->
             ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
 
-        SetActionType buyOrSell ->
-            ( { model | actionType = buyOrSell }, Cmd.none )
+        SetAction buyOrSell ->
+            ( { model | action = buyOrSell }, Cmd.none )
 
         ToggleModal ->
             ( { model | modalOpen = not modalOpen }, Cmd.none )
@@ -182,7 +212,7 @@ update message ({ modalOpen } as model) =
 
 
 view : Language -> Model -> Account -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable, actionType, modalOpen } { ramQuota, ramUsage } =
+view language { actions, expandActions, rammarketTable, globalTable, action, modalOpen } { ramQuota, ramUsage } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -204,11 +234,11 @@ view language { actions, expandActions, rammarketTable, globalTable, actionType,
                         getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
 
                     ( buyClass, sellClass, buyOthersRamTab ) =
-                        case actionType of
-                            Buy ->
+                        case action of
+                            Buy _ ->
                                 ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
 
-                            Sell ->
+                            Sell _ ->
                                 -- Produce empty html node with text tag.
                                 ( "", " ing", text "" )
                   in
@@ -237,14 +267,14 @@ view language { actions, expandActions, rammarketTable, globalTable, actionType,
                             [ button
                                 [ type_ "button"
                                 , class ("buy tab button" ++ buyClass)
-                                , onClick (SetActionType Buy)
+                                , onClick (SetAction (Buy initBuyParameters))
                                 ]
                                 [ text "구매하기"
                                 ]
                             , button
                                 [ type_ "button"
                                 , class ("sell tab button" ++ sellClass)
-                                , onClick (SetActionType Sell)
+                                , onClick (SetAction (Sell initSellParameters))
                                 ]
                                 [ text "판매하기"
                                 ]
@@ -252,8 +282,9 @@ view language { actions, expandActions, rammarketTable, globalTable, actionType,
                         , div [ class "unit" ]
                             [ div [ class "select period" ]
                                 [ i [ attribute "data-value" "0" ] [ text "EOS" ]
-                                , button [ type_ "button", class "prev button" ] [ text "이전 단위 고르기" ]
-                                , button [ type_ "button", class "next button" ] [ text "다음 단위 고르기" ]
+
+                                -- , button [ type_ "button", class "prev button" ] [ text "이전 단위 고르기" ]
+                                -- , button [ type_ "button", class "next button" ] [ text "다음 단위 고르기" ]
                                 ]
                             , buyOthersRamTab
                             ]

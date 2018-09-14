@@ -22,6 +22,8 @@ module Data.Action exposing
     , delegatebwDecoder
     , encodeAction
     , errorDecoder
+    , initBuyramParameters
+    , initSellramParameters
     , newaccountDecoder
     , refineAction
     , regproxyDecoder
@@ -109,10 +111,25 @@ type alias SellramParameters =
     }
 
 
+initSellramParameters : SellramParameters
+initSellramParameters =
+    { account = ""
+    , bytes = 0
+    }
+
+
 type alias BuyramParameters =
     { payer : String
     , receiver : String
     , quant : String
+    }
+
+
+initBuyramParameters : BuyramParameters
+initBuyramParameters =
+    { payer = ""
+    , receiver = ""
+    , quant = ""
     }
 
 
