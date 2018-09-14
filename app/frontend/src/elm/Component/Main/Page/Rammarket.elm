@@ -58,6 +58,7 @@ import Html.Attributes
         , style
         , title
         , type_
+        , value
         )
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -185,6 +186,8 @@ type Message
       -- | SetSellFormField SellFormField Int String
     | SetProxyBuy
     | CancelProxy
+    | TypeEosAmount Float String
+    | ClickEosDistribution Distribution Float
 
 
 getActions : Cmd Message
@@ -263,6 +266,36 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
             , Cmd.none
             )
 
+        TypeEosAmount availableEos value ->
+            update (SetBuyFormField BuyQuantity availableEos value)
+                { model
+                    | buyModel = { buyModel | distribution = Manual }
+                }
+
+        ClickEosDistribution distribution availableEos ->
+            let
+                newQuantity =
+                    case distribution of
+                        Percentage10 ->
+                            availableEos * 0.1
+
+                        Percentage50 ->
+                            availableEos * 0.5
+
+                        Percentage70 ->
+                            availableEos * 0.7
+
+                        Percentage100 ->
+                            availableEos
+
+                        _ ->
+                            availableEos
+            in
+            update (SetBuyFormField BuyQuantity availableEos (newQuantity |> Round.round 4))
+                { model
+                    | buyModel = { buyModel | distribution = distribution }
+                }
+
         SetProxyBuy ->
             let
                 newModel =
@@ -293,11 +326,27 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
 
 view : Language -> Model -> Account -> Html Message
 view language { actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } { ramQuota, ramUsage, coreLiquidBalance } =
+    let
+        availableEos =
+            coreLiquidBalance |> assetToFloat
+    in
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
         , div [ class "container" ]
-            [ section [ class "dashboard" ]
+            [ let
+                ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
+                    getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
+
+                ( buyClass, sellClass, buyOthersRamTab ) =
+                    if isBuyTab then
+                        ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
+
+                    else
+                        -- Produce empty html node with text tag.
+                        ( "", " ing", text "" )
+              in
+              section [ class "dashboard" ]
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
                         [ h3 [] [ text "이오스 램 가격" ]
@@ -309,19 +358,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                         ]
                     , div [ class "graph", id "tv-chart-container" ] []
                     ]
-                , let
-                    ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
-                        getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
-
-                    ( buyClass, sellClass, buyOthersRamTab ) =
-                        if isBuyTab then
-                            ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
-
-                        else
-                            -- Produce empty html node with text tag.
-                            ( "", " ing", text "" )
-                  in
-                  div [ class "my status" ]
+                , div [ class "my status" ]
                     [ div [ class "summary" ]
                         [ h3 []
                             [ text "나의 램"
@@ -379,18 +416,29 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                             ]
                         , form [ class "input panel" ]
                             [ div []
-                                [ input [ type_ "number", placeholder "구매하실 수량을 입력하세요" ] []
+                                [ input
+                                    [ type_ "number"
+                                    , placeholder "구매하실 수량을 입력하세요"
+                                    , onInput <| TypeEosAmount availableEos
+                                    , value buyModel.params.quant
+                                    ]
+                                    [ text "30" ]
                                 , span [ class "unit" ] [ text "EOS" ]
                                 ]
                             , div []
-                                [ button [ type_ "button" ] [ text "10%" ]
-                                , button [ type_ "button" ] [ text "50%" ]
-                                , button [ type_ "button" ] [ text "70%" ]
-                                , button [ type_ "button" ] [ text "최대" ]
+                                [ eosDistributionButton buyModel.distribution Percentage10 availableEos
+                                , eosDistributionButton buyModel.distribution Percentage50 availableEos
+                                , eosDistributionButton buyModel.distribution Percentage70 availableEos
+                                , eosDistributionButton buyModel.distribution Percentage100 availableEos
                                 ]
                             ]
                         , div [ class "btn_area" ]
-                            [ button [ type_ "button", class "ok button", disabled True ] [ text "구매하기" ]
+                            [ button
+                                [ type_ "button"
+                                , class "ok button"
+                                , disabled (not buyModel.isValid)
+                                ]
+                                [ text "구매하기" ]
                             ]
                         ]
                     ]
@@ -433,31 +481,30 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                 , viewMoreButton
                 ]
             ]
-        , section
+        , let
+            ( spanClass, message ) =
+                case buyModel.accountValidation of
+                    ValidAccount ->
+                        ( "false validate description", "올바른 계정입니다." )
+
+                    InvalidAccount ->
+                        ( "true validate description", "올바르지 않은 계정입니다." )
+
+                    _ ->
+                        ( "", "" )
+
+            modalViewClass =
+                if modalOpen then
+                    " viewing"
+
+                else
+                    ""
+          in
+          section
             [ attribute "aria-live" "true"
-            , class
-                ("buy_ram modal popup"
-                    ++ (if modalOpen then
-                            " viewing"
-
-                        else
-                            ""
-                       )
-                )
+            , class ("buy_ram modal popup" ++ modalViewClass)
             ]
-            (let
-                ( spanClass, message ) =
-                    case buyModel.accountValidation of
-                        ValidAccount ->
-                            ( "false validate description", "올바른 계정입니다." )
-
-                        InvalidAccount ->
-                            ( "true validate description", "올바르지 않은 계정입니다." )
-
-                        _ ->
-                            ( "", "" )
-             in
-             [ div [ class "wrapper" ]
+            [ div [ class "wrapper" ]
                 [ h2 []
                     [ text "타계정 구매" ]
                 , p []
@@ -467,7 +514,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                         [ class "user"
                         , placeholder "ex) eosio"
                         , type_ "text"
-                        , onInput <| SetBuyFormField ProxyAccount (coreLiquidBalance |> assetToFloat)
+                        , onInput <| SetBuyFormField ProxyAccount availableEos
                         ]
                         []
                     ]
@@ -485,9 +532,43 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                 , button [ class "close button", type_ "button", onClick ToggleModal ]
                     [ text "닫기" ]
                 ]
-             ]
-            )
+            ]
         ]
+
+
+eosDistributionButton : Distribution -> Distribution -> Float -> Html Message
+eosDistributionButton modelDist dist availableEos =
+    let
+        classContent =
+            if modelDist == dist then
+                "clicked"
+
+            else
+                ""
+
+        textContent =
+            case dist of
+                Percentage10 ->
+                    "10%"
+
+                Percentage50 ->
+                    "50%"
+
+                Percentage70 ->
+                    "70%"
+
+                Percentage100 ->
+                    "최대"
+
+                _ ->
+                    ""
+    in
+    button
+        [ type_ "button"
+        , onClick (ClickEosDistribution dist availableEos)
+        , class classContent
+        ]
+        [ text textContent ]
 
 
 
@@ -599,9 +680,20 @@ setBuyFormField field ({ params } as buyModel) availableQuantity value =
                 availableQuantity
 
         ProxyAccount ->
-            validateBuy
-                { buyModel | params = { params | receiver = value } }
-                availableQuantity
+            let
+                ({ accountValidation, isValid } as newBuyModel) =
+                    validateBuy
+                        { buyModel | params = { params | receiver = value } }
+                        availableQuantity
+            in
+            if accountValidation == ValidAccount then
+                newBuyModel
+
+            else
+                { buyModel
+                    | accountValidation = accountValidation
+                    , isValid = isValid
+                }
 
 
 
@@ -630,7 +722,7 @@ validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
                 accountValidation == ValidAccount
 
              else
-                accountValidation == EmptyAccount
+                True
             )
                 && (quantityValidation == ValidQuantity)
     in
