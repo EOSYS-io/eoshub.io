@@ -28,16 +28,15 @@ class OrdersController < ApiController
       timeout: 5
     ).run
 
+    CreateOrderJob.perform_async(
+      order_params[:pgcode],
+      order_no,
+      order_params[:amount],
+      order_params[:product_name]
+    ) if response.code == 200
+
     result = JSON.parse(response.body)
-
-    order = Order.create!({
-      pgcode: order_params[:pgcode],
-      order_no: order_no
-      amount: order_params[:amount],
-      product_name: order_params[:product_name)
-    })
-
-    render json: { online_url: result[:online_url] }
+    render json: result, status: response.code
   end
 
   private
