@@ -116,7 +116,7 @@ initBuyModel =
 type ByteUnit
     = KB
     | MB
-    | GB
+    | Byte
 
 
 type alias SellModel =
@@ -179,14 +179,14 @@ type Message
     | UpdateChainData Time.Time
     | SwitchTab
     | ToggleModal
-    | SetBuyFormField BuyFormField Float String
-    | SetSellFormField Int String
+    | SetBuyFormField BuyFormField String
+    | SetSellFormField String
     | SetProxyBuy
     | CancelProxy
-    | TypeEosAmount Float String
-    | TypeBytesAmount Int String
-    | ClickEosDistribution Distribution Float
-    | ClickRamDistribution Distribution Int
+    | TypeEosAmount String
+    | TypeBytesAmount String
+    | ClickEosDistribution Distribution
+    | ClickRamDistribution Distribution
     | SubmitAction String
 
 
@@ -226,8 +226,15 @@ initCmd =
 -- UPDATE
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuota, ramUsage, coreLiquidBalance } as account) =
+    let
+        availableRam =
+            ramQuota - ramUsage
+
+        availableEos =
+            coreLiquidBalance |> assetToFloat
+    in
     case message of
         OnFetchActions (Ok actions) ->
             ( { model | actions = actions |> List.reverse }, Cmd.none )
@@ -261,29 +268,31 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
         ToggleModal ->
             ( { model | modalOpen = not modalOpen }, Cmd.none )
 
-        SetBuyFormField field availableEos value ->
+        SetBuyFormField field value ->
             ( { model | buyModel = setBuyFormField field buyModel availableEos value }
             , Cmd.none
             )
 
-        SetSellFormField availableRam value ->
+        SetSellFormField value ->
             ( { model | sellModel = setSellFormField sellModel availableRam value }
             , Cmd.none
             )
 
-        TypeEosAmount availableEos value ->
-            update (SetBuyFormField BuyQuantity availableEos value)
+        TypeEosAmount value ->
+            update (SetBuyFormField BuyQuantity value)
                 { model
                     | buyModel = { buyModel | distribution = Manual }
                 }
+                account
 
-        TypeBytesAmount availableRam value ->
-            update (SetSellFormField availableRam value)
+        TypeBytesAmount value ->
+            update (SetSellFormField value)
                 { model
                     | sellModel = { sellModel | distribution = Manual }
                 }
+                account
 
-        ClickEosDistribution distribution availableEos ->
+        ClickEosDistribution distribution ->
             let
                 newQuantity =
                     case distribution of
@@ -299,12 +308,13 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
                         _ ->
                             availableEos
             in
-            update (SetBuyFormField BuyQuantity availableEos (newQuantity |> Round.round 4))
+            update (SetBuyFormField BuyQuantity (newQuantity |> Round.round 4))
                 { model
                     | buyModel = { buyModel | distribution = distribution }
                 }
+                account
 
-        ClickRamDistribution distribution availableRam ->
+        ClickRamDistribution distribution ->
             let
                 floatAvailableRam =
                     availableRam |> toFloat
@@ -323,17 +333,18 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
                         _ ->
                             floatAvailableRam
             in
-            update (SetSellFormField availableRam (newQuantity |> toString))
+            update (SetSellFormField (newQuantity |> toString))
                 { model
                     | sellModel = { sellModel | distribution = distribution }
                 }
+                account
 
         SetProxyBuy ->
             let
                 newModel =
                     { model | buyModel = { buyModel | proxyBuy = True } }
             in
-            update ToggleModal newModel
+            update ToggleModal newModel account
 
         CancelProxy ->
             let
@@ -461,7 +472,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                                 ]
                             , buyOthersRamTab
                             ]
-                        , div [ class "target", hidden (not buyModel.proxyBuy) ]
+                        , div [ class "target", hidden (not (buyModel.proxyBuy && isBuyTab)) ]
                             [ text (buyModel.params.receiver ++ " 에게")
                             , button
                                 [ type_ "button"
@@ -476,7 +487,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                                 [ input
                                     [ type_ "number"
                                     , placeholder "구매하실 수량을 입력하세요"
-                                    , onInput <| TypeEosAmount availableEos
+                                    , onInput <| TypeEosAmount
                                     , value buyModel.params.quant
                                     ]
                                     [ text "30" ]
@@ -572,7 +583,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                         [ class "user"
                         , placeholder "ex) eosio"
                         , type_ "text"
-                        , onInput <| SetBuyFormField ProxyAccount availableEos
+                        , onInput <| SetBuyFormField ProxyAccount
                         ]
                         []
                     ]
@@ -623,7 +634,7 @@ eosDistributionButton modelDist dist availableEos =
     in
     button
         [ type_ "button"
-        , onClick (ClickEosDistribution dist availableEos)
+        , onClick (ClickEosDistribution dist)
         , class classContent
         ]
         [ text textContent ]
@@ -765,8 +776,8 @@ setSellFormField ({ params, byteUnit } as sellModel) availableRam value =
                 MB ->
                     mega
 
-                GB ->
-                    giga
+                Byte ->
+                    1
 
         intValue =
             value |> String.toFloat |> Result.withDefault 0 |> (*) (multiplier |> toFloat) |> floor

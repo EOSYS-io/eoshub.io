@@ -452,7 +452,7 @@ update message ({ page, notification, header, sidebar } as model) =
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Rammarket.update subMessage subModel
+                    Rammarket.update subMessage subModel sidebar.account
             in
             ( { model | page = newPage |> RammarketPage }, Cmd.map RammarketMessage subCmd )
 
