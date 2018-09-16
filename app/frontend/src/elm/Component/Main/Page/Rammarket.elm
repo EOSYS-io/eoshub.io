@@ -68,7 +68,7 @@ import Port
 import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (giga, kilo)
+import Util.Constant exposing (giga, kilo, mega)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, resourceUnitConverter, timeFormatter)
 import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 import Util.Validation
@@ -172,10 +172,6 @@ type BuyFormField
     | ProxyAccount
 
 
-type SellFormField
-    = SellRamBytes
-
-
 type Message
     = OnFetchActions (Result Http.Error (List Action))
     | OnFetchTableRows (Result Http.Error (List Row))
@@ -184,11 +180,13 @@ type Message
     | SwitchTab
     | ToggleModal
     | SetBuyFormField BuyFormField Float String
-      -- | SetSellFormField SellFormField Int String
+    | SetSellFormField Int String
     | SetProxyBuy
     | CancelProxy
     | TypeEosAmount Float String
+    | TypeBytesAmount Int String
     | ClickEosDistribution Distribution Float
+    | ClickRamDistribution Distribution Int
     | SubmitAction String
 
 
@@ -268,10 +266,21 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
             , Cmd.none
             )
 
+        SetSellFormField availableRam value ->
+            ( { model | sellModel = setSellFormField sellModel availableRam value }
+            , Cmd.none
+            )
+
         TypeEosAmount availableEos value ->
             update (SetBuyFormField BuyQuantity availableEos value)
                 { model
                     | buyModel = { buyModel | distribution = Manual }
+                }
+
+        TypeBytesAmount availableRam value ->
+            update (SetSellFormField availableRam value)
+                { model
+                    | sellModel = { sellModel | distribution = Manual }
                 }
 
         ClickEosDistribution distribution availableEos ->
@@ -287,15 +296,36 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
                         Percentage70 ->
                             availableEos * 0.7
 
-                        Percentage100 ->
-                            availableEos
-
                         _ ->
                             availableEos
             in
             update (SetBuyFormField BuyQuantity availableEos (newQuantity |> Round.round 4))
                 { model
                     | buyModel = { buyModel | distribution = distribution }
+                }
+
+        ClickRamDistribution distribution availableRam ->
+            let
+                floatAvailableRam =
+                    availableRam |> toFloat
+
+                newQuantity =
+                    case distribution of
+                        Percentage10 ->
+                            floatAvailableRam * 0.1
+
+                        Percentage50 ->
+                            floatAvailableRam * 0.5
+
+                        Percentage70 ->
+                            floatAvailableRam * 0.7
+
+                        _ ->
+                            floatAvailableRam
+            in
+            update (SetSellFormField availableRam (newQuantity |> toString))
+                { model
+                    | sellModel = { sellModel | distribution = distribution }
                 }
 
         SetProxyBuy ->
@@ -322,18 +352,29 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) =
             )
 
         SubmitAction accountName ->
-            let
-                { params, proxyBuy } =
-                    buyModel
+            if isBuyTab then
+                let
+                    { params, proxyBuy } =
+                        buyModel
 
-                newParams =
-                    if proxyBuy then
-                        { params | payer = accountName }
+                    newParams =
+                        if proxyBuy then
+                            { params | payer = accountName }
 
-                    else
-                        { params | payer = accountName, receiver = accountName }
-            in
-            ( model, newParams |> Data.Action.Buyram |> encodeAction |> Port.pushAction )
+                        else
+                            { params | payer = accountName, receiver = accountName }
+                in
+                ( model, newParams |> Data.Action.Buyram |> encodeAction |> Port.pushAction )
+
+            else
+                let
+                    { params } =
+                        sellModel
+
+                    newParams =
+                        { params | account = accountName }
+                in
+                ( model, newParams |> Data.Action.Sellram |> encodeAction |> Port.pushAction )
 
 
 
@@ -713,13 +754,26 @@ setBuyFormField field ({ params } as buyModel) availableQuantity value =
                 }
 
 
+setSellFormField : SellModel -> Int -> String -> SellModel
+setSellFormField ({ params, byteUnit } as sellModel) availableRam value =
+    let
+        multiplier =
+            case byteUnit of
+                KB ->
+                    kilo
 
--- setSellField : SellFormField -> SellModel -> Int -> String -> SellModel
--- setSellField field ({params} as sellModel) availableRam value =
---     case field of
---       SellRamBytes = validate
---                 (Sell { sellModel | params = { params | bytes = intValue } })
---                 (toFloat availableRam)
+                MB ->
+                    mega
+
+                GB ->
+                    giga
+
+        intValue =
+            value |> String.toFloat |> Result.withDefault 0 |> (*) (multiplier |> toFloat) |> floor
+    in
+    validateSell
+        { sellModel | params = { params | bytes = intValue } }
+        availableRam
 
 
 validateBuy : BuyModel -> Float -> BuyModel
@@ -746,5 +800,30 @@ validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
     { buyModel
         | accountValidation = accountValidation
         , quantityValidation = quantityValidation
+        , isValid = isValid
+    }
+
+
+validateSell : SellModel -> Int -> SellModel
+validateSell ({ params } as sellModel) availableRam =
+    let
+        { bytes } =
+            params
+
+        quantityValidation =
+            if bytes <= 0 then
+                InvalidQuantity
+
+            else if bytes > availableRam then
+                OverValidQuantity
+
+            else
+                ValidQuantity
+
+        isValid =
+            quantityValidation == ValidQuantity
+    in
+    { sellModel
+        | quantityValidation = quantityValidation
         , isValid = isValid
     }

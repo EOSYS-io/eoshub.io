@@ -707,6 +707,9 @@ encodeAction action =
         Buyram message ->
             buyramParametersToValue message
 
+        Sellram message ->
+            sellramParametersToValue message
+
         _ ->
             Encode.null
 
@@ -774,6 +777,21 @@ buyramParametersToValue { payer, receiver, quant } =
                 [ ( "payer", Encode.string payer )
                 , ( "receiver", Encode.string receiver )
                 , ( "quant", Encode.string ((quant |> formatEosQuantity) ++ " EOS") )
+                ]
+          )
+        ]
+
+
+sellramParametersToValue : SellramParameters -> Encode.Value
+sellramParametersToValue { account, bytes } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "sellram" )
+        , ( "payload"
+          , Encode.object
+                [ ( "account", Encode.string account )
+                , ( "bytes", Encode.int bytes )
                 ]
           )
         ]
