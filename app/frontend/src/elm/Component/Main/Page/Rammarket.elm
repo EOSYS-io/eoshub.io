@@ -10,6 +10,7 @@ module Component.Main.Page.Rammarket exposing
     , view
     )
 
+import Array
 import Data.Account exposing (Account, getResource)
 import Data.Action
     exposing
@@ -122,9 +123,11 @@ type ByteUnit
 type alias SellModel =
     { params : SellramParameters
     , distribution : Distribution
-    , byteUnit : ByteUnit
+    , byteUnits : Array.Array ByteUnit
+    , byteUnitIndex : Int
     , quantityValidation : QuantityStatus
     , isValid : Bool
+    , byteUnitIndex : Int
     }
 
 
@@ -132,7 +135,8 @@ initSellModel : SellModel
 initSellModel =
     { params = initSellramParameters
     , distribution = Manual
-    , byteUnit = KB
+    , byteUnits = Array.fromList [ KB, MB, Byte ]
+    , byteUnitIndex = 0
     , quantityValidation = EmptyQuantity
     , isValid = False
     }
@@ -185,9 +189,9 @@ type Message
     | CancelProxy
     | TypeEosAmount String
     | TypeBytesAmount String
-    | ClickEosDistribution Distribution
-    | ClickRamDistribution Distribution
+    | ClickDistribution Distribution
     | SubmitAction String
+    | ChangeByteUnit Bool
 
 
 getActions : Cmd Message
@@ -292,52 +296,82 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                 }
                 account
 
-        ClickEosDistribution distribution ->
+        ClickDistribution distribution ->
             let
-                newQuantity =
-                    case distribution of
-                        Percentage10 ->
-                            availableEos * 0.1
+                ( msg, newModel ) =
+                    if isBuyTab then
+                        let
+                            newQuantity =
+                                case distribution of
+                                    Percentage10 ->
+                                        availableEos * 0.1
 
-                        Percentage50 ->
-                            availableEos * 0.5
+                                    Percentage50 ->
+                                        availableEos * 0.5
 
-                        Percentage70 ->
-                            availableEos * 0.7
+                                    Percentage70 ->
+                                        availableEos * 0.7
 
-                        _ ->
-                            availableEos
+                                    _ ->
+                                        availableEos
+                        in
+                        ( SetBuyFormField BuyQuantity (newQuantity |> Round.round 4)
+                        , { model
+                            | buyModel = { buyModel | distribution = distribution }
+                          }
+                        )
+
+                    else
+                        let
+                            floatAvailableRam =
+                                availableRam |> toFloat
+
+                            denominator =
+                                case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
+                                    Byte ->
+                                        1.0
+
+                                    KB ->
+                                        kilo |> toFloat
+
+                                    MB ->
+                                        mega |> toFloat
+
+                            newQuantity =
+                                case distribution of
+                                    Percentage10 ->
+                                        floatAvailableRam * 0.1
+
+                                    Percentage50 ->
+                                        floatAvailableRam * 0.5
+
+                                    Percentage70 ->
+                                        floatAvailableRam * 0.7
+
+                                    _ ->
+                                        floatAvailableRam
+                        in
+                        ( SetSellFormField ((newQuantity / denominator) |> toString)
+                        , { model
+                            | sellModel = { sellModel | distribution = distribution }
+                          }
+                        )
             in
-            update (SetBuyFormField BuyQuantity (newQuantity |> Round.round 4))
-                { model
-                    | buyModel = { buyModel | distribution = distribution }
-                }
-                account
+            update msg newModel account
 
-        ClickRamDistribution distribution ->
+        ChangeByteUnit isForward ->
             let
-                floatAvailableRam =
-                    availableRam |> toFloat
+                length =
+                    Array.length sellModel.byteUnits
 
-                newQuantity =
-                    case distribution of
-                        Percentage10 ->
-                            floatAvailableRam * 0.1
+                newIndex =
+                    if isForward then
+                        (sellModel.byteUnitIndex + 1) % length
 
-                        Percentage50 ->
-                            floatAvailableRam * 0.5
-
-                        Percentage70 ->
-                            floatAvailableRam * 0.7
-
-                        _ ->
-                            floatAvailableRam
+                    else
+                        (sellModel.byteUnitIndex - 1 + length) % length
             in
-            update (SetSellFormField (newQuantity |> toString))
-                { model
-                    | sellModel = { sellModel | distribution = distribution }
-                }
-                account
+            ( { model | sellModel = { sellModel | byteUnitIndex = newIndex } }, Cmd.none )
 
         SetProxyBuy ->
             let
@@ -393,10 +427,13 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
 
 view : Language -> Model -> Account -> Html Message
-view language { actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } { ramQuota, ramUsage, coreLiquidBalance, accountName } =
+view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } as model) { ramQuota, ramUsage, coreLiquidBalance, accountName } =
     let
         availableEos =
             coreLiquidBalance |> assetToFloat
+
+        availableRam =
+            ramQuota - ramUsage
     in
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
@@ -405,14 +442,6 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
             [ let
                 ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
                     getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
-
-                ( buyClass, sellClass, buyOthersRamTab ) =
-                    if isBuyTab then
-                        ( " ing", "", a [ onClick ToggleModal ] [ text "타계정 구매" ] )
-
-                    else
-                        -- Produce empty html node with text tag.
-                        ( "", " ing", text "" )
               in
               section [ class "dashboard" ]
                 [ div [ class "ram status" ]
@@ -446,70 +475,7 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
                             , text ramPercent
                             ]
                         ]
-                    , div [ class "sell_buy" ]
-                        [ div [ class "tab" ]
-                            [ button
-                                [ type_ "button"
-                                , class ("buy tab button" ++ buyClass)
-                                , onClick SwitchTab
-                                ]
-                                [ text "구매하기"
-                                ]
-                            , button
-                                [ type_ "button"
-                                , class ("sell tab button" ++ sellClass)
-                                , onClick SwitchTab
-                                ]
-                                [ text "판매하기"
-                                ]
-                            ]
-                        , div [ class "unit" ]
-                            [ div [ class "select period" ]
-                                [ i [ attribute "data-value" "0" ] [ text "EOS" ]
-
-                                -- , button [ type_ "button", class "prev button" ] [ text "이전 단위 고르기" ]
-                                -- , button [ type_ "button", class "next button" ] [ text "다음 단위 고르기" ]
-                                ]
-                            , buyOthersRamTab
-                            ]
-                        , div [ class "target", hidden (not (buyModel.proxyBuy && isBuyTab)) ]
-                            [ text (buyModel.params.receiver ++ " 에게")
-                            , button
-                                [ type_ "button"
-                                , title "타 계정의 구매를 하지 않습니다."
-                                , onClick CancelProxy
-                                , class "close button"
-                                ]
-                                [ text "타 계정의 구매를 하지 않습니다." ]
-                            ]
-                        , form [ class "input panel" ]
-                            [ div []
-                                [ input
-                                    [ type_ "number"
-                                    , placeholder "구매하실 수량을 입력하세요"
-                                    , onInput <| TypeEosAmount
-                                    , value buyModel.params.quant
-                                    ]
-                                    [ text "30" ]
-                                , span [ class "unit" ] [ text "EOS" ]
-                                ]
-                            , div []
-                                [ eosDistributionButton buyModel.distribution Percentage10 availableEos
-                                , eosDistributionButton buyModel.distribution Percentage50 availableEos
-                                , eosDistributionButton buyModel.distribution Percentage70 availableEos
-                                , eosDistributionButton buyModel.distribution Percentage100 availableEos
-                                ]
-                            ]
-                        , div [ class "btn_area" ]
-                            [ button
-                                [ type_ "button"
-                                , class "ok button"
-                                , disabled (not buyModel.isValid)
-                                , onClick (SubmitAction accountName)
-                                ]
-                                [ text "구매하기" ]
-                            ]
-                        ]
+                    , buySellTab model availableEos availableRam accountName
                     ]
                 ]
             , let
@@ -605,9 +571,134 @@ view language { actions, expandActions, rammarketTable, globalTable, modalOpen, 
         ]
 
 
-eosDistributionButton : Distribution -> Distribution -> Float -> Html Message
-eosDistributionButton modelDist dist availableEos =
+buySellTab : Model -> Float -> Int -> String -> Html Message
+buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRam accountName =
     let
+        ( byteText, byteQuant ) =
+            case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
+                Byte ->
+                    ( "Bytes", sellModel.params.bytes |> toString )
+
+                KB ->
+                    ( "Kilo Bytes", (toFloat sellModel.params.bytes / toFloat kilo) |> toString )
+
+                MB ->
+                    ( "Mega Bytes", (toFloat sellModel.params.bytes / toFloat mega) |> toString )
+
+        ( buyClass, sellClass, buyOthersRamTab, buttonText, inputText, inputMsg, inputQuant, inputPlaceholder, buttonDisabled ) =
+            if isBuyTab then
+                ( " ing"
+                , ""
+                , a [ onClick ToggleModal ] [ text "타계정 구매" ]
+                , "구매하기"
+                , "EOS"
+                , TypeEosAmount
+                , buyModel.params.quant
+                , "구매하실 수량을 입력하세요"
+                , not buyModel.isValid
+                )
+
+            else
+                -- Produce empty html node with text tag.
+                ( ""
+                , " ing"
+                , text ""
+                , "판매하기"
+                , byteText
+                , TypeBytesAmount
+                , byteQuant
+                , "판매하실 수량을 입력하세요"
+                , not sellModel.isValid
+                )
+
+        selectChilds =
+            if isBuyTab then
+                [ i [ attribute "data-value" "0" ] [ text inputText ] ]
+
+            else
+                [ i [ attribute "data-value" "0" ] [ text inputText ]
+                , button [ type_ "button", class "prev button", onClick (ChangeByteUnit False) ] [ text "이전 단위 고르기" ]
+                , button [ type_ "button", class "next button", onClick (ChangeByteUnit True) ] [ text "다음 단위 고르기" ]
+                ]
+
+        selectDiv =
+            div [ class "select period" ]
+                selectChilds
+    in
+    div [ class "sell_buy" ]
+        [ div [ class "tab" ]
+            [ button
+                [ type_ "button"
+                , class ("buy tab button" ++ buyClass)
+                , onClick SwitchTab
+                ]
+                [ text "구매하기"
+                ]
+            , button
+                [ type_ "button"
+                , class ("sell tab button" ++ sellClass)
+                , onClick SwitchTab
+                ]
+                [ text "판매하기"
+                ]
+            ]
+        , div [ class "unit" ]
+            [ selectDiv
+            , buyOthersRamTab
+            ]
+        , div [ class "target", hidden (not (buyModel.proxyBuy && isBuyTab)) ]
+            [ text (buyModel.params.receiver ++ " 에게")
+            , button
+                [ type_ "button"
+                , title "타 계정의 구매를 하지 않습니다."
+                , onClick CancelProxy
+                , class "close button"
+                ]
+                [ text "타 계정의 구매를 하지 않습니다." ]
+            ]
+        , form [ class "input panel" ]
+            [ div []
+                [ input
+                    [ type_ "number"
+                    , placeholder inputPlaceholder
+                    , onInput <| inputMsg
+                    , value inputQuant
+                    ]
+                    [ text "30" ]
+                , span [ class "unit" ] [ text inputText ]
+                ]
+            , div []
+                [ distributionButton model Percentage10 availableEos availableRam
+                , distributionButton model Percentage50 availableEos availableRam
+                , distributionButton model Percentage70 availableEos availableRam
+                , distributionButton model Percentage100 availableEos availableRam
+                ]
+            ]
+        , div [ class "btn_area" ]
+            [ button
+                [ type_ "button"
+                , class "ok button"
+                , disabled buttonDisabled
+                , onClick (SubmitAction accountName)
+                ]
+                [ text buttonText ]
+            ]
+        ]
+
+
+distributionButton : Model -> Distribution -> Float -> Int -> Html Message
+distributionButton model dist availableEos availableRam =
+    let
+        { buyModel, sellModel, isBuyTab } =
+            model
+
+        modelDist =
+            if isBuyTab then
+                buyModel.distribution
+
+            else
+                sellModel.distribution
+
         classContent =
             if modelDist == dist then
                 "clicked"
@@ -634,7 +725,7 @@ eosDistributionButton modelDist dist availableEos =
     in
     button
         [ type_ "button"
-        , onClick (ClickEosDistribution dist)
+        , onClick (ClickDistribution dist)
         , class classContent
         ]
         [ text textContent ]
@@ -766,10 +857,10 @@ setBuyFormField field ({ params } as buyModel) availableQuantity value =
 
 
 setSellFormField : SellModel -> Int -> String -> SellModel
-setSellFormField ({ params, byteUnit } as sellModel) availableRam value =
+setSellFormField ({ params, byteUnits } as sellModel) availableRam value =
     let
         multiplier =
-            case byteUnit of
+            (case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
                 KB ->
                     kilo
 
@@ -778,9 +869,11 @@ setSellFormField ({ params, byteUnit } as sellModel) availableRam value =
 
                 Byte ->
                     1
+            )
+                |> toFloat
 
         intValue =
-            value |> String.toFloat |> Result.withDefault 0 |> (*) (multiplier |> toFloat) |> floor
+            value |> String.toFloat |> Result.withDefault 0 |> (*) multiplier |> floor
     in
     validateSell
         { sellModel | params = { params | bytes = intValue } }
@@ -813,6 +906,11 @@ validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
         , quantityValidation = quantityValidation
         , isValid = isValid
     }
+
+
+
+-- TODO(heejae): Replace hardcoded validation after refactoring validQuantity function
+-- by dividing it into validFloatQuantity and validIntQuantity.
 
 
 validateSell : SellModel -> Int -> SellModel
