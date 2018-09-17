@@ -11,7 +11,11 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :orders, only: [:create]
+  resources :orders, only: [:create] do
+    collection do
+      post 'request_payment'
+    end
+  end
 
   namespace :eos_ram_price_histories do
     get 'data'

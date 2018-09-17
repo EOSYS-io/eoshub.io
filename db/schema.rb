@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_14_092031) do
+ActiveRecord::Schema.define(version: 2018_09_17_044403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -73,6 +73,11 @@ ActiveRecord::Schema.define(version: 2018_09_14_092031) do
     t.string "product_name", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "account_no", default: "", comment: "virtual account number"
+    t.string "account_name", comment: "the name of the payer who issued the virtual account"
+    t.string "bank_code", comment: "Virtual account bank code"
+    t.string "bank_name", comment: "Virtual account bank name"
+    t.date "expire_date", comment: "expiration date of the virtual account"
     t.index ["order_no"], name: "index_orders_on_order_no"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
