@@ -22,6 +22,8 @@ module Data.Action exposing
     , delegatebwDecoder
     , encodeAction
     , errorDecoder
+    , initBuyramParameters
+    , initSellramParameters
     , newaccountDecoder
     , refineAction
     , regproxyDecoder
@@ -109,10 +111,25 @@ type alias SellramParameters =
     }
 
 
+initSellramParameters : SellramParameters
+initSellramParameters =
+    { account = ""
+    , bytes = 0
+    }
+
+
 type alias BuyramParameters =
     { payer : String
     , receiver : String
     , quant : String
+    }
+
+
+initBuyramParameters : BuyramParameters
+initBuyramParameters =
+    { payer = ""
+    , receiver = ""
+    , quant = ""
     }
 
 
@@ -687,6 +704,12 @@ encodeAction action =
         Undelegatebw message ->
             undelegatebwParametersToValue message
 
+        Buyram message ->
+            buyramParametersToValue message
+
+        Sellram message ->
+            sellramParametersToValue message
+
         _ ->
             Encode.null
 
@@ -738,6 +761,37 @@ undelegatebwParametersToValue { from, receiver, unstakeNetQuantity, unstakeCpuQu
                 , ( "receiver", Encode.string receiver )
                 , ( "unstake_net_quantity", Encode.string (unstakeNetQuantity |> formatAsset) )
                 , ( "unstake_cpu_quantity", Encode.string (unstakeCpuQuantity |> formatAsset) )
+                ]
+          )
+        ]
+
+
+buyramParametersToValue : BuyramParameters -> Encode.Value
+buyramParametersToValue { payer, receiver, quant } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "buyram" )
+        , ( "payload"
+          , Encode.object
+                [ ( "payer", Encode.string payer )
+                , ( "receiver", Encode.string receiver )
+                , ( "quant", Encode.string (quant |> formatAsset) )
+                ]
+          )
+        ]
+
+
+sellramParametersToValue : SellramParameters -> Encode.Value
+sellramParametersToValue { account, bytes } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "sellram" )
+        , ( "payload"
+          , Encode.object
+                [ ( "account", Encode.string account )
+                , ( "bytes", Encode.int bytes )
                 ]
           )
         ]

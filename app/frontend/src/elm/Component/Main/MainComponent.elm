@@ -239,7 +239,7 @@ view { page, header, notification, sidebar } =
                     Html.map IndexMessage (Index.view language)
 
                 RammarketPage subModel ->
-                    Html.map RammarketMessage (Rammarket.view language subModel)
+                    Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
 
                 _ ->
                     NotFound.view language
@@ -452,7 +452,7 @@ update message ({ page, notification, header, sidebar } as model) =
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Rammarket.update subMessage subModel
+                    Rammarket.update subMessage subModel sidebar.account
             in
             ( { model | page = newPage |> RammarketPage }, Cmd.map RammarketMessage subCmd )
 
