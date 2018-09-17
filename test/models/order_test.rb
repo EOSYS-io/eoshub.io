@@ -2,15 +2,20 @@
 #
 # Table name: orders
 #
-#  id           :bigint(8)        not null, primary key
-#  amount       :integer          not null
-#  order_no     :string           not null
-#  pgcode       :integer          default(NULL), not null
-#  product_name :string           default("")
-#  state        :integer          default("created"), not null
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  user_id      :bigint(8)
+#  id                                                                 :bigint(8)        not null, primary key
+#  account_name(the name of the payer who issued the virtual account) :string
+#  account_no(virtual account number)                                 :string           default("")
+#  amount                                                             :integer          not null
+#  bank_code(Virtual account bank code)                               :string
+#  bank_name(Virtual account bank name)                               :string
+#  expire_date(expiration date of the virtual account)                :date
+#  order_no                                                           :string           not null
+#  pgcode                                                             :integer          default(NULL), not null
+#  product_name                                                       :string           default("")
+#  state                                                              :integer          default("created"), not null
+#  created_at                                                         :datetime         not null
+#  updated_at                                                         :datetime         not null
+#  user_id                                                            :bigint(8)
 #
 # Indexes
 #

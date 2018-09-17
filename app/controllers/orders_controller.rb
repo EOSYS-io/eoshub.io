@@ -15,6 +15,7 @@ class OrdersController < ApiController
       amount: params[:amount],
       product_name: params[:product_name],
       return_url: orders_path,
+      # TODO(sinhyeok): 가상계좌 입금완료 후 호출될 payment_result api 구현 후 연결
       callback_url: ''
     }
 
