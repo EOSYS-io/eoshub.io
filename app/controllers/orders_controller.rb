@@ -1,4 +1,4 @@
-class OrdersController < ApiController
+class OrdersController < ApplicationController
   include EosAccount
 
   def request_payment
