@@ -776,7 +776,7 @@ buyramParametersToValue { payer, receiver, quant } =
           , Encode.object
                 [ ( "payer", Encode.string payer )
                 , ( "receiver", Encode.string receiver )
-                , ( "quant", Encode.string ((quant |> formatEosQuantity) ++ " EOS") )
+                , ( "quant", Encode.string (quant |> formatAsset) )
                 ]
           )
         ]
