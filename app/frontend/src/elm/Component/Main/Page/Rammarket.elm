@@ -54,7 +54,6 @@ import Html.Attributes
         , disabled
         , hidden
         , id
-        , name
         , placeholder
         , scope
         , style
@@ -243,7 +242,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         OnFetchActions (Ok actions) ->
             ( { model | actions = actions |> List.reverse }, Cmd.none )
 
-        OnFetchActions (Err error) ->
+        OnFetchActions (Err _) ->
             ( model, Cmd.none )
 
         OnFetchTableRows (Ok rows) ->
@@ -257,7 +256,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                 _ ->
                     ( model, Cmd.none )
 
-        OnFetchTableRows (Err error) ->
+        OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
 
         ExpandActions ->
@@ -272,25 +271,25 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         ToggleModal ->
             ( { model | modalOpen = not modalOpen }, Cmd.none )
 
-        SetBuyFormField field value ->
-            ( { model | buyModel = setBuyFormField field buyModel availableEos value }
+        SetBuyFormField field val ->
+            ( { model | buyModel = setBuyFormField field buyModel availableEos val }
             , Cmd.none
             )
 
-        SetSellFormField value ->
-            ( { model | sellModel = setSellFormField sellModel availableRam value }
+        SetSellFormField val ->
+            ( { model | sellModel = setSellFormField sellModel availableRam val }
             , Cmd.none
             )
 
-        TypeEosAmount value ->
-            update (SetBuyFormField BuyQuantity value)
+        TypeEosAmount val ->
+            update (SetBuyFormField BuyQuantity val)
                 { model
                     | buyModel = { buyModel | distribution = Manual }
                 }
                 account
 
-        TypeBytesAmount value ->
-            update (SetSellFormField value)
+        TypeBytesAmount val ->
+            update (SetSellFormField val)
                 { model
                     | sellModel = { sellModel | distribution = Manual }
                 }
@@ -340,18 +339,18 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                                     _ ->
                                         floatAvailableRam
 
-                            ( denominator, decimal ) =
+                            denominator =
                                 case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
                                     Byte ->
-                                        ( 1.0, 0 )
+                                        1.0
 
                                     KB ->
-                                        ( kilo |> toFloat, 4 )
+                                        kilo |> toFloat
 
                                     MB ->
-                                        ( mega |> toFloat, 8 )
+                                        mega |> toFloat
                         in
-                        ( SetSellFormField ((newQuantity / denominator) |> Round.floor decimal)
+                        ( SetSellFormField ((newQuantity / denominator) |> Round.round 8)
                         , { model
                             | sellModel = { sellModel | distribution = distribution }
                           }
@@ -427,20 +426,13 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel, sellModel, isBuyTab } as model) { ramQuota, ramUsage, coreLiquidBalance, accountName } =
-    let
-        availableEos =
-            coreLiquidBalance |> assetToFloat
-
-        availableRam =
-            ramQuota - ramUsage
-    in
+view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) { ramQuota, ramUsage, accountName } =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
         , div [ class "container" ]
             [ let
-                ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
+                ( _, _, _, ramPercent, ramColor ) =
                     getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
               in
               section [ class "dashboard" ]
@@ -475,7 +467,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                             , text ramPercent
                             ]
                         ]
-                    , buySellTab model availableEos availableRam accountName
+                    , buySellTab model accountName
                     ]
                 ]
             , let
@@ -571,8 +563,8 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
         ]
 
 
-buySellTab : Model -> Float -> Int -> String -> Html Message
-buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRam accountName =
+buySellTab : Model -> String -> Html Message
+buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
     let
         ( byteText, byteQuant ) =
             case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
@@ -580,10 +572,10 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRa
                     ( "Bytes", sellModel.params.bytes |> toString )
 
                 KB ->
-                    ( "Kilo Bytes", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 4 )
+                    ( "KB", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 4 )
 
                 MB ->
-                    ( "Mega Bytes", (toFloat sellModel.params.bytes / toFloat mega) |> Round.floor 8 )
+                    ( "MB", (toFloat sellModel.params.bytes / toFloat mega) |> Round.floor 8 )
 
         ( buyClass, sellClass, buyOthersRamTab, buttonText, inputText, inputMsg, inputQuant, inputPlaceholder, buttonDisabled ) =
             if isBuyTab then
@@ -664,14 +656,14 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRa
                     , onInput <| inputMsg
                     , value inputQuant
                     ]
-                    [ text "30" ]
+                    []
                 , span [ class "unit" ] [ text inputText ]
                 ]
             , div []
-                [ distributionButton model Percentage10 availableEos availableRam
-                , distributionButton model Percentage50 availableEos availableRam
-                , distributionButton model Percentage70 availableEos availableRam
-                , distributionButton model Percentage100 availableEos availableRam
+                [ distributionButton model Percentage10
+                , distributionButton model Percentage50
+                , distributionButton model Percentage70
+                , distributionButton model Percentage100
                 ]
             ]
         , div [ class "btn_area" ]
@@ -686,8 +678,8 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRa
         ]
 
 
-distributionButton : Model -> Distribution -> Float -> Int -> Html Message
-distributionButton model dist availableEos availableRam =
+distributionButton : Model -> Distribution -> Html Message
+distributionButton model dist =
     let
         { buyModel, sellModel, isBuyTab } =
             model
@@ -832,18 +824,18 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
 
 
 setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> BuyModel
-setBuyFormField field ({ params } as buyModel) availableQuantity value =
+setBuyFormField field ({ params } as buyModel) availableQuantity val =
     case field of
         BuyQuantity ->
             validateBuy
-                { buyModel | params = { params | quant = value } }
+                { buyModel | params = { params | quant = val } }
                 availableQuantity
 
         ProxyAccount ->
             let
                 ({ accountValidation, isValid } as newBuyModel) =
                     validateBuy
-                        { buyModel | params = { params | receiver = value } }
+                        { buyModel | params = { params | receiver = val } }
                         availableQuantity
             in
             if accountValidation == ValidAccount then
@@ -857,10 +849,10 @@ setBuyFormField field ({ params } as buyModel) availableQuantity value =
 
 
 setSellFormField : SellModel -> Int -> String -> SellModel
-setSellFormField ({ params, byteUnits } as sellModel) availableRam value =
+setSellFormField ({ params, byteUnitIndex, byteUnits } as sellModel) availableRam val =
     let
         multiplier =
-            (case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
+            (case Array.get byteUnitIndex byteUnits |> Maybe.withDefault KB of
                 KB ->
                     kilo
 
@@ -873,7 +865,7 @@ setSellFormField ({ params, byteUnits } as sellModel) availableRam value =
                 |> toFloat
 
         intValue =
-            value |> String.toFloat |> Result.withDefault 0 |> (*) multiplier |> floor
+            val |> String.toFloat |> Result.withDefault 0 |> (*) multiplier |> floor
     in
     validateSell
         { sellModel | params = { params | bytes = intValue } }
