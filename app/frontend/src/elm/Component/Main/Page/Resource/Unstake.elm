@@ -155,12 +155,10 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
 
                 newModel =
                     { model
-                        | undelegatebw =
-                            { undelegatebw | unstakeCpuQuantity = value }
-                        , percentageOfCpu = percentageOfResource
+                        | percentageOfCpu = percentageOfResource
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            update (CpuAmountInput value) newModel account
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -174,12 +172,10 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
 
                 newModel =
                     { model
-                        | undelegatebw =
-                            { undelegatebw | unstakeNetQuantity = value }
-                        , percentageOfNet = percentageOfResource
+                        | percentageOfNet = percentageOfResource
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            update (NetAmountInput value) newModel account
 
         SubmitAction ->
             let
