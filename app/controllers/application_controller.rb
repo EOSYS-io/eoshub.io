@@ -3,6 +3,9 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
 
+  # Payletter return url
+  skip_before_action :verify_authenticity_token, if: -> { controller_name == 'orders' && action_name == 'create' }
+
   before_action :set_locale
 
   rescue_from StandardError, with: :unexpected_error
