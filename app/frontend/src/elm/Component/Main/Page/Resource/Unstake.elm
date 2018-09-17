@@ -5,7 +5,7 @@ module Component.Main.Page.Resource.Unstake exposing
     , PercentageOfResource(..)
     , ResourceType(..)
     , getPercentageOfResource
-    , getUnstakeAbleResource
+    , getUnstakePossibleResource
     , initModel
     , percentageButton
     , update
@@ -112,11 +112,11 @@ type Message
 update : Message -> Model -> Account -> ( Model, Cmd Message )
 update message ({ undelegatebw, minimumResource } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
-        unstakeAbleCpu =
-            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+        unstakePossibleCpu =
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
 
-        unstakeAbleNet =
-            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+        unstakePossibleNet =
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
     in
     case message of
         CpuAmountInput value ->
@@ -129,7 +129,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             }
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         NetAmountInput value ->
             let
@@ -141,7 +141,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             }
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         ClickCpuPercentage percentageOfResource ->
             let
@@ -149,7 +149,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                     getPercentageOfResource percentageOfResource
 
                 value =
-                    assetToFloat unstakeAbleCpu
+                    assetToFloat unstakePossibleCpu
                         * ratio
                         |> Round.round 4
 
@@ -166,7 +166,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                     getPercentageOfResource percentageOfResource
 
                 value =
-                    assetToFloat unstakeAbleNet
+                    assetToFloat unstakePossibleNet
                         * ratio
                         |> Round.round 4
 
@@ -198,14 +198,14 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         unstakedAmount =
             floatToAsset (larimerToEos account.voterInfo.staked)
 
-        unstakeAbleAmount =
+        unstakePossibleAmount =
             assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
 
-        unstakeAbleCpu =
-            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+        unstakePossibleCpu =
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
 
-        unstakeAbleNet =
-            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+        unstakePossibleNet =
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
 
         ( _, _, _, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
@@ -262,11 +262,11 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 [ h3 []
                     [ text "언스테이크 가능한 CPU" ]
                 , p []
-                    [ text unstakeAbleCpu ]
+                    [ text unstakePossibleCpu ]
                 , h3 []
                     [ text "언스테이크 가능한 NET" ]
                 , p []
-                    [ text unstakeAbleNet ]
+                    [ text unstakePossibleNet ]
                 , p [ class ("validate description" ++ validatedAttr) ]
                     [ text validatedText ]
                 ]
@@ -313,14 +313,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
             , div [ class "btn_area" ]
                 [ button
                     [ class "ok button"
-                    , attribute
-                        (if isFormValid then
-                            "no_op"
-
-                         else
-                            "disabled"
-                        )
-                        ""
+                    , disabled (not isFormValid)
                     , type_ "button"
                     , onClick SubmitAction
                     ]
@@ -364,8 +357,8 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
         [ text buttonText ]
 
 
-getUnstakeAbleResource : String -> String -> String
-getUnstakeAbleResource selfDelegatedAmount minimum =
+getUnstakePossibleResource : String -> String -> String
+getUnstakePossibleResource selfDelegatedAmount minimum =
     let
         subtractResult =
             assetSubtract selfDelegatedAmount minimum
@@ -378,13 +371,13 @@ getUnstakeAbleResource selfDelegatedAmount minimum =
 
 
 validate : Model -> String -> String -> Model
-validate ({ undelegatebw } as model) unstakeAbleCpu unstakeAbleNet =
+validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
         netQuantityValidation =
-            validateQuantity undelegatebw.unstakeNetQuantity (assetToFloat unstakeAbleNet)
+            validateQuantity undelegatebw.unstakeNetQuantity (assetToFloat unstakePossibleNet)
 
         cpuQuantityValidation =
-            validateQuantity undelegatebw.unstakeCpuQuantity (assetToFloat unstakeAbleCpu)
+            validateQuantity undelegatebw.unstakeCpuQuantity (assetToFloat unstakePossibleCpu)
 
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
@@ -474,4 +467,3 @@ getPercentageOfResource percentageOfResource =
 
         _ ->
             1
-
