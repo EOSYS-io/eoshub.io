@@ -2,6 +2,7 @@ module Component.Main.Sidebar exposing
     ( Message(..)
     , Model
     , State(..)
+    , accountCmd
     , accountInfoView
     , initCmd
     , initModel
@@ -96,9 +97,32 @@ type Message
     | OnFetchAccount (Result Http.Error Account)
 
 
+
+-- Cmd
+
+
 initCmd : Cmd Message
 initCmd =
     Port.checkWalletStatus ()
+
+
+accountCmd : State -> String -> Cmd Message
+accountCmd state accountName =
+    case state of
+        AccountInfo ->
+            let
+                body =
+                    Encode.object
+                        [ ( "account_name", Encode.string accountName ) ]
+                        |> Http.jsonBody
+            in
+            post (getFullPath "/v1/chain/get_account")
+                body
+                accountDecoder
+                |> Http.send OnFetchAccount
+
+        _ ->
+            Cmd.none
 
 
 
@@ -320,21 +344,7 @@ update message ({ fold, wallet } as model) =
         UpdateState state ->
             let
                 newCmd =
-                    case state of
-                        AccountInfo ->
-                            let
-                                body =
-                                    Encode.object
-                                        [ ( "account_name", Encode.string wallet.account ) ]
-                                        |> Http.jsonBody
-                            in
-                            post (getFullPath "/v1/chain/get_account")
-                                body
-                                accountDecoder
-                                |> Http.send OnFetchAccount
-
-                        _ ->
-                            Cmd.none
+                    accountCmd state wallet.account
             in
             ( { model | state = state }, newCmd )
 

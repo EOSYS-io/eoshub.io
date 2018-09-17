@@ -18,6 +18,7 @@ import Data.Account
         , getUnstakingAmount
         , keyAccountsDecoder
         )
+import Data.Action exposing (UndelegatebwParameters)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -29,14 +30,16 @@ import Translation exposing (I18n(..), Language, translate)
 
 
 type alias Model =
-    { undelegateInput : String
+    { undelegatebw : UndelegatebwParameters
+    , undelegateInput : String
     , delegateListModal : DelegateList.Model
     }
 
 
 initModel : Model
 initModel =
-    { undelegateInput = ""
+    { undelegatebw = { from = "", receiver = "", unstakeNetQuantity = "", unstakeCpuQuantity = "" }
+    , undelegateInput = ""
     , delegateListModal = DelegateList.initModel
     }
 

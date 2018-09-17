@@ -684,6 +684,9 @@ encodeAction action =
         Delegatebw message ->
             delegatebwParametersToValue message
 
+        Undelegatebw message ->
+            undelegatebwParametersToValue message
+
         _ ->
             Encode.null
 
@@ -718,6 +721,23 @@ delegatebwParametersToValue { from, receiver, stakeNetQuantity, stakeCpuQuantity
                 , ( "stake_net_quantity", Encode.string stakeNetQuantity )
                 , ( "stake_cpu_quantity", Encode.string stakeCpuQuantity )
                 , ( "transfer", Encode.int transfer )
+                ]
+          )
+        ]
+
+
+undelegatebwParametersToValue : UndelegatebwParameters -> Encode.Value
+undelegatebwParametersToValue { from, receiver, unstakeNetQuantity, unstakeCpuQuantity } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "undelegatebw" )
+        , ( "payload"
+          , Encode.object
+                [ ( "from", Encode.string from )
+                , ( "receiver", Encode.string receiver )
+                , ( "unstake_net_quantity", Encode.string unstakeNetQuantity )
+                , ( "unstake_cpu_quantity", Encode.string unstakeCpuQuantity )
                 ]
           )
         ]

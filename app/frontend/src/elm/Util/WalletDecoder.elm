@@ -14,9 +14,13 @@ import Translation
             ( CheckDetail
             , CheckError
             , DebugMessage
+            , DelegatebwFailed
+            , DelegatebwSucceeded
             , EmptyMessage
             , TransferFailed
             , TransferSucceeded
+            , UndelegatebwFailed
+            , UndelegatebwSucceeded
             , UnknownError
             )
         )
@@ -57,12 +61,20 @@ type alias Wallet =
 
 actionSuccessMessages : Dict String (String -> I18n)
 actionSuccessMessages =
-    fromList [ ( "transfer", TransferSucceeded ) ]
+    fromList
+        [ ( "transfer", TransferSucceeded )
+        , ( "delegatebw", DelegatebwSucceeded )
+        , ( "undelegatebw", UndelegatebwSucceeded )
+        ]
 
 
 actionFailMessages : Dict String (String -> I18n)
 actionFailMessages =
-    fromList [ ( "transfer", TransferFailed ) ]
+    fromList
+        [ ( "transfer", TransferFailed )
+        , ( "delegatebw", DelegatebwFailed )
+        , ( "undelegatebw", UndelegatebwFailed )
+        ]
 
 
 decodePushActionResponse : PushActionResponse -> String -> Notification.Content

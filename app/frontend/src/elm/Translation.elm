@@ -159,6 +159,10 @@ type I18n
     | StakeAble String String
     | StakeAbleAmountDesc
     | OverStakeAbleAmount
+    | DelegatebwSucceeded String
+    | DelegatebwFailed String
+    | UndelegatebwSucceeded String
+    | UndelegatebwFailed String
 
 
 translate : Language -> I18n -> String
@@ -831,5 +835,29 @@ getMessages i18n =
         OverStakeAbleAmount ->
             { korean = "스테이크 가능한 수량보다 많습니다."
             , english = ""
+            , chinese = ""
+            }
+
+        DelegatebwSucceeded receiver ->
+            { korean = receiver ++ "에게 스테이크 완료!"
+            , english = ""
+            , chinese = ""
+            }
+
+        DelegatebwFailed code ->
+            { korean = code ++ " 코드오류로 스테이크 실패"
+            , english = "Failed with error code " ++ code
+            , chinese = ""
+            }
+
+        UndelegatebwSucceeded receiver ->
+            { korean = receiver ++ "으로 언스테이크 완료!"
+            , english = ""
+            , chinese = ""
+            }
+
+        UndelegatebwFailed code ->
+            { korean = code ++ " 코드오류로 언스테이크 실패"
+            , english = "Failed with error code " ++ code
             , chinese = ""
             }

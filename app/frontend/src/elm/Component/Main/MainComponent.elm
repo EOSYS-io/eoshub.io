@@ -463,16 +463,34 @@ update message ({ page, notification, header, sidebar } as model) =
                         TransferPage { transfer } ->
                             transfer.to
 
+                        ResourcePage { tab } ->
+                            case tab of
+                                Resource.Stake { delegatebw } ->
+                                    delegatebw.receiver
+
+                                Resource.Unstake { undelegatebw } ->
+                                    undelegatebw.receiver
+
+                                Resource.Delegate { delegatebw } ->
+                                    delegatebw.receiver
+
+                                Resource.Undelegate { undelegatebw } ->
+                                    undelegatebw.receiver
+
                         _ ->
                             ""
+
+                ( newSidebar, accoutRefreshCmd ) =
+                    Sidebar.update (Sidebar.UpdateState sidebar.state) sidebar
             in
             ( { model
                 | notification =
                     { content = decodePushActionResponse resp notificationParameter
                     , open = True
                     }
+                , sidebar = newSidebar
               }
-            , Cmd.none
+            , Cmd.map SidebarMessage accoutRefreshCmd
             )
 
         ( OnLocationChange location newComponent, _ ) ->
