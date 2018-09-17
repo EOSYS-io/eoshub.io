@@ -134,7 +134,7 @@ initSellModel : SellModel
 initSellModel =
     { params = initSellramParameters
     , distribution = Manual
-    , byteUnits = Array.fromList [ KB, MB, Byte ]
+    , byteUnits = Array.fromList [ Byte, KB, MB ]
     , byteUnitIndex = 0
     , quantityValidation = EmptyQuantity
     , isValid = False
