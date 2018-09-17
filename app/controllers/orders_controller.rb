@@ -38,10 +38,10 @@ class OrdersController < ApplicationController
     order_params = order_create_params
 
     if order_params&.dig(:cid).present?
-      Order.create!({
+      Order.create!(
+        order_no: order_params[:order_no],
         user_id: order_params[:user_id],
         pgcode: order_params[:pgcode],
-        order_no: order_no,
         amount: order_params[:amount],
         product_name: order_params[:product_name],
         account_name: order_params[:account_name],
@@ -49,7 +49,7 @@ class OrdersController < ApplicationController
         bank_code: order_params[:bank_code],
         bank_name: order_params[:bank_name],
         expire_date: order_params[:expire_date]
-      })
+      )
   
       #TODO(sinhyeok): 가상계좌 발급완료 페이지 구현 후 연결
       redirect_to "https://eosys.io"
