@@ -368,12 +368,6 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                     ]
                     []
                 , quantityWarningSpan totalQuantityValidation language model
-
-                -- TODO(boseok): this should be applied to new design
-                , p [ class "validate description" ]
-                    [ text ("cpu : " ++ delegatebw.stakeCpuQuantity) ]
-                , p [ class "validate description" ]
-                    [ text ("net : " ++ delegatebw.stakeNetQuantity) ]
                 , percentageButton percentageOfLiquid Percentage10
                 , percentageButton percentageOfLiquid Percentage50
                 , percentageButton percentageOfLiquid Percentage70
@@ -607,7 +601,6 @@ validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
 
         isFormValid =
             isCpuValid
-                && isCpuValid
                 && isNetValid
                 && (totalQuantityValidation == ValidQuantity)
     in

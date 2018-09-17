@@ -91,13 +91,13 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
 
         ( UnstakeMessage unstakeMessage, Unstake unstakeModel ) ->
             let
-                ( newModel, _ ) =
+                ( newModel, subCmd ) =
                     UnstakeTab.update
                         unstakeMessage
                         unstakeModel
                         account
             in
-            ( { model | tab = Unstake newModel }, Cmd.none )
+            ( { model | tab = Unstake newModel }, Cmd.map UnstakeMessage subCmd )
 
         ( DelegateMessage delegateMessage, Delegate delegateModel ) ->
             let

@@ -736,8 +736,8 @@ undelegatebwParametersToValue { from, receiver, unstakeNetQuantity, unstakeCpuQu
           , Encode.object
                 [ ( "from", Encode.string from )
                 , ( "receiver", Encode.string receiver )
-                , ( "unstake_net_quantity", Encode.string unstakeNetQuantity )
-                , ( "unstake_cpu_quantity", Encode.string unstakeCpuQuantity )
+                , ( "unstake_net_quantity", Encode.string (unstakeNetQuantity |> formatAsset) )
+                , ( "unstake_cpu_quantity", Encode.string (unstakeCpuQuantity |> formatAsset) )
                 ]
           )
         ]

@@ -1,4 +1,19 @@
-module Component.Main.Page.Resource.Unstake exposing (Message(..), Model, initModel, update, view)
+module Component.Main.Page.Resource.Unstake exposing
+    ( Message(..)
+    , MinimumResource
+    , Model
+    , PercentageOfResource(..)
+    , ResourceType(..)
+    , getPercentageOfResource
+    , getUnstakeAbleResource
+    , initModel
+    , percentageButton
+    , update
+    , validate
+    , validateAttr
+    , validateText
+    , view
+    )
 
 import Data.Account
     exposing
@@ -13,11 +28,29 @@ import Data.Account
         , getUnstakingAmount
         , keyAccountsDecoder
         )
-import Data.Action exposing (UndelegatebwParameters)
+import Data.Action as Action exposing (UndelegatebwParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (onClick, onInput)
+import Port
+import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (assetAdd, assetSubtract)
+import Util.Formatter
+    exposing
+        ( assetAdd
+        , assetSubtract
+        , assetToFloat
+        , floatToAsset
+        , formatAsset
+        , larimerToEos
+        )
+import Util.Validation as Validation
+    exposing
+        ( AccountStatus(..)
+        , QuantityStatus(..)
+        , validateAccount
+        , validateQuantity
+        )
 
 
 
@@ -26,14 +59,41 @@ import Util.Formatter exposing (assetAdd, assetSubtract)
 
 type alias Model =
     { undelegatebw : UndelegatebwParameters
-    , unstakeInput : String
+    , minimumResource : MinimumResource
+    , percentageOfCpu : PercentageOfResource
+    , percentageOfNet : PercentageOfResource
+    , cpuQuantityValidation : QuantityStatus
+    , netQuantityValidation : QuantityStatus
+    , isFormValid : Bool
     }
+
+
+type alias MinimumResource =
+    { cpu : String, net : String }
+
+
+type PercentageOfResource
+    = NoOp
+    | Percentage10
+    | Percentage50
+    | Percentage70
+    | Percentage100
+
+
+type ResourceType
+    = Cpu
+    | Net
 
 
 initModel : Model
 initModel =
     { undelegatebw = { from = "", receiver = "", unstakeNetQuantity = "", unstakeCpuQuantity = "" }
-    , unstakeInput = ""
+    , minimumResource = { cpu = "0.8 EOS", net = "0.2 EOS" }
+    , percentageOfCpu = NoOp
+    , percentageOfNet = NoOp
+    , cpuQuantityValidation = EmptyQuantity
+    , netQuantityValidation = EmptyQuantity
+    , isFormValid = False
     }
 
 
@@ -42,14 +102,94 @@ initModel =
 
 
 type Message
-    = InputUnstakeAmount String
+    = CpuAmountInput String
+    | ClickCpuPercentage PercentageOfResource
+    | ClickNetPercentage PercentageOfResource
+    | NetAmountInput String
+    | SubmitAction
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ undelegatebw, minimumResource } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+    let
+        unstakeAbleCpu =
+            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+
+        unstakeAbleNet =
+            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+    in
     case message of
-        InputUnstakeAmount value ->
-            ( { model | unstakeInput = value }, Cmd.none )
+        CpuAmountInput value ->
+            let
+                newModel =
+                    { model
+                        | undelegatebw =
+                            { undelegatebw
+                                | unstakeCpuQuantity = value
+                            }
+                    }
+            in
+            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+
+        NetAmountInput value ->
+            let
+                newModel =
+                    { model
+                        | undelegatebw =
+                            { undelegatebw
+                                | unstakeNetQuantity = value
+                            }
+                    }
+            in
+            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+
+        ClickCpuPercentage percentageOfResource ->
+            let
+                ratio =
+                    getPercentageOfResource percentageOfResource
+
+                value =
+                    assetToFloat unstakeAbleCpu
+                        * ratio
+                        |> Round.round 4
+
+                newModel =
+                    { model
+                        | undelegatebw =
+                            { undelegatebw | unstakeCpuQuantity = value }
+                        , percentageOfCpu = percentageOfResource
+                    }
+            in
+            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+
+        ClickNetPercentage percentageOfResource ->
+            let
+                ratio =
+                    getPercentageOfResource percentageOfResource
+
+                value =
+                    assetToFloat unstakeAbleNet
+                        * ratio
+                        |> Round.round 4
+
+                newModel =
+                    { model
+                        | undelegatebw =
+                            { undelegatebw | unstakeNetQuantity = value }
+                        , percentageOfNet = percentageOfResource
+                    }
+            in
+            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+
+        SubmitAction ->
+            let
+                cmd =
+                    { undelegatebw | from = accountName, receiver = accountName }
+                        |> Action.Undelegatebw
+                        |> encodeAction
+                        |> Port.pushAction
+            in
+            ( { model | undelegatebw = { undelegatebw | from = accountName, receiver = accountName } }, cmd )
 
 
 
@@ -57,7 +197,35 @@ update message model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalanc
 
 
 view : Language -> Model -> Account -> Html Message
-view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+    let
+        unstakedAmount =
+            floatToAsset (larimerToEos account.voterInfo.staked)
+
+        unstakeAbleAmount =
+            assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
+
+        unstakeAbleCpu =
+            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+
+        unstakeAbleNet =
+            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+
+        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
+            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
+
+        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
+            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
+
+        ( validatedText, validatedAttr ) =
+            validateText model
+
+        cpuValidateAttr =
+            validateAttr cpuQuantityValidation
+
+        netValidateAttr =
+            validateAttr netQuantityValidation
+    in
     div [ class "unstake container" ]
         [ div [ class "my resource" ]
             [ div []
@@ -71,9 +239,9 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class "hell", attribute "style" "height:10%" ]
+                    [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
                         []
-                    , text "10%"
+                    , text cpuPercent
                     ]
                 ]
             , div []
@@ -87,61 +255,231 @@ view language model ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class "hell", attribute "style" "height:10%" ]
+                    [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
                         []
-                    , text "10%"
+                    , text netPercent
                     ]
                 ]
             ]
         , section []
             [ div [ class "wallet status" ]
                 [ h3 []
-                    [ text "언스테이크 가능한 토큰" ]
+                    [ text "언스테이크 가능한 CPU" ]
                 , p []
-                    [ text "100 EOS" ]
-                , p [ class "validate description" ]
-                    [ text "CPU는 최소 0.7 EOS, NET은 최소 0.3 EOS 이상 스테이킹 하세요." ]
+                    [ text unstakeAbleCpu ]
+                , h3 []
+                    [ text "언스테이크 가능한 NET" ]
+                , p []
+                    [ text unstakeAbleNet ]
+                , p [ class ("validate description" ++ validatedAttr) ]
+                    [ text validatedText ]
                 ]
             , div [ class "field group" ]
                 [ div [ class "input field" ]
                     [ label [ for "cpu" ]
                         [ text "CPU" ]
-                    , input [ id "cpu", Html.Attributes.max "1000000000", Html.Attributes.min "0.0001", pattern "\\d+(\\.\\d{1,4})?", placeholder "CPU 언스테이크 할 수량 입력", step "0.0001", type_ "number" ]
+                    , input
+                        [ attribute "data-validate" cpuValidateAttr
+                        , id "cpu"
+                        , placeholder "CPU 언스테이크 할 수량 입력"
+                        , step "0.0001"
+                        , type_ "number"
+                        , onInput CpuAmountInput
+                        , value undelegatebw.unstakeCpuQuantity
+                        ]
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , button [ type_ "button" ]
-                        [ text "10%" ]
-                    , button [ type_ "button" ]
-                        [ text "50%" ]
-                    , button [ type_ "button" ]
-                        [ text "70%" ]
-                    , button [ type_ "button" ]
-                        [ text "최대" ]
+                    , percentageButton Cpu percentageOfCpu Percentage10
+                    , percentageButton Cpu percentageOfCpu Percentage50
+                    , percentageButton Cpu percentageOfCpu Percentage70
+                    , percentageButton Cpu percentageOfCpu Percentage100
                     ]
                 , div [ class "input field" ]
                     [ label [ for "net" ]
                         [ text "NET" ]
-                    , input [ attribute "data-validate" "false", id "net", Html.Attributes.max "1000000000", Html.Attributes.min "0.0001", pattern "\\d+(\\.\\d{1,4})?", placeholder "NET 언스테이크할 수량 입력", step "0.0001", type_ "number" ]
+                    , input
+                        [ attribute "data-validate" netValidateAttr
+                        , id "net"
+                        , placeholder "NET 언스테이크할 수량 입력"
+                        , step "0.0001"
+                        , type_ "number"
+                        , onInput NetAmountInput
+                        , value undelegatebw.unstakeNetQuantity
+                        ]
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , button [ type_ "button" ]
-                        [ text "10%" ]
-                    , button [ type_ "button" ]
-                        [ text "50%" ]
-                    , button [ type_ "button" ]
-                        [ text "70%" ]
-                    , button [ type_ "button" ]
-                        [ text "최대" ]
+                    , percentageButton Net percentageOfNet Percentage10
+                    , percentageButton Net percentageOfNet Percentage50
+                    , percentageButton Net percentageOfNet Percentage70
+                    , percentageButton Net percentageOfNet Percentage100
                     ]
                 ]
             , div [ class "btn_area" ]
-                [ button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                [ button
+                    [ class "ok button"
+                    , attribute
+                        (if isFormValid then
+                            "no_op"
+
+                         else
+                            "disabled"
+                        )
+                        ""
+                    , type_ "button"
+                    , onClick SubmitAction
+                    ]
                     [ text "확인" ]
                 ]
             ]
-        , node "script"
-            []
-            [ text "(function(){var button=document.querySelectorAll('div.input.field button');var clicked;for(var i=0;i<button.length;i++){button[i].addEventListener('click',function(){if(!!clicked){clicked.classList.remove('clicked')}this.classList.add('clicked');clicked=this})}})();(function(){var button=document.querySelectorAll('div.input.field button');var input=document.querySelector('input[type=\"number\"]');var submit=document.querySelector('.btn_area button');var max=parseInt(1000);button[0].addEventListener('click',function(){input.value=max*0.1 input.focus()});button[1].addEventListener('click',function(){input.value=max*0.5;input.focus()});button[2].addEventListener('click',function(){input.value=max*0.7;input.focus()});button[3].addEventListener('click',function(){input.value=max*1;input.focus()})})();(function(){var submit=document.querySelector('.btn_area button');var input=document.querySelector('input[type=\"number\"]');input.addEventListener('focus',function(){console.log(this.vaule);if(this.value>0){submit.removeAttribute('disabled')}});input.addEventListener('keyup',function(){!this.value>0?submit.setAttribute('disabled',''):submit.removeAttribute('disabled')})})();" ]
         ]
+
+
+percentageButton : ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
+percentageButton resourceType modelPercentageOfResource thisPercentageOfResource =
+    let
+        ratio =
+            getPercentageOfResource thisPercentageOfResource
+
+        buttonText =
+            if ratio < 1 then
+                Round.round 0 (ratio * 100) ++ "%"
+
+            else
+                "최대"
+    in
+    button
+        [ type_ "button"
+        , class
+            (if modelPercentageOfResource == thisPercentageOfResource then
+                "clicked"
+
+             else
+                ""
+            )
+        , onClick
+            (case resourceType of
+                Cpu ->
+                    ClickCpuPercentage thisPercentageOfResource
+
+                Net ->
+                    ClickNetPercentage thisPercentageOfResource
+            )
+        ]
+        [ text buttonText ]
+
+
+getUnstakeAbleResource : String -> String -> String
+getUnstakeAbleResource selfDelegatedAmount minimum =
+    let
+        subtractResult =
+            assetSubtract selfDelegatedAmount minimum
+    in
+    if (subtractResult |> assetToFloat) >= 0 then
+        subtractResult
+
+    else
+        "0 EOS"
+
+
+validate : Model -> String -> String -> Model
+validate ({ undelegatebw } as model) unstakeAbleCpu unstakeAbleNet =
+    let
+        netQuantityValidation =
+            validateQuantity undelegatebw.unstakeNetQuantity (assetToFloat unstakeAbleNet)
+
+        cpuQuantityValidation =
+            validateQuantity undelegatebw.unstakeCpuQuantity (assetToFloat unstakeAbleCpu)
+
+        isCpuValid =
+            (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
+
+        isNetValid =
+            (netQuantityValidation == ValidQuantity) || (netQuantityValidation == EmptyQuantity)
+
+        isNotEmptyBoth =
+            not ((cpuQuantityValidation == EmptyQuantity) && (netQuantityValidation == EmptyQuantity))
+
+        isFormValid =
+            isCpuValid
+                && isNetValid
+                && isNotEmptyBoth
+    in
+    { model
+        | cpuQuantityValidation = cpuQuantityValidation
+        , netQuantityValidation = netQuantityValidation
+        , isFormValid = isFormValid
+    }
+
+
+validateAttr : QuantityStatus -> String
+validateAttr resourceQuantityStatus =
+    case resourceQuantityStatus of
+        InvalidQuantity ->
+            "false"
+
+        OverValidQuantity ->
+            "false"
+
+        ValidQuantity ->
+            "true"
+
+        EmptyQuantity ->
+            ""
+
+
+validateText : Model -> ( String, String )
+validateText ({ cpuQuantityValidation, netQuantityValidation, minimumResource } as model) =
+    let
+        isCpuValid =
+            (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
+
+        isNetValid =
+            (netQuantityValidation == ValidQuantity) || (netQuantityValidation == EmptyQuantity)
+
+        isNotEmptyBoth =
+            not ((cpuQuantityValidation == EmptyQuantity) && (netQuantityValidation == EmptyQuantity))
+
+        isFormValid =
+            isCpuValid
+                && isNetValid
+                && isNotEmptyBoth
+    in
+    if isFormValid then
+        ( "언스테이크 가능합니다 :)", " true" )
+
+    else if isNotEmptyBoth then
+        if not isCpuValid && not isNetValid then
+            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+
+        else if not isCpuValid then
+            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+
+        else if not isNetValid then
+            ( "NET의 수량입력이 잘못되었습니다", " false" )
+
+        else
+            ( "발생 불가 케이스", "" )
+
+    else
+        ( "CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.", "" )
+
+
+getPercentageOfResource : PercentageOfResource -> Float
+getPercentageOfResource percentageOfResource =
+    case percentageOfResource of
+        Percentage10 ->
+            0.1
+
+        Percentage50 ->
+            0.5
+
+        Percentage70 ->
+            0.7
+
+        Percentage100 ->
+            1
+
+        _ ->
+            0

@@ -69,7 +69,7 @@ validateAccount accountName =
 
 
 validateQuantity : String -> Float -> QuantityStatus
-validateQuantity quantity eosLiquidAmount =
+validateQuantity quantity maxAmount =
     if quantity == "" then
         EmptyQuantity
 
@@ -85,8 +85,7 @@ validateQuantity quantity eosLiquidAmount =
                 if quantity <= 0 then
                     InvalidQuantity
 
-                else if quantity > eosLiquidAmount then
-                    -- NOTE(boseok): Change the name to OverValidQuantity, OverProperQuantity
+                else if quantity > maxAmount then
                     OverValidQuantity
 
                 else
