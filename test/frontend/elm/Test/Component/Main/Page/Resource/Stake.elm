@@ -20,7 +20,7 @@ import Util.Validation as Validation
 
 tests : Test
 tests =
-    describe "Page.SearchKey module"
+    describe "Page.Resource.Stake module"
         [ describe "initModel"
             [ test "delegatebw.transfer should always be 0 when from == receiver" <|
                 \() ->
