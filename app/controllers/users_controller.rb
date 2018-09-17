@@ -1,4 +1,6 @@
 class UsersController < ApiController
+  include EosAccount
+
   def create
     @user = User.find_by(email: params[:email])
     if @user.present?
@@ -39,9 +41,9 @@ class UsersController < ApiController
     elsif user.eos_account_created?
       render json: { message: I18n.t('users.eos_account_creation_failure_already_created') }, status: :precondition_failed
     else
-      raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if helpers.eos_account_exist?(params[:account_name])
+      raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:account_name])
 
-      response = helpers.create_eos_account(params[:account_name], params[:pubkey])
+      response = request_eos_account_creation(params[:account_name], params[:pubkey])
       if response.code == 200
         user.eos_account_created!
         render json: { message: I18n.t('users.eos_account_created') }, status: :ok
