@@ -57,7 +57,7 @@ view language =
                     , p [] [ text (translate language RamMarketDesc) ]
                     ]
                 , a
-                    [ onClick (ChangeUrl "/voting")
+                    [ onClick (ChangeUrl "/vote")
                     , class "card vote"
                     ]
                     [ h3 [] [ text (translate language Vote) ]
