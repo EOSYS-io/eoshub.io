@@ -326,17 +326,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                             floatAvailableRam =
                                 availableRam |> toFloat
 
-                            denominator =
-                                case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
-                                    Byte ->
-                                        1.0
-
-                                    KB ->
-                                        kilo |> toFloat
-
-                                    MB ->
-                                        mega |> toFloat
-
                             newQuantity =
                                 case distribution of
                                     Percentage10 ->
@@ -350,8 +339,19 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
                                     _ ->
                                         floatAvailableRam
+
+                            ( denominator, decimal ) =
+                                case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
+                                    Byte ->
+                                        ( 1.0, 0 )
+
+                                    KB ->
+                                        ( kilo |> toFloat, 4 )
+
+                                    MB ->
+                                        ( mega |> toFloat, 8 )
                         in
-                        ( SetSellFormField ((newQuantity / denominator) |> toString)
+                        ( SetSellFormField ((newQuantity / denominator) |> Round.floor decimal)
                         , { model
                             | sellModel = { sellModel | distribution = distribution }
                           }
@@ -580,10 +580,10 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) availableEos availableRa
                     ( "Bytes", sellModel.params.bytes |> toString )
 
                 KB ->
-                    ( "Kilo Bytes", (toFloat sellModel.params.bytes / toFloat kilo) |> toString )
+                    ( "Kilo Bytes", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 4 )
 
                 MB ->
-                    ( "Mega Bytes", (toFloat sellModel.params.bytes / toFloat mega) |> toString )
+                    ( "Mega Bytes", (toFloat sellModel.params.bytes / toFloat mega) |> Round.floor 8 )
 
         ( buyClass, sellClass, buyOthersRamTab, buttonText, inputText, inputMsg, inputQuant, inputPlaceholder, buttonDisabled ) =
             if isBuyTab then
