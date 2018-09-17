@@ -13,7 +13,5 @@ class ApiController < ActionController::API
 
   rescue_from Exceptions::DefaultError, with: :render_default_error
 
-  rescue_from Exceptions::DefaultError, with: :render_default_error
-
   rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable_entity
 end

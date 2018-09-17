@@ -18,8 +18,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exceptions::DefaultError, with: :render_default_error
 
-  rescue_from Exceptions::DefaultError, with: :render_default_error
-
   rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable_entity
 
   def access_denied(exception)
