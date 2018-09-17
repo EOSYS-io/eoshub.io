@@ -528,11 +528,8 @@ getPercentageOfLiquid percentageOfLiquid =
         Percentage70 ->
             0.7
 
-        Percentage100 ->
-            1
-
         _ ->
-            0
+            1
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message

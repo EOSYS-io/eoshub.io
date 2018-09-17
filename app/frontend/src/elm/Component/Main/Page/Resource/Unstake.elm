@@ -207,10 +207,10 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         unstakeAbleNet =
             getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
 
-        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
+        ( _, _, _, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
 
-        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
+        ( _, _, _, netPercent, netColor ) =
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
         ( validatedText, validatedAttr ) =
@@ -235,7 +235,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
+                    [ span [ class cpuColor, style [ ( "height", cpuPercent ) ] ]
                         []
                     , text cpuPercent
                     ]
@@ -251,7 +251,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
+                    [ span [ class netColor, style [ ( "height", netPercent ) ] ]
                         []
                     , text netPercent
                     ]
@@ -276,7 +276,6 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "CPU" ]
                     , input
                         [ attribute "data-validate" cpuValidateAttr
-                        , id "cpu"
                         , placeholder "CPU 언스테이크 할 수량 입력"
                         , step "0.0001"
                         , type_ "number"
@@ -296,7 +295,6 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "NET" ]
                     , input
                         [ attribute "data-validate" netValidateAttr
-                        , id "net"
                         , placeholder "NET 언스테이크할 수량 입력"
                         , step "0.0001"
                         , type_ "number"
@@ -474,8 +472,6 @@ getPercentageOfResource percentageOfResource =
         Percentage70 ->
             0.7
 
-        Percentage100 ->
+        _ ->
             1
 
-        _ ->
-            0

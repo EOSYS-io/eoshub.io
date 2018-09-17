@@ -20,6 +20,19 @@ import Util.Validation as Validation
 
 tests : Test
 tests =
+    let
+        unstakeAbleCpu =
+            "0.3 EOS"
+
+        unstakeAbleNet =
+            "0.4 EOS"
+
+        defaultModel =
+            initModel
+
+        { undelegatebw } =
+            defaultModel
+    in
     describe "Page.Resource.Unstake module"
         [ describe "getPercentageOfResource"
             [ test "Percentage10" <|
@@ -36,7 +49,7 @@ tests =
                     Expect.equal 1 (getPercentageOfResource Percentage100)
             , test "NoOp" <|
                 \() ->
-                    Expect.equal 0 (getPercentageOfResource NoOp)
+                    Expect.equal 1 (getPercentageOfResource NoOp)
             ]
         , describe "getUnstakeAbleResource"
             [ test "cpu, selfDelegatedAmount > minimum (0.8 EOS)" <|
@@ -96,12 +109,6 @@ tests =
             [ test "validate test1. cpu ValidQuantity, net EmptyQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -109,15 +116,6 @@ tests =
                                         | unstakeCpuQuantity = "0.0600"
                                     }
                             }
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
 
                         expectedModel =
                             { newModel
@@ -129,12 +127,6 @@ tests =
             , test "validate test2. cpu EmptyQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -143,15 +135,6 @@ tests =
                                         , unstakeCpuQuantity = ""
                                     }
                             }
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
 
                         expectedModel =
                             { newModel
@@ -163,12 +146,6 @@ tests =
             , test "validate test3. cpu ValidQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -177,15 +154,6 @@ tests =
                                         , unstakeCpuQuantity = "0.1000"
                                     }
                             }
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
 
                         expectedModel =
                             { newModel
@@ -198,12 +166,6 @@ tests =
             , test "validate test4. cpu OverValidQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -212,15 +174,6 @@ tests =
                                         , unstakeCpuQuantity = "0.1000"
                                     }
                             }
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
 
                         expectedModel =
                             { newModel
@@ -233,12 +186,6 @@ tests =
             , test "validate test5. cpu ValidQuantity, net OverValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -247,15 +194,6 @@ tests =
                                         , unstakeCpuQuantity = "1.1000"
                                     }
                             }
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
 
                         expectedModel =
                             { newModel
@@ -268,18 +206,6 @@ tests =
             , test "validate test6. cpu EmptyQuantity, net EmptyQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { defaultModel
                                 | netQuantityValidation = EmptyQuantity
