@@ -121,4 +121,13 @@ ActiveRecord::Schema.define(version: 2018_09_20_014258) do
     t.index ["eos_account"], name: "index_users_on_eos_account", unique: true
   end
 
+  create_table "vote_stats", force: :cascade do |t|
+    t.float "total_voted_eos", null: false
+    t.float "total_staked_eos", null: false
+    t.float "eosys_proxy_staked_eos", null: false
+    t.integer "eosys_proxy_staked_account_count", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
 end
