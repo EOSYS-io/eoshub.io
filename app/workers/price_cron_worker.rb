@@ -1,4 +1,4 @@
-class CronWorker
+class PriceCronWorker
   include Sidekiq::Worker
 
   def perform(*args)
