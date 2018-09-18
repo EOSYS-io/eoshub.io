@@ -94,13 +94,13 @@ update message model =
 view : Language -> Model -> Html Message
 view _ { tab } =
     let
-        ( addedMainClass, tabView ) =
+        ( addedMainClass, tabView, voteTabClass, proxyVoteTabClass ) =
             case tab of
                 VoteTab ->
-                    ( "", voteView )
+                    ( "", voteView, " ing", "" )
 
                 ProxyVoteTab ->
-                    ( " proxy", proxyView )
+                    ( " proxy", proxyView, "", " ing" )
     in
     main_ [ class ("vote" ++ addedMainClass) ]
         [ h2 []
@@ -109,12 +109,12 @@ view _ { tab } =
             [ text "건강한 이오스 생태계를 위해 투표해주세요." ]
         , div [ class "tab" ]
             [ a
-                [ class "vote ing tab button"
+                [ class ("vote tab button" ++ voteTabClass)
                 , onClick (SwitchTab VoteTab)
                 ]
                 [ text "투표하기" ]
             , a
-                [ class "proxy_vote tab button"
+                [ class ("proxy_vote tab button" ++ proxyVoteTabClass)
                 , onClick (SwitchTab ProxyVoteTab)
                 ]
                 [ text "대리투표" ]
@@ -210,7 +210,28 @@ voteView =
                     [ td []
                         [ text "21" ]
                     , td []
-                        [ text "" ]
+                        [ span [ class "up" ] [ text "21" ] ]
+                    , td []
+                        [ span [ class "bp bi" ]
+                            [ img [ alt "", src "" ]
+                                []
+                            ]
+                        , strong []
+                            [ text "eos-2" ]
+                        , text "korea"
+                        ]
+                    , td []
+                        [ strong []
+                            [ text "2.16%" ]
+                        , span []
+                            [ text "(64,173,932.6431 EOS)" ]
+                        ]
+                    , td []
+                        [ input [ id "eos-2", type_ "checkbox" ]
+                            []
+                        , label [ for "eos-2" ]
+                            [ text "eosyskoreabp에 투표하시려면 체크하세요!" ]
+                        ]
                     ]
                 ]
             ]
