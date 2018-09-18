@@ -41,7 +41,7 @@ tests =
                     Expect.equal 1 (getPercentageOfLiquid Percentage100)
             , test "NoOp" <|
                 \() ->
-                    Expect.equal 0 (getPercentageOfLiquid NoOp)
+                    Expect.equal 1 (getPercentageOfLiquid NoOp)
             ]
         , describe "validate"
             -- TODO(boseok): these tests only cover totalQuantity validation and modal open/close validation cases

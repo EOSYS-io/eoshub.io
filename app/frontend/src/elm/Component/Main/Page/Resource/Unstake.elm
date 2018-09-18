@@ -5,7 +5,7 @@ module Component.Main.Page.Resource.Unstake exposing
     , PercentageOfResource(..)
     , ResourceType(..)
     , getPercentageOfResource
-    , getUnstakeAbleResource
+    , getUnstakePossibleResource
     , initModel
     , percentageButton
     , update
@@ -112,11 +112,11 @@ type Message
 update : Message -> Model -> Account -> ( Model, Cmd Message )
 update message ({ undelegatebw, minimumResource } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
-        unstakeAbleCpu =
-            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+        unstakePossibleCpu =
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
 
-        unstakeAbleNet =
-            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+        unstakePossibleNet =
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
     in
     case message of
         CpuAmountInput value ->
@@ -129,7 +129,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             }
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         NetAmountInput value ->
             let
@@ -141,7 +141,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             }
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         ClickCpuPercentage percentageOfResource ->
             let
@@ -149,18 +149,16 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                     getPercentageOfResource percentageOfResource
 
                 value =
-                    assetToFloat unstakeAbleCpu
+                    assetToFloat unstakePossibleCpu
                         * ratio
                         |> Round.round 4
 
                 newModel =
                     { model
-                        | undelegatebw =
-                            { undelegatebw | unstakeCpuQuantity = value }
-                        , percentageOfCpu = percentageOfResource
+                        | percentageOfCpu = percentageOfResource
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            update (CpuAmountInput value) newModel account
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -168,18 +166,16 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                     getPercentageOfResource percentageOfResource
 
                 value =
-                    assetToFloat unstakeAbleNet
+                    assetToFloat unstakePossibleNet
                         * ratio
                         |> Round.round 4
 
                 newModel =
                     { model
-                        | undelegatebw =
-                            { undelegatebw | unstakeNetQuantity = value }
-                        , percentageOfNet = percentageOfResource
+                        | percentageOfNet = percentageOfResource
                     }
             in
-            ( validate newModel unstakeAbleCpu unstakeAbleNet, Cmd.none )
+            update (NetAmountInput value) newModel account
 
         SubmitAction ->
             let
@@ -202,19 +198,19 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         unstakedAmount =
             floatToAsset (larimerToEos account.voterInfo.staked)
 
-        unstakeAbleAmount =
+        unstakePossibleAmount =
             assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
 
-        unstakeAbleCpu =
-            getUnstakeAbleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+        unstakePossibleCpu =
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
 
-        unstakeAbleNet =
-            getUnstakeAbleResource selfDelegatedBandwidth.netWeight minimumResource.net
+        unstakePossibleNet =
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
 
-        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
+        ( _, _, _, cpuPercent, cpuColor ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
 
-        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
+        ( _, _, _, netPercent, netColor ) =
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
         ( validatedText, validatedAttr ) =
@@ -239,7 +235,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
+                    [ span [ class cpuColor, style [ ( "height", cpuPercent ) ] ]
                         []
                     , text cpuPercent
                     ]
@@ -255,7 +251,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 , p []
                     [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
                 , div [ class "graph status" ]
-                    [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
+                    [ span [ class netColor, style [ ( "height", netPercent ) ] ]
                         []
                     , text netPercent
                     ]
@@ -266,11 +262,11 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                 [ h3 []
                     [ text "언스테이크 가능한 CPU" ]
                 , p []
-                    [ text unstakeAbleCpu ]
+                    [ text unstakePossibleCpu ]
                 , h3 []
                     [ text "언스테이크 가능한 NET" ]
                 , p []
-                    [ text unstakeAbleNet ]
+                    [ text unstakePossibleNet ]
                 , p [ class ("validate description" ++ validatedAttr) ]
                     [ text validatedText ]
                 ]
@@ -280,7 +276,6 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "CPU" ]
                     , input
                         [ attribute "data-validate" cpuValidateAttr
-                        , id "cpu"
                         , placeholder "CPU 언스테이크 할 수량 입력"
                         , step "0.0001"
                         , type_ "number"
@@ -300,7 +295,6 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "NET" ]
                     , input
                         [ attribute "data-validate" netValidateAttr
-                        , id "net"
                         , placeholder "NET 언스테이크할 수량 입력"
                         , step "0.0001"
                         , type_ "number"
@@ -319,14 +313,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
             , div [ class "btn_area" ]
                 [ button
                     [ class "ok button"
-                    , attribute
-                        (if isFormValid then
-                            "no_op"
-
-                         else
-                            "disabled"
-                        )
-                        ""
+                    , disabled (not isFormValid)
                     , type_ "button"
                     , onClick SubmitAction
                     ]
@@ -370,8 +357,8 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
         [ text buttonText ]
 
 
-getUnstakeAbleResource : String -> String -> String
-getUnstakeAbleResource selfDelegatedAmount minimum =
+getUnstakePossibleResource : String -> String -> String
+getUnstakePossibleResource selfDelegatedAmount minimum =
     let
         subtractResult =
             assetSubtract selfDelegatedAmount minimum
@@ -384,13 +371,13 @@ getUnstakeAbleResource selfDelegatedAmount minimum =
 
 
 validate : Model -> String -> String -> Model
-validate ({ undelegatebw } as model) unstakeAbleCpu unstakeAbleNet =
+validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
         netQuantityValidation =
-            validateQuantity undelegatebw.unstakeNetQuantity (assetToFloat unstakeAbleNet)
+            validateQuantity undelegatebw.unstakeNetQuantity (assetToFloat unstakePossibleNet)
 
         cpuQuantityValidation =
-            validateQuantity undelegatebw.unstakeCpuQuantity (assetToFloat unstakeAbleCpu)
+            validateQuantity undelegatebw.unstakeCpuQuantity (assetToFloat unstakePossibleCpu)
 
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
@@ -478,8 +465,5 @@ getPercentageOfResource percentageOfResource =
         Percentage70 ->
             0.7
 
-        Percentage100 ->
-            1
-
         _ ->
-            0
+            1

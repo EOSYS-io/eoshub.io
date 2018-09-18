@@ -20,6 +20,19 @@ import Util.Validation as Validation
 
 tests : Test
 tests =
+    let
+        unstakePossibleCpu =
+            "0.3 EOS"
+
+        unstakePossibleNet =
+            "0.4 EOS"
+
+        defaultModel =
+            initModel
+
+        { undelegatebw } =
+            defaultModel
+    in
     describe "Page.Resource.Unstake module"
         [ describe "getPercentageOfResource"
             [ test "Percentage10" <|
@@ -36,9 +49,9 @@ tests =
                     Expect.equal 1 (getPercentageOfResource Percentage100)
             , test "NoOp" <|
                 \() ->
-                    Expect.equal 0 (getPercentageOfResource NoOp)
+                    Expect.equal 1 (getPercentageOfResource NoOp)
             ]
-        , describe "getUnstakeAbleResource"
+        , describe "getUnstakePossibleResource"
             [ test "cpu, selfDelegatedAmount > minimum (0.8 EOS)" <|
                 \() ->
                     let
@@ -51,7 +64,7 @@ tests =
                         expected =
                             "0.5000 EOS"
                     in
-                    Expect.equal expected (getUnstakeAbleResource selfDelegatedAcount minimum)
+                    Expect.equal expected (getUnstakePossibleResource selfDelegatedAcount minimum)
             , test "cpu, selfDelegatedAmount <= minimum (0.8 EOS)" <|
                 \() ->
                     let
@@ -64,7 +77,7 @@ tests =
                         expected =
                             "0 EOS"
                     in
-                    Expect.equal expected (getUnstakeAbleResource selfDelegatedAcount minimum)
+                    Expect.equal expected (getUnstakePossibleResource selfDelegatedAcount minimum)
             , test "net, selfDelegatedAmount > minimum (0.2 EOS)" <|
                 \() ->
                     let
@@ -77,7 +90,7 @@ tests =
                         expected =
                             "0.1000 EOS"
                     in
-                    Expect.equal expected (getUnstakeAbleResource selfDelegatedAcount minimum)
+                    Expect.equal expected (getUnstakePossibleResource selfDelegatedAcount minimum)
             , test "net, selfDelegatedAmount <= minimum (0.2 EOS)" <|
                 \() ->
                     let
@@ -90,18 +103,12 @@ tests =
                         expected =
                             "0 EOS"
                     in
-                    Expect.equal expected (getUnstakeAbleResource selfDelegatedAcount minimum)
+                    Expect.equal expected (getUnstakePossibleResource selfDelegatedAcount minimum)
             ]
         , describe "validate"
             [ test "validate test1. cpu ValidQuantity, net EmptyQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -110,31 +117,16 @@ tests =
                                     }
                             }
 
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { newModel
                                 | cpuQuantityValidation = ValidQuantity
                                 , isFormValid = True
                             }
                     in
-                    Expect.equal expectedModel (validate newModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
             , test "validate test2. cpu EmptyQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -144,31 +136,16 @@ tests =
                                     }
                             }
 
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { newModel
                                 | netQuantityValidation = ValidQuantity
                                 , isFormValid = True
                             }
                     in
-                    Expect.equal expectedModel (validate newModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
             , test "validate test3. cpu ValidQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -178,15 +155,6 @@ tests =
                                     }
                             }
 
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { newModel
                                 | netQuantityValidation = ValidQuantity
@@ -194,16 +162,10 @@ tests =
                                 , isFormValid = True
                             }
                     in
-                    Expect.equal expectedModel (validate newModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
             , test "validate test4. cpu OverValidQuantity, net ValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -213,15 +175,6 @@ tests =
                                     }
                             }
 
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { newModel
                                 | netQuantityValidation = OverValidQuantity
@@ -229,16 +182,10 @@ tests =
                                 , isFormValid = False
                             }
                     in
-                    Expect.equal expectedModel (validate newModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
             , test "validate test5. cpu ValidQuantity, net OverValidQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        { undelegatebw } =
-                            defaultModel
-
                         newModel =
                             { defaultModel
                                 | undelegatebw =
@@ -248,15 +195,6 @@ tests =
                                     }
                             }
 
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { newModel
                                 | netQuantityValidation = ValidQuantity
@@ -264,22 +202,10 @@ tests =
                                 , isFormValid = False
                             }
                     in
-                    Expect.equal expectedModel (validate newModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
             , test "validate test6. cpu EmptyQuantity, net EmptyQuantity" <|
                 \() ->
                     let
-                        defaultModel =
-                            initModel
-
-                        unstakeAbleCpu =
-                            "0.3 EOS"
-
-                        unstakeAbleNet =
-                            "0.4 EOS"
-
-                        modalOpened =
-                            False
-
                         expectedModel =
                             { defaultModel
                                 | netQuantityValidation = EmptyQuantity
@@ -287,7 +213,7 @@ tests =
                                 , isFormValid = False
                             }
                     in
-                    Expect.equal expectedModel (validate defaultModel unstakeAbleCpu unstakeAbleNet)
+                    Expect.equal expectedModel (validate defaultModel unstakePossibleCpu unstakePossibleNet)
             ]
         , describe "validateAttr"
             [ test "resourceQuantityStatus -> EmptyQuantity" <|

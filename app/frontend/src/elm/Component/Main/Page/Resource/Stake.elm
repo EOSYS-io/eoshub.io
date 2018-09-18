@@ -152,7 +152,7 @@ type StakeAmountMessage
 update : Message -> Model -> Account -> ( Model, Cmd Message )
 update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
     let
-        stakeAbleAmount =
+        stakePossibleAmount =
             coreLiquidBalance
     in
     case message of
@@ -472,14 +472,7 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
                     [ text "취소" ]
                 , button
                     [ class "ok button"
-                    , attribute
-                        (if stakeAmountModal.isFormValid then
-                            "no_op"
-
-                         else
-                            "disabled"
-                        )
-                        ""
+                    , disabled (not stakeAmountModal.isFormValid)
                     , type_ "button"
                     , onClick ClickOk
                     ]
@@ -528,11 +521,8 @@ getPercentageOfLiquid percentageOfLiquid =
         Percentage70 ->
             0.7
 
-        Percentage100 ->
-            1
-
         _ ->
-            0
+            1
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
@@ -552,20 +542,20 @@ quantityWarningSpan quantityStatus language ({ delegatebw, manuallySet } as mode
                     ( " false", translate language InvalidAmount )
 
                 OverValidQuantity ->
-                    ( " false", translate language OverStakeAbleAmount )
+                    ( " false", translate language OverStakePossibleAmount )
 
                 ValidQuantity ->
                     ( " true"
                     , manualText
                         ++ translate language
-                            (StakeAble
+                            (StakePossible
                                 delegatebw.stakeCpuQuantity
                                 delegatebw.stakeNetQuantity
                             )
                     )
 
                 EmptyQuantity ->
-                    ( "", translate language StakeAbleAmountDesc )
+                    ( "", translate language StakePossibleAmountDesc )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]
