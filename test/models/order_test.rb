@@ -8,6 +8,7 @@
 #  amount                                                             :integer          not null
 #  bank_code(Virtual account bank code)                               :string
 #  bank_name(Virtual account bank name)                               :string
+#  eos_account                                                        :string           default(""), not null
 #  expire_date(expiration date of the virtual account)                :date
 #  order_no                                                           :string           not null
 #  pgcode                                                             :integer          default(NULL), not null
@@ -19,8 +20,9 @@
 #
 # Indexes
 #
-#  index_orders_on_order_no  (order_no)
-#  index_orders_on_user_id   (user_id)
+#  index_orders_on_eos_account  (eos_account) UNIQUE
+#  index_orders_on_order_no     (order_no)
+#  index_orders_on_user_id      (user_id)
 #
 
 require 'test_helper'

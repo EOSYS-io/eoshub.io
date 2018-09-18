@@ -39,8 +39,8 @@ class OrdersController < ApplicationController
 
     if @order_params&.dig(:cid).present?
       Order.create!(
+        eos_account: @order_params[:user_id],
         order_no: @order_params[:order_no],
-        user_id: @order_params[:user_id],
         pgcode: @order_params[:pgcode],
         amount: @order_params[:amount],
         product_name: @order_params[:product_name],

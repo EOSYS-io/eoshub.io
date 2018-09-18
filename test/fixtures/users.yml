@@ -14,6 +14,7 @@
 #
 #  index_users_on_confirm_token  (confirm_token)
 #  index_users_on_email          (email)
+#  index_users_on_eos_account    (eos_account) UNIQUE
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
