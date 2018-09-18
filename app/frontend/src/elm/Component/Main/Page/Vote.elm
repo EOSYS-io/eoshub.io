@@ -34,8 +34,8 @@ import Html
 import Html.Attributes
     exposing
         ( alt
-        , attribute
         , class
+        , disabled
         , for
         , id
         , placeholder
@@ -171,7 +171,7 @@ voteView =
                     , th [ scope "col" ]
                         [ span [ class "count" ]
                             [ text "0/30" ]
-                        , button [ class "vote ok button", attribute "disabled" "", type_ "button" ]
+                        , button [ class "vote ok button", disabled True, type_ "button" ]
                             [ text "투표" ]
                         ]
                     ]
@@ -256,17 +256,17 @@ proxyView =
     , section [ class "proxy vote status" ]
         [ ul []
             [ li []
-                [ text "Proxied EOS      "
+                [ text "Proxied EOS"
                 , strong []
                     [ text "370,006,164.1111 EOS" ]
                 ]
             , li []
-                [ text "Proxied Accounts      "
+                [ text "Proxied Accounts"
                 , strong []
                     [ text "147 Accounts" ]
                 ]
             , li []
-                [ text "Proxied BP      "
+                [ text "Proxied BP"
                 , strong []
                     [ text "9 BP" ]
                 ]
@@ -277,7 +277,7 @@ proxyView =
             [ text "투표한 BP" ]
         , ul [ class "list" ]
             [ li []
-                [ img [ alt "", src "./image/bi-demo.png" ]
+                [ img [ alt "", src "" ]
                     []
                 , strong [ title "eosbpkorea" ]
                     [ text "eosyskoreabeosyskoreabeosyskoreabeosyskoreabppppeosyskoreabp" ]
@@ -285,7 +285,7 @@ proxyView =
                     [ text "Korea" ]
                 ]
             , li []
-                [ img [ alt "", src "./image/bi-demo.png" ]
+                [ img [ alt "", src "" ]
                     []
                 , strong [ title "eosbpkorea" ]
                     [ text "eosyskoreabp" ]
@@ -293,7 +293,7 @@ proxyView =
                     [ text "Korea" ]
                 ]
             , li []
-                [ img [ alt "", src "./image/bi-demo.png" ]
+                [ img [ alt "", src "" ]
                     []
                 , strong [ title "eosbpkorea" ]
                     [ text "eosyskoreabp" ]
@@ -301,7 +301,7 @@ proxyView =
                     [ text "Korea" ]
                 ]
             , li []
-                [ img [ alt "", src "./image/bi-demo.png" ]
+                [ img [ alt "", src "" ]
                     []
                 , strong [ title "eosbpkorea" ]
                     [ text "eosyskoreabp" ]
