@@ -1,15 +1,25 @@
 default: &default
   host_url: http://localhost:3000
+  
+  # EOS account
   eos_wallet_node_host: http://localhost:5000
   eos_account_url: /account
   account_create_email_confirmed_url: /account/email_confirmed
   account_create_email_confirm_failure_url: /account/email_confirm_failure
+  
+  # EOS api
   eos_rpc_urls:
     - https://rpc.eosys.io
     - https://api.eosnewyork.io  # Thanks eos newyork!
     - http://mainnet.eoscalgary.io  # Thanks eos calgary!
   eos_get_table_url: /v1/chain/get_table_rows
+
+  # Redis
   redis_host: redis://localhost:6379/0
+  
+  # Payment
+  payletter_host: https://testpgapi.payletter.com
+  payletter_pay_api_url: /v1.0/payments/request
 
 development:
   <<: *default
@@ -25,3 +35,5 @@ alpha:
 
 production:
   <<: *default
+  eos_wallet_node_host: http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com:5000
+  payletter_host: https://pgapi.payletter.com

@@ -1,0 +1,7 @@
+ko:
+  errors:
+    object_not_found: '데이터가 존재하지 않습니다.'
+    parameter_missing: '요청 파라미터가 잘못 됐습니다.'
+    unexpected_error: '시스템 오류입니다. 관리자에게 연락해주세요.'
+    unauthorized: '권한이 없거나 인증이 되지않았습니다.'
+    forbidden: '허용되지않은 요청입니다.'

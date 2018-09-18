@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_10_110901) do
+ActiveRecord::Schema.define(version: 2018_09_17_044403) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -64,15 +64,34 @@ ActiveRecord::Schema.define(version: 2018_09_10_110901) do
     t.index ["intvl", "start_time"], name: "index_eos_ram_price_histories_on_intvl_and_start_time", unique: true
   end
 
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id"
+    t.integer "state", default: 0, null: false
+    t.integer "pgcode", default: 0, null: false
+    t.string "order_no", null: false
+    t.integer "amount", null: false
+    t.string "product_name", default: ""
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "account_no", default: "", comment: "virtual account number"
+    t.string "account_name", comment: "the name of the payer who issued the virtual account"
+    t.string "bank_code", comment: "Virtual account bank code"
+    t.string "bank_name", comment: "Virtual account bank name"
+    t.date "expire_date", comment: "expiration date of the virtual account"
+    t.index ["order_no"], name: "index_orders_on_order_no"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email", limit: 255, null: false
+    t.string "email"
     t.string "confirm_token", limit: 22, default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "state", default: 0
+    t.string "eos_account", default: "", null: false
     t.index ["confirm_token"], name: "index_users_on_confirm_token"
     t.index ["email"], name: "index_users_on_email"
   end

@@ -20,7 +20,7 @@ class UsersControllerTest < ActionController::TestCase
     alice = users(:alice)
     get :confirm_email, params: { id: alice.confirm_token }
 
-    @controller.helpers.stub :eos_account_exist?, true do
+    @controller.stub :eos_account_exist?, true do
       post :create_eos_account, params: { id: alice.confirm_token }, body: { account_name: 'chainpartner', pubkey: 'EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3' }.to_json, as: :json
       assert_response :conflict
     end
@@ -28,17 +28,22 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should success to create eos account" do
     class MockResponse
+      def initialize(mock_body)
+        @mock_body = mock_body
+      end
+
       def code
         200
       end
 
       def body
-        JSON.parse(file_fixture('eos_create_account_response_success.json').read)
+        @mock_body
       end
     end
 
-    @controller.helpers.stub :eos_account_exist?, false do
-      @controller.helpers.stub :create_eos_account, MockResponse.new do
+    @controller.stub :eos_account_exist?, false do
+      mock_body = file_fixture('eos_create_account_response_success.json').read
+      @controller.stub :request_eos_account_creation, MockResponse.new(mock_body) do
         alice = users(:alice)
         get :confirm_email, params: { id: alice.confirm_token }
     

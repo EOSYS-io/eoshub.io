@@ -1,0 +1,7 @@
+en:
+  general:
+    object_not_found: 'Object not found'
+    parameter_missing: 'Parameter missing'
+    unexpected_error: 'Unexpected error'
+    unauthorized: 'Unauthorized'
+    forbidden: 'Forbidden'
