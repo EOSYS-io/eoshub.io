@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_17_044403) do
+ActiveRecord::Schema.define(version: 2018_09_18_043008) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -80,6 +80,17 @@ ActiveRecord::Schema.define(version: 2018_09_17_044403) do
     t.date "expire_date", comment: "expiration date of the virtual account"
     t.index ["order_no"], name: "index_orders_on_order_no"
     t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
+  create_table "payment_results", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "tid"
+    t.string "cid"
+    t.string "pay_info"
+    t.datetime "transaction_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_payment_results_on_order_id"
   end
 
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
