@@ -127,6 +127,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             { undelegatebw
                                 | unstakeCpuQuantity = value
                             }
+                        , percentageOfCpu = NoOp
                     }
             in
             ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
@@ -139,6 +140,7 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
                             { undelegatebw
                                 | unstakeNetQuantity = value
                             }
+                        , percentageOfNet = NoOp
                     }
             in
             ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
@@ -155,10 +157,14 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
 
                 newModel =
                     { model
-                        | percentageOfCpu = percentageOfResource
+                        | undelegatebw =
+                            { undelegatebw
+                                | unstakeCpuQuantity = value
+                            }
+                        , percentageOfCpu = percentageOfResource
                     }
             in
-            update (CpuAmountInput value) newModel account
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -172,10 +178,14 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
 
                 newModel =
                     { model
-                        | percentageOfNet = percentageOfResource
+                        | undelegatebw =
+                            { undelegatebw
+                                | unstakeNetQuantity = value
+                            }
+                        , percentageOfNet = percentageOfResource
                     }
             in
-            update (NetAmountInput value) newModel account
+            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
 
         SubmitAction ->
             let

@@ -741,8 +741,8 @@ delegatebwParametersToValue { from, receiver, stakeNetQuantity, stakeCpuQuantity
           , Encode.object
                 [ ( "from", Encode.string from )
                 , ( "receiver", Encode.string receiver )
-                , ( "stake_net_quantity", Encode.string stakeNetQuantity )
-                , ( "stake_cpu_quantity", Encode.string stakeCpuQuantity )
+                , ( "stake_net_quantity", Encode.string (stakeNetQuantity |> formatAsset) )
+                , ( "stake_cpu_quantity", Encode.string (stakeCpuQuantity |> formatAsset) )
                 , ( "transfer", Encode.int transfer )
                 ]
           )

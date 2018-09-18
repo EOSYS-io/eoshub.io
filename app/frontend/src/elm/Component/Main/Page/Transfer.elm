@@ -160,7 +160,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
         ]
 
 
-accountWarningSpan : AccountStatus -> Language -> Html Message
+accountWarningSpan : AccountStatus -> Language -> Html msg
 accountWarningSpan accountStatus language =
     let
         ( classAddedValue, textValue ) =

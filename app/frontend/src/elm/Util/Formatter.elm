@@ -7,6 +7,7 @@ module Util.Formatter exposing
     , formatAsset
     , larimerToEos
     , percentageConverter
+    , removeSymbol
     , resourceUnitConverter
     , timeFormatter
     , unitConverterRound4
@@ -29,12 +30,17 @@ floatToAsset valFloat =
     Round.round 4 valFloat ++ " EOS"
 
 
+removeSymbol : String -> String
+removeSymbol asset =
+    asset |> replace All (regex " EOS") (\_ -> "")
+
+
 assetToFloat : String -> Float
 assetToFloat str =
     let
         result =
             str
-                |> replace All (regex " EOS") (\_ -> "")
+                |> removeSymbol
                 |> String.toFloat
     in
     case result of
