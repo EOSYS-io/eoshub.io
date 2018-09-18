@@ -24,7 +24,7 @@ import Component.Main.Page.Resource as Resource
 import Component.Main.Page.Search as Search
 import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
-import Component.Main.Page.Voting as Voting
+import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Html
     exposing
@@ -75,7 +75,7 @@ type Page
     | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
     | ResourcePage Resource.Model
-    | VotingPage Voting.Model
+    | VotePage Vote.Model
     | RammarketPage Rammarket.Model
     | NotFoundPage
 
@@ -119,7 +119,7 @@ initModel location =
 type Message
     = SearchMessage Search.Message
     | SearchKeyMessage SearchKey.Message
-    | VotingMessage Voting.Message
+    | VoteMessage Vote.Message
     | TransferMessage Transfer.Message
     | ResourceMessage Resource.Message
     | IndexMessage Index.Message
@@ -216,8 +216,8 @@ view { page, header, notification, sidebar } =
                 SearchKeyPage subModel ->
                     Html.map SearchKeyMessage (SearchKey.view language subModel)
 
-                VotingPage subModel ->
-                    Html.map VotingMessage (Voting.view language subModel)
+                VotePage subModel ->
+                    Html.map VoteMessage (Vote.view language subModel)
 
                 TransferPage subModel ->
                     Html.map TransferMessage
@@ -350,7 +350,7 @@ view { page, header, notification, sidebar } =
                         [ a
                             [ rel "nofollow"
                             , class "vote"
-                            , onClick (ChangeUrl "/voting")
+                            , onClick (ChangeUrl "/vote")
                             ]
                             [ text (translate language Translation.Vote) ]
                         , span [ class "tooltip", attribute "aria-hidden" "true" ]
@@ -439,12 +439,12 @@ update message ({ page, notification, header, sidebar } as model) =
             in
             ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
-        ( VotingMessage subMessage, VotingPage subModel ) ->
+        ( VoteMessage subMessage, VotePage subModel ) ->
             let
                 newPage =
-                    Voting.update subMessage subModel
+                    Vote.update subMessage subModel
             in
-            ( { model | page = newPage |> VotingPage }, Cmd.none )
+            ( { model | page = newPage |> VotePage }, Cmd.none )
 
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
@@ -614,8 +614,8 @@ getPage location =
                     -- it needs no result page. it shows NotFoundPage temporarily
                     NotFoundPage
 
-        VotingRoute ->
-            VotingPage Voting.initModel
+        VoteRoute ->
+            VotePage Vote.initModel
 
         TransferRoute ->
             TransferPage Transfer.initModel

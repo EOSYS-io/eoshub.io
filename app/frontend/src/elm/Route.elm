@@ -14,7 +14,7 @@ type Route
     | CreateRoute String
     | SearchRoute (Maybe String)
     | SearchKeyRoute (Maybe String)
-    | VotingRoute
+    | VoteRoute
     | TransferRoute
     | ResourceRoute
     | NotFoundRoute
@@ -33,7 +33,7 @@ matchRoute =
         , map CreateRoute (s "account" </> s "create" </> string)
         , map SearchRoute (s "search" <?> stringParam "query")
         , map SearchKeyRoute (s "searchkey" <?> stringParam "query")
-        , map VotingRoute (s "voting")
+        , map VoteRoute (s "vote")
         , map TransferRoute (s "transfer")
         , map ResourceRoute (s "resource")
         , map RammarketRoute (s "rammarket")

@@ -3,7 +3,7 @@ module Test.Component.Main.MainComponent exposing (location, tests)
 import Component.Main.MainComponent exposing (..)
 import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
-import Component.Main.Page.Voting as Voting
+import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar exposing (accountCmd)
 import Expect
 import Navigation exposing (Location)
@@ -42,8 +42,8 @@ tests =
         [ describe "getPage"
             [ test "IndexRoute" <|
                 \() -> Expect.equal IndexPage (getPage { location | pathname = "/" })
-            , test "VotingRoute" <|
-                \() -> Expect.equal (VotingPage Voting.initModel) (getPage { location | pathname = "/voting" })
+            , test "VoteRoute" <|
+                \() -> Expect.equal (VotePage Vote.initModel) (getPage { location | pathname = "/vote" })
             , test "TransferRoute" <|
                 \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" })
             , test "SearchRoute" <|
