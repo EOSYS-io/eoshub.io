@@ -55,15 +55,15 @@ aside {
 			flex: 0 0 49%;
 			border-radius: 2px;
 
-			&.login {
-				background-image: linear-gradient(112deg, #ff5252, #aa00ff);
-				color:#fff;
-			}
+			// &.login {
+			//     background-image: linear-gradient(112deg, #ff5252, #aa00ff);
+			//     color:#fff;
+			// }
 
-			&.join {
-				border-width:1px;
-				border-color:#999;
-			}
+			// &.join {
+			//     border-width:1px;
+			//     border-color:#999;
+			// }
 		}
 
 		@include media ('<1650px') {
@@ -75,6 +75,9 @@ aside {
 				display:block;
 				width:100%;
 
+				&:last-child {
+					margin-top:4px;
+				}
 			}
 		}
 

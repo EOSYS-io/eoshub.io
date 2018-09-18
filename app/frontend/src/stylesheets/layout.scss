@@ -100,11 +100,6 @@ section.content {
 		}
 
 	}
-	main.index {
-		max-width:1560px;
-		width:80.425vw;
-		min-width:965px;
-	}
 
 	main.transfer,
 	main.search,
@@ -112,8 +107,26 @@ section.content {
 	main.vote,
 	main.resource_management,
 	main.account {
+		padding-top:42px;
+	}
+
+
+	// width
+	main.search,
+	main.ram_market,
+	main.index {
+		max-width:1560px;
+		width:80.425vw;
+		min-width:965px;
+	}
+
+	main.transfer,
+	main.vote,
+	main.account,
+	main.resource_management {
 		width:965px;
 	}
+	// // width
 
 	aside {
 		box-sizing:border-box;
