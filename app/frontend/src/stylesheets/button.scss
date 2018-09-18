@@ -48,14 +48,16 @@ a.button {
 	}
 
 	// type case
-	&.ok {
+	&.ok,
+	&.login {
 		background-image: $pink-gradient;
 		color:$white;
+		border-width:0;
 	}
 
 	&.undo,
 	&.choice,
-	&.login {
+	&.join {
 		border:1px solid $gray;
 	}
 
