@@ -2,8 +2,9 @@
 module Exceptions
   # Error Codes
   ## General
-  MISSING_PARAMETER = { message: I18n.t('errors.parameter_missing'), error_code: 1, status_code: 400 }.freeze
+  MISSING_PARAMETER = { message: I18n.t('errors.parameter_missing'), error_code: 1, status_code: :bad_request }.freeze
   DUPLICATE_EOS_ACCOUNT = { message: I18n.t('users.eos_account_already_exist'), error_code: 2, status_code: :conflict }.freeze
+  DEACTIVATED_PRODUCT = { message: I18n.t('orders.deactivated_product'), error_code: 3, status_code: :bad_request }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects

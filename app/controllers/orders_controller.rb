@@ -5,15 +5,16 @@ class OrdersController < ApplicationController
     raise Exceptions::DefaultError, Exceptions::MISSING_PARAMETER if params.blank?
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:eos_account])
 
-    order_no = Order.generate_order_no
+    product = Product.find_by(id: params[:product_id])
+    raise Exceptions::DefaultError, Exceptions::DEACTIVATED_PRODUCT unless product.active?
     
     payment_params = {
-      pgcode: params[:pgcode],
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
       user_id: params[:eos_account],
-      order_no: order_no,
-      amount: params[:amount],
-      product_name: params[:product_name],
+      pgcode: params[:pgcode],
+      order_no: Order.generate_order_no,
+      amount: product.price,
+      product_name: product.name,
       return_url: orders_path,
       callback_url: payment_results_path
     }
