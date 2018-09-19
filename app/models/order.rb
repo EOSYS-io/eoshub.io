@@ -28,7 +28,7 @@
 class Order < ApplicationRecord
   include AASM
 
-  belongs_to :user
+  belongs_to :user, optional: true
 
   validates :eos_account, uniqueness: true
 
