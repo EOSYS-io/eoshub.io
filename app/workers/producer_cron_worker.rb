@@ -20,7 +20,6 @@ class ProducerCronWorker
         body: JSON.generate(body),
         timeout: 5
       ).run
-
       if response.code == 200
         break
       end
@@ -42,12 +41,12 @@ class ProducerCronWorker
       total_votes = row["total_votes"].to_f
       
       unless row["url"].empty?
-        bp_response = Typhoeus::Request.new(
+        bp_response = Typhoeus::Request.get(
           row["url"]+'/bp.json',
-          method: :get,
+          followlocation: true,
           timeout: 5
-        ).run
-
+        )
+        
         if response.code == 200
           begin
             bp_json = JSON.parse bp_response.body
