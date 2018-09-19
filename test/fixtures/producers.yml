@@ -40,7 +40,7 @@ eosys:
   updated_at: 2018-09-03 04:24:52.524187
   country: KR
 
-eosys:
+hkeos:
   is_active: true
   last_claim_time: '1537274646000000'
   location: 344

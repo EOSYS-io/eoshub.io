@@ -27,6 +27,8 @@ Rails.application.routes.draw do
     get 'recent_stat'
   end
 
+  resources :producers, only: [:index]
+
   devise_scope :admin_user do
     patch "/admin/confirmation" => "admin/admin_users/confirmations#confirm", as: :confirm_admin_user_confirmation
   end
