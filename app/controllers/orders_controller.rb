@@ -35,7 +35,7 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order_params = order_create_params
+    @order_params = create_params
 
     if @order_params&.dig(:cid).present?
       Order.create!(
@@ -55,7 +55,7 @@ class OrdersController < ApplicationController
 
   private
 
-  def order_create_params
+  def create_params
     params.permit(Order.permit_attributes_on_create)
   end
 end
