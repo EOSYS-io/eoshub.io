@@ -253,9 +253,9 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                         | delegatebw =
                             { delegatebw
                                 | stakeCpuQuantity =
-                                    stakeAmountModal.cpuQuantity |> formatAsset
+                                    stakeAmountModal.cpuQuantity
                                 , stakeNetQuantity =
-                                    stakeAmountModal.netQuantity |> formatAsset
+                                    stakeAmountModal.netQuantity
                             }
                         , percentageOfLiquid = NoOp
                         , totalQuantity = stakeAmountModal.totalQuantity

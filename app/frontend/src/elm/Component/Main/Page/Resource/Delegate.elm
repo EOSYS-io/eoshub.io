@@ -306,44 +306,8 @@ view language ({ delegatebw, cpuQuantityValidation, netQuantityValidation, accou
                     [ text validatedText ]
                 ]
             , div [ class "field group" ]
-                [ div [ class "input field" ]
-                    [ label [ for "cpu" ]
-                        [ text "CPU" ]
-                    , input
-                        [ attribute "data-validate" cpuValidateAttr
-                        , placeholder "0"
-                        , step "0.0001"
-                        , type_ "number"
-                        , onInput CpuAmountInput
-                        , value delegatebw.stakeCpuQuantity
-                        ]
-                        []
-                    , span [ class "unit" ]
-                        [ text "EOS" ]
-                    , percentageButton Cpu percentageOfCpu Percentage10
-                    , percentageButton Cpu percentageOfCpu Percentage50
-                    , percentageButton Cpu percentageOfCpu Percentage70
-                    , percentageButton Cpu percentageOfCpu Percentage100
-                    ]
-                , div [ class "input field" ]
-                    [ label [ for "net" ]
-                        [ text "NET" ]
-                    , input
-                        [ attribute "data-validate" netValidateAttr
-                        , placeholder "0"
-                        , step "0.0001"
-                        , type_ "number"
-                        , onInput NetAmountInput
-                        , value delegatebw.stakeNetQuantity
-                        ]
-                        []
-                    , span [ class "unit" ]
-                        [ text "EOS" ]
-                    , percentageButton Net percentageOfNet Percentage10
-                    , percentageButton Net percentageOfNet Percentage50
-                    , percentageButton Net percentageOfNet Percentage70
-                    , percentageButton Net percentageOfNet Percentage100
-                    ]
+                [ resourceInputDiv model Cpu
+                , resourceInputDiv model Net
                 ]
             , div [ class "btn_area" ]
                 [ button
@@ -393,17 +357,52 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
         [ text buttonText ]
 
 
-validate : Model -> Float -> Model
-validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+resourceInputDiv : Model -> ResourceType -> Html Message
+resourceInputDiv ({ delegatebw, percentageOfCpu, percentageOfNet, totalQuantityValidation, cpuQuantityValidation, netQuantityValidation } as model) resourceType =
     let
-        netQuantityValidation =
-            validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
+        cpuValidateAttr =
+            modalValidateAttr totalQuantityValidation cpuQuantityValidation
 
-        cpuQuantityValidation =
-            validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
+        netValidateAttr =
+            modalValidateAttr totalQuantityValidation netQuantityValidation
 
-        accountValidation =
-            validateAccount delegatebw.receiver
+        ( resourceText, validateAttr, inputMessage, resourceQuantity, percentageOfResource ) =
+            case resourceType of
+                Cpu ->
+                    ( "CPU", cpuValidateAttr, CpuAmountInput, delegatebw.stakeCpuQuantity, percentageOfCpu )
+
+                Net ->
+                    ( "NET", netValidateAttr, NetAmountInput, delegatebw.stakeNetQuantity, percentageOfNet )
+    in
+    div [ class "input field" ]
+        [ label [ for resourceText ]
+            [ text resourceText ]
+        , input
+            [ attribute "data-validate" validateAttr
+            , placeholder "0"
+            , step "0.0001"
+            , type_ "number"
+            , onInput inputMessage
+            , value resourceQuantity
+            ]
+            []
+        , span [ class "unit" ]
+            [ text "EOS" ]
+        , percentageButton resourceType percentageOfResource Percentage10
+        , percentageButton resourceType percentageOfResource Percentage50
+        , percentageButton resourceType percentageOfResource Percentage70
+        , percentageButton resourceType percentageOfResource Percentage100
+        ]
+
+
+validateEach : AccountStatus -> QuantityStatus -> QuantityStatus -> QuantityStatus -> ( Bool, Bool, Bool, Bool, Bool )
+validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation =
+    let
+        isAccountValid =
+            accountValidation == ValidAccount
+
+        isNotEmptyBoth =
+            not ((cpuQuantityValidation == EmptyQuantity) && (netQuantityValidation == EmptyQuantity))
 
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
@@ -411,18 +410,36 @@ validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
         isNetValid =
             (netQuantityValidation == ValidQuantity) || (netQuantityValidation == EmptyQuantity)
 
+        isTotalValid =
+            totalQuantityValidation == ValidQuantity
+    in
+    ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid )
+
+
+validate : Model -> Float -> Model
+validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+    let
+        accountValidation =
+            validateAccount delegatebw.receiver
+
+        cpuQuantityValidation =
+            validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
+
+        netQuantityValidation =
+            validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
+
         totalQuantityValidation =
             validateQuantity totalQuantity eosLiquidAmount
 
-        isNotEmptyBoth =
-            not ((cpuQuantityValidation == EmptyQuantity) && (netQuantityValidation == EmptyQuantity))
+        ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
+            validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
 
         isFormValid =
             isCpuValid
                 && isNetValid
                 && isNotEmptyBoth
-                && (totalQuantityValidation == ValidQuantity)
-                && (accountValidation == ValidAccount)
+                && isTotalValid
+                && isAccountValid
     in
     { model
         | totalQuantityValidation = totalQuantityValidation
@@ -436,20 +453,8 @@ validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
 validateText : Model -> ( String, String )
 validateText ({ cpuQuantityValidation, netQuantityValidation, totalQuantityValidation, accountValidation } as model) =
     let
-        isAccountValid =
-            accountValidation == ValidAccount
-
-        isNotEmptyBoth =
-            not ((cpuQuantityValidation == EmptyQuantity) && (netQuantityValidation == EmptyQuantity))
-
-        isTotalValid =
-            totalQuantityValidation == ValidQuantity
-
-        isCpuValid =
-            (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
-
-        isNetValid =
-            (netQuantityValidation == ValidQuantity) || (netQuantityValidation == EmptyQuantity)
+        ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
+            validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
 
         isFormValid =
             isAccountValid
@@ -471,7 +476,7 @@ validateText ({ cpuQuantityValidation, netQuantityValidation, totalQuantityValid
         else if not isNetValid then
             ( "NET의 수량입력이 잘못되었습니다", " false" )
 
-        else if isTotalValid then
+        else if not isTotalValid then
             ( "임대가능 토큰수량을 초과하였습니다", " false" )
 
         else

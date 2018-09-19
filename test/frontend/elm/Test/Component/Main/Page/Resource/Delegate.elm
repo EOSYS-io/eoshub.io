@@ -167,6 +167,7 @@ tests =
                 ]
             ]
 
+        -- TODO(boseok):validateEach test
         -- TODO(boseok):translation
         , describe "validateText"
             [ describe "accountValidation Valid"
@@ -234,13 +235,28 @@ tests =
                                 ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
                         in
                         Expect.equal expected (validateText defaultModel)
-                , test "cpu ValidQuantity, net ValidQuantity" <|
+                , test "cpu ValidQuantity, net ValidQuantity, total OverValidQuantity" <|
                     \() ->
                         let
                             defaultModel =
                                 { initModel
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
+                                    , totalQuantityValidation = OverValidQuantity
+                                }
+
+                            expected =
+                                ( "임대가능 토큰수량을 초과하였습니다", " false" )
+                        in
+                        Expect.equal expected (validateText defaultModel)
+                , test "cpu ValidQuantity, net ValidQuantity, total ValidQuantity" <|
+                    \() ->
+                        let
+                            defaultModel =
+                                { initModel
+                                    | netQuantityValidation = ValidQuantity
+                                    , cpuQuantityValidation = ValidQuantity
+                                    , totalQuantityValidation = ValidQuantity
                                 }
 
                             expected =
