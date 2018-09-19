@@ -33,12 +33,14 @@
 #
 one:
   amount: 1000
-  order_no: 1
+  order_no: 1234567890
   pgcode: 3 # virtualaccount
   state: 0
+  eos_account: testtesttest
 
 two:
   amount: 10000
   order_no: 2
   pgcode: 3 # virtualaccount
   state: 0
+  eos_account: goodgoodgood

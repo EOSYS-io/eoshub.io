@@ -23,8 +23,10 @@ alice:
   email: alice@chain.partners
   state: 0
   confirm_token: Sp6pKEQ8DMpRWrYOZGxmTw
+  eos_account: testtesttest
 
 bob:
   email: bob@chain.partners
   state: 0
   confirm_token:
+  eos_account: goodgoodgood
