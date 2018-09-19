@@ -14,3 +14,5 @@ ko:
     deactivated_product: '해당 상품은 현재 주문하실 수 없습니다.'
   eos_ram_price_histores:
     unsupported_intvl: '지원하지 않는 시간 간격입니다.'
+  vote_stats:
+    not_found: '통계를 찾을 수 없습니다.'

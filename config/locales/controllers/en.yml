@@ -14,3 +14,5 @@ en:
     deactivated_product: "You can't order this item for now."
   eos_ram_price_histores:
     unsupported_intvl: 'Unsupported interval.'
+  vote_stats:
+    not_found: 'Could not retrieve recent stat.'

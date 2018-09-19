@@ -23,6 +23,10 @@ Rails.application.routes.draw do
     get 'data'
   end
 
+  namespace :vote_stats do
+    get 'recent_stat'
+  end
+
   devise_scope :admin_user do
     patch "/admin/confirmation" => "admin/admin_users/confirmations#confirm", as: :confirm_admin_user_confirmation
   end
