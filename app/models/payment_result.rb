@@ -19,6 +19,8 @@
 class PaymentResult < ApplicationRecord
   belongs_to :order
 
+  validates :order, presence: true
+
   class << self
     def permit_attributes_on_create
       [:cid, :tid, :pay_info, :transaction_date]
