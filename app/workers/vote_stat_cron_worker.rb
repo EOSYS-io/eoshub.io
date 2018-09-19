@@ -73,17 +73,11 @@ class VoteStatCronWorker
       return
     end
 
-    record = VoteStat.find_or_initialize_by(id: 1) do | r |
-      r.total_voted_eos = total_voted_eos.to_f/10000
-      r.total_staked_eos = total_staked_eos.to_f/10000
-      r.eosys_proxy_staked_eos = eosys_proxy_staked_eos.to_f/10000
-      r.eosys_proxy_staked_account_count = eosys_proxy_staked_account_count
-    end
-
-    record.update(
+    VoteStat.create(
       total_voted_eos: total_voted_eos.to_f/10000,
       total_staked_eos: total_staked_eos.to_f/10000,
       eosys_proxy_staked_eos: eosys_proxy_staked_eos.to_f/10000,
-      eosys_proxy_staked_account_count: eosys_proxy_staked_account_count)
+      eosys_proxy_staked_account_count: eosys_proxy_staked_account_count
+    )
   end
 end
