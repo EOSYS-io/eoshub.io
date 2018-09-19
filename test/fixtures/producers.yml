@@ -1,0 +1,57 @@
+# == Schema Information
+#
+# Table name: producers
+#
+#  country         :string           default("")
+#  is_active       :boolean          default(TRUE), not null
+#  last_claim_time :string
+#  location        :integer          not null
+#  logo_image_url  :string
+#  owner           :string           not null, primary key
+#  prev_rank       :integer          not null
+#  producer_key    :string           not null
+#  rank            :integer          not null
+#  total_votes     :float            not null
+#  unpaid_blocks   :integer          not null
+#  url             :string
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined. If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+eosys:
+  is_active: true
+  last_claim_time: '1537326918000000'
+  location: 0
+  logo_image_url: https://eosys.io/logo_eosys_256.png
+  owner: eosyskoreabp
+  prev_rank: 22
+  producer_key: EOS7TjKVBkBcSmjsXF4jJfZ1QU9RqVHuBkkcHNJoEcHGR79CoLf2f
+  rank: 21
+  total_votes: 303587503664934976.00000000000000000
+  unpaid_blocks: 0
+  url: https://eosys.io
+  created_at: 2018-09-03 04:24:23.524187
+  updated_at: 2018-09-03 04:24:52.524187
+  country: KR
+
+eosys:
+  is_active: true
+  last_claim_time: '1537274646000000'
+  location: 344
+  logo_image_url: https://www.hkeos.com/img/hkeoslogo_256.png
+  owner: hkeoshkeosbp
+  prev_rank: 60
+  producer_key: EOS8SXELcUbgtBTmi7of9CJTUc6eGPw68G8ph7nLD7wpHkEosEShs
+  rank: 50
+  total_votes: 156120241757849120.00000000000000000
+  unpaid_blocks: 0
+  url: https://www.hkeos.com
+  created_at: 2018-09-03 04:24:23.524187
+  updated_at: 2018-09-03 04:24:52.524187
+  country: HK
