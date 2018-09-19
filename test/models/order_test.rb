@@ -20,7 +20,7 @@
 #
 # Indexes
 #
-#  index_orders_on_eos_account  (eos_account) UNIQUE
+#  index_orders_on_eos_account  (eos_account)
 #  index_orders_on_order_no     (order_no)
 #  index_orders_on_user_id      (user_id)
 #
