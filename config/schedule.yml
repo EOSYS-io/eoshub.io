@@ -1,6 +1,7 @@
 # Schedule file for sidekiq-cron.
 price_cron_job:
-  cron: "0 * * * *"
+  # Every minutes.
+  cron: "* * * * *"
   class: "PriceCronWorker"
 
 vote_stat_cron_job:
