@@ -6,7 +6,13 @@ class VoteStatCronWorker
     first_request = true
     further_request_needed = true
     # From experiments, eosio table request returns up to 2500 rows.
-    body = {code: "eosio", scope: "eosio", table: "voters", json: true, limit: 2500}
+    body = {
+      code: "eosio",
+      scope: "eosio",
+      table: "voters",
+      json: true,
+      limit: 2500
+    }
 
     total_voted_eos = 0
     total_staked_eos = 0
