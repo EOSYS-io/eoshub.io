@@ -45,7 +45,7 @@ import Util.Formatter
         , floatToAsset
         , formatAsset
         , larimerToEos
-        , removeSymbol
+        , removeSymbolIfExists
         )
 import Util.Validation as Validation
     exposing
@@ -619,7 +619,7 @@ distributeCpuNet totalQuantity a b =
 
         netQuantity =
             assetSubtract totalQuantity cpuQuantity
-                |> removeSymbol
+                |> removeSymbolIfExists
     in
     ( cpuQuantity, netQuantity )
 

@@ -20,10 +20,10 @@ tests =
                 \() ->
                     Expect.equal "0.1000 EOS" (floatToAsset 0.1)
             ]
-        , describe "removeSymbol"
+        , describe "removeSymbolIfExists"
             [ test "\"0.1000 EOS\" -> \"0.1000\"" <|
                 \() ->
-                    Expect.equal "0.1000" (removeSymbol "0.1000 EOS")
+                    Expect.equal "0.1000" (removeSymbolIfExists "0.1000 EOS")
             ]
         , describe "assetToFloat"
             [ test "\"0.1 EOS\" -> 0.1" <|
