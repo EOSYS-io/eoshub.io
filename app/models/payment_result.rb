@@ -17,4 +17,11 @@
 #
 
 class PaymentResult < ApplicationRecord
+  belongs_to :order
+
+  class << self
+    def permit_attributes_on_create
+      [:cid, :tid, :pay_info, :transaction_date]
+    end
+  end
 end
