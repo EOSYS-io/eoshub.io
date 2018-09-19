@@ -47,11 +47,10 @@ class EosRamPriceHistory < ApplicationRecord
 
   def self.upsert_eos_ram_price_histories(price)
     intvls = PriceHistoryIntvl.all
-    execute_at = Time.now
     intvls.each do | intvl_record | 
-      intvl = intvl_record.seconds
+      intvl = intvl_record.secondsz
       start = Time.at((Time.now.to_i/intvl).floor * intvl).to_datetime
-      record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
+      new_record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
         record.end_time = Time.at(start.to_i + intvl).to_datetime
         record.open = price
         record.close = price
@@ -59,7 +58,7 @@ class EosRamPriceHistory < ApplicationRecord
         record.low = price
       end
 
-      record.update(
+      new_record.update(
         close: price,
         high: [record.high, price].max,
         low: [record.low, price].min
