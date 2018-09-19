@@ -269,14 +269,17 @@ main.search {
 					$position:#{$padding + $padding / 2};
 
 					display:inline-block;
-					height:20px;
-					width:20px;
+					height:18px;
+					width:18px;
 					overflow:hidden;
 					position:absolute;
 					top:50%;
 					right:12px;
 					margin-top:calc(-#{$padding} / 2);
 
+					> span {
+						display:block;
+					}
 					button {
 						@include ir();
 						background:url('../image/icon-close-plus.svg');
@@ -297,6 +300,7 @@ main.search {
 						background-color: #282828;
 						box-shadow: 4px 4px 12px 0 rgba(0, 0, 0, 0.5);
 						width:200px;
+						height:auto;
 						min-height:182px;
 						z-index:10;
 
@@ -304,8 +308,8 @@ main.search {
 
 						box-sizing:border-box;
 
-						margin-top:-$position;
-						margin-right:-$padding;
+						margin-top:-27px;
+						margin-right:-18px;
 
 						strong,
 						span.description {
@@ -323,8 +327,8 @@ main.search {
 						}
 
 						button {
-							right:20px;
-							top:20px;
+							right:16px;
+							top:17px;
 							position:absolute;
 							transform:rotate(45deg);
 						}
