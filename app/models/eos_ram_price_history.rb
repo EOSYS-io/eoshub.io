@@ -19,39 +19,19 @@
 #
 
 class EosRamPriceHistory < ApplicationRecord
+  include EosRamPriceHistoriesHelper
+
   validates :start_time, presence: true, if: :is_correct_start_time?
   validates :end_time, presence: true, if: :is_correct_end_time?
   validates :high, presence: true, if: :is_correct_high?
   validates :low, presence: true, if: :is_correct_low?
-  
-   # A helper function for normalizing start time as a multiple of intvls.
-  def floor_timestamp(intvl, timestamp) 
-    return Time.at((timestamp.to_i/intvl).floor * intvl).to_datetime
-  end
-
-  def is_correct_start_time? 
-    return floor_timestamp(intvl, start_time) == start_time
-  end
-
-  def is_correct_end_time?
-    return (start_time.to_i + intvl) == end_time
-  end
-
-  def is_correct_high?
-    return [open, close, high, low].max == high && high > 0
-  end
-
-  def is_correct_low?
-    return [open, close, high, low].min == low && low > 0
-  end
 
   def self.upsert_eos_ram_price_histories(price)
     intvls = PriceHistoryIntvl.all
-    execute_at = Time.now
     intvls.each do | intvl_record | 
       intvl = intvl_record.seconds
       start = Time.at((Time.now.to_i/intvl).floor * intvl).to_datetime
-      record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
+      new_record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
         record.end_time = Time.at(start.to_i + intvl).to_datetime
         record.open = price
         record.close = price
@@ -59,10 +39,10 @@ class EosRamPriceHistory < ApplicationRecord
         record.low = price
       end
 
-      record.update(
+      new_record.update(
         close: price,
-        high: [record.high, price].max,
-        low: [record.low, price].min
+        high: [new_record.high, price].max,
+        low: [new_record.low, price].min
       )
     end
   end

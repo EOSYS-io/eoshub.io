@@ -1,0 +1,26 @@
+# == Schema Information
+#
+# Table name: vote_stats
+#
+#  id                               :bigint(8)        not null, primary key
+#  eosys_proxy_staked_account_count :integer          not null
+#  eosys_proxy_staked_eos           :float            not null
+#  total_staked_eos                 :float            not null
+#  total_voted_eos                  :float            not null
+#  created_at                       :datetime         not null
+#  updated_at                       :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+# This model initially had no columns defined. If you add columns to the
+# model remove the '{}' from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+recent_stat :
+  total_voted_eos : 30.0
+  total_staked_eos : 35.0
+  eosys_proxy_staked_eos : 10.0
+  eosys_proxy_staked_account_count : 1
+  created_at: 2018-09-03 04:23:23.524187
+  updated_at: 2018-09-03 04:23:52.524187

@@ -100,6 +100,22 @@ ActiveRecord::Schema.define(version: 2018_09_20_014258) do
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
   end
 
+  create_table "producers", primary_key: "owner", id: :string, force: :cascade do |t|
+    t.float "total_votes", null: false
+    t.string "producer_key", null: false
+    t.integer "location", null: false
+    t.string "url"
+    t.string "logo_image_url"
+    t.string "last_claim_time"
+    t.integer "unpaid_blocks", null: false
+    t.boolean "is_active", default: true, null: false
+    t.integer "rank", null: false
+    t.integer "prev_rank", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "country", default: ""
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name", null: false
     t.integer "price", null: false
@@ -119,6 +135,15 @@ ActiveRecord::Schema.define(version: 2018_09_20_014258) do
     t.index ["confirm_token"], name: "index_users_on_confirm_token"
     t.index ["email"], name: "index_users_on_email"
     t.index ["eos_account"], name: "index_users_on_eos_account", unique: true
+  end
+
+  create_table "vote_stats", force: :cascade do |t|
+    t.float "total_voted_eos", null: false
+    t.float "total_staked_eos", null: false
+    t.float "eosys_proxy_staked_eos", null: false
+    t.integer "eosys_proxy_staked_account_count", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
 end

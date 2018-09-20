@@ -1,4 +1,20 @@
 # Schedule file for sidekiq-cron.
-cron_job:
+price_cron_job:
+  # Every minutes.
   cron: "* * * * *"
-  class: "CronWorker"
+  class: "PriceCronWorker"
+
+vote_stat_cron_job:
+  # Every hour at minute 0.
+  cron: "0 * * * *"
+  class: "VoteStatCronWorker"
+
+producer_info_cron_job:
+  # Once in a day at noon.
+  cron: "0 12 * * *"
+  class: "ProducerInfoCronWorker"
+
+producer_stat_cron_job:
+  # Every 5 minutes.
+  cron: "*/5 * * * *"
+  class: "ProducerStatCronWorker"
