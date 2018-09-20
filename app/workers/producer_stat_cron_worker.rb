@@ -1,4 +1,4 @@
-class ProducerCronWorker
+class ProducerStatCronWorker
   include EosRamPriceHistoriesHelper
   include Sidekiq::Worker
 
@@ -34,53 +34,14 @@ class ProducerCronWorker
     rows = response_json["rows"].sort_by{ |row| row["total_votes"].to_f }.reverse
 
     rows.each_with_index do |row, index|
-      country = ""
       is_active = row["is_active"] == 1 ? true : false
       last_claim_time = row["last_claim_time"] == 0 ? "" : row["last_claim_time"]
-      logo_image_url = ""
       total_votes = row["total_votes"].to_f
       
-      unless row["url"].empty?
-        bp_response = Typhoeus::Request.get(
-          row["url"]+'/bp.json',
-          followlocation: true,
-          timeout: 5
-        )
-        
-        if response.code == 200
-          begin
-            bp_json = JSON.parse bp_response.body
-            if bp_json.has_key?("org") 
-              if bp_json["org"].has_key?("location") and
-                  bp_json["org"]["location"].has_key?("country")
-                country = bp_json["org"]["location"]["country"]
-              end
-    
-              if bp_json["org"].has_key?("branding")
-                if bp_json["org"]["branding"].has_key?("logo_256") and
-                    (not bp_json["org"]["branding"]["logo_256"].empty?)
-                  logo_image_url = bp_json["org"]["branding"]["logo_256"]
-                elsif bp_json["org"]["branding"].has_key?("logo_1024") and
-                    (not bp_json["org"]["branding"]["logo_1024"].empty?)
-                  logo_image_url = bp_json["org"]["branding"]["logo_1024"]
-                elsif bp_json["org"]["branding"].has_key?("logo_svg") and
-                    (not bp_json["org"]["branding"]["logo_svg"].empty?)
-                  logo_image_url = bp_json["org"]["branding"]["logo_svg"]
-                end
-              end
-            end
-          rescue JSON::ParserError
-            # Do nothing.
-          end
-        end
-      end
-
       producer = Producer.find_or_initialize_by(owner: row["owner"]) do |r|
-        r.country = country
         r.is_active = is_active
         r.last_claim_time = last_claim_time
         r.location = row["location"]
-        r.logo_image_url = logo_image_url
         r.producer_key = row["producer_key"]
         r.rank = index + 1
         r.total_votes = total_votes
@@ -102,11 +63,9 @@ class ProducerCronWorker
       end
 
       producer.update(
-        country: country,
         is_active: is_active,
         last_claim_time: last_claim_time,
         location: row["location"],
-        logo_image_url: logo_image_url,
         producer_key: row["producer_key"],
         rank: index + 1,
         prev_rank: prev_rank,
