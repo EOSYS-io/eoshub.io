@@ -1,5 +1,28 @@
-module Component.Main.Page.Vote exposing (Message, Model, initModel, update, view)
+module Component.Main.Page.Vote exposing
+    ( Message
+    , Model
+    , initCmd
+    , initModel
+    , update
+    , view
+    )
 
+import Data.Json
+    exposing
+        ( Producer
+        , VoteStat
+        , initVoteStat
+        , producersDecoder
+        , voteStatDecoder
+        )
+import Data.Table
+    exposing
+        ( GlobalFields
+        , Row
+        , TokenStatFields
+        , initGlobalFields
+        , initTokenStatFields
+        )
 import Html
     exposing
         ( Html
@@ -45,7 +68,11 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick)
+import Http
 import Translation exposing (Language)
+import Util.Flags exposing (Flags)
+import Util.HttpRequest exposing (getTableRows)
+import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
 
 
@@ -59,6 +86,9 @@ type Tab
 
 type Message
     = SwitchTab Tab
+    | OnFetchTableRows (Result Http.Error (List Row))
+    | OnFetchVoteStat (Result Http.Error VoteStat)
+    | OnFetchProducers (Result Http.Error (List Producer))
 
 
 
@@ -67,24 +97,85 @@ type Message
 
 type alias Model =
     { tab : Tab
+    , globalTable : GlobalFields
+    , tokenStatTable : TokenStatFields
+    , producers : List Producer
+    , voteStat : VoteStat
     }
 
 
 initModel : Model
 initModel =
     { tab = VoteTab
+    , globalTable = initGlobalFields
+    , tokenStatTable = initTokenStatFields
+    , producers = []
+    , voteStat = initVoteStat
     }
+
+
+getGlobalTable : Cmd Message
+getGlobalTable =
+    getTableRows "eosio" "eosio" "global"
+        |> Http.send OnFetchTableRows
+
+
+getTokenStatTable : Cmd Message
+getTokenStatTable =
+    getTableRows "eosio.token" "EOS" "stat"
+        |> Http.send OnFetchTableRows
+
+
+getProducers : Flags -> Cmd Message
+getProducers flags =
+    Http.get (getProducersUrl flags) producersDecoder |> Http.send OnFetchProducers
+
+
+getRecentVoteStat : Flags -> Cmd Message
+getRecentVoteStat flags =
+    Http.get (getRecentVoteStatUrl flags) voteStatDecoder |> Http.send OnFetchVoteStat
+
+
+initCmd : Flags -> Cmd Message
+initCmd flags =
+    Cmd.batch [ getGlobalTable, getTokenStatTable, getProducers flags, getRecentVoteStat flags ]
 
 
 
 -- UPDATE
 
 
-update : Message -> Model -> Model
-update message model =
+update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update message model _ =
     case message of
         SwitchTab newTab ->
-            { model | tab = newTab }
+            ( { model | tab = newTab }, Cmd.none )
+
+        OnFetchTableRows (Ok rows) ->
+            case rows of
+                (Data.Table.Global fields) :: [] ->
+                    ( { model | globalTable = fields }, Cmd.none )
+
+                (Data.Table.TokenStat fields) :: [] ->
+                    ( { model | tokenStatTable = fields }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnFetchTableRows (Err _) ->
+            ( model, Cmd.none )
+
+        OnFetchProducers (Ok producers) ->
+            ( { model | producers = producers }, Cmd.none )
+
+        OnFetchProducers (Err _) ->
+            ( model, Cmd.none )
+
+        OnFetchVoteStat (Ok voteStat) ->
+            ( { model | voteStat = voteStat }, Cmd.none )
+
+        OnFetchVoteStat (Err _) ->
+            ( model, Cmd.none )
 
 
 

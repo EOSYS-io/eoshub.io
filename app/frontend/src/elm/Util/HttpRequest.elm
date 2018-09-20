@@ -26,11 +26,11 @@ post url body decoder =
 
 
 getTableRows : String -> String -> String -> Http.Request (List Row)
-getTableRows scope code table =
+getTableRows code scope table =
     let
         requestBody =
-            [ ( "scope", scope |> Encode.string )
-            , ( "code", code |> Encode.string )
+            [ ( "code", code |> Encode.string )
+            , ( "scope", scope |> Encode.string )
             , ( "table", table |> Encode.string )
             , ( "json", True |> Encode.bool )
             ]

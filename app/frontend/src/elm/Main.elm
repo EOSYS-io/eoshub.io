@@ -52,7 +52,7 @@ init : Flags -> Location -> ( Model, Cmd Message )
 init flags location =
     let
         ( newComponent, cmd ) =
-            initComponent location
+            initComponent location flags
     in
     ( { currentComponent = newComponent
       , flags = flags
@@ -85,7 +85,7 @@ update message ({ currentComponent, flags } as model) =
         ( MainComponentMessage mainComponentMessage, MainComponent subModel ) ->
             let
                 ( newComponentModel, newCmd ) =
-                    MainComponent.update mainComponentMessage subModel
+                    MainComponent.update mainComponentMessage subModel flags
 
                 newComponent =
                     MainComponent newComponentModel
@@ -147,8 +147,8 @@ main =
 -- UTILS
 
 
-initComponent : Location -> ( Component, Cmd Message )
-initComponent location =
+initComponent : Location -> Flags -> ( Component, Cmd Message )
+initComponent location flags =
     let
         componentRoute =
             getComponentRoute location
@@ -160,7 +160,7 @@ initComponent location =
                     MainComponent.initModel location
 
                 componentCmd =
-                    MainComponent.initCmd componentModel location
+                    MainComponent.initCmd location flags
             in
             ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
 
@@ -187,10 +187,14 @@ updateComponent currentComponent location flags =
                 ( newComponentModel, componentCmd ) =
                     case currentComponent of
                         MainComponent subModel ->
-                            subModel |> MainComponent.update (MainComponent.OnLocationChange location False)
+                            MainComponent.update (MainComponent.OnLocationChange location False)
+                                subModel
+                                flags
 
                         _ ->
-                            MainComponent.initModel location |> MainComponent.update (MainComponent.OnLocationChange location True)
+                            MainComponent.update (MainComponent.OnLocationChange location True)
+                                (MainComponent.initModel location)
+                                flags
             in
             ( MainComponent newComponentModel, Cmd.map MainComponentMessage componentCmd )
 

@@ -15,7 +15,7 @@ module Data.Table exposing
     , initDelbandFields
     , initGlobalFields
     , initRammarketFields
-    , initTokenStat
+    , initTokenStatFields
     , rammarketDecoder
     , rowDecoder
     , rowsDecoder
@@ -36,6 +36,7 @@ type Row
     = Rammarket RammarketFields
     | Global GlobalFields
     | Delband DelbandFields
+    | TokenStat TokenStatFields
 
 
 type alias BalanceWeight =
@@ -158,8 +159,8 @@ type alias TokenStatFields =
     }
 
 
-initTokenStat : TokenStatFields
-initTokenStat =
+initTokenStatFields : TokenStatFields
+initTokenStatFields =
     { supply = ""
     , maxSupply = ""
     , issuer = ""
@@ -178,6 +179,7 @@ rowDecoder =
         [ Decode.map Rammarket rammarketDecoder
         , Decode.map Global globalDecoder
         , Decode.map Delband delbandDecoder
+        , Decode.map TokenStat tokenStatDecoder
         ]
 
 
