@@ -20,15 +20,11 @@ class ProducerStatCronWorker
         body: JSON.generate(body),
         timeout: 5
       ).run
-      if response.code == 200
-        break
-      end
+      break if response.code == 200
     end
 
     # All request fail.
-    if response.code != 200
-      return
-    end
+    return if response.code != 200
 
     response_json = JSON.parse response.body
     rows = response_json["rows"].sort_by{ |row| row["total_votes"].to_f }.reverse

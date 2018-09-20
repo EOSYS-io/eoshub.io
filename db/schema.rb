@@ -100,15 +100,6 @@ ActiveRecord::Schema.define(version: 2018_09_20_014258) do
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
   end
 
-  create_table "products", force: :cascade do |t|
-    t.string "name", null: false
-    t.integer "price", null: false
-    t.boolean "active", default: false, null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_products_on_name"
-  end
-
   create_table "producers", primary_key: "owner", id: :string, force: :cascade do |t|
     t.float "total_votes", null: false
     t.string "producer_key", null: false
@@ -123,6 +114,15 @@ ActiveRecord::Schema.define(version: 2018_09_20_014258) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "country", default: ""
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "price", null: false
+    t.boolean "active", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_products_on_name"
   end
 
   create_table "users", force: :cascade do |t|
