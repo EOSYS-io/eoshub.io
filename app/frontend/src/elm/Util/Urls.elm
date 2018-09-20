@@ -1,4 +1,10 @@
-module Util.Urls exposing (createEosAccountUrl, mainnetRpcUrl, usersApiUrl)
+module Util.Urls exposing
+    ( createEosAccountUrl
+    , getProducersUrl
+    , getRecentVoteStatUrl
+    , mainnetRpcUrl
+    , usersApiUrl
+    )
 
 import Util.Flags exposing (Flags)
 
@@ -29,6 +35,16 @@ usersApiUrl flags locale =
 createEosAccountUrl : Flags -> String -> String -> String
 createEosAccountUrl flags confirmToken locale =
     eoshubHost flags ++ "/users/" ++ confirmToken ++ "/create_eos_account?locale=" ++ locale
+
+
+getProducersUrl : Flags -> String
+getProducersUrl flags =
+    eoshubHost flags ++ "/producers/"
+
+
+getRecentVoteStatUrl : Flags -> String
+getRecentVoteStatUrl flags =
+    eoshubHost flags ++ "/vote_stats/recent_stat"
 
 
 mainnetRpcUrl : String
