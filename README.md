@@ -40,15 +40,21 @@ rails db:create
 ```
 
 ## Run
-```
-rails s(erver)
-```
-```
-bin/webpack-dev-server # for development
-```
-```
-bundle exec sidekiq RAILS_ENV=<env> # execute sidekiq for a cron job.
-```
+First, run Back-end  
+```  
+rails s(erver)  
+```  
+
+Second, run Front-end  
+```  
+bin/webpack-dev-server # for development  
+```  
+
+execute sidekiq for a cron job.  
+```  
+bundle exec sidekiq RAILS_ENV=<env>  
+```  
+
 
 ## Test
 - Elm
