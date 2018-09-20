@@ -8,18 +8,21 @@ module Data.Table exposing
     , RammarketFields
     , Row(..)
     , Table
+    , TokenStatFields
     , balanceWeightDecoder
     , delbandDecoder
     , globalDecoder
     , initDelbandFields
     , initGlobalFields
     , initRammarketFields
+    , initTokenStat
     , rammarketDecoder
     , rowDecoder
     , rowsDecoder
+    , tokenStatDecoder
     )
 
-import Json.Decode as Decode exposing (Decoder, decodeString, oneOf)
+import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
 
 
@@ -148,6 +151,21 @@ initDelbandFields =
     }
 
 
+type alias TokenStatFields =
+    { supply : String
+    , maxSupply : String
+    , issuer : String
+    }
+
+
+initTokenStat : TokenStatFields
+initTokenStat =
+    { supply = ""
+    , maxSupply = ""
+    , issuer = ""
+    }
+
+
 rowsDecoder : Decoder (List Row)
 rowsDecoder =
     Decode.field "rows"
@@ -220,3 +238,11 @@ delbandDecoder =
         |> required "to" Decode.string
         |> required "net_weight" Decode.string
         |> required "cpu_weight" Decode.string
+
+
+tokenStatDecoder : Decoder TokenStatFields
+tokenStatDecoder =
+    Decode.map3 TokenStatFields
+        (Decode.field "supply" Decode.string)
+        (Decode.field "max_supply" Decode.string)
+        (Decode.field "issuer" Decode.string)
