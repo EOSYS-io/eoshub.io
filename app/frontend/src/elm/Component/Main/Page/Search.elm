@@ -404,7 +404,7 @@ viewAction language selectedActionCategory accountName openedActionSeq ({ accoun
         , td []
             [ text actionTag ]
         , td []
-            [ text (timeFormatter language blockTime) ]
+            [ text (timeFormatter blockTime) ]
         , Html.map ActionMessage (viewActionInfo accountName action openedActionSeq)
         ]
 

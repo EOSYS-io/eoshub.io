@@ -750,7 +750,7 @@ actionToTableRow language { blockTime, data, trxId } =
                         ( "log buy", "구매", from )
 
                 formattedDateTime =
-                    blockTime |> timeFormatter language
+                    blockTime |> timeFormatter
             in
             tr [ class actionClass ]
                 [ td [] [ text actionType ]

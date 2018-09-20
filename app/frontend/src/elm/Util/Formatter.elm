@@ -159,19 +159,11 @@ formatAsset value =
 -- Time
 
 
-timeFormatter : Language -> String -> String
-timeFormatter language time =
+timeFormatter : String -> String
+timeFormatter time =
     case Date.fromIsoString time of
         Ok date ->
-            case language of
-                Korean ->
-                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
-
-                English ->
-                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
-
-                Chinese ->
-                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
+            Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
 
         Err str ->
             str
