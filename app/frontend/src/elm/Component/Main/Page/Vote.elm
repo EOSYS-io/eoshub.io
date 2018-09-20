@@ -23,6 +23,8 @@ import Data.Table
         , initGlobalFields
         , initTokenStatFields
         )
+import FormatNumber exposing (format)
+import FormatNumber.Locales exposing (usLocale)
 import Html
     exposing
         ( Html
@@ -69,8 +71,12 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick)
 import Http
+import Round
+import Task
+import Time exposing (Time)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
+import Util.Formatter exposing (assetToFloat)
 import Util.HttpRequest exposing (getTableRows)
 import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
@@ -89,6 +95,7 @@ type Message
     | OnFetchTableRows (Result Http.Error (List Row))
     | OnFetchVoteStat (Result Http.Error VoteStat)
     | OnFetchProducers (Result Http.Error (List Producer))
+    | OnTime Time.Time
 
 
 
@@ -101,6 +108,7 @@ type alias Model =
     , tokenStatTable : TokenStatFields
     , producers : List Producer
     , voteStat : VoteStat
+    , now : Time
     }
 
 
@@ -111,6 +119,7 @@ initModel =
     , tokenStatTable = initTokenStatFields
     , producers = []
     , voteStat = initVoteStat
+    , now = 0.0
     }
 
 
@@ -136,9 +145,20 @@ getRecentVoteStat flags =
     Http.get (getRecentVoteStatUrl flags) voteStatDecoder |> Http.send OnFetchVoteStat
 
 
+getNow : Cmd Message
+getNow =
+    Task.perform OnTime Time.now
+
+
 initCmd : Flags -> Cmd Message
 initCmd flags =
-    Cmd.batch [ getGlobalTable, getTokenStatTable, getProducers flags, getRecentVoteStat flags ]
+    Cmd.batch
+        [ getGlobalTable
+        , getTokenStatTable
+        , getProducers flags
+        , getRecentVoteStat flags
+        , getNow
+        ]
 
 
 
@@ -168,7 +188,7 @@ update message model _ =
         OnFetchProducers (Ok producers) ->
             ( { model | producers = producers }, Cmd.none )
 
-        OnFetchProducers (Err _) ->
+        OnFetchProducers (Err err) ->
             ( model, Cmd.none )
 
         OnFetchVoteStat (Ok voteStat) ->
@@ -177,21 +197,24 @@ update message model _ =
         OnFetchVoteStat (Err _) ->
             ( model, Cmd.none )
 
+        OnTime now ->
+            ( { model | now = now }, Cmd.none )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Html Message
-view _ { tab } =
+view _ ({ tab, now } as model) =
     let
         ( addedMainClass, tabView, voteTabClass, proxyVoteTabClass ) =
             case tab of
                 VoteTab ->
-                    ( "", voteView, " ing", "" )
+                    ( "", voteView model now, " ing", "" )
 
                 ProxyVoteTab ->
-                    ( " proxy", proxyView, "", " ing" )
+                    ( " proxy", proxyView model, "", " ing" )
     in
     main_ [ class ("vote" ++ addedMainClass) ]
         [ h2 []
@@ -214,22 +237,44 @@ view _ { tab } =
         ]
 
 
-voteView : List (Html Message)
-voteView =
+voteView : Model -> Time -> List (Html Message)
+voteView { globalTable, tokenStatTable, producers, voteStat } now =
+    let
+        totalEos =
+            tokenStatTable.supply |> assetToFloat
+
+        formattedTotalEos =
+            (totalEos
+                |> format { usLocale | decimals = 4 }
+            )
+                ++ " EOS"
+
+        formattedVotedEos =
+            (voteStat.totalVotedEos
+                |> format { usLocale | decimals = 4 }
+            )
+                ++ " EOS"
+
+        totalVotePower =
+            globalTable.totalProducerVoteWeight |> String.toFloat |> Result.withDefault 0
+
+        votingPercentage =
+            Round.round 2 ((voteStat.totalVotedEos / totalEos) * 100) ++ "%"
+    in
     [ section [ class "vote summary" ]
         [ h3 []
             [ text "총 투표율" ]
         , p []
-            [ text "36.7304%" ]
+            [ text votingPercentage ]
         , dl []
             [ dt []
                 [ text "투표된 EOS" ]
             , dd []
-                [ text "378,289,459.8382 EOS (37.4233%)" ]
+                [ text (formattedVotedEos ++ " (" ++ votingPercentage ++ ")") ]
             , dt []
                 [ text "전체 EOS 수량" ]
             , dd []
-                [ text "1,010,840,557.0558 EOS" ]
+                [ text formattedTotalEos ]
             ]
         , p []
             [ text "Vote for "
@@ -268,70 +313,80 @@ voteView =
                     ]
                 ]
             , tbody []
-                [ tr [ class "buy korea" ]
-                    [ td []
-                        [ text "21" ]
-                    , td []
-                        [ span []
-                            [ text "-" ]
-                        ]
-                    , td []
-                        [ span [ class "bp bi" ]
-                            [ img [ alt "", src "" ]
-                                []
-                            ]
-                        , strong []
-                            [ text "eos-1" ]
-                        , text "korea"
-                        ]
-                    , td []
-                        [ strong []
-                            [ text "2.16%" ]
-                        , span []
-                            [ text "(64,173,932.6431 EOS)" ]
-                        ]
-                    , td []
-                        [ input [ id "eos-1", type_ "checkbox" ]
-                            []
-                        , label [ for "eos-1", title "eos-1에 투표하시려면 체크하세요!" ]
-                            [ text "eosyskoreabp에 투표하시려면 체크하세요!" ]
-                        ]
-                    ]
-                , tr []
-                    [ td []
-                        [ text "21" ]
-                    , td []
-                        [ span [ class "up" ] [ text "21" ] ]
-                    , td []
-                        [ span [ class "bp bi" ]
-                            [ img [ alt "", src "" ]
-                                []
-                            ]
-                        , strong []
-                            [ text "eos-2" ]
-                        , text "korea"
-                        ]
-                    , td []
-                        [ strong []
-                            [ text "2.16%" ]
-                        , span []
-                            [ text "(64,173,932.6431 EOS)" ]
-                        ]
-                    , td []
-                        [ input [ id "eos-2", type_ "checkbox" ]
-                            []
-                        , label [ for "eos-2" ]
-                            [ text "eosyskoreabp에 투표하시려면 체크하세요!" ]
-                        ]
-                    ]
-                ]
+                (producers
+                    |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
+                )
             ]
         ]
     ]
 
 
-proxyView : List (Html Message)
-proxyView =
+producerTableRow : Float -> Float -> Producer -> Html Message
+producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank, logoImageUrl } =
+    let
+        ( upDownClass, delta ) =
+            if rank < prevRank then
+                ( "up", toString (prevRank - rank) )
+
+            else if rank > prevRank then
+                ( "down", toString (rank - prevRank) )
+
+            else
+                ( "", "-" )
+
+        votingYield =
+            (((totalVotes / totalVotedEos) * 100) |> Round.round 2) ++ "%"
+
+        eosAmount =
+            calculateEosQuantity totalVotes now
+
+        formattedEos =
+            (eosAmount
+                |> format { usLocale | decimals = 4 }
+            )
+                ++ " EOS"
+    in
+    tr []
+        [ td []
+            [ text (rank |> toString) ]
+        , td []
+            [ span [ class upDownClass ]
+                [ text delta ]
+            ]
+        , td []
+            [ span [ class "bp bi" ]
+                [ img [ src logoImageUrl ]
+                    []
+                ]
+            , strong []
+                [ text owner ]
+            , text country
+            ]
+        , td []
+            [ strong []
+                [ text votingYield ]
+            , span []
+                [ text formattedEos ]
+            ]
+        , td []
+            [ input [ id "eos-1", type_ "checkbox" ]
+                []
+            , label [ for "eos-1" ]
+                []
+            ]
+        ]
+
+
+proxyView : Model -> List (Html Message)
+proxyView { voteStat } =
+    let
+        formattedProxiedEos =
+            voteStat.eosysProxyStakedEos
+                |> format { usLocale | decimals = 4 }
+
+        proxiedAccounts =
+            voteStat.eosysProxyStakedAccountCount |> toString
+    in
     [ section [ class "philosophy" ]
         [ div [ class "animated image" ]
             []
@@ -349,12 +404,16 @@ proxyView =
             [ li []
                 [ text "Proxied EOS"
                 , strong []
-                    [ text "370,006,164.1111 EOS" ]
+                    [ text
+                        (formattedProxiedEos
+                            ++ " EOS"
+                        )
+                    ]
                 ]
             , li []
                 [ text "Proxied Accounts"
                 , strong []
-                    [ text "147 Accounts" ]
+                    [ text (proxiedAccounts ++ " Accounts") ]
                 ]
             , li []
                 [ text "Proxied BP"
@@ -375,30 +434,34 @@ proxyView =
                 , span []
                     [ text "Korea" ]
                 ]
-            , li []
-                [ img [ alt "", src "" ]
-                    []
-                , strong [ title "eosbpkorea" ]
-                    [ text "eosyskoreabp" ]
-                , span []
-                    [ text "Korea" ]
-                ]
-            , li []
-                [ img [ alt "", src "" ]
-                    []
-                , strong [ title "eosbpkorea" ]
-                    [ text "eosyskoreabp" ]
-                , span []
-                    [ text "Korea" ]
-                ]
-            , li []
-                [ img [ alt "", src "" ]
-                    []
-                , strong [ title "eosbpkorea" ]
-                    [ text "eosyskoreabp" ]
-                , span []
-                    [ text "Korea" ]
-                ]
             ]
         ]
     ]
+
+
+
+-- Utility functions.
+
+
+calculatePowerCoefficient : Float -> Float
+calculatePowerCoefficient now =
+    let
+        secsSince2000 =
+            now - 946684800
+
+        secsOfWeek =
+            604800
+
+        power =
+            toFloat (floor (secsSince2000 / secsOfWeek)) / 52.0
+    in
+    2 ^ power
+
+
+calculateEosQuantity : Float -> Float -> Float
+calculateEosQuantity votingPower now =
+    let
+        coeff =
+            now |> calculatePowerCoefficient
+    in
+    (votingPower / 10000) / coeff

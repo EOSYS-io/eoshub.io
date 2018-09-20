@@ -86,7 +86,7 @@ producerDecoder =
         |> required "producer_key" Decode.string
         |> required "location" Decode.int
         |> required "url" Decode.string
-        |> required "logo_image_url" Decode.string
+        |> required "logo_image_url" (Decode.oneOf [ Decode.string, Decode.null "" ])
         |> required "last_claim_time" Decode.string
         |> required "unpaid_blocks" Decode.int
         |> required "is_active" Decode.bool
