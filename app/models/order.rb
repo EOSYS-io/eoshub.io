@@ -29,6 +29,7 @@ class Order < ApplicationRecord
   include AASM
 
   belongs_to :user, optional: true
+  has_many :payment_results
 
   validates :eos_account, uniqueness: true
 

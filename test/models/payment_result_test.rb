@@ -4,6 +4,8 @@
 #
 #  id               :bigint(8)        not null, primary key
 #  cid              :string
+#  code             :string           default("")
+#  message          :string           default("")
 #  pay_info         :string
 #  tid              :string
 #  transaction_date :datetime

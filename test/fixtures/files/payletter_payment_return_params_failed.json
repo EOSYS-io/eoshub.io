@@ -1,0 +1,9 @@
+{
+    "code":"1",
+    "message":"error message",
+    "user_id":"testtesttest",
+    "order_no":"1234567890",
+    "service_name":"EOSHUB",    
+    "product_name":"EOS Account",
+    "custom_parameter":""
+}

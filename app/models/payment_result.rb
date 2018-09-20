@@ -4,6 +4,8 @@
 #
 #  id               :bigint(8)        not null, primary key
 #  cid              :string
+#  code             :string           default("")
+#  message          :string           default("")
 #  pay_info         :string
 #  tid              :string
 #  transaction_date :datetime
@@ -23,7 +25,7 @@ class PaymentResult < ApplicationRecord
 
   class << self
     def permit_attributes_on_create
-      [:cid, :tid, :pay_info, :transaction_date]
+      [:cid, :tid, :pay_info, :transaction_date, :code, :message]
     end
   end
 end

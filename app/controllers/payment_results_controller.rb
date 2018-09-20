@@ -2,8 +2,8 @@ class PaymentResultsController < ApiController
   def create
     @payment_result_params = create_params
 
+    order = Order.find_by(order_no: params[:order_no])
     if @payment_result_params&.dig(:cid).present?
-      order = Order.find_by(order_no: params[:order_no])
       order.paid!
 
       PaymentResult.create!(
@@ -11,7 +11,15 @@ class PaymentResultsController < ApiController
         cid: @payment_result_params[:cid],
         tid: @payment_result_params[:tid],
         pay_info: @payment_result_params[:pay_info],
-        transaction_date: DateTime.parse(@payment_result_params[:transaction_date])
+        transaction_date: DateTime.parse(@payment_result_params[:transaction_date]),
+        code: @payment_result_params[:code],
+        message: @payment_result_params[:message],
+      )
+    else
+      PaymentResult.create!(
+        order: order,
+        code: @payment_result_params[:code],
+        message: @payment_result_params[:message],
       )
     end
 
