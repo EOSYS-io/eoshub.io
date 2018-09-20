@@ -8,10 +8,6 @@ import Test exposing (..)
 
 tests : Test
 tests =
-    let
-        flags =
-            { node_env = "test" }
-    in
     describe "Page.Search module"
         [ describe "accountDecoder"
             [ test "Account parsing (core_liquid_balance field doesn't exist)" <|

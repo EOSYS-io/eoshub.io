@@ -6,6 +6,7 @@ module Data.Json exposing
     , VoteStat
     , initProducer
     , initVoteStat
+    , producerDecoder
     , producersDecoder
     , voteStatDecoder
     )
