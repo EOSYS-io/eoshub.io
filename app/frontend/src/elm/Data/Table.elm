@@ -3,12 +3,15 @@
 
 module Data.Table exposing
     ( BalanceWeight
+    , DelbandFields
     , GlobalFields
     , RammarketFields
     , Row(..)
     , Table
     , balanceWeightDecoder
+    , delbandDecoder
     , globalDecoder
+    , initDelbandFields
     , initGlobalFields
     , initRammarketFields
     , rammarketDecoder
@@ -29,6 +32,7 @@ type alias Table =
 type Row
     = Rammarket RammarketFields
     | Global GlobalFields
+    | Delband DelbandFields
 
 
 type alias BalanceWeight =
@@ -127,6 +131,23 @@ initGlobalFields =
     }
 
 
+type alias DelbandFields =
+    { from : String
+    , receiver : String
+    , netWeight : String
+    , cpuWeight : String
+    }
+
+
+initDelbandFields : DelbandFields
+initDelbandFields =
+    { from = ""
+    , receiver = ""
+    , netWeight = ""
+    , cpuWeight = ""
+    }
+
+
 rowsDecoder : Decoder (List Row)
 rowsDecoder =
     Decode.field "rows"
@@ -138,6 +159,7 @@ rowDecoder =
     oneOf
         [ Decode.map Rammarket rammarketDecoder
         , Decode.map Global globalDecoder
+        , Decode.map Delband delbandDecoder
         ]
 
 
@@ -189,3 +211,12 @@ globalDecoder =
         |> required "last_producer_schedule_size" Decode.int
         |> required "total_producer_vote_weight" Decode.string
         |> required "last_name_close" Decode.string
+
+
+delbandDecoder : Decoder DelbandFields
+delbandDecoder =
+    decode DelbandFields
+        |> required "from" Decode.string
+        |> required "to" Decode.string
+        |> required "net_weight" Decode.string
+        |> required "cpu_weight" Decode.string

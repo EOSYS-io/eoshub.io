@@ -77,7 +77,7 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
     case ( message, tab ) of
         ( StakeMessage stakeMessage, Stake stakeModel ) ->
             let
@@ -128,10 +128,18 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
                     ( { model | tab = newTab, selectedTab = UnstakeSelected }, Cmd.none )
 
                 Delegate delegateModel ->
-                    ( { model | tab = newTab, selectedTab = DelegateSelected }, Cmd.none )
+                    let
+                        cmd =
+                            Cmd.map DelegateMessage (DelegateTab.initCmd accountName)
+                    in
+                    ( { model | tab = newTab, selectedTab = DelegateSelected }, cmd )
 
                 Undelegate undelegateModel ->
-                    ( { model | tab = newTab, selectedTab = UndelegateSelected }, Cmd.none )
+                    let
+                        cmd =
+                            Cmd.map UndelegateMessage (UndelegateTab.initCmd accountName)
+                    in
+                    ( { model | tab = newTab, selectedTab = UndelegateSelected }, cmd )
 
         ( _, _ ) ->
             ( model, Cmd.none )
