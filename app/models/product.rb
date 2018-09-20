@@ -17,5 +17,5 @@
 class Product < ApplicationRecord
   validates :name, presence: true
   validates :price, presence: true
-  validates :active, presence: true
+  validates :active, inclusion: { in: [true, false] }
 end
