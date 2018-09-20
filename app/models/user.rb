@@ -14,6 +14,7 @@
 #
 #  index_users_on_confirm_token  (confirm_token)
 #  index_users_on_email          (email)
+#  index_users_on_eos_account    (eos_account) UNIQUE
 #
 
 class User < ApplicationRecord
@@ -22,6 +23,7 @@ class User < ApplicationRecord
   has_many :orders
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
+  validates :eos_account, uniqueness: true
   before_create :confirmation_token
 
   enum state: {

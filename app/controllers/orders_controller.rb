@@ -5,18 +5,18 @@ class OrdersController < ApplicationController
     raise Exceptions::DefaultError, Exceptions::MISSING_PARAMETER if params.blank?
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:eos_account])
 
-    order_no = Order.generate_order_no
+    product = Product.find_by(id: params[:product_id])
+    raise Exceptions::DefaultError, Exceptions::DEACTIVATED_PRODUCT unless product.active?
     
     payment_params = {
-      pgcode: params[:pgcode],
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
       user_id: params[:eos_account],
-      order_no: order_no,
-      amount: params[:amount],
-      product_name: params[:product_name],
+      pgcode: params[:pgcode],
+      order_no: Order.generate_order_no,
+      amount: product.price,
+      product_name: product.name,
       return_url: orders_path,
-      # TODO(sinhyeok): 가상계좌 입금완료 후 호출될 payment_result api 구현 후 연결
-      callback_url: ''
+      callback_url: payment_results_path
     }
 
     response = Typhoeus::Request.new(
@@ -35,12 +35,12 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order_params = order_create_params
+    @order_params = create_params
 
     if @order_params&.dig(:cid).present?
       Order.create!(
+        eos_account: @order_params[:user_id],
         order_no: @order_params[:order_no],
-        user_id: @order_params[:user_id],
         pgcode: @order_params[:pgcode],
         amount: @order_params[:amount],
         product_name: @order_params[:product_name],
@@ -55,7 +55,7 @@ class OrdersController < ApplicationController
 
   private
 
-  def order_create_params
+  def create_params
     params.permit(Order.permit_attributes_on_create)
   end
 end

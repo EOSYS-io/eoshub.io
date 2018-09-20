@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_17_044403) do
+ActiveRecord::Schema.define(version: 2018_09_20_014258) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -78,11 +78,35 @@ ActiveRecord::Schema.define(version: 2018_09_17_044403) do
     t.string "bank_code", comment: "Virtual account bank code"
     t.string "bank_name", comment: "Virtual account bank name"
     t.date "expire_date", comment: "expiration date of the virtual account"
+    t.string "eos_account", default: "", null: false
+    t.index ["eos_account"], name: "index_orders_on_eos_account"
     t.index ["order_no"], name: "index_orders_on_order_no"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "payment_results", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.string "tid"
+    t.string "cid"
+    t.string "pay_info"
+    t.datetime "transaction_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "code", default: ""
+    t.string "message", default: ""
+    t.index ["order_id"], name: "index_payment_results_on_order_id"
+  end
+
   create_table "price_history_intvls", primary_key: "seconds", id: :serial, force: :cascade do |t|
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "price", null: false
+    t.boolean "active", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_products_on_name"
   end
 
   create_table "users", force: :cascade do |t|
@@ -94,6 +118,7 @@ ActiveRecord::Schema.define(version: 2018_09_17_044403) do
     t.string "eos_account", default: "", null: false
     t.index ["confirm_token"], name: "index_users_on_confirm_token"
     t.index ["email"], name: "index_users_on_email"
+    t.index ["eos_account"], name: "index_users_on_eos_account", unique: true
   end
 
 end

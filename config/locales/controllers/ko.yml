@@ -10,5 +10,7 @@ ko:
     eos_account_creation_failure_email_not_confirmed: '이메일이 인증되지 않았습니다.'
     eos_account_creation_failure_already_created: '해당 이메일로 이미 EOS 계정을 생성하였습니다.'
     eos_node_connection_failed: 'EOS 노드 접속에 실패하였습니다.'
+  orders:
+    deactivated_product: '해당 상품은 현재 주문하실 수 없습니다.'
   eos_ram_price_histores:
     unsupported_intvl: '지원하지 않는 시간 간격입니다.'

@@ -8,6 +8,7 @@
 #  amount                                                             :integer          not null
 #  bank_code(Virtual account bank code)                               :string
 #  bank_name(Virtual account bank name)                               :string
+#  eos_account                                                        :string           default(""), not null
 #  expire_date(expiration date of the virtual account)                :date
 #  order_no                                                           :string           not null
 #  pgcode                                                             :integer          default(NULL), not null
@@ -19,14 +20,18 @@
 #
 # Indexes
 #
-#  index_orders_on_order_no  (order_no)
-#  index_orders_on_user_id   (user_id)
+#  index_orders_on_eos_account  (eos_account)
+#  index_orders_on_order_no     (order_no)
+#  index_orders_on_user_id      (user_id)
 #
 
 class Order < ApplicationRecord
   include AASM
 
-  belongs_to :user
+  belongs_to :user, optional: true
+  has_many :payment_results
+
+  validates :eos_account, uniqueness: true
 
   # using only virtual_account
   enum pgcode: {

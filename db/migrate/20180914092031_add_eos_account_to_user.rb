@@ -10,6 +10,6 @@ class AddEosAccountToUser < ActiveRecord::Migration[5.2]
 
   def down
     remove_column :users, :eos_account
-    change_column :users, :email, null: false
+    change_column :users, :email, :string, null: false
   end
 end
