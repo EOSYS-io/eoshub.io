@@ -50,7 +50,7 @@ Second, run Front-end
 bin/webpack-dev-server # for development  
 ```  
 
-execute sidekiq for a cron job.  
+execute sidekiq for a cron jobs.  
 ```  
 bundle exec sidekiq RAILS_ENV=<env>  
 ```  
