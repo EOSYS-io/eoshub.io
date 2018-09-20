@@ -45,6 +45,7 @@ import Util.Formatter
         , floatToAsset
         , formatAsset
         , larimerToEos
+        , removeSymbolIfExists
         )
 import Util.Validation as Validation
     exposing
@@ -151,10 +152,6 @@ type StakeAmountMessage
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
 update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
-    let
-        stakePossibleAmount =
-            coreLiquidBalance
-    in
     case message of
         TotalAmountInput value ->
             let
@@ -256,9 +253,9 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
                         | delegatebw =
                             { delegatebw
                                 | stakeCpuQuantity =
-                                    stakeAmountModal.cpuQuantity |> formatAsset
+                                    stakeAmountModal.cpuQuantity
                                 , stakeNetQuantity =
-                                    stakeAmountModal.netQuantity |> formatAsset
+                                    stakeAmountModal.netQuantity
                             }
                         , percentageOfLiquid = NoOp
                         , totalQuantity = stakeAmountModal.totalQuantity
@@ -618,10 +615,11 @@ distributeCpuNet : String -> Float -> Float -> ( String, String )
 distributeCpuNet totalQuantity a b =
     let
         cpuQuantity =
-            floatToAsset <| assetToFloat totalQuantity * (a / (a + b))
+            Round.round 4 <| assetToFloat totalQuantity * (a / (a + b))
 
         netQuantity =
             assetSubtract totalQuantity cpuQuantity
+                |> removeSymbolIfExists
     in
     ( cpuQuantity, netQuantity )
 

@@ -101,23 +101,23 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
 
         ( DelegateMessage delegateMessage, Delegate delegateModel ) ->
             let
-                ( newModel, _ ) =
+                ( newModel, subCmd ) =
                     DelegateTab.update
                         delegateMessage
                         delegateModel
                         account
             in
-            ( { model | tab = Delegate newModel }, Cmd.none )
+            ( { model | tab = Delegate newModel }, Cmd.map DelegateMessage subCmd )
 
         ( UndelegateMessage undelegateMessage, Undelegate undelegateModel ) ->
             let
-                ( newModel, _ ) =
+                ( newModel, subCmd ) =
                     UndelegateTab.update
                         undelegateMessage
                         undelegateModel
                         account
             in
-            ( { model | tab = Undelegate newModel }, Cmd.none )
+            ( { model | tab = Undelegate newModel }, Cmd.map UndelegateMessage subCmd )
 
         ( ChangeTab newTab, _ ) ->
             case newTab of

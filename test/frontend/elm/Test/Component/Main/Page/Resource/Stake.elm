@@ -203,7 +203,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "0.3333 EOS", "0.6667 EOS" )
+                            ( "0.3333", "0.6667" )
                     in
                     Expect.equal expected (distributeCpuNet "1.0000 EOS" 1 2)
             ]

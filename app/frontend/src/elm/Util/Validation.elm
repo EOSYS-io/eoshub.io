@@ -12,6 +12,7 @@ module Util.Validation exposing
 
 import Regex exposing (..)
 import String.UTF8 as UTF8
+import Util.Formatter exposing (removeSymbolIfExists)
 
 
 isAccount : String -> Bool
@@ -77,7 +78,7 @@ validateQuantity quantity maxAmount =
         let
             maybeQuantity =
                 quantity
-                    |> replace All (regex " EOS") (\_ -> "")
+                    |> removeSymbolIfExists
                     |> String.toFloat
         in
         case maybeQuantity of
