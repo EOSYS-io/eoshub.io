@@ -16,5 +16,5 @@ producer_info_cron_job:
 
 producer_stat_cron_job:
   # Every 5 minutes.
-  cron: "*/5 * * *"
+  cron: "*/5 * * * *"
   class: "ProducerStatCronWorker"
