@@ -486,6 +486,10 @@ validateText ({ cpuQuantityValidation, netQuantityValidation, totalQuantityValid
         ( "임대가능한 토큰 수만큼 임대가 가능합니다", "" )
 
 
+
+-- TODO(boseok): gather similar functions in a separate module
+
+
 getPercentageOfResource : PercentageOfResource -> Float
 getPercentageOfResource percentageOfResource =
     case percentageOfResource of

@@ -160,6 +160,10 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
         ]
 
 
+
+-- TODO(boseok): be separated to another view model
+
+
 accountWarningSpan : AccountStatus -> Language -> Html msg
 accountWarningSpan accountStatus language =
     let
