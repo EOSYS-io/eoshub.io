@@ -51,18 +51,19 @@ tests =
                     Expect.equal 1.0 (percentageConverter 1 100)
             ]
         , describe "timeFormatter"
+            -- TODO(boseok): distinction by language is useless if the format type is fixed list this
             [ test "English, AM, Ok" <|
                 \() ->
-                    Expect.equal "2:16:21 AM, August 17, 2018" (timeFormatter English "2018-08-17T02:16:21.500")
+                    Expect.equal "2018/08/17 02:16:21" (timeFormatter English "2018-08-17T02:16:21.500")
             , test "English, PM, Ok" <|
                 \() ->
-                    Expect.equal "5:16:21 PM, August 17, 2018" (timeFormatter English "2018-08-17T17:16:21.500")
+                    Expect.equal "2018/08/17 17:16:21" (timeFormatter English "2018-08-17T17:16:21.500")
             , test "Korean, AM, Ok" <|
                 \() ->
-                    Expect.equal "2018년, 8월 17일, 2:16:21 AM" (timeFormatter Korean "2018-08-17T02:16:21.500")
+                    Expect.equal "2018/08/17 02:16:21" (timeFormatter Korean "2018-08-17T02:16:21.500")
             , test "Korean, PM, Ok" <|
                 \() ->
-                    Expect.equal "2018년, 8월 17일, 5:16:21 PM" (timeFormatter Korean "2018-08-17T17:16:21.500")
+                    Expect.equal "2018/08/17 17:16:21" (timeFormatter Korean "2018-08-17T17:16:21.500")
             , test "invalid time, Err" <|
                 \() ->
                     Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500': Invalid ISO 8601 format" (timeFormatter English "2018-108-17T17:16:21.500")

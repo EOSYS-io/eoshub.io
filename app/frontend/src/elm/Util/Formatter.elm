@@ -165,14 +165,13 @@ timeFormatter language time =
         Ok date ->
             case language of
                 Korean ->
-                    Date.toFormattedString "YYYY년, M월 d일, h:mm:ss a" date
+                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
 
                 English ->
-                    Date.toFormattedString "h:mm:ss a, MMMM d, YYYY" date
+                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
 
                 Chinese ->
-                    -- TODO(boseok): Add chinese
-                    Date.toFormattedString "h:mm:ss a, MMMM d, YYYY" date
+                    Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
 
         Err str ->
             str
