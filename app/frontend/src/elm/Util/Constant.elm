@@ -1,4 +1,4 @@
-module Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
+module Util.Constant exposing (day, eosysProxyAccount, giga, hour, kilo, mega, minute, second, tera)
 
 -- module for collect unit constants
 -- [time]
@@ -50,3 +50,8 @@ giga =
 tera : Int
 tera =
     1024 * 1024 * 1024 * 1024
+
+
+eosysProxyAccount : String
+eosysProxyAccount =
+    "bpgovernance"

@@ -73,6 +73,7 @@ import Round
 import Task
 import Time exposing (Time)
 import Translation exposing (Language)
+import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat, formatWithUsLocale)
 import Util.HttpRequest exposing (getAccount, getTableRows)
@@ -152,9 +153,9 @@ getRecentVoteStat flags =
     Http.get (getRecentVoteStatUrl flags) voteStatDecoder |> Http.send OnFetchVoteStat
 
 
-getProxyAccount : Cmd Message
-getProxyAccount =
-    "bpgovernance"
+getProxyAccount : String -> Cmd Message
+getProxyAccount proxyAccount =
+    proxyAccount
         |> getAccount
         |> Http.send OnFetchAccount
 
@@ -172,7 +173,7 @@ initCmd flags =
         , getProducers flags
         , getRecentVoteStat flags
         , getNow
-        , getProxyAccount
+        , getProxyAccount eosysProxyAccount
         ]
 
 
