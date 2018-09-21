@@ -38,7 +38,6 @@ import Html
         , form
         , h2
         , h3
-        , img
         , input
         , label
         , li
@@ -58,14 +57,12 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( alt
-        , class
+        ( class
         , disabled
         , for
         , id
         , placeholder
         , scope
-        , src
         , title
         , type_
         , value
@@ -301,7 +298,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                 |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
             , if List.length filteredProducers > producersLimit then
                 div [ class "btn_area" ]
-                    [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
+                    [ button [ type_ "button", class "view more button", onClick ExpandProducers ]
                         [ text "더 보기" ]
                     ]
 
