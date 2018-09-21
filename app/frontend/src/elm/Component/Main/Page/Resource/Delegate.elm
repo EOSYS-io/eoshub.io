@@ -119,7 +119,7 @@ initModel =
 
 initCmd : String -> Cmd Message
 initCmd query =
-    getTableRows query "eosio" "delband"
+    getTableRows "eosio" query "delband"
         |> Http.send OnFetchTableRows
 
 
