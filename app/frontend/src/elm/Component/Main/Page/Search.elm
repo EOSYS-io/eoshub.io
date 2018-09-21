@@ -71,7 +71,7 @@ import Util.Formatter
         , larimerToEos
         , timeFormatter
         )
-import Util.HttpRequest exposing (getFullPath, post)
+import Util.HttpRequest exposing (getAccount, getFullPath, post)
 
 
 
@@ -126,13 +126,8 @@ initCmd : String -> Model -> Cmd Message
 initCmd query { pagination } =
     let
         accountCmd =
-            let
-                body =
-                    Encode.object
-                        [ ( "account_name", Encode.string query ) ]
-                        |> Http.jsonBody
-            in
-            post (getFullPath "/v1/chain/get_account") body accountDecoder
+            query
+                |> getAccount
                 |> Http.send OnFetchAccount
 
         actionsCmd =

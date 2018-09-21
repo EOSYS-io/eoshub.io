@@ -36,7 +36,7 @@ import Util.Formatter
         , floatToAsset
         , larimerToEos
         )
-import Util.HttpRequest exposing (getFullPath, post)
+import Util.HttpRequest exposing (getAccount, getFullPath, post)
 import Util.WalletDecoder
     exposing
         ( Wallet
@@ -110,15 +110,8 @@ accountCmd : State -> String -> Cmd Message
 accountCmd state accountName =
     case state of
         AccountInfo ->
-            let
-                body =
-                    Encode.object
-                        [ ( "account_name", Encode.string accountName ) ]
-                        |> Http.jsonBody
-            in
-            post (getFullPath "/v1/chain/get_account")
-                body
-                accountDecoder
+            accountName
+                |> getAccount
                 |> Http.send OnFetchAccount
 
         _ ->
