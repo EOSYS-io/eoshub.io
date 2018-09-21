@@ -97,6 +97,7 @@ type Message
     | OnFetchAccount (Result Http.Error Account)
     | OnFetchProducers (Result Http.Error (List Producer))
     | OnTime Time.Time
+    | ExpandProducers
 
 
 
@@ -111,6 +112,7 @@ type alias Model =
     , voteStat : VoteStat
     , now : Time
     , proxies : List String
+    , producersLimit : Int
     }
 
 
@@ -123,6 +125,7 @@ initModel =
     , voteStat = initVoteStat
     , now = 0.0
     , proxies = []
+    , producersLimit = 100
     }
 
 
@@ -177,7 +180,7 @@ initCmd flags =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message model _ =
+update message ({ producersLimit } as model) _ =
     case message of
         SwitchTab newTab ->
             ( { model | tab = newTab }, Cmd.none )
@@ -217,6 +220,9 @@ update message model _ =
         OnTime now ->
             ( { model | now = now }, Cmd.none )
 
+        ExpandProducers ->
+            ( { model | producersLimit = producersLimit + 100 }, Cmd.none )
+
 
 
 -- VIEW
@@ -255,7 +261,7 @@ view _ ({ tab, now } as model) =
 
 
 voteView : Model -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat } now =
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit } now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -277,6 +283,20 @@ voteView { globalTable, tokenStatTable, producers, voteStat } now =
 
         votingPercentage =
             Round.round 2 ((voteStat.totalVotedEos / totalEos) * 100) ++ "%"
+
+        ( producersView, viewMoreButton ) =
+            ( producers
+                |> List.take producersLimit
+                |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
+            , if List.length producers > producersLimit then
+                div [ class "btn_area" ]
+                    [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
+                        [ text "더 보기" ]
+                    ]
+
+              else
+                text ""
+            )
     in
     [ section [ class "vote summary" ]
         [ h3 []
@@ -329,11 +349,9 @@ voteView { globalTable, tokenStatTable, producers, voteStat } now =
                         ]
                     ]
                 ]
-            , tbody []
-                (producers
-                    |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
-                )
+            , tbody [] producersView
             ]
+        , viewMoreButton
         ]
     ]
 
