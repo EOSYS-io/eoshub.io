@@ -37,6 +37,9 @@ tests =
             , account = "account"
             , authority = "active"
             }
+
+        flags =
+            { node_env = "test" }
     in
     describe "Page module"
         [ describe "getPage"
@@ -92,7 +95,7 @@ tests =
                     in
                     Expect.equal
                         ( expectedModel, Cmd.map SidebarMessage newCmd )
-                        (update (UpdatePushActionResponse pushActionResponse) model)
+                        (update (UpdatePushActionResponse pushActionResponse) model flags)
             , test "UpdateLanguage" <|
                 \() ->
                     let
@@ -101,7 +104,7 @@ tests =
                     in
                     Expect.equal
                         ( { model | header = { header | language = English } }, Cmd.none )
-                        (update (UpdateLanguage English) model)
+                        (update (UpdateLanguage English) model flags)
             , test "CloseNotification" <|
                 \() ->
                     let
@@ -128,6 +131,7 @@ tests =
                         (update
                             (NotificationMessage View.Notification.CloseNotification)
                             openedModel
+                            flags
                         )
             ]
         , describe "parseQuery"

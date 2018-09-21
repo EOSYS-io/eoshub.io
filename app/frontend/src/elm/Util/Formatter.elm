@@ -5,6 +5,7 @@ module Util.Formatter exposing
     , deleteFromBack
     , floatToAsset
     , formatAsset
+    , formatWithUsLocale
     , larimerToEos
     , percentageConverter
     , removeSymbolIfExists
@@ -14,6 +15,8 @@ module Util.Formatter exposing
     )
 
 import Date.Extra as Date
+import FormatNumber exposing (format)
+import FormatNumber.Locales exposing (usLocale)
 import Regex exposing (..)
 import Round
 import Translation exposing (Language(..))
@@ -187,3 +190,9 @@ deleteFromBack digit string =
                 len - digit
     in
     String.slice 0 end string
+
+
+formatWithUsLocale : Int -> Float -> String
+formatWithUsLocale decimals value =
+    value
+        |> format { usLocale | decimals = decimals }

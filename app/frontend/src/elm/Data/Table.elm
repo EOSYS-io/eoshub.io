@@ -8,18 +8,21 @@ module Data.Table exposing
     , RammarketFields
     , Row(..)
     , Table
+    , TokenStatFields
     , balanceWeightDecoder
     , delbandDecoder
     , globalDecoder
     , initDelbandFields
     , initGlobalFields
     , initRammarketFields
+    , initTokenStatFields
     , rammarketDecoder
     , rowDecoder
     , rowsDecoder
+    , tokenStatDecoder
     )
 
-import Json.Decode as Decode exposing (Decoder, decodeString, oneOf)
+import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, required)
 
 
@@ -33,6 +36,7 @@ type Row
     = Rammarket RammarketFields
     | Global GlobalFields
     | Delband DelbandFields
+    | TokenStat TokenStatFields
 
 
 type alias BalanceWeight =
@@ -148,6 +152,21 @@ initDelbandFields =
     }
 
 
+type alias TokenStatFields =
+    { supply : String
+    , maxSupply : String
+    , issuer : String
+    }
+
+
+initTokenStatFields : TokenStatFields
+initTokenStatFields =
+    { supply = "1"
+    , maxSupply = ""
+    , issuer = ""
+    }
+
+
 rowsDecoder : Decoder (List Row)
 rowsDecoder =
     Decode.field "rows"
@@ -160,6 +179,7 @@ rowDecoder =
         [ Decode.map Rammarket rammarketDecoder
         , Decode.map Global globalDecoder
         , Decode.map Delband delbandDecoder
+        , Decode.map TokenStat tokenStatDecoder
         ]
 
 
@@ -220,3 +240,11 @@ delbandDecoder =
         |> required "to" Decode.string
         |> required "net_weight" Decode.string
         |> required "cpu_weight" Decode.string
+
+
+tokenStatDecoder : Decoder TokenStatFields
+tokenStatDecoder =
+    Decode.map3 TokenStatFields
+        (Decode.field "supply" Decode.string)
+        (Decode.field "max_supply" Decode.string)
+        (Decode.field "issuer" Decode.string)

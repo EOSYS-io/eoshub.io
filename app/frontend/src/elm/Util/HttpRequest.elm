@@ -1,5 +1,6 @@
-module Util.HttpRequest exposing (getFullPath, getTableRows, post)
+module Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 
+import Data.Account exposing (Account, accountDecoder)
 import Data.Table exposing (Row, rowsDecoder)
 import Http
 import Json.Decode exposing (Decoder)
@@ -25,12 +26,23 @@ post url body decoder =
         }
 
 
+getAccount : String -> Http.Request Account
+getAccount accountName =
+    let
+        body =
+            [ ( "account_name", accountName |> Encode.string ) ]
+                |> Encode.object
+                |> Http.jsonBody
+    in
+    post (getFullPath "/v1/chain/get_account") body accountDecoder
+
+
 getTableRows : String -> String -> String -> Http.Request (List Row)
-getTableRows scope code table =
+getTableRows code scope table =
     let
         requestBody =
-            [ ( "scope", scope |> Encode.string )
-            , ( "code", code |> Encode.string )
+            [ ( "code", code |> Encode.string )
+            , ( "scope", scope |> Encode.string )
             , ( "table", table |> Encode.string )
             , ( "json", True |> Encode.bool )
             ]

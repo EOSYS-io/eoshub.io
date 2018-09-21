@@ -19,8 +19,8 @@ import Json.Decode.Pipeline exposing (decode, optional, required)
 import Round
 import Util.Formatter
     exposing
-        ( floatToAsset
-        , assetToFloat
+        ( assetToFloat
+        , floatToAsset
         , larimerToEos
         , percentageConverter
         , resourceUnitConverter
@@ -66,6 +66,7 @@ type alias Refund =
 
 type alias VoterInfo =
     { staked : Int
+    , producers : List String
     }
 
 
@@ -74,7 +75,9 @@ defaultAccount =
     { accountName = "Loading..."
     , coreLiquidBalance = "0 EOS"
     , voterInfo =
-        { staked = 0 }
+        { staked = 0
+        , producers = []
+        }
     , ramQuota = 0
     , ramUsage = 0
     , netLimit =
@@ -108,8 +111,9 @@ accountDecoder =
         |> optional "voter_info"
             (decode VoterInfo
                 |> required "staked" JD.int
+                |> required "producers" (JD.list JD.string)
             )
-            (VoterInfo 0)
+            (VoterInfo 0 [])
         |> required "ram_quota" intOrStringDecoder
         |> required "ram_usage" intOrStringDecoder
         |> required "net_limit"

@@ -59,6 +59,7 @@ import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), Language(..), translate)
+import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, Wallet, decodePushActionResponse)
@@ -147,21 +148,21 @@ type alias PublicKeyQuery =
     String
 
 
-initCmd : Model -> Location -> Cmd Message
-initCmd { page } location =
+initCmd : Location -> Flags -> Cmd Message
+initCmd location flags =
     Cmd.batch
-        [ pageCmd page location
+        [ pageCmd location flags
         , Cmd.map SidebarMessage Sidebar.initCmd
         ]
 
 
-updateCmd : Model -> Location -> Cmd Message
-updateCmd { page } location =
-    pageCmd page location
+updateCmd : Location -> Flags -> Cmd Message
+updateCmd location flags =
+    pageCmd location flags
 
 
-pageCmd : Page -> Location -> Cmd Message
-pageCmd page location =
+pageCmd : Location -> Flags -> Cmd Message
+pageCmd location flags =
     let
         route =
             location |> parseLocation
@@ -193,6 +194,9 @@ pageCmd page location =
 
         RammarketRoute ->
             Cmd.map RammarketMessage Rammarket.initCmd
+
+        VoteRoute ->
+            Cmd.map VoteMessage (Vote.initCmd flags)
 
         _ ->
             Cmd.none
@@ -401,8 +405,8 @@ view { page, header, notification, sidebar } =
 -- UPDATE
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar } as model) =
+update : Message -> Model -> Flags -> ( Model, Cmd Message )
+update message ({ page, notification, header, sidebar } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -441,10 +445,10 @@ update message ({ page, notification, header, sidebar } as model) =
 
         ( VoteMessage subMessage, VotePage subModel ) ->
             let
-                newPage =
-                    Vote.update subMessage subModel
+                ( newPage, subCmd ) =
+                    Vote.update subMessage subModel flags
             in
-            ( { model | page = newPage |> VotePage }, Cmd.none )
+            ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
         ( IndexMessage (Index.ChangeUrl url), _ ) ->
             ( model, Navigation.newUrl url )
@@ -500,10 +504,10 @@ update message ({ page, notification, header, sidebar } as model) =
 
                 cmd =
                     if newComponent then
-                        initCmd model location
+                        initCmd location flags
 
                     else
-                        updateCmd model location
+                        updateCmd location flags
             in
             ( { model | page = newPage }, cmd )
 
