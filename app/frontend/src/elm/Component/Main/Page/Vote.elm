@@ -68,8 +68,9 @@ import Html.Attributes
         , src
         , title
         , type_
+        , value
         )
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Round
 import Task
@@ -98,6 +99,7 @@ type Message
     | OnFetchProducers (Result Http.Error (List Producer))
     | OnTime Time.Time
     | ExpandProducers
+    | OnSearchInput String
 
 
 
@@ -113,6 +115,7 @@ type alias Model =
     , now : Time
     , proxies : List String
     , producersLimit : Int
+    , searchInput : String
     }
 
 
@@ -126,6 +129,7 @@ initModel =
     , now = 0.0
     , proxies = []
     , producersLimit = 100
+    , searchInput = ""
     }
 
 
@@ -223,6 +227,9 @@ update message ({ producersLimit } as model) _ =
         ExpandProducers ->
             ( { model | producersLimit = producersLimit + 100 }, Cmd.none )
 
+        OnSearchInput searchInput ->
+            ( { model | searchInput = searchInput }, Cmd.none )
+
 
 
 -- VIEW
@@ -261,7 +268,7 @@ view _ ({ tab, now } as model) =
 
 
 voteView : Model -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit } now =
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput } now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -284,11 +291,15 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit } no
         votingPercentage =
             Round.round 2 ((voteStat.totalVotedEos / totalEos) * 100) ++ "%"
 
+        filteredProducers =
+            producers
+                |> List.filter (\producer -> String.startsWith searchInput producer.owner)
+
         ( producersView, viewMoreButton ) =
-            ( producers
+            ( filteredProducers
                 |> List.take producersLimit
                 |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
-            , if List.length producers > producersLimit then
+            , if List.length filteredProducers > producersLimit then
                 div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
                         [ text "더 보기" ]
@@ -333,7 +344,12 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit } no
                         ]
                     , th [ class "search", scope "col" ]
                         [ form []
-                            [ input [ placeholder "BP 후보 검색", type_ "text" ]
+                            [ input
+                                [ placeholder "BP 후보 검색"
+                                , type_ "text"
+                                , onInput <| OnSearchInput
+                                , value searchInput
+                                ]
                                 []
                             , button [ type_ "submit" ]
                                 [ text "검색" ]
@@ -389,7 +405,7 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 [ text delta ]
             ]
         , td []
-            [ span [ class ("bp bi" ++ owner) ]
+            [ span [ class ("bp bi " ++ owner) ]
                 []
             , strong []
                 [ text owner ]
@@ -476,7 +492,7 @@ producerSimplifiedView producers accountName =
                 |> Maybe.withDefault initProducer
     in
     li []
-        [ img [ alt "", src "" ]
+        [ span [ class ("bp bi " ++ accountName) ]
             []
         , strong [ title accountName ]
             [ text accountName ]
