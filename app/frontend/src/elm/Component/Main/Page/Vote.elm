@@ -58,8 +58,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
-        , disabled
+        ( checked
+        , class
         , for
         , id
         , placeholder
@@ -68,10 +68,11 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onCheck, onClick, onInput)
 import Http
 import Port
 import Round
+import Set exposing (Set)
 import Task
 import Time exposing (Time)
 import Translation exposing (Language)
@@ -102,6 +103,7 @@ type Message
     | OnSearchInput String
     | SubmitVoteProxyAction
     | SubmitVoteProducersAction
+    | OnToggleProducer String Bool
 
 
 
@@ -118,7 +120,7 @@ type alias Model =
     , proxies : List String
     , producersLimit : Int
     , searchInput : String
-    , producerNamesToVote : List String
+    , producerNamesToVote : Set String
     }
 
 
@@ -133,7 +135,7 @@ initModel =
     , proxies = []
     , producersLimit = 100
     , searchInput = ""
-    , producerNamesToVote = []
+    , producerNamesToVote = Set.empty
     }
 
 
@@ -249,7 +251,7 @@ update message ({ producersLimit, producerNamesToVote } as model) _ { accountNam
         SubmitVoteProducersAction ->
             let
                 params =
-                    Data.Action.VoteproducerParameters accountName "" producerNamesToVote
+                    Data.Action.VoteproducerParameters accountName "" (producerNamesToVote |> Set.toList)
             in
             ( model
             , params
@@ -257,6 +259,17 @@ update message ({ producersLimit, producerNamesToVote } as model) _ { accountNam
                 |> encodeAction
                 |> Port.pushAction
             )
+
+        OnToggleProducer owner check ->
+            if check then
+                if Set.size producerNamesToVote >= 30 then
+                    ( model, Cmd.none )
+
+                else
+                    ( { model | producerNamesToVote = Set.insert owner producerNamesToVote }, Cmd.none )
+
+            else
+                ( { model | producerNamesToVote = Set.remove owner producerNamesToVote }, Cmd.none )
 
 
 
@@ -296,7 +309,7 @@ view _ ({ tab, now } as model) =
 
 
 voteView : Model -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput } now =
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -326,7 +339,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
         producersView =
             filteredProducers
                 |> List.take producersLimit
-                |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
+                |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds) producerNamesToVote)
 
         viewMoreButton =
             if List.length filteredProducers > producersLimit then
@@ -388,8 +401,12 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                         [ text "득표" ]
                     , th [ scope "col" ]
                         [ span [ class "count" ]
-                            [ text "0/30" ]
-                        , button [ class "vote ok button", disabled True, type_ "button" ]
+                            [ text ((producerNamesToVote |> Set.size |> toString) ++ "/30") ]
+                        , button
+                            [ class "vote ok button"
+                            , type_ "button"
+                            , onClick SubmitVoteProducersAction
+                            ]
                             [ text "투표" ]
                         ]
                     ]
@@ -401,8 +418,8 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
     ]
 
 
-producerTableRow : Float -> Float -> Producer -> Html Message
-producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank } =
+producerTableRow : Float -> Float -> Set String -> Producer -> Html Message
+producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank } =
     let
         ( upDownClass, delta ) =
             if rank < prevRank then
@@ -425,6 +442,9 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 |> formatWithUsLocale 4
             )
                 ++ " EOS"
+
+        checkBoxValue =
+            Set.member owner producerNamesToVote
     in
     tr []
         [ td []
@@ -447,9 +467,14 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 [ text formattedEos ]
             ]
         , td []
-            [ input [ id "eos-1", type_ "checkbox" ]
+            [ input
+                [ id owner
+                , type_ "checkbox"
+                , onCheck <| OnToggleProducer owner
+                , checked checkBoxValue
+                ]
                 []
-            , label [ for "eos-1" ]
+            , label [ for owner ]
                 []
             ]
         ]
