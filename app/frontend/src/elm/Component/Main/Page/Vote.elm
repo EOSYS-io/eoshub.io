@@ -25,8 +25,6 @@ import Data.Table
         , initGlobalFields
         , initTokenStatFields
         )
-import FormatNumber exposing (format)
-import FormatNumber.Locales exposing (usLocale)
 import Html
     exposing
         ( Html
@@ -78,7 +76,7 @@ import Task
 import Time exposing (Time)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
-import Util.Formatter exposing (assetToFloat)
+import Util.Formatter exposing (assetToFloat, formatWithUsLocale)
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
@@ -264,13 +262,13 @@ voteView { globalTable, tokenStatTable, producers, voteStat } now =
 
         formattedTotalEos =
             (totalEos
-                |> format { usLocale | decimals = 4 }
+                |> formatWithUsLocale 4
             )
                 ++ " EOS"
 
         formattedVotedEos =
             (voteStat.totalVotedEos
-                |> format { usLocale | decimals = 4 }
+                |> formatWithUsLocale 4
             )
                 ++ " EOS"
 
@@ -361,7 +359,7 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
 
         formattedEos =
             (eosAmount
-                |> format { usLocale | decimals = 4 }
+                |> formatWithUsLocale 4
             )
                 ++ " EOS"
     in
@@ -401,7 +399,7 @@ proxyView { voteStat, producers, proxies } =
     let
         formattedProxiedEos =
             voteStat.eosysProxyStakedEos
-                |> format { usLocale | decimals = 4 }
+                |> formatWithUsLocale 4
 
         proxiedAccounts =
             voteStat.eosysProxyStakedAccountCount |> toString
