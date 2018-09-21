@@ -161,7 +161,7 @@ type alias TokenStatFields =
 
 initTokenStatFields : TokenStatFields
 initTokenStatFields =
-    { supply = ""
+    { supply = "1"
     , maxSupply = ""
     , issuer = ""
     }
