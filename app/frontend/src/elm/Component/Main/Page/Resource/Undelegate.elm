@@ -439,7 +439,7 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation =
 
 
 validate : Model -> String -> String -> Model
-validate ({ undelegatebw, accountValidation } as model) unstakePossibleCpu unstakePossibleNet =
+validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
         accountValidation =
             validateAccount undelegatebw.receiver
@@ -458,7 +458,8 @@ validate ({ undelegatebw, accountValidation } as model) unstakePossibleCpu unsta
             validateEach accountValidation cpuQuantityValidation netQuantityValidation
 
         isFormValid =
-            isCpuValid
+            isAccountValid
+                && isCpuValid
                 && isNetValid
                 && isNotEmptyBoth
     in
