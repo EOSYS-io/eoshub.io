@@ -821,9 +821,9 @@ getMessages i18n =
             }
 
         StakePossible cpu net ->
-            { korean = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
-            , english = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
-            , chinese = "한 CPU " ++ cpu ++ ", NET " ++ net ++ " 스테이크 됩니다."
+            { korean = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
+            , english = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
+            , chinese = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
             }
 
         StakePossibleAmountDesc ->

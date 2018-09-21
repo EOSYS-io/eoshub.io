@@ -4,10 +4,13 @@ module Component.Main.Page.Resource.Delegate exposing
     , PercentageOfResource(..)
     , ResourceType(..)
     , getPercentageOfResource
+    , initCmd
     , initModel
     , percentageButton
+    , resourceInputDiv
     , update
     , validate
+    , validateEach
     , validateText
     , view
     )
@@ -15,7 +18,7 @@ module Component.Main.Page.Resource.Delegate exposing
 import Component.Main.Page.Resource.Modal.DelegateList as DelegateList
     exposing
         ( Message(..)
-        , viewDelegateListModal
+        , view
         )
 import Component.Main.Page.Resource.Stake exposing (modalValidateAttr)
 import Component.Main.Page.Transfer exposing (accountWarningSpan)
@@ -33,9 +36,11 @@ import Data.Account
         , keyAccountsDecoder
         )
 import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
+import Data.Table exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Http
 import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
@@ -48,6 +53,7 @@ import Util.Formatter
         , formatAsset
         , larimerToEos
         )
+import Util.HttpRequest exposing (getFullPath, getTableRows, post)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -65,6 +71,7 @@ import Util.Validation as Validation
 
 type alias Model =
     { delegatebw : DelegatebwParameters
+    , delbandTable : List Row
     , totalQuantity : String
     , percentageOfCpu : PercentageOfResource
     , percentageOfNet : PercentageOfResource
@@ -93,6 +100,7 @@ type ResourceType
 initModel : Model
 initModel =
     { delegatebw = { from = "", receiver = "", stakeNetQuantity = "", stakeCpuQuantity = "", transfer = 0 }
+    , delbandTable = []
     , totalQuantity = ""
     , percentageOfCpu = NoOp
     , percentageOfNet = NoOp
@@ -106,17 +114,28 @@ initModel =
 
 
 
+-- CMD
+
+
+initCmd : String -> Cmd Message
+initCmd query =
+    getTableRows query "eosio" "delband"
+        |> Http.send OnFetchTableRows
+
+
+
 -- UPDATE
 
 
 type Message
-    = OpenDelegateListModal
+    = OnFetchTableRows (Result Http.Error (List Row))
     | CpuAmountInput String
     | NetAmountInput String
     | ReceiverInput String
     | ClickCpuPercentage PercentageOfResource
     | ClickNetPercentage PercentageOfResource
     | SubmitAction
+    | OpenDelegateListModal
     | DelegateListMessage DelegateList.Message
 
 
@@ -127,6 +146,12 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
             assetToFloat coreLiquidBalance
     in
     case message of
+        OnFetchTableRows (Ok rows) ->
+            ( { model | delbandTable = rows }, Cmd.none )
+
+        OnFetchTableRows (Err str) ->
+            ( model, Cmd.none )
+
         CpuAmountInput value ->
             let
                 total =
@@ -244,11 +269,29 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
             )
 
         DelegateListMessage subMessage ->
-            let
-                ( newModel, _ ) =
-                    DelegateList.update subMessage delegateListModal
-            in
-            ( { model | delegateListModal = newModel }, Cmd.none )
+            case subMessage of
+                ClickDelband receiver _ _ ->
+                    let
+                        newModel =
+                            { model
+                                | delegatebw =
+                                    { delegatebw
+                                        | receiver = receiver
+                                    }
+                                , delegateListModal =
+                                    { delegateListModal
+                                        | isDelegateListModalOpened = False
+                                    }
+                            }
+                    in
+                    ( validate newModel eosLiquidAmount, Cmd.none )
+
+                _ ->
+                    let
+                        ( newModel, _ ) =
+                            DelegateList.update subMessage delegateListModal
+                    in
+                    ( { model | delegateListModal = newModel }, Cmd.none )
 
 
 
@@ -256,7 +299,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delegatebw, cpuQuantityValidation, netQuantityValidation, accountValidation, totalQuantityValidation, totalQuantity, percentageOfCpu, percentageOfNet, isFormValid, delegateListModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityValidation, accountValidation, totalQuantityValidation, totalQuantity, percentageOfCpu, percentageOfNet, isFormValid, delegateListModal } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
     let
         accountWarning =
             accountWarningSpan accountValidation language
@@ -271,7 +314,7 @@ view language ({ delegatebw, cpuQuantityValidation, netQuantityValidation, accou
             modalValidateAttr totalQuantityValidation netQuantityValidation
 
         modalHtml =
-            Html.map DelegateListMessage (viewDelegateListModal language delegateListModal)
+            Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
     in
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
@@ -291,6 +334,7 @@ view language ({ delegatebw, cpuQuantityValidation, netQuantityValidation, accou
                     , placeholder "임대해줄 계정의 이름을 입력하세요"
                     , onInput ReceiverInput
                     , type_ "text"
+                    , value delegatebw.receiver
                     ]
                     []
                 , accountWarning
