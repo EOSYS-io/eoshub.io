@@ -20,7 +20,7 @@ tests =
                             Account
                                 "123412341234"
                                 "0 EOS"
-                                (VoterInfo 0)
+                                (VoterInfo 0 [])
                                 3050
                                 2996
                                 (Resource 0 0 0)
@@ -42,7 +42,7 @@ tests =
                             Account
                                 "eosyskoreabp"
                                 "9159.2669 EOS"
-                                (VoterInfo 28348132)
+                                (VoterInfo 28348132 [ "eosyskoreabp" ])
                                 65741
                                 4223
                                 (Resource 105 778970655 778970760)
@@ -64,7 +64,7 @@ tests =
                             Account
                                 "eosio"
                                 "10.0055 EOS"
-                                (VoterInfo 0)
+                                (VoterInfo 0 [])
                                 -1
                                 38299755
                                 (Resource -1 -1 -1)
@@ -86,7 +86,7 @@ tests =
                             Account
                                 "eosyskoreabp"
                                 "9159.2669 EOS"
-                                (VoterInfo 28348132)
+                                (VoterInfo 28348132 [ "eosyskoreabp" ])
                                 3012341234
                                 3012341234
                                 (Resource 3012341234 3012341234 3012341234)
