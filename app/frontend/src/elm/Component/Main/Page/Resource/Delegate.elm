@@ -270,7 +270,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
 
         DelegateListMessage subMessage ->
             case subMessage of
-                ClickDelband receiver cpu net ->
+                ClickDelband receiver _ _ ->
                     let
                         newModel =
                             { model
