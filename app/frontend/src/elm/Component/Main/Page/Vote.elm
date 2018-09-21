@@ -371,10 +371,8 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 [ text delta ]
             ]
         , td []
-            [ span [ class "bp bi" ]
-                [ img []
-                    []
-                ]
+            [ span [ class ("bp bi" ++ owner) ]
+                []
             , strong []
                 [ text owner ]
             , text country
