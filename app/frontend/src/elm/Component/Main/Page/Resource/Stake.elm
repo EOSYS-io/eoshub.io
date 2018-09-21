@@ -296,53 +296,7 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
     in
     div [ class "stake container" ]
-        [ div [ class "my resource" ]
-            [ div []
-                [ h3 []
-                    [ text "CPU 총량"
-                    , strong []
-                        [ text totalResources.cpuWeight ]
-                    ]
-                , p []
-                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
-                , p []
-                    [ text
-                        ("임대받은 토큰 : "
-                            ++ assetSubtract
-                                totalResources.cpuWeight
-                                selfDelegatedBandwidth.cpuWeight
-                        )
-                    ]
-                , div [ class "graph status" ]
-                    [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
-                        []
-                    , text cpuPercent
-                    ]
-                ]
-            , div []
-                [ h3 []
-                    [ text "NET 총량"
-                    , strong []
-                        [ text totalResources.netWeight ]
-                    ]
-                , p []
-                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
-                , p []
-                    [ text
-                        ("임대받은 토큰 : "
-                            ++ assetSubtract
-                                totalResources.netWeight
-                                selfDelegatedBandwidth.netWeight
-                        )
-                    ]
-                , div [ class "graph status" ]
-                    [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
-                        []
-                    , text netPercent
-                    ]
-                ]
-            ]
-        , section []
+        [ section []
             [ div [ class "wallet status" ]
                 [ h3 []
                     [ text "스테이크 가능한 토큰" ]
