@@ -226,7 +226,7 @@ update message ({ producersLimit } as model) _ =
             ( { model | producersLimit = producersLimit + 100 }, Cmd.none )
 
         OnSearchInput searchInput ->
-            ( { model | searchInput = searchInput }, Cmd.none )
+            ( { model | searchInput = searchInput |> String.toLower }, Cmd.none )
 
 
 
@@ -293,19 +293,20 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
             producers
                 |> List.filter (\producer -> String.startsWith searchInput producer.owner)
 
-        ( producersView, viewMoreButton ) =
-            ( filteredProducers
+        producersView =
+            filteredProducers
                 |> List.take producersLimit
                 |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
-            , if List.length filteredProducers > producersLimit then
+
+        viewMoreButton =
+            if List.length filteredProducers > producersLimit then
                 div [ class "btn_area" ]
                     [ button [ type_ "button", class "view more button", onClick ExpandProducers ]
                         [ text "더 보기" ]
                     ]
 
-              else
+            else
                 text ""
-            )
     in
     [ section [ class "vote summary" ]
         [ h3 []
