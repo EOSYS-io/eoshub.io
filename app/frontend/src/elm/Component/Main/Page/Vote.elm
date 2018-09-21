@@ -7,10 +7,12 @@ module Component.Main.Page.Vote exposing
     , view
     )
 
+import Data.Account exposing (Account)
 import Data.Json
     exposing
         ( Producer
         , VoteStat
+        , initProducer
         , initVoteStat
         , producersDecoder
         , voteStatDecoder
@@ -77,7 +79,7 @@ import Time exposing (Time)
 import Translation exposing (Language)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
-import Util.HttpRequest exposing (getTableRows)
+import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
 
@@ -94,6 +96,7 @@ type Message
     = SwitchTab Tab
     | OnFetchTableRows (Result Http.Error (List Row))
     | OnFetchVoteStat (Result Http.Error VoteStat)
+    | OnFetchAccount (Result Http.Error Account)
     | OnFetchProducers (Result Http.Error (List Producer))
     | OnTime Time.Time
 
@@ -109,6 +112,7 @@ type alias Model =
     , producers : List Producer
     , voteStat : VoteStat
     , now : Time
+    , proxies : List String
     }
 
 
@@ -120,6 +124,7 @@ initModel =
     , producers = []
     , voteStat = initVoteStat
     , now = 0.0
+    , proxies = []
     }
 
 
@@ -145,6 +150,13 @@ getRecentVoteStat flags =
     Http.get (getRecentVoteStatUrl flags) voteStatDecoder |> Http.send OnFetchVoteStat
 
 
+getProxyAccount : Cmd Message
+getProxyAccount =
+    "bpgovernance"
+        |> getAccount
+        |> Http.send OnFetchAccount
+
+
 getNow : Cmd Message
 getNow =
     Task.perform OnTime Time.now
@@ -158,6 +170,7 @@ initCmd flags =
         , getProducers flags
         , getRecentVoteStat flags
         , getNow
+        , getProxyAccount
         ]
 
 
@@ -188,13 +201,19 @@ update message model _ =
         OnFetchProducers (Ok producers) ->
             ( { model | producers = producers }, Cmd.none )
 
-        OnFetchProducers (Err err) ->
+        OnFetchProducers (Err _) ->
             ( model, Cmd.none )
 
         OnFetchVoteStat (Ok voteStat) ->
             ( { model | voteStat = voteStat }, Cmd.none )
 
         OnFetchVoteStat (Err _) ->
+            ( model, Cmd.none )
+
+        OnFetchAccount (Ok { voterInfo }) ->
+            ( { model | proxies = voterInfo.producers }, Cmd.none )
+
+        OnFetchAccount (Err _) ->
             ( model, Cmd.none )
 
         OnTime now ->
@@ -322,7 +341,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat } now =
 
 
 producerTableRow : Float -> Float -> Producer -> Html Message
-producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank, logoImageUrl } =
+producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank } =
     let
         ( upDownClass, delta ) =
             if rank < prevRank then
@@ -355,7 +374,7 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank,
             ]
         , td []
             [ span [ class "bp bi" ]
-                [ img [ src logoImageUrl ]
+                [ img []
                     []
                 ]
             , strong []
@@ -378,7 +397,7 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank,
 
 
 proxyView : Model -> List (Html Message)
-proxyView { voteStat } =
+proxyView { voteStat, producers, proxies } =
     let
         formattedProxiedEos =
             voteStat.eosysProxyStakedEos
@@ -386,6 +405,9 @@ proxyView { voteStat } =
 
         proxiedAccounts =
             voteStat.eosysProxyStakedAccountCount |> toString
+
+        proxyingAccountCount =
+            proxies |> List.length |> toString
     in
     [ section [ class "philosophy" ]
         [ div [ class "animated image" ]
@@ -418,7 +440,7 @@ proxyView { voteStat } =
             , li []
                 [ text "Proxied BP"
                 , strong []
-                    [ text "9 BP" ]
+                    [ text (proxyingAccountCount ++ " BP") ]
                 ]
             ]
         ]
@@ -426,17 +448,27 @@ proxyView { voteStat } =
         [ h3 []
             [ text "투표한 BP" ]
         , ul [ class "list" ]
-            [ li []
-                [ img [ alt "", src "" ]
-                    []
-                , strong [ title "eosbpkorea" ]
-                    [ text "eosyskoreabeosyskoreabeosyskoreabeosyskoreabppppeosyskoreabp" ]
-                , span []
-                    [ text "Korea" ]
-                ]
-            ]
+            (List.map (producerSimplifiedView producers) proxies)
         ]
     ]
+
+
+producerSimplifiedView : List Producer -> String -> Html Message
+producerSimplifiedView producers accountName =
+    let
+        { country } =
+            List.filter (\producer -> producer.owner == accountName) producers
+                |> List.head
+                |> Maybe.withDefault initProducer
+    in
+    li []
+        [ img [ alt "", src "" ]
+            []
+        , strong [ title accountName ]
+            [ text accountName ]
+        , span []
+            [ text country ]
+        ]
 
 
 
