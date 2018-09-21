@@ -710,6 +710,9 @@ encodeAction action =
         Sellram message ->
             sellramParametersToValue message
 
+        Voteproducer message ->
+            voteproducersParametersToValue message
+
         _ ->
             Encode.null
 
@@ -792,6 +795,21 @@ sellramParametersToValue { account, bytes } =
           , Encode.object
                 [ ( "account", Encode.string account )
                 , ( "bytes", Encode.int bytes )
+                ]
+          )
+        ]
+
+
+voteproducersParametersToValue : VoteproducerParameters -> Encode.Value
+voteproducersParametersToValue { voter, producers, proxy } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "voteproducer" )
+        , ( "payload"
+          , Encode.object
+                [ ( "voter", Encode.string voter )
+                , ( "proxy", Encode.string proxy )
+                , ( "producers", Encode.list (List.map Encode.string producers) )
                 ]
           )
         ]

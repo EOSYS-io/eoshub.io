@@ -8,6 +8,7 @@ module Component.Main.Page.Vote exposing
     )
 
 import Data.Account exposing (Account)
+import Data.Action exposing (encodeAction)
 import Data.Json
     exposing
         ( Producer
@@ -69,6 +70,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Http
+import Port
 import Round
 import Task
 import Time exposing (Time)
@@ -98,6 +100,8 @@ type Message
     | OnTime Time.Time
     | ExpandProducers
     | OnSearchInput String
+    | SubmitVoteProxyAction
+    | SubmitVoteProducersAction
 
 
 
@@ -114,6 +118,7 @@ type alias Model =
     , proxies : List String
     , producersLimit : Int
     , searchInput : String
+    , producerNamesToVote : List String
     }
 
 
@@ -128,6 +133,7 @@ initModel =
     , proxies = []
     , producersLimit = 100
     , searchInput = ""
+    , producerNamesToVote = []
     }
 
 
@@ -181,8 +187,8 @@ initCmd flags =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ producersLimit } as model) _ =
+update : Message -> Model -> Flags -> Account -> ( Model, Cmd Message )
+update message ({ producersLimit, producerNamesToVote } as model) _ { accountName } =
     case message of
         SwitchTab newTab ->
             ( { model | tab = newTab }, Cmd.none )
@@ -227,6 +233,30 @@ update message ({ producersLimit } as model) _ =
 
         OnSearchInput searchInput ->
             ( { model | searchInput = searchInput |> String.toLower }, Cmd.none )
+
+        SubmitVoteProxyAction ->
+            let
+                params =
+                    Data.Action.VoteproducerParameters accountName eosysProxyAccount []
+            in
+            ( model
+            , params
+                |> Data.Action.Voteproducer
+                |> encodeAction
+                |> Port.pushAction
+            )
+
+        SubmitVoteProducersAction ->
+            let
+                params =
+                    Data.Action.VoteproducerParameters accountName "" producerNamesToVote
+            in
+            ( model
+            , params
+                |> Data.Action.Voteproducer
+                |> encodeAction
+                |> Port.pushAction
+            )
 
 
 
@@ -446,7 +476,11 @@ proxyView { voteStat, producers, proxies } =
                 [ text "Vote Philosophy" ]
             , p []
                 [ text "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own." ]
-            , button [ class "ok button", type_ "button" ]
+            , button
+                [ class "ok button"
+                , type_ "button"
+                , onClick SubmitVoteProxyAction
+                ]
                 [ text "대리투표 하기" ]
             ]
         ]
