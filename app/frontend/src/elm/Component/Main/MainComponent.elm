@@ -584,6 +584,9 @@ subscriptions { sidebar, page } =
             RammarketPage _ ->
                 Sub.map RammarketMessage Rammarket.subscriptions
 
+            VotePage _ ->
+                Sub.map VoteMessage Vote.subscriptions
+
             _ ->
                 Sub.none
         ]

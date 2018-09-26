@@ -3,6 +3,7 @@ module Component.Main.Page.Vote exposing
     , Model
     , initCmd
     , initModel
+    , subscriptions
     , update
     , view
     )
@@ -106,6 +107,7 @@ type Message
     | SubmitVoteProxyAction
     | SubmitVoteProducersAction
     | OnToggleProducer String Bool
+    | UpdateVoteData Time.Time
 
 
 
@@ -192,7 +194,7 @@ initCmd flags =
 
 
 update : Message -> Model -> Flags -> Account -> ( Model, Cmd Message )
-update message ({ producersLimit, producerNamesToVote } as model) _ { accountName } =
+update message ({ producersLimit, producerNamesToVote } as model) flags { accountName } =
     case message of
         SwitchTab newTab ->
             ( { model | tab = newTab }, Cmd.none )
@@ -272,6 +274,18 @@ update message ({ producersLimit, producerNamesToVote } as model) _ { accountNam
 
             else
                 ( { model | producerNamesToVote = Set.remove owner producerNamesToVote }, Cmd.none )
+
+        UpdateVoteData _ ->
+            ( model
+            , Cmd.batch
+                [ getGlobalTable
+                , getTokenStatTable
+                , getProducers flags
+                , getRecentVoteStat flags
+                , getNow
+                , getProxyAccount eosysProxyAccount
+                ]
+            )
 
 
 
@@ -571,6 +585,15 @@ producerSimplifiedView producers accountName =
         , span []
             [ text country ]
         ]
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Sub Message
+subscriptions =
+    Time.every (3 * Time.minute) UpdateVoteData
 
 
 
