@@ -60,6 +60,7 @@ import Html.Attributes
     exposing
         ( checked
         , class
+        , disabled
         , for
         , id
         , placeholder
@@ -68,8 +69,9 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onCheck, onClick, onInput)
+import Html.Events exposing (onClick, onInput, onWithOptions, targetChecked)
 import Http
+import Json.Decode
 import Port
 import Round
 import Set exposing (Set)
@@ -445,6 +447,17 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
 
         checkBoxValue =
             Set.member owner producerNamesToVote
+
+        -- To prevent default browser action, redefine onCheck function.
+        onCheck tagger =
+            onWithOptions "click"
+                { stopPropagation = True
+                , preventDefault = True
+                }
+                (Json.Decode.map
+                    tagger
+                    targetChecked
+                )
     in
     tr []
         [ td []
@@ -470,7 +483,8 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
             [ input
                 [ id owner
                 , type_ "checkbox"
-                , onCheck <| OnToggleProducer owner
+                , onCheck <|
+                    OnToggleProducer owner
                 , checked checkBoxValue
                 ]
                 []
