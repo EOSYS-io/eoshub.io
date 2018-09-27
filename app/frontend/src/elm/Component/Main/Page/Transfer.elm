@@ -12,17 +12,21 @@ module Component.Main.Page.Transfer exposing
     , view
     )
 
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
+import Util.HttpRequest exposing (getAccount)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificaitonRequestStatus(..)
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -65,8 +69,8 @@ type TransferMessageFormField
 type Message
     = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
-    | SetFormValidation Bool
     | OpenUnderConstruction
+    | OnFetchAccountToVerify (Result Http.Error Account)
 
 
 
@@ -174,6 +178,12 @@ accountWarningSpan accountStatus language =
 
                 ValidAccount ->
                     ( " true", translate language AccountExample )
+
+                InexistentAccount ->
+                    ( " false", "존재하지 않는 계정입니다." )
+
+                AccountToBeVerified ->
+                    ( " false", "존재 여부를 확인하는 중입니다." )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]
@@ -233,10 +243,13 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
             ( model, cmd )
 
         SetTransferMessageField field value ->
-            ( setTransferMessageField field value model eosLiquidAmount, Cmd.none )
+            setTransferMessageField field value model eosLiquidAmount
 
-        SetFormValidation validity ->
-            ( { model | isFormValid = validity }, Cmd.none )
+        OnFetchAccountToVerify (Ok _) ->
+            validate model eosLiquidAmount Succeed
+
+        OnFetchAccountToVerify (Err _) ->
+            validate model eosLiquidAmount Fail
 
         _ ->
             ( model, Cmd.none )
@@ -246,27 +259,36 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
 -- Utility functions.
 
 
-setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> Model
+setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
 setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
     case field of
         To ->
-            validate { model | transfer = { transfer | to = value } } eosLiquidAmount
+            validate { model | transfer = { transfer | to = value } } eosLiquidAmount NotSent
 
         Quantity ->
-            validate { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+            validate { model | transfer = { transfer | quantity = value } } eosLiquidAmount NotSent
 
         Memo ->
-            validate { model | transfer = { transfer | memo = value } } eosLiquidAmount
+            validate { model | transfer = { transfer | memo = value } } eosLiquidAmount NotSent
 
 
-validate : Model -> Float -> Model
-validate ({ transfer } as model) eosLiquidAmount =
+validate : Model -> Float -> VerificaitonRequestStatus -> ( Model, Cmd Message )
+validate ({ transfer } as model) eosLiquidAmount requestStatus =
     let
         { to, quantity, memo } =
             transfer
 
         accountValidation =
-            validateAccount to
+            validateAccount to requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                to
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
 
         -- Change the limit to user's balance.
         quantityValidation =
@@ -280,9 +302,11 @@ validate ({ transfer } as model) eosLiquidAmount =
                 && (quantityValidation == ValidQuantity)
                 && (memoValidation == ValidMemo)
     in
-    { model
+    ( { model
         | accountValidation = accountValidation
         , quantityValidation = quantityValidation
         , memoValidation = memoValidation
         , isFormValid = isFormValid
-    }
+      }
+    , accountCmd
+    )

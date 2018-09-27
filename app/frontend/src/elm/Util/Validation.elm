@@ -2,6 +2,7 @@ module Util.Validation exposing
     ( AccountStatus(..)
     , MemoStatus(..)
     , QuantityStatus(..)
+    , VerificaitonRequestStatus(..)
     , checkAccountName
     , isAccount
     , isPublicKey
@@ -37,7 +38,15 @@ checkAccountName query =
 type AccountStatus
     = EmptyAccount
     | ValidAccount
+    | InexistentAccount
     | InvalidAccount
+    | AccountToBeVerified
+
+
+type VerificaitonRequestStatus
+    = Succeed
+    | Fail
+    | NotSent
 
 
 type QuantityStatus
@@ -53,13 +62,21 @@ type MemoStatus
     | ValidMemo
 
 
-validateAccount : String -> AccountStatus
-validateAccount accountName =
+validateAccount : String -> VerificaitonRequestStatus -> AccountStatus
+validateAccount accountName requestStatus =
     if accountName == "" then
         EmptyAccount
 
     else if isAccount accountName then
-        ValidAccount
+        case requestStatus of
+            Succeed ->
+                ValidAccount
+
+            Fail ->
+                InexistentAccount
+
+            NotSent ->
+                AccountToBeVerified
 
     else
         InvalidAccount

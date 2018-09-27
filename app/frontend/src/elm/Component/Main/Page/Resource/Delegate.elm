@@ -464,7 +464,7 @@ validate : Model -> Float -> Model
 validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
     let
         accountValidation =
-            validateAccount delegatebw.receiver
+            validateAccount delegatebw.receiver Validation.NotSent
 
         cpuQuantityValidation =
             validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount

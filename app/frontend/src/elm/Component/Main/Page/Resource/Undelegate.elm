@@ -442,7 +442,7 @@ validate : Model -> String -> String -> Model
 validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
         accountValidation =
-            validateAccount undelegatebw.receiver
+            validateAccount undelegatebw.receiver Validation.NotSent
 
         netQuantityValidation =
             validateQuantity
