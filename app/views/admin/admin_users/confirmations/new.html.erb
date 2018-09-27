@@ -2,7 +2,7 @@
   <h2><%= active_admin_application.site_title %> <%= title t('active_admin.devise.resend_confirmation_instructions.title') %></h2>
 
   <%= devise_error_messages! %>
-  <%= active_admin_form_for(resource, as: resource_name, url: admin_user_confirmation_path(resource_name), html: { method: :post }) do |f|
+  <%= active_admin_form_for(resource, as: resource_name, url: admin_user_confirmation_path, html: { method: :post }) do |f|
     f.inputs do
       f.input :email
     end
