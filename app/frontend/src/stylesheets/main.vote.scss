@@ -316,7 +316,7 @@ main.vote {
 				}
 			}
 
-			td span.bp.bi {
+			td span.bi {
 				margin-right:12px;
 				line-height:1;
 				float:left;
@@ -324,8 +324,23 @@ main.vote {
 				height:48px;
 				border-radius:100%;
 				background-color:$xxxx-dark-gray;
-			}
+				position:relative;
+				overflow:hidden;
 
+				&:before {
+					content:'Block\AProducer';
+					font-size:$xx-small;
+					text-align:center;
+					letter-spacing:-0.04em;
+					display:block;
+					position:absolute;
+					top:50%;
+					left:50%;
+					transform:translate(-50%,-50%);
+					opacity:0.3;
+				}
+
+			}
 		}
 	}
 }
@@ -455,3 +470,32 @@ main.proxy.vote {
 		}
 	}
 }
+
+
+
+// bp name list
+
+// $spritesheet-width: 1216px;
+// $spritesheet-height: 1179px;
+
+@mixin sprites-bi($sprites) {
+	@each $sprite in $sprites {
+		$sprite-name: nth($sprite, 10);
+		.#{$sprite-name}:before {
+			display:none !important;
+		}
+		.#{$sprite-name}:after {
+			content:'';
+			display:block;
+			position:absolute;
+			width:inherit;
+			height:inherit;
+			top:50%;
+			left:50%;
+			transform:translate(-50%,-50%) scale(0.38);
+			@include sprite($sprite);
+		}
+	}
+}
+
+@include sprites-bi ($spritesheet-sprites);

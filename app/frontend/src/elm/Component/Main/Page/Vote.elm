@@ -481,7 +481,7 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
                 [ text delta ]
             ]
         , td []
-            [ span [ class ("bp bi " ++ owner) ]
+            [ span [ class ("bi bp-" ++ owner) ]
                 []
             , strong []
                 [ text owner ]
@@ -578,7 +578,7 @@ producerSimplifiedView producers accountName =
                 |> Maybe.withDefault initProducer
     in
     li []
-        [ span [ class ("bp bi " ++ accountName) ]
+        [ span [ class ("bi bp-" ++ accountName) ]
             []
         , strong [ title accountName ]
             [ text accountName ]
