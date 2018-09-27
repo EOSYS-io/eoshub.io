@@ -75,7 +75,7 @@ import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , QuantityStatus(..)
-        , VerificaitonRequestStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateQuantity
         )
@@ -866,7 +866,7 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
             ++ "%)"
 
 
-setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> VerificaitonRequestStatus -> ( BuyModel, Cmd Message )
+setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
 setBuyFormField field ({ params } as buyModel) availableQuantity val requestStatus =
     case field of
         BuyQuantity ->
@@ -906,7 +906,7 @@ setSellFormField ({ params, byteUnitIndex, byteUnits } as sellModel) availableRa
         availableRam
 
 
-validateBuy : BuyModel -> Float -> VerificaitonRequestStatus -> ( BuyModel, Cmd Message )
+validateBuy : BuyModel -> Float -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
 validateBuy ({ params, proxyBuy } as buyModel) availableQuantity requestStatus =
     let
         { receiver, quant } =

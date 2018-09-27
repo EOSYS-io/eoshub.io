@@ -26,7 +26,7 @@ import Util.Validation as Validation
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
-        , VerificaitonRequestStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -272,7 +272,7 @@ setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
             validate { model | transfer = { transfer | memo = value } } eosLiquidAmount NotSent
 
 
-validate : Model -> Float -> VerificaitonRequestStatus -> ( Model, Cmd Message )
+validate : Model -> Float -> VerificationRequestStatus -> ( Model, Cmd Message )
 validate ({ transfer } as model) eosLiquidAmount requestStatus =
     let
         { to, quantity, memo } =

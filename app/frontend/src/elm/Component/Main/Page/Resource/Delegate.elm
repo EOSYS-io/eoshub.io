@@ -53,12 +53,13 @@ import Util.Formatter
         , formatAsset
         , larimerToEos
         )
-import Util.HttpRequest exposing (getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -129,6 +130,7 @@ initCmd query =
 
 type Message
     = OnFetchTableRows (Result Http.Error (List Row))
+    | OnFetchAccountToVerify (Result Http.Error Account)
     | CpuAmountInput String
     | NetAmountInput String
     | ReceiverInput String
@@ -152,6 +154,12 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
         OnFetchTableRows (Err str) ->
             ( model, Cmd.none )
 
+        OnFetchAccountToVerify (Ok _) ->
+            validate model eosLiquidAmount Validation.Succeed
+
+        OnFetchAccountToVerify (Err _) ->
+            validate model eosLiquidAmount Validation.Fail
+
         CpuAmountInput value ->
             let
                 total =
@@ -167,7 +175,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validate newModel eosLiquidAmount Validation.NotSent
 
         NetAmountInput value ->
             let
@@ -184,7 +192,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validate newModel eosLiquidAmount Validation.NotSent
 
         ReceiverInput value ->
             let
@@ -196,7 +204,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                             }
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validate newModel eosLiquidAmount Validation.NotSent
 
         ClickCpuPercentage percentageOfResource ->
             let
@@ -221,7 +229,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfCpu = percentageOfResource
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validate newModel eosLiquidAmount Validation.NotSent
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -246,7 +254,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfNet = percentageOfResource
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validate newModel eosLiquidAmount Validation.NotSent
 
         SubmitAction ->
             let
@@ -284,7 +292,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                                     }
                             }
                     in
-                    ( validate newModel eosLiquidAmount, Cmd.none )
+                    validate newModel eosLiquidAmount Validation.NotSent
 
                 _ ->
                     let
@@ -460,11 +468,20 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation total
     ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid )
 
 
-validate : Model -> Float -> Model
-validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+validate : Model -> Float -> VerificationRequestStatus -> ( Model, Cmd Message )
+validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount requestStatus =
     let
         accountValidation =
-            validateAccount delegatebw.receiver Validation.NotSent
+            validateAccount delegatebw.receiver requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                delegatebw.receiver
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
 
         cpuQuantityValidation =
             validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
@@ -485,13 +502,15 @@ validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
                 && isTotalValid
                 && isAccountValid
     in
-    { model
+    ( { model
         | totalQuantityValidation = totalQuantityValidation
         , cpuQuantityValidation = cpuQuantityValidation
         , netQuantityValidation = netQuantityValidation
         , accountValidation = accountValidation
         , isFormValid = isFormValid
-    }
+      }
+    , accountCmd
+    )
 
 
 validateText : Model -> ( String, String )

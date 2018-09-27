@@ -52,7 +52,6 @@ import Util.Validation as Validation
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
-        , validateAccount
         , validateMemo
         , validateQuantity
         )
