@@ -3,11 +3,13 @@ module Component.Main.Page.Vote exposing
     , Model
     , initCmd
     , initModel
+    , subscriptions
     , update
     , view
     )
 
 import Data.Account exposing (Account)
+import Data.Action exposing (encodeAction)
 import Data.Json
     exposing
         ( Producer
@@ -57,7 +59,8 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( class
+        ( checked
+        , class
         , disabled
         , for
         , id
@@ -67,9 +70,12 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onWithOptions, targetChecked)
 import Http
+import Json.Decode
+import Port
 import Round
+import Set exposing (Set)
 import Task
 import Time exposing (Time)
 import Translation exposing (Language)
@@ -98,6 +104,10 @@ type Message
     | OnTime Time.Time
     | ExpandProducers
     | OnSearchInput String
+    | SubmitVoteProxyAction
+    | SubmitVoteProducersAction
+    | OnToggleProducer String Bool
+    | UpdateVoteData Time.Time
 
 
 
@@ -114,6 +124,7 @@ type alias Model =
     , proxies : List String
     , producersLimit : Int
     , searchInput : String
+    , producerNamesToVote : Set String
     }
 
 
@@ -128,6 +139,7 @@ initModel =
     , proxies = []
     , producersLimit = 100
     , searchInput = ""
+    , producerNamesToVote = Set.empty
     }
 
 
@@ -181,8 +193,8 @@ initCmd flags =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ producersLimit } as model) _ =
+update : Message -> Model -> Flags -> Account -> ( Model, Cmd Message )
+update message ({ producersLimit, producerNamesToVote } as model) flags { accountName } =
     case message of
         SwitchTab newTab ->
             ( { model | tab = newTab }, Cmd.none )
@@ -228,6 +240,53 @@ update message ({ producersLimit } as model) _ =
         OnSearchInput searchInput ->
             ( { model | searchInput = searchInput |> String.toLower }, Cmd.none )
 
+        SubmitVoteProxyAction ->
+            let
+                params =
+                    Data.Action.VoteproducerParameters accountName eosysProxyAccount []
+            in
+            ( model
+            , params
+                |> Data.Action.Voteproducer
+                |> encodeAction
+                |> Port.pushAction
+            )
+
+        SubmitVoteProducersAction ->
+            let
+                params =
+                    Data.Action.VoteproducerParameters accountName "" (producerNamesToVote |> Set.toList)
+            in
+            ( model
+            , params
+                |> Data.Action.Voteproducer
+                |> encodeAction
+                |> Port.pushAction
+            )
+
+        OnToggleProducer owner check ->
+            if check then
+                if Set.size producerNamesToVote >= 30 then
+                    ( model, Cmd.none )
+
+                else
+                    ( { model | producerNamesToVote = Set.insert owner producerNamesToVote }, Cmd.none )
+
+            else
+                ( { model | producerNamesToVote = Set.remove owner producerNamesToVote }, Cmd.none )
+
+        UpdateVoteData _ ->
+            ( model
+            , Cmd.batch
+                [ getGlobalTable
+                , getTokenStatTable
+                , getProducers flags
+                , getRecentVoteStat flags
+                , getNow
+                , getProxyAccount eosysProxyAccount
+                ]
+            )
+
 
 
 -- VIEW
@@ -266,7 +325,7 @@ view _ ({ tab, now } as model) =
 
 
 voteView : Model -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput } now =
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -296,7 +355,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
         producersView =
             filteredProducers
                 |> List.take producersLimit
-                |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds))
+                |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds) producerNamesToVote)
 
         viewMoreButton =
             if List.length filteredProducers > producersLimit then
@@ -358,8 +417,12 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                         [ text "득표" ]
                     , th [ scope "col" ]
                         [ span [ class "count" ]
-                            [ text "0/30" ]
-                        , button [ class "vote ok button", disabled True, type_ "button" ]
+                            [ text ((producerNamesToVote |> Set.size |> toString) ++ "/30") ]
+                        , button
+                            [ class "vote ok button"
+                            , type_ "button"
+                            , onClick SubmitVoteProducersAction
+                            ]
                             [ text "투표" ]
                         ]
                     ]
@@ -371,8 +434,8 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
     ]
 
 
-producerTableRow : Float -> Float -> Producer -> Html Message
-producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank } =
+producerTableRow : Float -> Float -> Set String -> Producer -> Html Message
+producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank } =
     let
         ( upDownClass, delta ) =
             if rank < prevRank then
@@ -395,6 +458,20 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 |> formatWithUsLocale 4
             )
                 ++ " EOS"
+
+        checkBoxValue =
+            Set.member owner producerNamesToVote
+
+        -- To prevent default browser action, redefine onCheck function.
+        onCheck tagger =
+            onWithOptions "click"
+                { stopPropagation = True
+                , preventDefault = True
+                }
+                (Json.Decode.map
+                    tagger
+                    targetChecked
+                )
     in
     tr []
         [ td []
@@ -417,9 +494,15 @@ producerTableRow totalVotedEos now { owner, totalVotes, country, rank, prevRank 
                 [ text formattedEos ]
             ]
         , td []
-            [ input [ id "eos-1", type_ "checkbox" ]
+            [ input
+                [ id owner
+                , type_ "checkbox"
+                , onCheck <|
+                    OnToggleProducer owner
+                , checked checkBoxValue
+                ]
                 []
-            , label [ for "eos-1" ]
+            , label [ for owner ]
                 []
             ]
         ]
@@ -446,7 +529,11 @@ proxyView { voteStat, producers, proxies } =
                 [ text "Vote Philosophy" ]
             , p []
                 [ text "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own." ]
-            , button [ class "ok button", type_ "button" ]
+            , button
+                [ class "ok button"
+                , type_ "button"
+                , onClick SubmitVoteProxyAction
+                ]
                 [ text "대리투표 하기" ]
             ]
         ]
@@ -498,6 +585,15 @@ producerSimplifiedView producers accountName =
         , span []
             [ text country ]
         ]
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Sub Message
+subscriptions =
+    Time.every (3 * Time.minute) UpdateVoteData
 
 
 

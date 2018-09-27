@@ -446,7 +446,7 @@ update message ({ page, notification, header, sidebar } as model) flags =
         ( VoteMessage subMessage, VotePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Vote.update subMessage subModel flags
+                    Vote.update subMessage subModel flags sidebar.account
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
@@ -583,6 +583,9 @@ subscriptions { sidebar, page } =
         , case page of
             RammarketPage _ ->
                 Sub.map RammarketMessage Rammarket.subscriptions
+
+            VotePage _ ->
+                Sub.map VoteMessage Vote.subscriptions
 
             _ ->
                 Sub.none
