@@ -264,14 +264,20 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         OnFetchAccountToVerify (Ok _) ->
             let
                 ( newBuyModel, _ ) =
-                    setBuyFormField ProxyAccount buyModel availableEos buyModel.params.receiver Validation.Succeed
+                    validateBuy
+                        buyModel
+                        availableEos
+                        Validation.Succeed
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
 
         OnFetchAccountToVerify (Err _) ->
             let
                 ( newBuyModel, _ ) =
-                    setBuyFormField ProxyAccount buyModel availableEos buyModel.params.receiver Validation.Fail
+                    validateBuy
+                        buyModel
+                        availableEos
+                        Validation.Fail
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
 
@@ -611,7 +617,14 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
             if isBuyTab then
                 ( " ing"
                 , ""
-                , a [ onClick ToggleModal ] [ text "타계정 구매" ]
+                , a
+                    (if not buyModel.proxyBuy then
+                        [ onClick ToggleModal ]
+
+                     else
+                        []
+                    )
+                    [ text "타계정 구매" ]
                 , "구매하기"
                 , "EOS"
                 , TypeEosAmount
@@ -863,23 +876,10 @@ setBuyFormField field ({ params } as buyModel) availableQuantity val requestStat
                 requestStatus
 
         ProxyAccount ->
-            let
-                ( { accountValidation, isValid } as newBuyModel, newCmd ) =
-                    validateBuy
-                        { buyModel | params = { params | receiver = val } }
-                        availableQuantity
-                        requestStatus
-            in
-            if accountValidation /= InvalidAccount && accountValidation /= InexistentAccount then
-                ( newBuyModel, newCmd )
-
-            else
-                ( { buyModel
-                    | accountValidation = accountValidation
-                    , isValid = isValid
-                  }
-                , Cmd.none
-                )
+            validateBuy
+                { buyModel | params = { params | receiver = val } }
+                availableQuantity
+                requestStatus
 
 
 setSellFormField : SellModel -> Int -> String -> SellModel
