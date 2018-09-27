@@ -71,9 +71,6 @@ type Message
 
 
 -- VIEW
--- Note(heejae): Current url change logic is so messy.
--- Refactor url change logic using Navigation.urlUpdate.
--- See details of this approach from https://github.com/sircharleswatson/elm-navigation-example
 -- TODO(heejae): Consider making nav as a separate component.
 
 
