@@ -26,4 +26,12 @@ class ApplicationController < ActionController::Base
     return redirect_to new_admin_user_confirmation_path unless current_admin_user.confirmed?
     redirect_back(fallback_location: admin_root_path)
   end
+
+  def after_sign_out_path_for(resource_or_scope)
+    if resource_or_scope == :admin_user
+      new_admin_user_session_path
+    else
+      root_path
+    end
+  end
 end
