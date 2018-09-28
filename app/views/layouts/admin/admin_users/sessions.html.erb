@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>EoshubIo</title>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag    'active_admin', media: 'all' %>
+    <%= javascript_include_tag 'active_admin' %>
+  </head>
+
+  <body class="active_admin logged_out new">
+    <div id="wrapper">
+      <div id="content_wrapper">
+        <div id="active_admin_content">
+          <div id="login">
+            <p class="notice"><%= notice %></p>
+            <p class="alert"><%= alert %></p>
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
