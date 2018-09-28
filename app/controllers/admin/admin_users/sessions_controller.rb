@@ -1,5 +1,5 @@
 module Admin::AdminUsers
   class SessionsController < Devise::SessionsController
-    layout 'admin/admin_users/sessions'
+    include ::ActiveAdmin::Devise::Controller
   end
 end
