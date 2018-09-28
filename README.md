@@ -18,6 +18,9 @@ Alpha: [![Build Status](https://travis-ci.org/EOSYS-io/eoshub.io.svg?branch=alph
   brew services start postgresql
   ```
 - Redis - https://redis.io/topics/quickstart
+  ```
+  brew install redis
+  ```
 
 ## Setup
 ```
@@ -54,6 +57,12 @@ execute sidekiq for a cron jobs.
 ```  
 bundle exec sidekiq RAILS_ENV=<env>  
 ```  
+
+for voting page crawling
+```
+redis-sever
+sidekiq RAILS_ENV=development &
+```
 
 
 ## Test
