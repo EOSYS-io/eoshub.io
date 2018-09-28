@@ -26,7 +26,8 @@ ko:
         unlock_token: "잠금해제 토큰"
         updated_at: "업데이트된 시간"
     models:
-      admin_user: "사용자"
+      user: "사용자"
+      admin_user: "어드민 사용자"
   devise:
     confirmations:
       confirmed: "이메일 주소가 성공적으로 인증되었습니다."
