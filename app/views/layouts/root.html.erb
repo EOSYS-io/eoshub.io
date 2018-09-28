@@ -4,13 +4,12 @@
     <title>EoshubIo</title>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-	<%= stylesheet_link_tag    'application', media: 'all' %>
-	<%= stylesheet_pack_tag 'index', media: 'all' %>
+    
+    <%= stylesheet_pack_tag 'index', media: 'all' %>
+    <%= javascript_pack_tag 'index' %>
   </head>
 
   <body>
     <%= yield %>
   </body>
-  <%= javascript_include_tag 'application' %>
-  <%= javascript_pack_tag 'index' %>
 </html>
