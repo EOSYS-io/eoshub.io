@@ -37,6 +37,7 @@ main.index {
 			> a {
 				margin:6px;
 				display:block;
+				border-radius: 4px;
 			}
 
 			div.greeting {
@@ -53,7 +54,6 @@ main.index {
 				background-repeat:no-repeat;
 				background-size:22px 22px;
 
-				border-radius: 4px;
 
 				position:relative;
 				transition:box-shadow 0.4s;

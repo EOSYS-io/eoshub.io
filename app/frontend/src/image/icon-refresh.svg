@@ -3,20 +3,66 @@
     <!-- Generator: sketchtool 51 (57462) - http://www.bohemiancoding.com/sketch -->
     <title>BE1B8F2C-8BA8-4ADD-AA95-C6285C1CD7AD</title>
     <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <g id="icon_refresh">
-            <g id="recycle_hoso" transform="translate(2.000000, 2.000000)">
-                <g id="Rectangle">
-                    <rect id="Rectangle-path" x="0" y="0" width="19" height="19"></rect>
+	<defs>
+		<style>
+			g[fill] > g { display: none }
+
+			g:target g,
+			g:target { display: inline !important }
+
+			#base {
+				display:inline;
+			}
+
+			g:target ~ #base {
+				display:none;
+			}
+		</style>
+	</defs>
+    <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+
+        <g id="white">
+            <g transform="translate(2.000000, 2.000000)">
+                <g>
+                    <rect x="0" y="0" width="19" height="19"></rect>
                 </g>
-                <g id="icon_data" transform="translate(2.000000, 2.000000)" stroke="#999999" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline id="Shape" points="4.27777778 11.0526316 0.777777778 11.0526316 0.777777778 14.6052632"></polyline>
-                    <polyline id="Shape" points="9.72222222 3.94736842 13.2222222 3.94736842 13.2222222 0.394736842"></polyline>
-                    <path d="M14.0000001,7.5 C14.0004705,10.716305 11.8723519,13.5318281 8.81165576,14.3642334 C5.75095962,15.1966387 2.52107971,13.8383091 0.937222222,11.0526316" id="Shape"></path>
-                    <path d="M-7.80134467e-08,7.5 C-0.0004705389,4.28369502 2.12764811,1.4681719 5.18834424,0.635766581 C8.24904038,-0.196638741 11.4789203,1.16169087 13.0627778,3.94736842" id="Shape"></path>
+                <g transform="translate(2.000000, 2.000000)" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4.27777778 11.0526316 0.777777778 11.0526316 0.777777778 14.6052632"></polyline>
+                    <polyline points="9.72222222 3.94736842 13.2222222 3.94736842 13.2222222 0.394736842"></polyline>
+                    <path d="M14.0000001,7.5 C14.0004705,10.716305 11.8723519,13.5318281 8.81165576,14.3642334 C5.75095962,15.1966387 2.52107971,13.8383091 0.937222222,11.0526316"></path>
+                    <path d="M-7.80134467e-08,7.5 C-0.0004705389,4.28369502 2.12764811,1.4681719 5.18834424,0.635766581 C8.24904038,-0.196638741 11.4789203,1.16169087 13.0627778,3.94736842"></path>
                 </g>
             </g>
         </g>
+
+        <g id="dark-gray">
+            <g transform="translate(2.000000, 2.000000)">
+                <g>
+                    <rect x="0" y="0" width="19" height="19"></rect>
+                </g>
+                <g transform="translate(2.000000, 2.000000)" stroke="#5d5d5d" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4.27777778 11.0526316 0.777777778 11.0526316 0.777777778 14.6052632"></polyline>
+                    <polyline points="9.72222222 3.94736842 13.2222222 3.94736842 13.2222222 0.394736842"></polyline>
+                    <path d="M14.0000001,7.5 C14.0004705,10.716305 11.8723519,13.5318281 8.81165576,14.3642334 C5.75095962,15.1966387 2.52107971,13.8383091 0.937222222,11.0526316"></path>
+                    <path d="M-7.80134467e-08,7.5 C-0.0004705389,4.28369502 2.12764811,1.4681719 5.18834424,0.635766581 C8.24904038,-0.196638741 11.4789203,1.16169087 13.0627778,3.94736842"></path>
+                </g>
+            </g>
+        </g>
+
+		<!-- basement color/shape -->
+		<g id="base">
+            <g transform="translate(2.000000, 2.000000)">
+                <g>
+                    <rect x="0" y="0" width="19" height="19"></rect>
+                </g>
+                <g transform="translate(2.000000, 2.000000)" stroke="#999999" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4.27777778 11.0526316 0.777777778 11.0526316 0.777777778 14.6052632"></polyline>
+                    <polyline points="9.72222222 3.94736842 13.2222222 3.94736842 13.2222222 0.394736842"></polyline>
+                    <path d="M14.0000001,7.5 C14.0004705,10.716305 11.8723519,13.5318281 8.81165576,14.3642334 C5.75095962,15.1966387 2.52107971,13.8383091 0.937222222,11.0526316"></path>
+                    <path d="M-7.80134467e-08,7.5 C-0.0004705389,4.28369502 2.12764811,1.4681719 5.18834424,0.635766581 C8.24904038,-0.196638741 11.4789203,1.16169087 13.0627778,3.94736842"></path>
+                </g>
+            </g>
+        </g>
+
     </g>
 </svg>

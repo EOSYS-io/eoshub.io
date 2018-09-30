@@ -42,7 +42,8 @@ a.button {
 	&.choice,
 	&.tab,
 	&.login,
-	&.go.main {
+	&.go.main,
+	&.copy {
 		line-height:50px;
 		height: 52px;
 	}
@@ -57,7 +58,8 @@ a.button {
 
 	&.undo,
 	&.choice,
-	&.join {
+	&.join,
+	&.copy {
 		border:1px solid $gray;
 	}
 
@@ -77,10 +79,9 @@ a.button {
 		cursor:not-allowed;
 	}
 
-	// 더 보기
-	//
 	&.select,
-	&.view_more {
+	&.view_more,
+	&.action {
 		padding:0 40px;
 		height: 52px;
 		border-radius: 2px;
