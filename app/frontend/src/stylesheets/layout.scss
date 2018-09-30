@@ -228,10 +228,16 @@ aside.shrink {
         p {
             margin:0;
             color:#fff;
+
+			+ p {
+				font-size:$x-small;
+				font-weight:$light;
+				margin-top:3px;
+			}
         }
 
         a {
-            font-size:rem(13);
+            font-size:$small;
             color:#fff;
         }
 
@@ -302,6 +308,21 @@ aside.shrink {
 	}
 	@include media ('<=1280px') {
 		left:calc(240px + #{$lnb_width});
+	}
+
+	// 가입 프로세스
+	main.join + & {
+		left:0;
+	}
+
+	p {
+		line-height:1.6;
+
+		> strong {
+			color:$white;
+			font-weight:$light;
+			margin-right:0.1em;
+		}
 	}
 
 	// superset
@@ -623,7 +644,7 @@ aside.shrink {
 
 			&:after {
 				content:'';
-				displayL:block;
+				display:block;
 				width:22px;
 				height:22px;
 
@@ -789,6 +810,44 @@ aside.shrink {
 		}
 	}
 
+}
+
+.modal.popup.virtual_account_check {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+	dl {
+		margin: 32px;
+		background-color:$xxx-dark-gray;
+		display:grid;
+		grid-template-columns:50% 50%;
+		padding:12px 24px;
+		font-size:$small;
+
+		* {
+			padding:6px 0;
+		}
+		dt {
+			color:$white;
+			text-align:left;
+		}
+		dd {
+			text-align:right;
+			word-break:break-all;
+		}
+	}
+
+	dl + .btn_area {
+		margin:16px 32px;
+		display:flex;
+		button {
+			flex:1;
+			&:first-child {
+				margin-right:8px;
+			}
+		}
+	}
 }
 
 
