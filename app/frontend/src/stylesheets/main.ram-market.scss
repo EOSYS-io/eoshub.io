@@ -24,9 +24,7 @@ main.ram_market {
 
 
 		.ram.status {
-			background-color:$xx-dark-gray;
 
-			padding:32px;
 			box-sizing:border-box;
 
 			flex:1;
@@ -38,7 +36,7 @@ main.ram_market {
 			.wrapper {
 				margin-left:8px;
 				padding:24px;
-				background-color:$xxx-dark-gray;
+				background-color:$xx-dark-gray;
 
 				&:first-child {
 					margin:0;
@@ -47,7 +45,7 @@ main.ram_market {
 
 			.graph {
 				margin-top:8px;
-				background-color:$xxx-dark-gray;
+				background-color:$xx-dark-gray;
 				grid-column-start:1;
 				grid-column-end:4;
 			}
@@ -65,9 +63,9 @@ main.ram_market {
 
 			.summary {
 				background-color:$xx-dark-gray;
-				padding:35px 32px;
+				padding:24px;
 				box-sizing:border-box;
-				height:138px;
+				height:86px;
 
 				h3 span {
 					display:block;
@@ -174,28 +172,18 @@ main.ram_market {
 
 					display:flex;
 					justify-content:space-between;
-					align-items:center;
 
-					div.select.period  {
+					div.available  {
 						flex:1;
 
-						border-radius: 2px;
-						border:1px solid $x-dark-gray;
-
-						color:$gray;
-						background-color:transparent;
-
-						display:flex;
-
-						height: 40px;
-
-						align-items:center;
-						justify-content:space-between;
-
-						padding-left:16px;
-						padding-right:8px;
 						color:$white;
 						font-size:$small;
+
+						strong {
+							margin-top:4px;
+							display:block;
+							color:$gray;
+						}
 
 						button.button {
 							width:16px;
@@ -266,7 +254,7 @@ main.ram_market {
 					> div {
 						display:flex;
 
-						&:last-child {
+						&:nth-of-type(2) {
 							padding-top:8px;
 							border-top:1px solid $x-dark-gray;
 						}
@@ -288,13 +276,28 @@ main.ram_market {
 							}
 						}
 					}
+
+					> div.amount {
+						font-size:$x-small;
+						padding:12px 0 20px;
+						&:before {
+							content:'=';
+							margin-right:0.5em;
+						}
+					}
 				}
 
 				div.btn_area {
-					margin:32px;
+					margin:24px 32px;
 					button {
 						width:100%;
 					}
+				}
+
+				p.description {
+					margin:16px 0 0 0;
+					text-align:center;
+					font-size:$x-small;
 				}
 			}
 		}
