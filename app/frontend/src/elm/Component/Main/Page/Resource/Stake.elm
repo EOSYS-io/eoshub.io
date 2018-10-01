@@ -377,8 +377,6 @@ viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model)
                     , strong []
                         [ text (stakeAmountModal.totalQuantity ++ " EOS") ]
                     ]
-                , button [ class "set auto button", type_ "button" ]
-                    [ text "자동 분배" ]
                 ]
             , div [ class "form container" ]
                 [ h3 []
