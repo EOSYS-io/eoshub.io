@@ -352,7 +352,8 @@ aside.shrink {
 		background-color:$x-dark-gray;
 
 		position:absolute;
-		top:calc(#{$header_height} + 61px + 100px);		// 대충 중간...
+		top:calc(50% + 61px/2);
+		// top:calc(#{$header_height} + 61px + 100px);		// 대충 중간...
 		left:50%;
 		min-width:386px;
 		width:30.15625%;
@@ -361,6 +362,7 @@ aside.shrink {
 
 		padding:32px 0;
 		box-sizing:border-box;
+		z-index:100;
 	}
 
 	//layout for scroll area
@@ -524,7 +526,7 @@ aside.shrink {
 
 	.wrapper {
 		transition:transform 0.4s;
-		transform:translate(-50%, -10%);
+		transform:translate(-50%, -60%);
 	}
 
 	&.viewing {
@@ -532,7 +534,7 @@ aside.shrink {
 		visibility:visible;
 
 		.wrapper {
-			transform:translate(-50%, 0);
+			transform:translate(-50%, -50%);
 		}
 	}
 
