@@ -6,7 +6,10 @@ module Component.Main.MainComponent exposing
     , Page(..)
     , PublicKeyQuery
     , Query(..)
+    , SelectedNav(..)
+    , getNavClass
     , getPage
+    , getPageNav
     , initCmd
     , initModel
     , pageCmd
@@ -95,6 +98,7 @@ type alias Model =
     , notification : Notification.Model
     , header : Header
     , sidebar : Sidebar.Model
+    , selectedNav : SelectedNav
     }
 
 
@@ -110,6 +114,7 @@ initModel location =
         , language = Korean
         }
     , sidebar = Sidebar.initModel
+    , selectedNav = NothingNav
     }
 
 
@@ -146,6 +151,14 @@ type alias AccountQuery =
 
 type alias PublicKeyQuery =
     String
+
+
+type SelectedNav
+    = TransferNav
+    | VoteNav
+    | ResourceNav
+    | RammarketNav
+    | NothingNav
 
 
 initCmd : Location -> Flags -> Cmd Message
@@ -207,7 +220,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar } =
+view { page, header, notification, sidebar, selectedNav } =
     let
         { language } =
             header
@@ -318,7 +331,7 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "transfer"
+                            , class ("transfer" ++ getNavClass selectedNav TransferNav)
                             , onClick (ChangeUrl "/transfer")
                             ]
                             [ text (translate language Translation.Transfer) ]
@@ -330,7 +343,7 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "vote"
+                            , class ("vote" ++ getNavClass selectedNav VoteNav)
                             , onClick (ChangeUrl "/vote")
                             ]
                             [ text (translate language Translation.Vote) ]
@@ -342,7 +355,7 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "resource"
+                            , class ("resource" ++ getNavClass selectedNav ResourceNav)
                             , onClick (ChangeUrl "/resource")
                             ]
                             [ text (translate language Translation.ManageResource) ]
@@ -353,7 +366,7 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "ram_market"
+                            , class ("ram_market" ++ getNavClass selectedNav RammarketNav)
                             , onClick (ChangeUrl "/rammarket")
                             ]
                             [ text (translate language Translation.RamMarket) ]
@@ -490,6 +503,9 @@ update message ({ page, notification, header, sidebar } as model) flags =
                 newPage =
                     getPage location
 
+                newSelectedNav =
+                    getPageNav location.pathname
+
                 cmd =
                     if newComponent then
                         initCmd location flags
@@ -497,7 +513,7 @@ update message ({ page, notification, header, sidebar } as model) flags =
                     else
                         updateCmd location flags
             in
-            ( { model | page = newPage }, cmd )
+            ( { model | page = newPage, selectedNav = newSelectedNav }, cmd )
 
         ( InputSearch value, _ ) ->
             ( { model | header = { header | searchInput = value } }, Cmd.none )
@@ -629,3 +645,31 @@ getPage location =
 
         _ ->
             NotFoundPage
+
+
+getPageNav : String -> SelectedNav
+getPageNav pathname =
+    case pathname of
+        "/transfer" ->
+            TransferNav
+
+        "/vote" ->
+            VoteNav
+
+        "/resource" ->
+            ResourceNav
+
+        "/rammarket" ->
+            RammarketNav
+
+        _ ->
+            NothingNav
+
+
+getNavClass : SelectedNav -> SelectedNav -> String
+getNavClass modelSelectedNav thisSelectedNav =
+    if modelSelectedNav == thisSelectedNav then
+        " viewing"
+
+    else
+        ""
