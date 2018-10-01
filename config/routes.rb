@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
-  devise_for :admin_users, ActiveAdmin::Devise.config.merge(controllers: { confirmations: "admin/admin_users/confirmations" })
+  devise_for :admin_users, ActiveAdmin::Devise.config.merge(controllers: { confirmations: "admin/admin_users/confirmations",
+                                                                           sessions: "admin/admin_users/sessions" })
   ActiveAdmin.routes(self)
+
   root to: 'root#index'
   get 'health_check.html', to: proc{[200, {}, ['<html><head></head><body>HealthCheck OK</body></html>']]}
 
