@@ -271,7 +271,7 @@ main.search {
 			td.info {
 				width:52.184179%;
 				position:relative;
-				padding-right:40px;
+				padding-right:60px;
 				word-break:break-all;
 
 				span.memo.popup {
@@ -284,15 +284,17 @@ main.search {
 					overflow:hidden;
 					position:absolute;
 					top:50%;
-					right:12px;
+					right:30px;
 					margin-top:calc(-#{$padding} / 2);
 
 					> span {
 						display:block;
 					}
+
 					button {
 						@include ir();
-						background:url('../image/icon-close-plus.svg');
+						background:url('../image/icon-memo.svg') center center no-repeat;
+						background-size:18px;
 						height:20px;
 						width:20px;
 						transition:transform 0.1s;
@@ -334,12 +336,14 @@ main.search {
 							font-size: $small;
 							color: $white;
 							margin-bottom:16px;
+							background-size:20px;
 						}
 
 						button {
 							right:16px;
 							top:17px;
 							position:absolute;
+							background-image:url('../image/icon-close-plus.svg');
 							transform:rotate(45deg);
 						}
 
