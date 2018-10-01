@@ -32,15 +32,8 @@ view language =
                         ]
                     , p
                         []
-                        [ a [] [ text "이오스 허브 사용법 보기" ]
+                        [ a [] [ text (translate language HowToUseEosHub) ]
                         ]
-                    ]
-                , a
-                    [ onClick (ChangeUrl "/resource")
-                    , class "card resource"
-                    ]
-                    [ h3 [] [ text "리소스 관리" ]
-                    , p [] [ text "이오스 동작을 위한 리소스를 관리합니다." ]
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -50,27 +43,26 @@ view language =
                     , p [] [ text (translate language TransferHereDesc) ]
                     ]
                 , a
-                    [ onClick (ChangeUrl "/rammarket")
-                    , class "card ram_market"
-                    ]
-                    [ h3 [] [ text (translate language RamMarket) ]
-                    , p [] [ text (translate language RamMarketDesc) ]
-                    ]
-                , a
                     [ onClick (ChangeUrl "/vote")
                     , class "card vote"
                     ]
                     [ h3 [] [ text (translate language Vote) ]
                     , p [] [ text (translate language VoteDesc) ]
                     ]
+                , a
+                    [ onClick (ChangeUrl "/resource")
+                    , class "card resource"
+                    ]
+                    [ h3 [] [ text (translate language ManageResource) ]
+                    , p [] [ text (translate language ManageResourceDesc) ]
+                    ]
+                , a
+                    [ onClick (ChangeUrl "/rammarket")
+                    , class "card ram_market"
+                    ]
+                    [ h3 [] [ text (translate language RamMarket) ]
+                    , p [] [ text (translate language RamMarketDesc) ]
+                    ]
                 ]
-            ]
-        , section [ class "dapps" ]
-            [ h2 [] [ text "최신 이오스 디앱" ]
-            , p [] [ text "업데이트되는 다양한 이오스 디앱들을 만나보세요" ]
-            , div [ class "rolling banner" ]
-                [ text "Comming Soon"
-                ]
-            , a [ class "view more" ] [ text " 더 보기" ]
             ]
         ]

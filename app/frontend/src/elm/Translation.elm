@@ -58,6 +58,7 @@ type I18n
     | OpenCloseSidebar
     | Hello
     | WelcomeEosHub
+    | HowToUseEosHub
     | IfYouHaveEos
     | IfYouAreNew
     | AttachableWallet1
@@ -77,6 +78,8 @@ type I18n
     | WhatIsStaking
     | Transfer
     | TransferHereDesc
+    | ManageResource
+    | ManageResourceDesc
     | Vote
     | VoteDesc
     | RamMarket
@@ -232,6 +235,12 @@ getMessages i18n =
             , chinese = "欢迎使用eoshub"
             }
 
+        HowToUseEosHub ->
+            { korean = "이오스허브 사용법 보기"
+            , english = "How to use eoshub"
+            , chinese = "查看eoshub使用说明"
+            }
+
         IfYouHaveEos ->
             { korean = "이오스 계정이 있으시면 로그인을,"
             , english = "If you have an EOS account, sign in"
@@ -344,6 +353,18 @@ getMessages i18n =
             { korean = "여기서 토큰을 보내실 수 있어요"
             , english = "Send tokens here"
             , chinese = "去传送代币"
+            }
+
+        ManageResource ->
+            { korean = "리소스 관리"
+            , english = "Manage Resource"
+            , chinese = "管理资源"
+            }
+
+        ManageResourceDesc ->
+            { korean = "CPU, 네트워크 자원관리를 하실 수 있어요"
+            , english = "Manage CPU, Network"
+            , chinese = "在这儿可以管理CPU和网络资源"
             }
 
         Vote ->

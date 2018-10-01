@@ -318,35 +318,12 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "resource"
-                            , onClick (ChangeUrl "/resource")
-                            ]
-                            [ text "리소스 관리" ]
-                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
-                            [ text "리소스 관리" ]
-                        ]
-                    , li
-                        []
-                        [ a
-                            [ rel "nofollow"
                             , class "transfer"
                             , onClick (ChangeUrl "/transfer")
                             ]
                             [ text (translate language Translation.Transfer) ]
                         , span [ class "tooltip", attribute "aria-hidden" "true" ]
                             [ text (translate language Translation.Transfer)
-                            ]
-                        ]
-                    , li
-                        []
-                        [ a
-                            [ rel "nofollow"
-                            , class "ram_market"
-                            , onClick (ChangeUrl "/rammarket")
-                            ]
-                            [ text (translate language Translation.RamMarket) ]
-                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
-                            [ text (translate language Translation.RamMarket)
                             ]
                         ]
                     , li
@@ -365,12 +342,23 @@ view { page, header, notification, sidebar } =
                         []
                         [ a
                             [ rel "nofollow"
-                            , class "dapps"
-                            , onClick (ChangeUrl "/dapps")
+                            , class "resource"
+                            , onClick (ChangeUrl "/resource")
                             ]
-                            [ text "Dapps" ]
+                            [ text (translate language Translation.ManageResource) ]
                         , span [ class "tooltip", attribute "aria-hidden" "true" ]
-                            [ text "Dapps"
+                            [ text (translate language Translation.ManageResource) ]
+                        ]
+                    , li
+                        []
+                        [ a
+                            [ rel "nofollow"
+                            , class "ram_market"
+                            , onClick (ChangeUrl "/rammarket")
+                            ]
+                            [ text (translate language Translation.RamMarket) ]
+                        , span [ class "tooltip", attribute "aria-hidden" "true" ]
+                            [ text (translate language Translation.RamMarket)
                             ]
                         ]
                     ]
