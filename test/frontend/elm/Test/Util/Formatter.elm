@@ -40,10 +40,10 @@ tests =
                 \() ->
                     Expect.equal "0.5000 EOS" (assetSubtract "1.0000 EOS" "0.5000 EOS")
             ]
-        , describe "unitConverterRound4"
+        , describe "unitConverterRound2"
             [ test "1024 -> 1k" <|
                 \() ->
-                    Expect.equal "1.0000" (unitConverterRound4 1024 kilo)
+                    Expect.equal "1.00" (unitConverterRound2 1024 kilo)
             ]
         , describe "percentageConverter"
             [ test "1/100 * 100 = 1%" <|
@@ -62,7 +62,7 @@ tests =
                     Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500': Invalid ISO 8601 format" (timeFormatter "2018-108-17T17:16:21.500")
             , test "no time, Err" <|
                 \() ->
-                    Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter  "")
+                    Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter "")
             ]
         , describe "deleteFromBack"
             [ test "remove 4 characters." <|

@@ -211,7 +211,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 KB", "0 bytes", "1.0000 KB", "0.00%", "hell" )
+                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", "hell" )
 
                         resourceType =
                             "net"
@@ -230,7 +230,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 MB", "0 bytes", "1.0000 MB", "0.00%", "hell" )
+                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", "hell" )
 
                         resourceType =
                             "net"
@@ -249,7 +249,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 GB", "0 bytes", "1.0000 GB", "0.00%", "hell" )
+                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", "hell" )
 
                         resourceType =
                             "net"
@@ -268,7 +268,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 TB", "0 bytes", "1.0000 TB", "0.00%", "hell" )
+                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", "hell" )
 
                         resourceType =
                             "net"
@@ -306,7 +306,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "4.3000 s", "0 ms", "4.3000 s", "0.00%", "hell" )
+                            ( "4.30 s", "0 ms", "4.30 s", "0.00%", "hell" )
 
                         resourceType =
                             "cpu"
@@ -325,7 +325,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "7.1667 min", "0 ms", "7.1667 min", "0.00%", "hell" )
+                            ( "7.17 min", "0 ms", "7.17 min", "0.00%", "hell" )
 
                         resourceType =
                             "cpu"
@@ -344,7 +344,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.1944 hour", "0 ms", "1.1944 hour", "0.00%", "hell" )
+                            ( "1.19 hour", "0 ms", "1.19 hour", "0.00%", "hell" )
 
                         resourceType =
                             "cpu"
@@ -363,7 +363,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "4.9769 day", "0 ms", "4.9769 day", "0.00%", "hell" )
+                            ( "4.98 day", "0 ms", "4.98 day", "0.00%", "hell" )
 
                         resourceType =
                             "cpu"
@@ -477,7 +477,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 KB", "0 bytes", "1.0000 KB", "0.00%", "hell" )
+                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", "hell" )
 
                         resourceType =
                             "ram"
@@ -496,7 +496,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 MB", "0 bytes", "1.0000 MB", "0.00%", "hell" )
+                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", "hell" )
 
                         resourceType =
                             "ram"
@@ -515,7 +515,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 GB", "0 bytes", "1.0000 GB", "0.00%", "hell" )
+                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", "hell" )
 
                         resourceType =
                             "ram"
@@ -534,7 +534,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.0000 TB", "0 bytes", "1.0000 TB", "0.00%", "hell" )
+                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", "hell" )
 
                         resourceType =
                             "ram"

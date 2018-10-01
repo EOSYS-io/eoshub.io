@@ -11,7 +11,7 @@ module Util.Formatter exposing
     , removeSymbolIfExists
     , resourceUnitConverter
     , timeFormatter
-    , unitConverterRound4
+    , unitConverterRound2
     )
 
 import Date.Extra as Date
@@ -19,7 +19,6 @@ import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
 import Regex exposing (..)
 import Round
-import Translation exposing (Language(..))
 import Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
 
 
@@ -68,9 +67,9 @@ assetSubtract a b =
         |> floatToAsset
 
 
-unitConverterRound4 : Int -> Int -> String
-unitConverterRound4 value unit =
-    Round.round 4 (toFloat value / toFloat unit)
+unitConverterRound2 : Int -> Int -> String
+unitConverterRound2 value unit =
+    Round.round 2 (toFloat value / toFloat unit)
 
 
 resourceUnitConverter : String -> Int -> String
@@ -83,19 +82,19 @@ resourceUnitConverter resourceType value =
                 -- KB
 
             else if (value >= kilo) && (value < mega) then
-                unitConverterRound4 value kilo ++ " KB"
+                unitConverterRound2 value kilo ++ " KB"
                 -- MB
 
             else if (value >= mega) && (value < giga) then
-                unitConverterRound4 value mega ++ " MB"
+                unitConverterRound2 value mega ++ " MB"
                 -- GB
 
             else if (value >= giga) && (value < tera) then
-                unitConverterRound4 value giga ++ " GB"
+                unitConverterRound2 value giga ++ " GB"
                 -- TB
 
             else
-                unitConverterRound4 value tera ++ " TB"
+                unitConverterRound2 value tera ++ " TB"
 
         "cpu" ->
             -- ms
@@ -104,19 +103,19 @@ resourceUnitConverter resourceType value =
                 -- second
 
             else if (value >= second) && (value < minute) then
-                unitConverterRound4 value second ++ " s"
+                unitConverterRound2 value second ++ " s"
                 -- minute
 
             else if (value >= minute) && (value < hour) then
-                unitConverterRound4 value minute ++ " min"
+                unitConverterRound2 value minute ++ " min"
                 -- hour
 
             else if (value >= hour) && (value < day) then
-                unitConverterRound4 value hour ++ " hour"
+                unitConverterRound2 value hour ++ " hour"
                 -- day
 
             else
-                unitConverterRound4 value day ++ " day"
+                unitConverterRound2 value day ++ " day"
 
         "ram" ->
             -- Bytes
@@ -125,19 +124,19 @@ resourceUnitConverter resourceType value =
                 -- KB
 
             else if (value >= kilo) && (value < mega) then
-                unitConverterRound4 value kilo ++ " KB"
+                unitConverterRound2 value kilo ++ " KB"
                 -- MB
 
             else if (value >= mega) && (value < giga) then
-                unitConverterRound4 value mega ++ " MB"
+                unitConverterRound2 value mega ++ " MB"
                 -- GB
 
             else if (value >= giga) && (value < tera) then
-                unitConverterRound4 value giga ++ " GB"
+                unitConverterRound2 value giga ++ " GB"
                 -- TB
 
             else
-                unitConverterRound4 value tera ++ " TB"
+                unitConverterRound2 value tera ++ " TB"
 
         _ ->
             ""
