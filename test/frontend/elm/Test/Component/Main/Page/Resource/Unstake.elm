@@ -3,6 +3,15 @@ module Test.Component.Main.Page.Resource.Unstake exposing (tests)
 import Component.Main.Page.Resource.Unstake exposing (..)
 import Expect
 import Test exposing (..)
+import Translation
+    exposing
+        ( I18n(..)
+        , Language(Chinese, English, Korean)
+        , getMessages
+        , toLanguage
+        , toLocale
+        , translate
+        )
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -242,9 +251,9 @@ tests =
                             defaultModel.minimumResource
 
                         expected =
-                            ( "CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.", "" )
+                            ( "", "" )
                     in
-                    Expect.equal expected (validateText defaultModel)
+                    Expect.equal expected (validateText Korean defaultModel)
             , test "cpu OverValidQuantity, net EmptyQuantity" <|
                 \() ->
                     let
@@ -257,9 +266,9 @@ tests =
                             defaultModel.minimumResource
 
                         expected =
-                            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+                            ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
-                    Expect.equal expected (validateText defaultModel)
+                    Expect.equal expected (validateText Korean defaultModel)
             , test "cpu EmptyQuantity, net OverValidQuantity" <|
                 \() ->
                     let
@@ -272,9 +281,9 @@ tests =
                             defaultModel.minimumResource
 
                         expected =
-                            ( "NET의 수량입력이 잘못되었습니다", " false" )
+                            ( "언스테이크 가능한 NET 수량을 초과하였습니다.", " false" )
                     in
-                    Expect.equal expected (validateText defaultModel)
+                    Expect.equal expected (validateText Korean defaultModel)
             , test "cpu OverValidQuantity, net OverValidQuantity" <|
                 \() ->
                     let
@@ -288,9 +297,9 @@ tests =
                             defaultModel.minimumResource
 
                         expected =
-                            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+                            ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
-                    Expect.equal expected (validateText defaultModel)
+                    Expect.equal expected (validateText Korean defaultModel)
             , test "cpu ValidQuantity, net ValidQuantity" <|
                 \() ->
                     let
@@ -306,6 +315,6 @@ tests =
                         expected =
                             ( "언스테이크 가능합니다 :)", " true" )
                     in
-                    Expect.equal expected (validateText defaultModel)
+                    Expect.equal expected (validateText Korean defaultModel)
             ]
         ]
