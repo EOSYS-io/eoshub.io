@@ -24,6 +24,12 @@ Rails.application.routes.draw do
 
   resources :payment_results, only: [:create]
 
+  resources :products, only: [] do
+    collection do
+      get 'eos_account'
+    end
+  end
+
   namespace :eos_ram_price_histories do
     get 'data'
   end
