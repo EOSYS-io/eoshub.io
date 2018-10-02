@@ -16,10 +16,10 @@ import Util.Validation
 
 model : Model
 model =
-    { accountValidation = AccountToBeVerified
+    { accountValidation = ValidAccount
     , quantityValidation = ValidQuantity
     , memoValidation = ValidMemo
-    , isFormValid = False
+    , isFormValid = True
     , transfer =
         { from = "from"
         , to = "to"
@@ -55,11 +55,6 @@ submitActionTest =
         \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from" 300.0)
 
 
-getModelAfterValidation : Model -> Model
-getModelAfterValidation model =
-    Tuple.first (validate model balance NotSent)
-
-
 tests : Test
 tests =
     describe "Transfer page module"
@@ -73,20 +68,17 @@ tests =
              [ test "To" <|
                 \() ->
                     Expect.equal
-                        ( { model
-                            | transfer = { transfer | to = "newTo" }
-                            , accountValidation = InvalidAccount
-                            , quantityValidation = ValidQuantity
-                          }
-                        , Cmd.none
-                        )
-                        (setTransferMessageField To "newTo" model balance)
+                        { model
+                            | transfer = { transfer | to = "newto" }
+                            , accountValidation = AccountToBeVerified
+                            , isFormValid = False
+                        }
+                        (Tuple.first (setTransferMessageField To "newto" model balance))
              , test "Quantity" <|
                 \() ->
                     Expect.equal
                         { model
                             | transfer = { transfer | quantity = "0.1" }
-                            , accountValidation = AccountToBeVerified
                             , quantityValidation = ValidQuantity
                         }
                         (Tuple.first
@@ -97,7 +89,6 @@ tests =
                     Expect.equal
                         { model
                             | transfer = { transfer | memo = "newMemo" }
-                            , accountValidation = AccountToBeVerified
                             , quantityValidation = ValidQuantity
                         }
                         (Tuple.first
@@ -110,33 +101,22 @@ tests =
                 { transfer } =
                     model
              in
-             [ describe "account"
-                [ test "EmptyAccount" <|
-                    \() ->
-                        Expect.equal
-                            ( { model
-                                | transfer = { transfer | to = "" }
-                                , accountValidation = EmptyAccount
-                              }
-                            , Cmd.none
-                            )
-                            (validate
-                                { model
-                                    | transfer = { transfer | to = "" }
-                                }
-                                balance
-                                NotSent
-                            )
-                , test "AccountToBeVerified" <|
+             [ describe "validateToField"
+                [ test "AccountToBeVerified" <|
                     \() ->
                         Expect.equal
                             { model
                                 | transfer = { transfer | to = "eosio.ram" }
+                                , accountValidation = AccountToBeVerified
+                                , isFormValid = False
                             }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | to = "eosio.ram" }
-                                }
+                            (Tuple.first
+                                (validateToField
+                                    { model
+                                        | transfer = { transfer | to = "eosio.ram" }
+                                    }
+                                    NotSent
+                                )
                             )
                 , test "ValidAccount" <|
                     \() ->
@@ -148,8 +128,8 @@ tests =
                               }
                             , Cmd.none
                             )
-                            (validate { model | transfer = { transfer | to = "eosio.ram" } }
-                                balance
+                            (validateToField
+                                { model | transfer = { transfer | to = "eosio.ram" } }
                                 Succeed
                             )
                 , test "InexistentAccount" <|
@@ -157,118 +137,42 @@ tests =
                         Expect.equal
                             ( { model
                                 | transfer = { transfer | to = "eosio.ran" }
-                                , isFormValid = False
                                 , accountValidation = InexistentAccount
+                                , isFormValid = False
                               }
                             , Cmd.none
                             )
-                            (validate { model | transfer = { transfer | to = "eosio.ran" } }
-                                balance
+                            (validateToField
+                                { model | transfer = { transfer | to = "eosio.ran" } }
                                 Fail
                             )
                 , test "InvalidAccount" <|
                     \() ->
                         Expect.equal
                             ( { model
-                                | transfer = { transfer | to = "abc1237" }
+                                | transfer = { transfer | to = "INVALID" }
                                 , accountValidation = InvalidAccount
+                                , isFormValid = False
                               }
                             , Cmd.none
                             )
-                            (validate
-                                { model
-                                    | transfer = { transfer | to = "abc1237" }
-                                }
-                                balance
-                                NotSent
+                            (validateToField
+                                { model | transfer = { transfer | to = "INVALID" } }
+                                Fail
                             )
-                ]
-             , describe "quantity"
-                [ test "EmptyQuantity" <|
+                , test "EmptyAccount" <|
                     \() ->
                         Expect.equal
-                            { model
-                                | transfer = { transfer | quantity = "" }
-                                , quantityValidation = EmptyQuantity
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | quantity = "" }
-                                }
+                            ( { model
+                                | transfer = { transfer | to = "" }
+                                , accountValidation = EmptyAccount
+                                , isFormValid = False
+                              }
+                            , Cmd.none
                             )
-                , test "InvalidQuantity" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer = { transfer | quantity = "-1.0" }
-                                , quantityValidation = InvalidQuantity
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | quantity = "-1.0" }
-                                }
-                            )
-                , test "OverValidQuantity" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer = { transfer | quantity = "301.0" }
-                                , quantityValidation = OverValidQuantity
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | quantity = "301.0" }
-                                }
-                            )
-                , test "ValidQuantity" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer = { transfer | quantity = "299.9999" }
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | quantity = "299.9999" }
-                                }
-                            )
-                ]
-             , describe "memo"
-                [ test "EmptyMemo" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer = { transfer | memo = "" }
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | memo = "" }
-                                }
-                            )
-                , test "ValidMemo" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer = { transfer | memo = "hi~" }
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | memo = "hi~" }
-                                }
-                            )
-                , test "InvalidMemo" <|
-                    \() ->
-                        Expect.equal
-                            { model
-                                | transfer =
-                                    { transfer
-                                        | memo = "This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes."
-                                    }
-                                , memoValidation = MemoTooLong
-                            }
-                            (getModelAfterValidation
-                                { model
-                                    | transfer = { transfer | memo = "This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes." }
-                                }
+                            (validateToField
+                                { model | transfer = { transfer | to = "" } }
+                                Fail
                             )
                 ]
              ]

@@ -8,7 +8,10 @@ module Component.Main.Page.Transfer exposing
     , quantityWarningSpan
     , setTransferMessageField
     , update
-    , validate
+    , validateForm
+    , validateMemoField
+    , validateQuantityField
+    , validateToField
     , view
     )
 
@@ -246,10 +249,10 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
             setTransferMessageField field value model eosLiquidAmount
 
         OnFetchAccountToVerify (Ok _) ->
-            validate model eosLiquidAmount Succeed
+            validateToField model Succeed
 
         OnFetchAccountToVerify (Err _) ->
-            validate model eosLiquidAmount Fail
+            validateToField model Fail
 
         _ ->
             ( model, Cmd.none )
@@ -263,19 +266,36 @@ setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -
 setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
     case field of
         To ->
-            validate { model | transfer = { transfer | to = value } } eosLiquidAmount NotSent
+            validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
-            validate { model | transfer = { transfer | quantity = value } } eosLiquidAmount NotSent
+            ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+            , Cmd.none
+            )
 
         Memo ->
-            validate { model | transfer = { transfer | memo = value } } eosLiquidAmount NotSent
+            ( validateMemoField { model | transfer = { transfer | memo = value } }
+            , Cmd.none
+            )
 
 
-validate : Model -> Float -> VerificationRequestStatus -> ( Model, Cmd Message )
-validate ({ transfer } as model) eosLiquidAmount requestStatus =
+validateForm : Model -> Model
+validateForm ({ accountValidation, quantityValidation, memoValidation } as model) =
     let
-        { to, quantity, memo } =
+        isFormValid =
+            (accountValidation == ValidAccount)
+                && (quantityValidation == ValidQuantity)
+                && (memoValidation == ValidMemo)
+    in
+    { model
+        | isFormValid = isFormValid
+    }
+
+
+validateToField : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
+validateToField ({ transfer } as model) requestStatus =
+    let
+        { to } =
             transfer
 
         accountValidation =
@@ -289,24 +309,19 @@ validate ({ transfer } as model) eosLiquidAmount requestStatus =
 
             else
                 Cmd.none
-
-        -- Change the limit to user's balance.
-        quantityValidation =
-            validateQuantity quantity eosLiquidAmount
-
-        memoValidation =
-            validateMemo memo
-
-        isFormValid =
-            (accountValidation == ValidAccount)
-                && (quantityValidation == ValidQuantity)
-                && (memoValidation == ValidMemo)
     in
-    ( { model
-        | accountValidation = accountValidation
-        , quantityValidation = quantityValidation
-        , memoValidation = memoValidation
-        , isFormValid = isFormValid
-      }
-    , accountCmd
-    )
+    ( validateForm { model | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityField : Model -> Float -> Model
+validateQuantityField ({ transfer } as model) eosLiquidAmount =
+    validateForm
+        { model
+            | quantityValidation =
+                validateQuantity transfer.quantity eosLiquidAmount
+        }
+
+
+validateMemoField : Model -> Model
+validateMemoField ({ transfer } as model) =
+    validateForm { model | memoValidation = validateMemo transfer.memo }
