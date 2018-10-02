@@ -264,9 +264,8 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         OnFetchAccountToVerify (Ok _) ->
             let
                 ( newBuyModel, _ ) =
-                    validateBuy
+                    validateReceiverField
                         buyModel
-                        availableEos
                         Validation.Succeed
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
@@ -274,9 +273,8 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         OnFetchAccountToVerify (Err _) ->
             let
                 ( newBuyModel, _ ) =
-                    validateBuy
+                    validateReceiverField
                         buyModel
-                        availableEos
                         Validation.Fail
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
@@ -866,19 +864,23 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
             ++ "%)"
 
 
+
+-- TODO(heejae): Add tests for validation functions.
+
+
 setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
 setBuyFormField field ({ params } as buyModel) availableQuantity val requestStatus =
     case field of
         BuyQuantity ->
-            validateBuy
+            ( validateQuantityField
                 { buyModel | params = { params | quant = val } }
                 availableQuantity
-                requestStatus
+            , Cmd.none
+            )
 
         ProxyAccount ->
-            validateBuy
+            validateReceiverField
                 { buyModel | params = { params | receiver = val } }
-                availableQuantity
                 requestStatus
 
 
@@ -906,10 +908,29 @@ setSellFormField ({ params, byteUnitIndex, byteUnits } as sellModel) availableRa
         availableRam
 
 
-validateBuy : BuyModel -> Float -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
-validateBuy ({ params, proxyBuy } as buyModel) availableQuantity requestStatus =
+validateBuyForm : BuyModel -> BuyModel
+validateBuyForm ({ proxyBuy, accountValidation, quantityValidation } as buyModel) =
     let
-        { receiver, quant } =
+        isValid =
+            (if proxyBuy then
+                accountValidation == ValidAccount
+
+             else
+                True
+            )
+                && (quantityValidation == ValidQuantity)
+    in
+    { buyModel
+        | accountValidation = accountValidation
+        , quantityValidation = quantityValidation
+        , isValid = isValid
+    }
+
+
+validateReceiverField : BuyModel -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
+validateReceiverField ({ params } as buyModel) requestStatus =
+    let
+        { receiver } =
             params
 
         accountValidation =
@@ -923,26 +944,14 @@ validateBuy ({ params, proxyBuy } as buyModel) availableQuantity requestStatus =
 
             else
                 Cmd.none
-
-        quantityValidation =
-            validateQuantity quant availableQuantity
-
-        isValid =
-            (if proxyBuy then
-                accountValidation == ValidAccount
-
-             else
-                True
-            )
-                && (quantityValidation == ValidQuantity)
     in
-    ( { buyModel
-        | accountValidation = accountValidation
-        , quantityValidation = quantityValidation
-        , isValid = isValid
-      }
-    , accountCmd
-    )
+    ( validateBuyForm { buyModel | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityField : BuyModel -> Float -> BuyModel
+validateQuantityField ({ params } as buyModel) availableQuantity =
+    validateBuyForm
+        { buyModel | quantityValidation = validateQuantity params.quant availableQuantity }
 
 
 
