@@ -1,11 +1,13 @@
 module Util.Formatter exposing
-    ( assetAdd
+    ( Message(..)
+    , assetAdd
     , assetSubtract
     , assetToFloat
     , deleteFromBack
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
+    , getNow
     , larimerToEos
     , percentageConverter
     , removeSymbolIfExists
@@ -19,7 +21,13 @@ import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
 import Regex exposing (..)
 import Round
+import Task
+import Time exposing (Time)
 import Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
+
+
+type Message
+    = OnTime Time.Time
 
 
 larimerToEos : Int -> Float
@@ -167,9 +175,14 @@ formatAsset value =
 -- Time
 
 
+getNow : Cmd Message
+getNow =
+    Task.perform OnTime Time.now
+
+
 timeFormatter : String -> String
 timeFormatter time =
-    case Date.fromIsoString time of
+    case Date.fromIsoString (time ++ "+00:00") of
         Ok date ->
             Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
 

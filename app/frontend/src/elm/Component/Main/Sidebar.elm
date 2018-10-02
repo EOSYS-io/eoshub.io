@@ -22,18 +22,22 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
+import Date exposing (fromTime)
+import Date.Extra as Date exposing (Interval(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Encode as Encode
 import Navigation
 import Port
+import Time exposing (Time)
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
-import Util.Formatter
+import Util.Formatter as Formatter
     exposing
-        ( deleteFromBack
+        ( Message(..)
+        , deleteFromBack
         , floatToAsset
+        , getNow
         , larimerToEos
         )
 import Util.HttpRequest exposing (getAccount, getFullPath, post)
@@ -63,6 +67,7 @@ type alias Model =
     , fold : Bool
     , configPanelOpen : Bool
     , account : Account
+    , now : Time
     }
 
 
@@ -77,6 +82,7 @@ initModel =
     , fold = False
     , configPanelOpen = False
     , account = defaultAccount
+    , now = 0
     }
 
 
@@ -95,6 +101,7 @@ type Message
     | OpenConfigPanel Bool
     | AndThen Message Message
     | OnFetchAccount (Result Http.Error Account)
+    | FormatterMessage Formatter.Message
 
 
 
@@ -103,7 +110,10 @@ type Message
 
 initCmd : Cmd Message
 initCmd =
-    Port.checkWalletStatus ()
+    Cmd.batch
+        [ Port.checkWalletStatus ()
+        , getTimeCmd
+        ]
 
 
 accountCmd : State -> String -> Cmd Message
@@ -116,6 +126,11 @@ accountCmd state accountName =
 
         _ ->
             Cmd.none
+
+
+getTimeCmd : Cmd Message
+getTimeCmd =
+    Cmd.map FormatterMessage getNow
 
 
 
@@ -217,7 +232,7 @@ pairWalletView language =
 
 
 accountInfoView : Model -> Language -> List (Html Message)
-accountInfoView { wallet, account, configPanelOpen } language =
+accountInfoView { wallet, account, configPanelOpen, now } language =
     let
         { coreLiquidBalance, voterInfo, refundRequest } =
             account
@@ -291,9 +306,7 @@ accountInfoView { wallet, account, configPanelOpen } language =
         , li []
             [ span [ class "title" ] [ text "refunding" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
-
-            -- TODO(boseok): 72.3 hours hard coding should be changed
-            , span [ class "remaining time" ] [ text "72.3 hours" ]
+            , span [ class "remaining time" ] [ text (getLeftTime refundRequest.requestTime now) ]
             ]
         ]
     , button
@@ -378,6 +391,38 @@ update message ({ fold, wallet } as model) =
 
         OnFetchAccount (Err error) ->
             ( model, Cmd.none )
+
+        FormatterMessage msg ->
+            case msg of
+                OnTime now ->
+                    ( { model | now = now }, Cmd.none )
+
+
+getLeftTime : String -> Time -> String
+getLeftTime requestTime now =
+    case Date.fromIsoString (requestTime ++ "+00:00") of
+        Ok time ->
+            let
+                expectedDate =
+                    Date.add Hour 72 time
+
+                nowDate =
+                    Date.fromTime now
+
+                leftHours =
+                    Date.diff Hour nowDate expectedDate
+
+                leftMinutes =
+                    Date.diff Minute nowDate expectedDate
+            in
+            if leftHours < 1 then
+                (leftMinutes |> toString) ++ " minutes"
+
+            else
+                (leftHours |> toString) ++ " hours"
+
+        Err _ ->
+            ""
 
 
 
