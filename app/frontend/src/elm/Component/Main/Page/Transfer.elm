@@ -92,8 +92,9 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language TransferableAmount)
                     , em [] [ text eosLiquidAmount ]
                     ]
-                , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
-                    [ text "토큰 바꾸기" ]
+
+                -- , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
+                --     [ text "토큰 바꾸기" ]
                 ]
             , let
                 { to, quantity, memo } =
