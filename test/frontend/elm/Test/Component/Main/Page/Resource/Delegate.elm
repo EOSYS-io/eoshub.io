@@ -54,6 +54,8 @@ tests =
                             }
                     in
                     Expect.equal expectedModel (Tuple.first (validateReceiverField newModel NotSent))
+
+            -- TODO(heejae, boseok): Validate quantity fields with valid account.
             , describe "Validate quantity fields."
                 [ test "validate test2. cpu EmptyQuantity, net OverValidQuantity" <|
                     \() ->
