@@ -114,7 +114,7 @@ initModel location =
         , language = Korean
         }
     , sidebar = Sidebar.initModel
-    , selectedNav = NothingNav
+    , selectedNav = None
     }
 
 
@@ -158,7 +158,7 @@ type SelectedNav
     | VoteNav
     | ResourceNav
     | RammarketNav
-    | NothingNav
+    | None
 
 
 initCmd : Location -> Flags -> Cmd Message
@@ -663,7 +663,7 @@ getPageNav pathname =
             RammarketNav
 
         _ ->
-            NothingNav
+            None
 
 
 getNavClass : SelectedNav -> SelectedNav -> String

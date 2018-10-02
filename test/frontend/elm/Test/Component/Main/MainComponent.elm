@@ -66,7 +66,7 @@ tests =
                 \() ->
                     Expect.equal RammarketNav (getPageNav "/rammarket")
             , test "else" <|
-                \() -> Expect.equal NothingNav (getPageNav "/search")
+                \() -> Expect.equal None (getPageNav "/search")
             ]
         , describe "getNavClass"
             [ test "equal" <|
