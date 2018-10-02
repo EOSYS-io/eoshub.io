@@ -9,8 +9,10 @@ module Component.Main.Page.Resource.Delegate exposing
     , percentageButton
     , resourceInputDiv
     , update
-    , validate
     , validateEach
+    , validateForm
+    , validateQuantityFields
+    , validateReceiverField
     , validateText
     , view
     )
@@ -155,10 +157,10 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
             ( model, Cmd.none )
 
         OnFetchAccountToVerify (Ok _) ->
-            validate model eosLiquidAmount Validation.Succeed
+            validateReceiverField model Validation.Succeed
 
         OnFetchAccountToVerify (Err _) ->
-            validate model eosLiquidAmount Validation.Fail
+            validateReceiverField model Validation.Fail
 
         CpuAmountInput value ->
             let
@@ -175,7 +177,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            validate newModel eosLiquidAmount Validation.NotSent
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         NetAmountInput value ->
             let
@@ -192,7 +194,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            validate newModel eosLiquidAmount Validation.NotSent
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         ReceiverInput value ->
             let
@@ -204,7 +206,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                             }
                     }
             in
-            validate newModel eosLiquidAmount Validation.NotSent
+            validateReceiverField newModel Validation.NotSent
 
         ClickCpuPercentage percentageOfResource ->
             let
@@ -229,7 +231,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfCpu = percentageOfResource
                     }
             in
-            validate newModel eosLiquidAmount Validation.NotSent
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -254,7 +256,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfNet = percentageOfResource
                     }
             in
-            validate newModel eosLiquidAmount Validation.NotSent
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         SubmitAction ->
             let
@@ -292,7 +294,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                                     }
                             }
                     in
-                    validate newModel eosLiquidAmount Validation.NotSent
+                    validateReceiverField newModel Validation.NotSent
 
                 _ ->
                     let
@@ -468,8 +470,30 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation total
     ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid )
 
 
-validate : Model -> Float -> VerificationRequestStatus -> ( Model, Cmd Message )
-validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount requestStatus =
+validateForm : Model -> Model
+validateForm ({ accountValidation, cpuQuantityValidation, netQuantityValidation, totalQuantityValidation } as model) =
+    let
+        ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
+            validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
+
+        isFormValid =
+            isCpuValid
+                && isNetValid
+                && isNotEmptyBoth
+                && isTotalValid
+                && isAccountValid
+    in
+    { model
+        | totalQuantityValidation = totalQuantityValidation
+        , cpuQuantityValidation = cpuQuantityValidation
+        , netQuantityValidation = netQuantityValidation
+        , accountValidation = accountValidation
+        , isFormValid = isFormValid
+    }
+
+
+validateReceiverField : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
+validateReceiverField ({ delegatebw } as model) requestStatus =
     let
         accountValidation =
             validateAccount delegatebw.receiver requestStatus
@@ -482,35 +506,18 @@ validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount requestStatus 
 
             else
                 Cmd.none
-
-        cpuQuantityValidation =
-            validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
-
-        netQuantityValidation =
-            validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
-
-        totalQuantityValidation =
-            validateQuantity totalQuantity eosLiquidAmount
-
-        ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
-            validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
-
-        isFormValid =
-            isCpuValid
-                && isNetValid
-                && isNotEmptyBoth
-                && isTotalValid
-                && isAccountValid
     in
-    ( { model
-        | totalQuantityValidation = totalQuantityValidation
-        , cpuQuantityValidation = cpuQuantityValidation
-        , netQuantityValidation = netQuantityValidation
-        , accountValidation = accountValidation
-        , isFormValid = isFormValid
-      }
-    , accountCmd
-    )
+    ( validateForm { model | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityFields : Model -> Float -> Model
+validateQuantityFields ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+    validateForm
+        { model
+            | cpuQuantityValidation = validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
+            , netQuantityValidation = validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
+            , totalQuantityValidation = validateQuantity totalQuantity eosLiquidAmount
+        }
 
 
 validateText : Model -> ( String, String )
