@@ -8,21 +8,28 @@ module Component.Main.Page.Transfer exposing
     , quantityWarningSpan
     , setTransferMessageField
     , update
-    , validate
+    , validateForm
+    , validateMemoField
+    , validateQuantityField
+    , validateToField
     , view
     )
 
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
+import Util.HttpRequest exposing (getAccount)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -65,15 +72,12 @@ type TransferMessageFormField
 type Message
     = SetTransferMessageField TransferMessageFormField String
     | SubmitAction
-    | SetFormValidation Bool
     | OpenUnderConstruction
+    | OnFetchAccountToVerify (Result Http.Error Account)
 
 
 
 -- VIEW
--- Note(heejae): Current url change logic is so messy.
--- Refactor url change logic using Navigation.urlUpdate.
--- See details of this approach from https://github.com/sircharleswatson/elm-navigation-example
 -- TODO(heejae): Consider making nav as a separate component.
 
 
@@ -88,8 +92,9 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language TransferableAmount)
                     , em [] [ text eosLiquidAmount ]
                     ]
-                , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
-                    [ text "토큰 바꾸기" ]
+
+                -- , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
+                --     [ text "토큰 바꾸기" ]
                 ]
             , let
                 { to, quantity, memo } =
@@ -177,6 +182,12 @@ accountWarningSpan accountStatus language =
 
                 ValidAccount ->
                     ( " true", translate language AccountExample )
+
+                InexistentAccount ->
+                    ( " false", "존재하지 않는 계정입니다." )
+
+                AccountToBeVerified ->
+                    ( " false", "존재 여부를 확인하는 중입니다." )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]
@@ -236,10 +247,13 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
             ( model, cmd )
 
         SetTransferMessageField field value ->
-            ( setTransferMessageField field value model eosLiquidAmount, Cmd.none )
+            setTransferMessageField field value model eosLiquidAmount
 
-        SetFormValidation validity ->
-            ( { model | isFormValid = validity }, Cmd.none )
+        OnFetchAccountToVerify (Ok _) ->
+            validateToField model Succeed
+
+        OnFetchAccountToVerify (Err _) ->
+            validateToField model Fail
 
         _ ->
             ( model, Cmd.none )
@@ -249,43 +263,66 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
 -- Utility functions.
 
 
-setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> Model
+setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
 setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
     case field of
         To ->
-            validate { model | transfer = { transfer | to = value } } eosLiquidAmount
+            validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
-            validate { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+            ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+            , Cmd.none
+            )
 
         Memo ->
-            validate { model | transfer = { transfer | memo = value } } eosLiquidAmount
+            ( validateMemoField { model | transfer = { transfer | memo = value } }
+            , Cmd.none
+            )
 
 
-validate : Model -> Float -> Model
-validate ({ transfer } as model) eosLiquidAmount =
+validateForm : Model -> Model
+validateForm ({ accountValidation, quantityValidation, memoValidation } as model) =
     let
-        { to, quantity, memo } =
-            transfer
-
-        accountValidation =
-            validateAccount to
-
-        -- Change the limit to user's balance.
-        quantityValidation =
-            validateQuantity quantity eosLiquidAmount
-
-        memoValidation =
-            validateMemo memo
-
         isFormValid =
             (accountValidation == ValidAccount)
                 && (quantityValidation == ValidQuantity)
                 && (memoValidation == ValidMemo)
     in
     { model
-        | accountValidation = accountValidation
-        , quantityValidation = quantityValidation
-        , memoValidation = memoValidation
-        , isFormValid = isFormValid
+        | isFormValid = isFormValid
     }
+
+
+validateToField : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
+validateToField ({ transfer } as model) requestStatus =
+    let
+        { to } =
+            transfer
+
+        accountValidation =
+            validateAccount to requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                to
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
+    in
+    ( validateForm { model | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityField : Model -> Float -> Model
+validateQuantityField ({ transfer } as model) eosLiquidAmount =
+    validateForm
+        { model
+            | quantityValidation =
+                validateQuantity transfer.quantity eosLiquidAmount
+        }
+
+
+validateMemoField : Model -> Model
+validateMemoField ({ transfer } as model) =
+    validateForm { model | memoValidation = validateMemo transfer.memo }

@@ -9,8 +9,10 @@ module Component.Main.Page.Resource.Delegate exposing
     , percentageButton
     , resourceInputDiv
     , update
-    , validate
     , validateEach
+    , validateForm
+    , validateQuantityFields
+    , validateReceiverField
     , validateText
     , view
     )
@@ -53,12 +55,13 @@ import Util.Formatter
         , formatAsset
         , larimerToEos
         )
-import Util.HttpRequest exposing (getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -129,6 +132,7 @@ initCmd query =
 
 type Message
     = OnFetchTableRows (Result Http.Error (List Row))
+    | OnFetchAccountToVerify (Result Http.Error Account)
     | CpuAmountInput String
     | NetAmountInput String
     | ReceiverInput String
@@ -152,6 +156,12 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
         OnFetchTableRows (Err str) ->
             ( model, Cmd.none )
 
+        OnFetchAccountToVerify (Ok _) ->
+            validateReceiverField model Validation.Succeed
+
+        OnFetchAccountToVerify (Err _) ->
+            validateReceiverField model Validation.Fail
+
         CpuAmountInput value ->
             let
                 total =
@@ -167,7 +177,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         NetAmountInput value ->
             let
@@ -184,7 +194,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , totalQuantity = total
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         ReceiverInput value ->
             let
@@ -196,7 +206,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                             }
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            validateReceiverField newModel Validation.NotSent
 
         ClickCpuPercentage percentageOfResource ->
             let
@@ -221,7 +231,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfCpu = percentageOfResource
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         ClickNetPercentage percentageOfResource ->
             let
@@ -246,7 +256,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                         , percentageOfNet = percentageOfResource
                     }
             in
-            ( validate newModel eosLiquidAmount, Cmd.none )
+            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
 
         SubmitAction ->
             let
@@ -284,7 +294,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
                                     }
                             }
                     in
-                    ( validate newModel eosLiquidAmount, Cmd.none )
+                    validateReceiverField newModel Validation.NotSent
 
                 _ ->
                     let
@@ -460,21 +470,9 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation total
     ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid )
 
 
-validate : Model -> Float -> Model
-validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+validateForm : Model -> Model
+validateForm ({ accountValidation, cpuQuantityValidation, netQuantityValidation, totalQuantityValidation } as model) =
     let
-        accountValidation =
-            validateAccount delegatebw.receiver
-
-        cpuQuantityValidation =
-            validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
-
-        netQuantityValidation =
-            validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
-
-        totalQuantityValidation =
-            validateQuantity totalQuantity eosLiquidAmount
-
         ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
             validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
 
@@ -492,6 +490,34 @@ validate ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
         , accountValidation = accountValidation
         , isFormValid = isFormValid
     }
+
+
+validateReceiverField : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
+validateReceiverField ({ delegatebw } as model) requestStatus =
+    let
+        accountValidation =
+            validateAccount delegatebw.receiver requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                delegatebw.receiver
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
+    in
+    ( validateForm { model | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityFields : Model -> Float -> Model
+validateQuantityFields ({ delegatebw, totalQuantity } as model) eosLiquidAmount =
+    validateForm
+        { model
+            | cpuQuantityValidation = validateQuantity delegatebw.stakeCpuQuantity eosLiquidAmount
+            , netQuantityValidation = validateQuantity delegatebw.stakeNetQuantity eosLiquidAmount
+            , totalQuantityValidation = validateQuantity totalQuantity eosLiquidAmount
+        }
 
 
 validateText : Model -> ( String, String )

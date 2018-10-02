@@ -48,7 +48,6 @@ import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , QuantityStatus(..)
-        , validateAccount
         , validateQuantity
         )
 

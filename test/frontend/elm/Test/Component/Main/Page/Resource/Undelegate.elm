@@ -89,9 +89,9 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , cpuQuantityValidation = ValidQuantity
-                                    , isFormValid = True
+                                    , isFormValid = False
                                 }
                         in
                         Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
@@ -110,9 +110,9 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , netQuantityValidation = ValidQuantity
-                                    , isFormValid = True
+                                    , isFormValid = False
                                 }
                         in
                         Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
@@ -131,10 +131,10 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
-                                    , isFormValid = True
+                                    , isFormValid = False
                                 }
                         in
                         Expect.equal expectedModel (validate newModel unstakePossibleCpu unstakePossibleNet)
@@ -153,7 +153,7 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , netQuantityValidation = OverValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , isFormValid = False
@@ -175,7 +175,7 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = OverValidQuantity
                                     , isFormValid = False
@@ -195,7 +195,7 @@ tests =
 
                             expectedModel =
                                 { newModel
-                                    | accountValidation = ValidAccount
+                                    | accountValidation = AccountToBeVerified
                                     , netQuantityValidation = EmptyQuantity
                                     , cpuQuantityValidation = EmptyQuantity
                                     , isFormValid = False

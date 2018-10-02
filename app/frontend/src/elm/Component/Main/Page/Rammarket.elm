@@ -70,11 +70,12 @@ import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo, mega)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, resourceUnitConverter, timeFormatter)
-import Util.HttpRequest exposing (getFullPath, getTableRows, post)
-import Util.Validation
+import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateQuantity
         )
@@ -178,6 +179,7 @@ type BuyFormField
 type Message
     = OnFetchActions (Result Http.Error (List Action))
     | OnFetchTableRows (Result Http.Error (List Row))
+    | OnFetchAccountToVerify (Result Http.Error Account)
     | ExpandActions
     | UpdateChainData Time.Time
     | SwitchTab
@@ -259,6 +261,24 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
 
+        OnFetchAccountToVerify (Ok _) ->
+            let
+                ( newBuyModel, _ ) =
+                    validateReceiverField
+                        buyModel
+                        Validation.Succeed
+            in
+            ( { model | buyModel = newBuyModel }, Cmd.none )
+
+        OnFetchAccountToVerify (Err _) ->
+            let
+                ( newBuyModel, _ ) =
+                    validateReceiverField
+                        buyModel
+                        Validation.Fail
+            in
+            ( { model | buyModel = newBuyModel }, Cmd.none )
+
         ExpandActions ->
             ( { model | expandActions = True }, Cmd.none )
 
@@ -272,8 +292,12 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
             ( { model | modalOpen = not modalOpen }, Cmd.none )
 
         SetBuyFormField field val ->
-            ( { model | buyModel = setBuyFormField field buyModel availableEos val }
-            , Cmd.none
+            let
+                ( newBuyModel, newCmd ) =
+                    setBuyFormField field buyModel availableEos val Validation.NotSent
+            in
+            ( { model | buyModel = newBuyModel }
+            , newCmd
             )
 
         SetSellFormField val ->
@@ -510,15 +534,25 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
             ]
         , let
             ( spanClass, message ) =
-                case buyModel.accountValidation of
-                    ValidAccount ->
-                        ( "false validate description", "올바른 계정입니다." )
+                let
+                    ( validationClass, msg ) =
+                        case buyModel.accountValidation of
+                            ValidAccount ->
+                                ( "false", "올바른 계정입니다." )
 
-                    InvalidAccount ->
-                        ( "true validate description", "올바르지 않은 계정입니다." )
+                            InvalidAccount ->
+                                ( "true", "올바르지 않은 계정입니다." )
 
-                    _ ->
-                        ( "", "" )
+                            InexistentAccount ->
+                                ( "true", "존재하지 않는 계정입니다." )
+
+                            AccountToBeVerified ->
+                                ( "true", "존재 여부를 확인하는 중입니다." )
+
+                            _ ->
+                                ( "", "" )
+                in
+                ( "validate description " ++ validationClass, msg )
 
             modalViewClass =
                 if modalOpen then
@@ -581,7 +615,14 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
             if isBuyTab then
                 ( " ing"
                 , ""
-                , a [ onClick ToggleModal ] [ text "타계정 구매" ]
+                , a
+                    (if not buyModel.proxyBuy then
+                        [ onClick ToggleModal ]
+
+                     else
+                        []
+                    )
+                    [ text "타계정 구매" ]
                 , "구매하기"
                 , "EOS"
                 , TypeEosAmount
@@ -823,29 +864,24 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
             ++ "%)"
 
 
-setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> BuyModel
-setBuyFormField field ({ params } as buyModel) availableQuantity val =
+
+-- TODO(heejae): Add tests for validation functions.
+
+
+setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
+setBuyFormField field ({ params } as buyModel) availableQuantity val requestStatus =
     case field of
         BuyQuantity ->
-            validateBuy
+            ( validateQuantityField
                 { buyModel | params = { params | quant = val } }
                 availableQuantity
+            , Cmd.none
+            )
 
         ProxyAccount ->
-            let
-                ({ accountValidation, isValid } as newBuyModel) =
-                    validateBuy
-                        { buyModel | params = { params | receiver = val } }
-                        availableQuantity
-            in
-            if accountValidation == ValidAccount then
-                newBuyModel
-
-            else
-                { buyModel
-                    | accountValidation = accountValidation
-                    , isValid = isValid
-                }
+            validateReceiverField
+                { buyModel | params = { params | receiver = val } }
+                requestStatus
 
 
 setSellFormField : SellModel -> Int -> String -> SellModel
@@ -872,18 +908,9 @@ setSellFormField ({ params, byteUnitIndex, byteUnits } as sellModel) availableRa
         availableRam
 
 
-validateBuy : BuyModel -> Float -> BuyModel
-validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
+validateBuyForm : BuyModel -> BuyModel
+validateBuyForm ({ proxyBuy, accountValidation, quantityValidation } as buyModel) =
     let
-        { receiver, quant } =
-            params
-
-        accountValidation =
-            validateAccount receiver
-
-        quantityValidation =
-            validateQuantity quant availableQuantity
-
         isValid =
             (if proxyBuy then
                 accountValidation == ValidAccount
@@ -898,6 +925,33 @@ validateBuy ({ params, proxyBuy } as buyModel) availableQuantity =
         , quantityValidation = quantityValidation
         , isValid = isValid
     }
+
+
+validateReceiverField : BuyModel -> VerificationRequestStatus -> ( BuyModel, Cmd Message )
+validateReceiverField ({ params } as buyModel) requestStatus =
+    let
+        { receiver } =
+            params
+
+        accountValidation =
+            validateAccount receiver requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                receiver
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
+    in
+    ( validateBuyForm { buyModel | accountValidation = accountValidation }, accountCmd )
+
+
+validateQuantityField : BuyModel -> Float -> BuyModel
+validateQuantityField ({ params } as buyModel) availableQuantity =
+    validateBuyForm
+        { buyModel | quantityValidation = validateQuantity params.quant availableQuantity }
 
 
 

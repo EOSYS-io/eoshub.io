@@ -203,13 +203,14 @@ pairWalletView language =
                 ]
                 [ text (translate language Attach) ]
             ]
-        , li [ class "nova" ]
-            [ text "NOVA"
-            , button
-                [ type_ "button"
-                ]
-                [ text (translate language Attach) ]
-            ]
+
+        -- , li [ class "nova" ]
+        --     [ text "NOVA"
+        --     , button
+        --         [ type_ "button"
+        --         ]
+        --         [ text (translate language Attach) ]
+        --     ]
         ]
     , a [ class "go link wallet_sync" ] [ text (translate language HowToAttach) ]
     ]

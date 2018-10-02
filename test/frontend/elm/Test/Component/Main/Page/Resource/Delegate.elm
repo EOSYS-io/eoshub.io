@@ -8,6 +8,7 @@ import Util.Validation as Validation
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateMemo
         , validateQuantity
@@ -21,9 +22,6 @@ import Util.Validation as Validation
 tests : Test
 tests =
     let
-        eosLiquidAmount =
-            0.7
-
         defaultModel =
             initModel
 
@@ -32,9 +30,12 @@ tests =
 
         { delegatebw } =
             defaultModel
+
+        eosLiquidAmount =
+            0.7
     in
     describe "Page.Resource.Delegate module"
-        [ describe "validate"
+        [ describe "Validate the account field."
             [ test "validate test1. accountValidation InvalidAccount" <|
                 \() ->
                     let
@@ -52,8 +53,10 @@ tests =
                                 , isFormValid = False
                             }
                     in
-                    Expect.equal expectedModel (validate newModel eosLiquidAmount)
-            , describe "accountValidation ValidAccount"
+                    Expect.equal expectedModel (Tuple.first (validateReceiverField newModel NotSent))
+
+            -- TODO(heejae, boseok): Validate quantity fields with valid account.
+            , describe "Validate quantity fields."
                 [ test "validate test2. cpu EmptyQuantity, net OverValidQuantity" <|
                     \() ->
                         let
@@ -63,18 +66,18 @@ tests =
                                         { delegatebw
                                             | stakeNetQuantity = "0.9000"
                                             , stakeCpuQuantity = ""
-                                            , receiver = accountValid
                                         }
+                                    , totalQuantity = "0.9000"
                                 }
 
                             expectedModel =
                                 { newModel
                                     | netQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , totalQuantityValidation = OverValidQuantity
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (validateQuantityFields newModel eosLiquidAmount)
                 , test "validate test3. cpu OverValidQuantity, net EmptyQuantity" <|
                     \() ->
                         let
@@ -84,18 +87,18 @@ tests =
                                         { delegatebw
                                             | stakeNetQuantity = ""
                                             , stakeCpuQuantity = "0.9000"
-                                            , receiver = accountValid
                                         }
+                                    , totalQuantity = "0.9000"
                                 }
 
                             expectedModel =
                                 { newModel
                                     | cpuQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , totalQuantityValidation = OverValidQuantity
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (validateQuantityFields newModel eosLiquidAmount)
                 , test "validate test4. cpu ValidQuantity, net ValidQuantity, total OverValidQuantity" <|
                     \() ->
                         let
@@ -105,7 +108,6 @@ tests =
                                         { delegatebw
                                             | stakeNetQuantity = "0.5000"
                                             , stakeCpuQuantity = "0.5000"
-                                            , receiver = accountValid
                                         }
                                     , totalQuantity = "1.0000"
                                 }
@@ -115,11 +117,10 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (validateQuantityFields newModel eosLiquidAmount)
                 , test "validate test5. cpu ValidQuantity, net ValidQuantity, total ValidQuantity" <|
                     \() ->
                         let
@@ -129,7 +130,6 @@ tests =
                                         { delegatebw
                                             | stakeNetQuantity = "0.3000"
                                             , stakeCpuQuantity = "0.3000"
-                                            , receiver = accountValid
                                         }
                                     , totalQuantity = "0.6000"
                                 }
@@ -139,31 +139,22 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = ValidQuantity
-                                    , accountValidation = ValidAccount
-                                    , isFormValid = True
-                                }
-                        in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
-                , test "validate test6. cpu EmptyQuantity, net EmptyQuantity" <|
-                    \() ->
-                        let
-                            newModel =
-                                { defaultModel
-                                    | delegatebw =
-                                        { delegatebw
-                                            | receiver = accountValid
-                                        }
-                                }
-
-                            expectedModel =
-                                { newModel
-                                    | netQuantityValidation = EmptyQuantity
-                                    , cpuQuantityValidation = EmptyQuantity
-                                    , accountValidation = ValidAccount
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (validateQuantityFields newModel eosLiquidAmount)
+                , test "validate test6. cpu EmptyQuantity, net EmptyQuantity" <|
+                    \() ->
+                        let
+                            expectedModel =
+                                { defaultModel
+                                    | netQuantityValidation = EmptyQuantity
+                                    , cpuQuantityValidation = EmptyQuantity
+                                    , totalQuantityValidation = EmptyQuantity
+                                    , isFormValid = False
+                                }
+                        in
+                        Expect.equal expectedModel (validateQuantityFields defaultModel eosLiquidAmount)
                 ]
             ]
 
@@ -189,11 +180,11 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = ValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                 }
 
                             expected =
-                                ( "임대 가능합니다 :)", " true" )
+                                ( "임대해줄 계정을 입력하세요", " false" )
                         in
                         Expect.equal expected (validateText defaultModel)
                 ]
