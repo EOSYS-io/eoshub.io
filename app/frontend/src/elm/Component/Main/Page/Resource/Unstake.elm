@@ -224,7 +224,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
         ( validatedText, validatedAttr ) =
-            validateText model
+            validateText language model
 
         cpuValidateAttr =
             validateAttr cpuQuantityValidation
@@ -235,48 +235,19 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
     div [ class "unstake container" ]
         [ div [ class "my resource" ]
             [ div []
-                [ h3 []
-                    [ text "CPU 총량"
-                    , strong []
-                        [ text totalResources.cpuWeight ]
-                    ]
-                , p []
-                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.cpuWeight) ]
-                , p []
-                    [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.cpuWeight selfDelegatedBandwidth.cpuWeight) ]
-                , div [ class "graph status" ]
-                    [ span [ class cpuColor, style [ ( "height", cpuPercent ) ] ]
-                        []
-                    , text cpuPercent
-                    ]
+                [ p []
+                    [ text ("내가 스테이크한 CPU : " ++ selfDelegatedBandwidth.cpuWeight) ]
                 ]
             , div []
-                [ h3 []
-                    [ text "NET 총량"
-                    , strong []
-                        [ text totalResources.netWeight ]
-                    ]
-                , p []
-                    [ text ("내가 스테이크한 토큰 : " ++ selfDelegatedBandwidth.netWeight) ]
-                , p []
-                    [ text ("임대받은 토큰 : " ++ assetSubtract totalResources.netWeight selfDelegatedBandwidth.netWeight) ]
-                , div [ class "graph status" ]
-                    [ span [ class netColor, style [ ( "height", netPercent ) ] ]
-                        []
-                    , text netPercent
-                    ]
+                [ p []
+                    [ text ("내가 스테이크한 NET : " ++ selfDelegatedBandwidth.netWeight) ]
                 ]
             ]
         , section []
+            -- NOTE(boseok): new design is needed
             [ div [ class "wallet status" ]
-                [ h3 []
-                    [ text "언스테이크 가능한 CPU" ]
-                , p []
-                    [ text unstakePossibleCpu ]
-                , h3 []
-                    [ text "언스테이크 가능한 NET" ]
-                , p []
-                    [ text unstakePossibleNet ]
+                [ p [ class "validate description" ]
+                    [ text ("CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.") ]
                 , p [ class ("validate description" ++ validatedAttr) ]
                     [ text validatedText ]
                 ]
@@ -426,8 +397,8 @@ validateAttr resourceQuantityStatus =
             ""
 
 
-validateText : Model -> ( String, String )
-validateText ({ cpuQuantityValidation, netQuantityValidation, minimumResource } as model) =
+validateText : Language -> Model -> ( String, String )
+validateText language ({ cpuQuantityValidation, netQuantityValidation, minimumResource } as model) =
     let
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
@@ -444,23 +415,36 @@ validateText ({ cpuQuantityValidation, netQuantityValidation, minimumResource } 
                 && isNotEmptyBoth
     in
     if isFormValid then
-        ( "언스테이크 가능합니다 :)", " true" )
+        ( translate language UnstakePossible, " true" )
 
     else if isNotEmptyBoth then
-        if not isCpuValid && not isNetValid then
-            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+        if not isCpuValid then
+            case cpuQuantityValidation of
+                InvalidQuantity ->
+                    ( translate language (UnstakeInvalidQuantity "CPU"), " false" )
 
-        else if not isCpuValid then
-            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+                OverValidQuantity ->
+                    ( translate language (UnstakeOverValidQuantity "CPU"), " false" )
+
+                _ ->
+                    ( "발생 불가 케이스", "" )
 
         else if not isNetValid then
-            ( "NET의 수량입력이 잘못되었습니다", " false" )
+            case netQuantityValidation of
+                InvalidQuantity ->
+                    ( translate language (UnstakeInvalidQuantity "NET"), " false" )
+
+                OverValidQuantity ->
+                    ( translate language (UnstakeOverValidQuantity "NET"), " false" )
+
+                _ ->
+                    ( "발생 불가 케이스", "" )
 
         else
             ( "발생 불가 케이스", "" )
 
     else
-        ( "CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.", "" )
+        ( "", "" )
 
 
 getPercentageOfResource : PercentageOfResource -> Float

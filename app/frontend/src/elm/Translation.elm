@@ -163,6 +163,9 @@ type I18n
     | DelegatebwFailed String
     | UndelegatebwSucceeded String
     | UndelegatebwFailed String
+    | UnstakeInvalidQuantity String
+    | UnstakeOverValidQuantity String
+    | UnstakePossible
 
 
 translate : Language -> I18n -> String
@@ -860,4 +863,22 @@ getMessages i18n =
             { korean = code ++ " 코드오류로 언스테이크 실패"
             , english = "Failed with error code " ++ code
             , chinese = ""
+            }
+
+        UnstakeInvalidQuantity resourceType ->
+            { korean = resourceType ++ "의 수량입력이 잘못되었습니다"
+            , english = ""
+            , chinese = resourceType ++ "数量输入有误"
+            }
+
+        UnstakeOverValidQuantity resourceType ->
+            { korean = "언스테이크 가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
+            , english = ""
+            , chinese = ""
+            }
+
+        UnstakePossible ->
+            { korean = "언스테이크 가능합니다 :)"
+            , english = ""
+            , chinese = "可以进行Unstake：）"
             }
