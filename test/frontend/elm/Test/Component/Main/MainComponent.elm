@@ -55,6 +55,25 @@ tests =
             , test "NotFoundRoute" <|
                 \() -> Expect.equal NotFoundPage (getPage location)
             ]
+        , describe "getPageNav"
+            [ test "/transfer" <|
+                \() -> Expect.equal TransferNav (getPageNav "/transfer")
+            , test "/vote" <|
+                \() -> Expect.equal VoteNav (getPageNav "/vote")
+            , test "/resource" <|
+                \() -> Expect.equal ResourceNav (getPageNav "/resource")
+            , test "/rammarket" <|
+                \() ->
+                    Expect.equal RammarketNav (getPageNav "/rammarket")
+            , test "else" <|
+                \() -> Expect.equal None (getPageNav "/search")
+            ]
+        , describe "getNavClass"
+            [ test "equal" <|
+                \() -> Expect.equal " viewing" (getNavClass TransferNav TransferNav)
+            , test "not equal" <|
+                \() -> Expect.equal "" (getNavClass TransferNav ResourceNav)
+            ]
         , describe "update"
             [ test "UpdatePushActionResponse" <|
                 \() ->
