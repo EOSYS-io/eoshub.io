@@ -8,10 +8,20 @@ import Util.Validation as Validation
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
+        , VerificationRequestStatus(..)
         , validateAccount
         , validateMemo
         , validateQuantity
         )
+
+
+getModelAfterValidation : Model -> Model
+getModelAfterValidation model =
+    let
+        eosLiquidAmount =
+            0.7
+    in
+    Tuple.first (validate model eosLiquidAmount NotSent)
 
 
 
@@ -21,9 +31,6 @@ import Util.Validation as Validation
 tests : Test
 tests =
     let
-        eosLiquidAmount =
-            0.7
-
         defaultModel =
             initModel
 
@@ -52,8 +59,8 @@ tests =
                                 , isFormValid = False
                             }
                     in
-                    Expect.equal expectedModel (validate newModel eosLiquidAmount)
-            , describe "accountValidation ValidAccount"
+                    Expect.equal expectedModel (getModelAfterValidation newModel)
+            , describe "accountValidation AccountToBeVerified"
                 [ test "validate test2. cpu EmptyQuantity, net OverValidQuantity" <|
                     \() ->
                         let
@@ -70,11 +77,11 @@ tests =
                             expectedModel =
                                 { newModel
                                     | netQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (getModelAfterValidation newModel)
                 , test "validate test3. cpu OverValidQuantity, net EmptyQuantity" <|
                     \() ->
                         let
@@ -91,11 +98,11 @@ tests =
                             expectedModel =
                                 { newModel
                                     | cpuQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (getModelAfterValidation newModel)
                 , test "validate test4. cpu ValidQuantity, net ValidQuantity, total OverValidQuantity" <|
                     \() ->
                         let
@@ -115,11 +122,11 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = OverValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (getModelAfterValidation newModel)
                 , test "validate test5. cpu ValidQuantity, net ValidQuantity, total ValidQuantity" <|
                     \() ->
                         let
@@ -139,11 +146,11 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = ValidQuantity
-                                    , accountValidation = ValidAccount
-                                    , isFormValid = True
+                                    , accountValidation = AccountToBeVerified
+                                    , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (getModelAfterValidation newModel)
                 , test "validate test6. cpu EmptyQuantity, net EmptyQuantity" <|
                     \() ->
                         let
@@ -159,11 +166,11 @@ tests =
                                 { newModel
                                     | netQuantityValidation = EmptyQuantity
                                     , cpuQuantityValidation = EmptyQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                     , isFormValid = False
                                 }
                         in
-                        Expect.equal expectedModel (validate newModel eosLiquidAmount)
+                        Expect.equal expectedModel (getModelAfterValidation newModel)
                 ]
             ]
 
@@ -189,11 +196,11 @@ tests =
                                     | netQuantityValidation = ValidQuantity
                                     , cpuQuantityValidation = ValidQuantity
                                     , totalQuantityValidation = ValidQuantity
-                                    , accountValidation = ValidAccount
+                                    , accountValidation = AccountToBeVerified
                                 }
 
                             expected =
-                                ( "임대 가능합니다 :)", " true" )
+                                ( "임대해줄 계정을 입력하세요", " false" )
                         in
                         Expect.equal expected (validateText defaultModel)
                 ]
