@@ -6,6 +6,7 @@ import Component.Account.Page.CreateKeys as CreateKeys
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
 import Component.Account.Page.EmailConfirmed as EmailConfirmed
+import Component.Account.Page.EventCreation as EventCreation
 import Component.Main.Page.NotFound as NotFound
 import Html
     exposing
@@ -39,13 +40,14 @@ type Page
     | CreatedPage Created.Model
     | CreateKeysPage CreateKeys.Model
     | CreatePage Create.Model
+    | EventCreationPage EventCreation.Model
     | NotFoundPage
 
 
 type alias Model =
     { page : Page
-    , confirmToken : String
     , language : Language
+    , flags : Flags
     }
 
 
@@ -59,8 +61,8 @@ toLanguage maybeLocale =
             Translation.Korean
 
 
-initModel : Location -> Model
-initModel location =
+initModel : Location -> Flags -> Model
+initModel location flags =
     let
         route =
             location |> parseLocation
@@ -71,20 +73,26 @@ initModel location =
     case route of
         ConfirmEmailRoute maybeLocale ->
             { page = page
-            , confirmToken = ""
             , language = toLanguage maybeLocale
+            , flags = flags
             }
 
         EmailConfirmedRoute confirmToken email maybeLocale ->
             { page = page
-            , confirmToken = confirmToken
             , language = toLanguage maybeLocale
+            , flags = flags
+            }
+
+        EventCreationRoute maybeLocale ->
+            { page = page
+            , language = toLanguage maybeLocale
+            , flags = flags
             }
 
         _ ->
             { page = page
-            , confirmToken = ""
             , language = Translation.Korean
+            , flags = flags
             }
 
 
@@ -99,11 +107,12 @@ type Message
     | CreateKeysMessage CreateKeys.Message
     | CreatedMessage Created.Message
     | CreateMessage Create.Message
+    | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
 
 
 initCmd : Model -> Cmd Message
-initCmd { page, confirmToken } =
+initCmd { page, flags, language } =
     case page of
         CreateKeysPage subModel ->
             let
@@ -112,6 +121,16 @@ initCmd { page, confirmToken } =
 
                 cmd =
                     Cmd.map CreateKeysMessage subCmd
+            in
+            cmd
+
+        EventCreationPage subModel ->
+            let
+                ( _, subCmd ) =
+                    EventCreation.update EventCreation.GenerateKeys subModel flags language
+
+                cmd =
+                    Cmd.map EventCreationMessage subCmd
             in
             cmd
 
@@ -146,6 +165,9 @@ view { language, page } =
                 CreatePage subModel ->
                     Html.map CreateMessage (Create.view subModel language)
 
+                EventCreationPage subModel ->
+                    Html.map EventCreationMessage (EventCreation.view subModel language)
+
                 _ ->
                     NotFound.view language
     in
@@ -157,8 +179,8 @@ view { language, page } =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, confirmToken, language } as model) flags =
+update : Message -> Model -> ( Model, Cmd Message )
+update message ({ page, language, flags } as model) =
     case ( message, page ) of
         ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
             let
@@ -170,7 +192,7 @@ update message ({ page, confirmToken, language } as model) flags =
         ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    EmailConfirmed.update subMessage subModel confirmToken
+                    EmailConfirmed.update subMessage subModel "confirmToken"
             in
             ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
 
@@ -198,9 +220,16 @@ update message ({ page, confirmToken, language } as model) flags =
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags confirmToken language
+                    Create.update subMessage subModel flags "confirmToken" language
             in
             ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
+
+        ( EventCreationMessage subMessage, EventCreationPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    EventCreation.update subMessage subModel flags language
+            in
+            ( { model | page = newPage |> EventCreationPage }, Cmd.map EventCreationMessage subCmd )
 
         ( OnLocationChange location, _ ) ->
             let
@@ -229,7 +258,9 @@ update message ({ page, confirmToken, language } as model) flags =
 subscriptions : Model -> Sub Message
 subscriptions model =
     Sub.batch
-        [ Sub.map CreateKeysMessage CreateKeys.subscriptions ]
+        [ Sub.map CreateKeysMessage CreateKeys.subscriptions
+        , Sub.map EventCreationMessage EventCreation.subscriptions
+        ]
 
 
 
@@ -249,17 +280,16 @@ getPage route =
             EmailConfirmFailurePage EmailConfirmFailure.initModel
 
         CreateKeysRoute ->
-            let
-                createKeysModel =
-                    CreateKeys.initModel
-            in
-            CreateKeysPage createKeysModel
+            CreateKeysPage CreateKeys.initModel
 
         CreatedRoute ->
             CreatedPage Created.initModel
 
         CreateRoute pubkey ->
             CreatePage (Create.initModel pubkey)
+
+        EventCreationRoute maybeLocale ->
+            EventCreationPage EventCreation.initModel
 
         _ ->
             NotFoundPage

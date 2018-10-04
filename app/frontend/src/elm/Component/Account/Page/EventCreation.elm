@@ -1,0 +1,448 @@
+module Component.Account.Page.EventCreation exposing (Message(..), Model, createEosAccountBodyParams, initModel, subscriptions, update, view)
+
+import Html exposing (Html, a, article, br, button, dd, div, dl, dt, form, h2, h3, img, input, label, li, main_, ol, p, section, span, strong, text, textarea, time, ul)
+import Html.Attributes exposing (action, alt, attribute, class, for, href, id, name, pattern, placeholder, src, style, title, type_, value)
+import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
+import Json.Decode exposing (Decoder, decodeString, string)
+import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
+import Navigation
+import Port exposing (KeyPair)
+import Translation
+    exposing
+        ( I18n
+            ( AccountCreationAlreadyHaveAccount
+            , AccountCreationClickConfirmLink
+            , AccountCreationConfirmEmail
+            , AccountCreationEmailInvalid
+            , AccountCreationEmailSend
+            , AccountCreationEmailValid
+            , AccountCreationFailure
+            , AccountCreationLoginLink
+            , AccountCreationNameCondition
+            , AccountCreationNameConditionExample
+            , AccountCreationNameInvalid
+            , AccountCreationNamePlaceholder
+            , AccountCreationNameValid
+            , AccountCreationProgressCreateNew
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationTypeName
+            , ConfirmEmailSent
+            , DebugMessage
+            , EmptyMessage
+            , Next
+            , UnknownError
+            )
+        , Language
+        , toLocale
+        , translate
+        )
+import Util.Flags exposing (Flags)
+import Util.Urls as Urls
+import Util.Validation exposing (checkAccountName)
+import Validate exposing (isValidEmail)
+import View.I18nViews exposing (textViewI18n)
+import View.Notification as Notification
+
+
+
+-- MODEL
+
+
+type alias Model =
+    { accountName : String
+    , accountValidation : Bool
+    , accountValidationMsg : I18n
+    , accountRequestSuccess : Bool
+    , keys : KeyPair
+    , keyCopied : Bool
+    , email : String
+    , confirmToken : String
+    , emailValidationMsg : I18n
+    , emailRequested : Bool
+    , emailValid : Bool
+    , emailInputValid : String
+    , notification : Notification.Model
+    }
+
+
+initModel : Model
+initModel =
+    { accountName = ""
+    , accountValidation = False
+    , accountValidationMsg = EmptyMessage
+    , accountRequestSuccess = False
+    , keys = { privateKey = "", publicKey = "" }
+    , keyCopied = False
+    , email = ""
+    , confirmToken = ""
+    , emailValidationMsg = EmptyMessage
+    , emailRequested = False
+    , emailValid = False
+    , emailInputValid = "invalid"
+    , notification = Notification.initModel
+    }
+
+
+
+-- UPDATES
+
+
+type Message
+    = ValidateAccountName String
+    | CreateEosAccount
+    | NewEosAccount (Result Http.Error Response)
+    | GenerateKeys
+    | UpdateKeys KeyPair
+    | Copy
+    | ValidateEmail String
+    | CreateUser
+    | NewUser (Result Http.Error Response)
+    | NotificationMessage Notification.Message
+
+
+update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
+update msg ({ confirmToken, notification } as model) flags language =
+    case msg of
+        GenerateKeys ->
+            ( model, Port.generateKeys () )
+
+        UpdateKeys keyPair ->
+            ( { model | keys = keyPair }, Cmd.none )
+
+        Copy ->
+            ( { model | keyCopied = True }, Port.copy () )
+
+        ValidateAccountName accountName ->
+            let
+                newModel =
+                    { model | accountName = accountName }
+
+                ( validateMsg, validate ) =
+                    if checkAccountName accountName then
+                        ( AccountCreationNameValid, True )
+
+                    else
+                        ( AccountCreationNameInvalid, False )
+            in
+            ( { newModel | accountValidation = validate, accountValidationMsg = validateMsg }, Cmd.none )
+
+        CreateEosAccount ->
+            ( model, createEosAccountRequest model flags confirmToken language )
+
+        NewEosAccount (Ok res) ->
+            ( { model | accountRequestSuccess = True }, Navigation.newUrl "/account/created" )
+
+        NewEosAccount (Err error) ->
+            case error of
+                Http.BadStatus response ->
+                    ( { model
+                        | accountRequestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = EmptyMessage }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                Http.BadPayload debugMsg response ->
+                    ( { model
+                        | accountRequestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( { model
+                        | accountRequestSuccess = False
+                        , notification =
+                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage (toString error) }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+        ValidateEmail email ->
+            let
+                newModel =
+                    { model | email = email }
+
+                ( validationMsg, emailValid ) =
+                    if String.isEmpty email then
+                        ( EmptyMessage, False )
+
+                    else
+                        emailValidation newModel
+
+                inputValid =
+                    if emailValid then
+                        "valid"
+
+                    else
+                        "invalid"
+            in
+            ( { newModel | emailValidationMsg = validationMsg, emailValid = emailValid, emailInputValid = inputValid }, Cmd.none )
+
+        CreateUser ->
+            ( { model | emailRequested = True }, createUserRequest model flags language )
+
+        NewUser (Ok res) ->
+            ( { model
+                | notification =
+                    { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
+
+        NewUser (Err error) ->
+            case error of
+                Http.BadStatus response ->
+                    ( { model
+                        | emailRequested = False
+                        , notification =
+                            { content =
+                                Notification.Error
+                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    , detail = EmptyMessage
+                                    }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                Http.BadPayload debugMsg response ->
+                    ( { model
+                        | emailRequested = False
+                        , notification =
+                            { content =
+                                Notification.Error
+                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
+                                    }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+                _ ->
+                    ( { model
+                        | emailRequested = False
+                        , notification =
+                            { content =
+                                Notification.Error
+                                    { message = UnknownError
+                                    , detail = DebugMessage (toString error)
+                                    }
+                            , open = True
+                            }
+                      }
+                    , Cmd.none
+                    )
+
+        NotificationMessage Notification.CloseNotification ->
+            ( { model
+                | notification =
+                    { notification | open = False }
+              }
+            , Cmd.none
+            )
+
+
+
+-- VIEW
+
+
+view : Model -> Language -> Html Message
+view { accountValidation, accountName, accountValidationMsg, accountRequestSuccess, notification } language =
+    main_ [ class "join" ]
+        [ article []
+            [ h2 []
+                [ text "계정생성하기" ]
+            , p []
+                [ text "1-5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다." ]
+            , div [ class "container" ]
+                [ h3 []
+                    [ text "계정명 입력" ]
+                , input [ class "account_name", placeholder "ex) eoshuby12345", attribute "required" "", type_ "text" ]
+                    []
+                , span [ class "true validate" ]
+                    [ text "사용가능한 이메일입니다." ]
+                , span [ class "false validate" ]
+                    [ text "이미 존재하는 계정입니다." ]
+                , span [ class "false validate" ]
+                    [ text "이메일을 확인해주세요!" ]
+                ]
+            , div [ class "container" ]
+                [ h3 []
+                    [ text "키 생성" ]
+                , dl [ class "keybox" ]
+                    [ dt []
+                        [ text "공개 키" ]
+                    , dd [ title "툴팁" ]
+                        [ text "werwerewrwrwerwerwerwerwerewrwrwerwerwerwerwerewrwrwerwerwerwwwwerwerewrwrwerwerwerw" ]
+                    , dt []
+                        [ text "개인 키" ]
+                    , dd []
+                        [ text "werwerewrwrwerwerwerw" ]
+                    ]
+                , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
+                    [ text "PublicKey:sdfsdfsdf    PrivateKey:wefwefwefwef" ]
+                , button [ class "refresh button", type_ "button" ]
+                    [ text "새로 고침" ]
+                , div [ class "btn_area" ]
+                    [ button [ class "copy button", id "copy", type_ "button" ]
+                        [ text "키 한 번에 복사하기" ]
+                    ]
+                , p [ class "important description" ]
+                    [ text "* 계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!" ]
+                ]
+            , h3 []
+                [ text "이메일 인증" ]
+            , div [ class "container" ]
+                [ section [ class "email verification" ]
+                    [ input [ name "", pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$", placeholder "이메일을 입력해주세요.", type_ "email", value "" ]
+                        []
+                    , button [ class "action button", id "sendCode", type_ "button" ]
+                        [ text "코드 전송" ]
+                    , input [ id "inputCode", name "", placeholder "메일로 전송된 코드를 입력해주세요.", type_ "text", value "" ]
+                        []
+                    , button [ class "action button", attribute "disabled" "", id "inputCodeValidate", type_ "button" ]
+                        [ text "확인" ]
+                    ]
+                , div [ class "validation bunch" ]
+                    [ span [ class "description" ]
+                        [ time []
+                            [ text "3:00" ]
+                        , text "안으로 코드를 입력해주세요.  "
+                        ]
+                    , span [ class "false validate description" ]
+                        [ text "일치하지 않는 코드입니다." ]
+                    , span [ class "true validate description" ]
+                        [ text "이메일 인증이 완료됐습니다." ]
+                    , button [ class "re_send button", type_ "button" ]
+                        [ text "코드 재전송" ]
+                    ]
+                ]
+            , div [ class "confirm area" ]
+                [ section []
+                    [ input [ id "agreeContract", type_ "checkbox" ]
+                        []
+                    , label [ for "agreeContract" ]
+                        [ text "EOS Consitution에 동의합니다." ]
+                    ]
+                , button [ class "ok button", attribute "disabled" "", type_ "button" ]
+                    [ text "생성하기" ]
+                ]
+            , p [ class "exist_account" ]
+                [ text "이미 이오스 계정이 있으신가요?          "
+                , a [ href "index-view.html" ]
+                    [ text "로그인하기" ]
+                ]
+            ]
+        ]
+
+
+
+-- HTTP
+
+
+type alias Response =
+    { msg : String }
+
+
+accountResponseDecoder : Decoder Response
+accountResponseDecoder =
+    decode Response
+        |> required "msg" string
+
+
+createEosAccountBodyParams : Model -> Http.Body
+createEosAccountBodyParams model =
+    Encode.object
+        [ ( "account_name", Encode.string model.accountName )
+        , ( "pubkey", Encode.string model.keys.publicKey )
+        ]
+        |> Http.jsonBody
+
+
+postCreateEosAccount : Model -> Flags -> String -> Language -> Http.Request Response
+postCreateEosAccount model flags confirmToken language =
+    let
+        url =
+            Urls.createEosAccountUrl flags confirmToken (toLocale language)
+
+        params =
+            createEosAccountBodyParams model
+    in
+    Http.post url params accountResponseDecoder
+
+
+createEosAccountRequest : Model -> Flags -> String -> Language -> Cmd Message
+createEosAccountRequest model flags confirmToken language =
+    Http.send NewEosAccount <| postCreateEosAccount model flags confirmToken language
+
+
+emailResponseDecoder : Decoder Response
+emailResponseDecoder =
+    decode Response
+        |> required "msg" string
+
+
+createUserBodyParams : Model -> Http.Body
+createUserBodyParams model =
+    Encode.object [ ( "email", Encode.string model.email ) ]
+        |> Http.jsonBody
+
+
+postUsers : Model -> Flags -> Language -> Http.Request Response
+postUsers model flags language =
+    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) emailResponseDecoder
+
+
+createUserRequest : Model -> Flags -> Language -> Cmd Message
+createUserRequest model flags language =
+    Http.send NewUser <| postUsers model flags language
+
+
+decodeResponseBodyMsg : Http.Response String -> String
+decodeResponseBodyMsg response =
+    case decodeString emailResponseDecoder response.body of
+        Ok body ->
+            body.msg
+
+        Err body ->
+            body
+
+
+
+-- VALIDATION
+
+
+emailValidation : Model -> ( I18n, Bool )
+emailValidation { email } =
+    if isValidEmail email then
+        ( AccountCreationEmailValid, True )
+
+    else
+        ( AccountCreationEmailInvalid, False )
+
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Sub Message
+subscriptions =
+    Port.receiveKeys UpdateKeys
