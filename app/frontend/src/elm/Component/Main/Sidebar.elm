@@ -19,6 +19,8 @@ import Data.Account
         ( Account
         , accountDecoder
         , defaultAccount
+        , getResource
+        , getResourceColorClass
         , getTotalAmount
         , getUnstakingAmount
         )
@@ -260,6 +262,15 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
                             ""
                        )
                 )
+
+        ( _, _, _, _, cpuColorCode ) =
+            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
+
+        ( _, _, _, _, netColorCode ) =
+            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
+
+        colorCode =
+            Basics.min cpuColorCode netColorCode |> getResourceColorClass
     in
     [ h2 []
         [ text wallet.account
@@ -299,7 +310,9 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
         , li []
             [ span [ class "title" ] [ text "stake" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
-            , span [ class "status available" ] [ text (translate language TransactionPossible) ]
+
+            -- TODO(boseok): wording should be decided
+            , span [ class ("status " ++ colorCode) ] [ text (translate language TransactionPossible) ]
 
             -- span [ class "status unavailable" ] [ text "" ]
             ]

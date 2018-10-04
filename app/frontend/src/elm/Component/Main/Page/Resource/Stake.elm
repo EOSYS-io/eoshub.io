@@ -25,7 +25,6 @@ import Data.Account
         , ResourceInEos
         , accountDecoder
         , defaultAccount
-        , getResource
         , getTotalAmount
         , getUnstakingAmount
         , keyAccountsDecoder
@@ -284,16 +283,6 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
 
 view : Language -> Model -> Account -> Html Message
 view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
-    let
-        stakedAmount =
-            floatToAsset (larimerToEos account.voterInfo.staked)
-
-        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
-            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
-
-        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
-            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
-    in
     div [ class "stake container" ]
         [ section []
             [ div [ class "wallet status" ]

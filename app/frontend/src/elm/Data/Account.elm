@@ -7,6 +7,7 @@ module Data.Account exposing
     , accountDecoder
     , defaultAccount
     , getResource
+    , getResourceColorClass
     , getTotalAmount
     , getUnstakingAmount
     , intOrStringDecoder
@@ -200,7 +201,7 @@ getUnstakingAmount unstakingNetAmount unstakingCpuAmount =
     floatToAsset (assetToFloat unstakingNetAmount + assetToFloat unstakingCpuAmount)
 
 
-getResource : String -> Int -> Int -> Int -> ( String, String, String, String, String )
+getResource : String -> Int -> Int -> Int -> ( String, String, String, String, Int )
 getResource resourceType used available max =
     let
         -- NOTE(boseok): there's no ram available field, so calculate it by (available = max - used).
@@ -258,10 +259,10 @@ getResource resourceType used available max =
         color =
             case max of
                 0 ->
-                    "hell"
+                    1
 
                 (-1) ->
-                    "fine"
+                    4
 
                 _ ->
                     let
@@ -269,15 +270,34 @@ getResource resourceType used available max =
                             percentageConverter available max
                     in
                     if percentage < 10 then
-                        "hell"
+                        1
 
                     else if percentage >= 10 && percentage < 30 then
-                        "bad"
+                        2
 
                     else if percentage >= 30 && percentage < 100 then
-                        "good"
+                        3
 
                     else
-                        "fine"
+                        4
     in
     ( usedString, availableString, totalString, avaliablePercent, color )
+
+
+getResourceColorClass : Int -> String
+getResourceColorClass code =
+    case code of
+        1 ->
+            "hell"
+
+        2 ->
+            "bad"
+
+        3 ->
+            "good"
+
+        4 ->
+            "fine"
+
+        _ ->
+            ""

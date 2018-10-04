@@ -23,7 +23,6 @@ import Data.Account
         , ResourceInEos
         , accountDecoder
         , defaultAccount
-        , getResource
         , getTotalAmount
         , getUnstakingAmount
         , keyAccountsDecoder
@@ -215,12 +214,6 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
 
         unstakePossibleNet =
             getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
-
-        ( _, _, _, cpuPercent, cpuColor ) =
-            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
-
-        ( _, _, _, netPercent, netColor ) =
-            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
         ( validatedText, validatedAttr ) =
             validateText language model
