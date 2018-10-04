@@ -130,6 +130,8 @@ type I18n
     | Next
     | AccountCreationEmailConfirmFailure
     | AccountCreationKeypairGenerated
+    | AccountCreationKeypairGeneration
+    | AccountCreationKeypairRegenerate
     | AccountCreationKeypairCaution
     | PublicKey
     | PrivateKey
@@ -671,10 +673,22 @@ getMessages i18n =
             , chinese = "确保将密钥对复制到安全的地方！"
             }
 
+        AccountCreationKeypairGeneration ->
+            { korean = "키 생성"
+            , english = "Key pair generation"
+            , chinese = "密钥生成"
+            }
+
+        AccountCreationKeypairRegenerate ->
+            { korean = "새로 고침"
+            , english = "Regenerate"
+            , chinese = "刷新"
+            }
+
         AccountCreationKeypairCaution ->
-            { korean = "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
-            , english = "Make sure you save the key pair somewhere safe! It is used to verify your account."
-            , chinese = "确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
+            { korean = "* 계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
+            , english = "* Make sure you save the key pair somewhere safe! It is used to verify your account."
+            , chinese = "* 确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
             }
 
         PublicKey ->

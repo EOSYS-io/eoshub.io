@@ -21,6 +21,9 @@ import Translation
             , AccountCreationEmailValid
             , AccountCreationFailure
             , AccountCreationInput
+            , AccountCreationKeypairCaution
+            , AccountCreationKeypairGeneration
+            , AccountCreationKeypairRegenerate
             , AccountCreationLoginLink
             , AccountCreationNameCondition
             , AccountCreationNameConditionExample
@@ -31,9 +34,12 @@ import Translation
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
             , ConfirmEmailSent
+            , CopyAll
             , DebugMessage
             , EmptyMessage
             , Next
+            , PrivateKey
+            , PublicKey
             , UnknownError
             )
         , Language
@@ -311,6 +317,33 @@ accountInput { accountName, accountValidation, accountValidationMsg } language =
     ]
 
 
+keypairGenerationView : Model -> Language -> List (Html Message)
+keypairGenerationView { keys } language =
+    [ h3 []
+        [ textViewI18n language AccountCreationKeypairGeneration ]
+    , dl [ class "keybox" ]
+        [ dt []
+            [ textViewI18n language PublicKey ]
+        , dd []
+            [ text keys.publicKey ]
+        , dt []
+            [ textViewI18n language PrivateKey ]
+        , dd []
+            [ text keys.privateKey ]
+        ]
+    , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
+        [ text ("PublicKey:" ++ keys.publicKey ++ " \nPrivateKey:" ++ keys.privateKey) ]
+    , button [ class "refresh button", type_ "button", onClick GenerateKeys ]
+        [ textViewI18n language AccountCreationKeypairRegenerate ]
+    , div [ class "btn_area" ]
+        [ button [ class "copy button", id "copy", type_ "button", onClick Copy ]
+            [ textViewI18n language CopyAll ]
+        ]
+    , p [ class "important description" ]
+        [ textViewI18n language AccountCreationKeypairCaution ]
+    ]
+
+
 view : Model -> Language -> Html Message
 view ({ accountValidation, accountName, accountValidationMsg, accountRequestSuccess, notification } as model) language =
     main_ [ class "join" ]
@@ -322,29 +355,7 @@ view ({ accountValidation, accountName, accountValidationMsg, accountRequestSucc
             , div [ class "container" ]
                 (accountInput model language)
             , div [ class "container" ]
-                [ h3 []
-                    [ text "키 생성" ]
-                , dl [ class "keybox" ]
-                    [ dt []
-                        [ text "공개 키" ]
-                    , dd [ title "툴팁" ]
-                        [ text "werwerewrwrwerwerwerwerwerewrwrwerwerwerwerwerewrwrwerwerwerwwwwerwerewrwrwerwerwerw" ]
-                    , dt []
-                        [ text "개인 키" ]
-                    , dd []
-                        [ text "werwerewrwrwerwerwerw" ]
-                    ]
-                , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
-                    [ text "PublicKey:sdfsdfsdf    PrivateKey:wefwefwefwef" ]
-                , button [ class "refresh button", type_ "button" ]
-                    [ text "새로 고침" ]
-                , div [ class "btn_area" ]
-                    [ button [ class "copy button", id "copy", type_ "button" ]
-                        [ text "키 한 번에 복사하기" ]
-                    ]
-                , p [ class "important description" ]
-                    [ text "* 계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!" ]
-                ]
+                (keypairGenerationView model language)
             , h3 []
                 [ text "이메일 인증" ]
             , div [ class "container" ]
