@@ -101,6 +101,7 @@ type Message
     | CreateUser
     | NewUser (Result Http.Error Response)
     | NotificationMessage Notification.Message
+    | ChangeUrl String
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
@@ -259,6 +260,9 @@ update msg ({ confirmToken, notification } as model) flags language =
             , Cmd.none
             )
 
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
+
 
 
 -- VIEW
@@ -346,9 +350,9 @@ view { accountValidation, accountName, accountValidationMsg, accountRequestSucce
                     [ text "생성하기" ]
                 ]
             , p [ class "exist_account" ]
-                [ text "이미 이오스 계정이 있으신가요?          "
-                , a [ href "index-view.html" ]
-                    [ text "로그인하기" ]
+                [ textViewI18n language AccountCreationAlreadyHaveAccount
+                , a [ onClick (ChangeUrl "/") ]
+                    [ textViewI18n language AccountCreationLoginLink ]
                 ]
             ]
         ]
