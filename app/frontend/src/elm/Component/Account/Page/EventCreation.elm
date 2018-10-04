@@ -12,13 +12,15 @@ import Port exposing (KeyPair)
 import Translation
     exposing
         ( I18n
-            ( AccountCreationAlreadyHaveAccount
+            ( AccountCreation
+            , AccountCreationAlreadyHaveAccount
             , AccountCreationClickConfirmLink
             , AccountCreationConfirmEmail
             , AccountCreationEmailInvalid
             , AccountCreationEmailSend
             , AccountCreationEmailValid
             , AccountCreationFailure
+            , AccountCreationInput
             , AccountCreationLoginLink
             , AccountCreationNameCondition
             , AccountCreationNameConditionExample
@@ -28,7 +30,6 @@ import Translation
             , AccountCreationProgressCreateNew
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
-            , AccountCreationTypeName
             , ConfirmEmailSent
             , DebugMessage
             , EmptyMessage
@@ -268,26 +269,58 @@ update msg ({ confirmToken, notification } as model) flags language =
 -- VIEW
 
 
+accountInput : Model -> Language -> List (Html Message)
+accountInput { accountName, accountValidation, accountValidationMsg } language =
+    [ h3 []
+        [ textViewI18n language AccountCreationInput ]
+    , input
+        [ class "account_name"
+        , placeholder (translate language AccountCreationNamePlaceholder)
+        , attribute "required" ""
+        , attribute
+            (if accountValidation then
+                "valid"
+
+             else
+                "invalid"
+            )
+            ""
+        , type_ "text"
+        , onInput ValidateAccountName
+        ]
+        []
+    , span
+        [ style
+            [ ( "visibility"
+              , if String.isEmpty accountName then
+                    "hidden"
+
+                else
+                    "visible"
+              )
+            ]
+        , class
+            (if accountValidation then
+                "true validate"
+
+             else
+                "false validate"
+            )
+        ]
+        [ textViewI18n language accountValidationMsg ]
+    ]
+
+
 view : Model -> Language -> Html Message
-view { accountValidation, accountName, accountValidationMsg, accountRequestSuccess, notification } language =
+view ({ accountValidation, accountName, accountValidationMsg, accountRequestSuccess, notification } as model) language =
     main_ [ class "join" ]
         [ article []
             [ h2 []
-                [ text "계정생성하기" ]
+                [ textViewI18n language AccountCreation ]
             , p []
-                [ text "1-5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다." ]
+                [ textViewI18n language AccountCreationNameCondition ]
             , div [ class "container" ]
-                [ h3 []
-                    [ text "계정명 입력" ]
-                , input [ class "account_name", placeholder "ex) eoshuby12345", attribute "required" "", type_ "text" ]
-                    []
-                , span [ class "true validate" ]
-                    [ text "사용가능한 이메일입니다." ]
-                , span [ class "false validate" ]
-                    [ text "이미 존재하는 계정입니다." ]
-                , span [ class "false validate" ]
-                    [ text "이메일을 확인해주세요!" ]
-                ]
+                (accountInput model language)
             , div [ class "container" ]
                 [ h3 []
                     [ text "키 생성" ]

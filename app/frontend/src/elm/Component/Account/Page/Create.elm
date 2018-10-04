@@ -11,7 +11,8 @@ import Navigation
 import Translation
     exposing
         ( I18n
-            ( AccountCreationFailure
+            ( AccountCreation
+            , AccountCreationFailure
             , AccountCreationNameCondition
             , AccountCreationNameConditionExample
             , AccountCreationNameInvalid
@@ -20,7 +21,6 @@ import Translation
             , AccountCreationProgressCreateNew
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
-            , AccountCreationTypeName
             , DebugMessage
             , EmptyMessage
             , Next
@@ -150,7 +150,7 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
             [ span [ class "progress", attribute "data-progress" "01" ]
                 [ text "01" ]
             , h2 []
-                [ textViewI18n language AccountCreationTypeName ]
+                [ textViewI18n language AccountCreation ]
             , p []
                 [ textViewI18n language AccountCreationNameCondition ]
             , form []
@@ -170,6 +170,18 @@ view { validation, accountName, validationMsg, requestSuccess, notification } la
                     , onInput ValidateAccountName
                     ]
                     []
+                , span
+                    [ style
+                        [ ( "visibility"
+                          , if String.isEmpty accountName then
+                                "hidden"
+
+                            else
+                                "visible"
+                          )
+                        ]
+                    ]
+                    [ textViewI18n language validationMsg ]
                 ]
             , div [ class "btn_area" ]
                 [ button
