@@ -31,19 +31,30 @@ class EosRamPriceHistory < ApplicationRecord
     intvls.each do | intvl_record | 
       intvl = intvl_record.seconds
       start = Time.at((Time.now.to_i/intvl).floor * intvl).to_datetime
-      new_record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
-        record.end_time = Time.at(start.to_i + intvl).to_datetime
-        record.open = price
-        record.close = price
-        record.high = price
-        record.low = price
-      end
+      begin
+        new_record = find_or_initialize_by(intvl: intvl, start_time: start) do | record |
+          record.end_time = Time.at(start.to_i + intvl).to_datetime
+          record.open = price
+          record.close = price
+          record.high = price
+          record.low = price
+        end
 
-      new_record.update(
-        close: price,
-        high: [new_record.high, price].max,
-        low: [new_record.low, price].min
-      )
+        new_record.update(
+          close: price,
+          high: [new_record.high, price].max,
+          low: [new_record.low, price].min
+        )
+      rescue ActiveRecord::RecordNotUnique
+        # This case can happen in multithreaded environment when active record cannot sync with database.
+        existing_record = where({ intvl: intvl, start_time: start}).first
+        existing_record.update(
+          close: price,
+          high: [new_record.high, price].max,
+          low: [new_record.low, price].min
+        )
+        # As it is already inserted, do nothing.
+      end
     end
   end
 end
