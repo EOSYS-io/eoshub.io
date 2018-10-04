@@ -184,7 +184,7 @@ timeFormatter : String -> String
 timeFormatter time =
     case Date.fromIsoString (time ++ "+00:00") of
         Ok date ->
-            Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
+            Date.toFormattedString "HH:mm:ss YYYY/MM/dd" date
 
         Err str ->
             str
