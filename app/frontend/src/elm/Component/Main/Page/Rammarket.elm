@@ -15,11 +15,9 @@ import Data.Action
     exposing
         ( Action
         , BuyramParameters
-        , SellramParameters
         , actionsDecoder
         , encodeAction
         , initBuyramParameters
-        , initSellramParameters
         )
 import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
@@ -109,6 +107,20 @@ initBuyModel =
     , accountValidation = EmptyAccount
     , quantityValidation = EmptyQuantity
     , isValid = False
+    }
+
+
+
+-- Redefine sellram parameters to make default unit as kilo bytes.
+
+
+type alias SellramParameters =
+    { kiloBytes : String
+    }
+
+
+initSellramParameters =
+    { kiloBytes = "0"
     }
 
 
@@ -352,7 +364,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                             denominator =
                                 kilo |> toFloat
                         in
-                        ( SetSellFormField ((newQuantity / denominator) |> Round.round 8)
+                        ( SetSellFormField ((newQuantity / denominator) |> Round.floor 3)
                         , { model
                             | sellModel = { sellModel | distribution = distribution }
                           }
@@ -400,11 +412,11 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
             else
                 let
-                    { params } =
-                        sellModel
+                    bytes =
+                        ((sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0) * (kilo |> toFloat)) |> floor
 
                     newParams =
-                        { params | account = accountName }
+                        Data.Action.SellramParameters accountName bytes
                 in
                 ( model, newParams |> Data.Action.Sellram |> encodeAction |> Port.pushAction )
 
@@ -436,7 +448,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                         [ h3 []
                             [ text "나의 램"
                             , span []
-                                [ text ((((ramQuota |> toFloat) / (kilo |> toFloat)) |> Round.round 3) ++ " KB") ]
+                                [ text ((((ramQuota |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB") ]
                             ]
                         ]
                     , buySellTab model account
@@ -555,7 +567,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
             coreLiquidBalance |> assetToFloat
 
         ( byteText, byteQuant ) =
-            ( "KB", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 3 )
+            ( "KB", sellModel.params.kiloBytes )
 
         ( buyClass, sellClass, buyOthersRamTab, buttonText, inputText, inputMsg, inputQuant, inputPlaceholder, buttonDisabled ) =
             if isBuyTab then
@@ -602,16 +614,16 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                     ++ (((1 / ramPrice)
                             * (buyModel.params.quant |> String.toFloat |> Result.withDefault 0)
                         )
-                            |> Round.round 3
+                            |> Round.floor 3
                        )
                     ++ " KB"
                 )
 
             else
                 ( "판매가능수량"
-                , (((availableRam |> toFloat) / 1024) |> Round.round 3) ++ " KB"
+                , (((availableRam |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB"
                 , "* 판매시 0.5%의 수수료가 발생합니다. "
-                , ((ramPrice * ((sellModel.params.bytes |> toFloat) / 1024)) |> Round.round 4) ++ " EOS"
+                , ((ramPrice * (sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0)) |> Round.round 4) ++ " EOS"
                 )
 
         selectDiv =
@@ -855,15 +867,8 @@ setBuyFormField field ({ params } as buyModel) availableQuantity val requestStat
 
 setSellFormField : SellModel -> Int -> String -> SellModel
 setSellFormField ({ params } as sellModel) availableRam val =
-    let
-        multiplier =
-            kilo |> toFloat
-
-        intValue =
-            val |> String.toFloat |> Result.withDefault 0 |> (*) multiplier |> floor
-    in
     validateSell
-        { sellModel | params = { params | bytes = intValue } }
+        { sellModel | params = { params | kiloBytes = val } }
         availableRam
 
 
@@ -921,8 +926,11 @@ validateQuantityField ({ params } as buyModel) availableQuantity =
 validateSell : SellModel -> Int -> SellModel
 validateSell ({ params } as sellModel) availableRam =
     let
-        { bytes } =
+        { kiloBytes } =
             params
+
+        bytes =
+            ((kiloBytes |> String.toFloat |> Result.withDefault 0) * (kilo |> toFloat)) |> floor
 
         quantityValidation =
             if bytes <= 0 then
