@@ -295,12 +295,15 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
     in
     div [ class "stake container" ]
-        [ section []
+        [ p []
+            [ text "스테이크 가능한 토큰 수량"
+            , em []
+                [ text coreLiquidBalance ]
+            ]
+        , section []
             [ div [ class "wallet status" ]
                 [ h3 []
-                    [ text "스테이크 가능한 토큰" ]
-                , p []
-                    [ text coreLiquidBalance ]
+                    [ text "최소 1 EOS 이상은 스테이크 해놓으시는게 좋습니다. :)" ]
                 , a [ onClick OpenStakeAmountModal ]
                     [ text "직접설정" ]
                 ]
