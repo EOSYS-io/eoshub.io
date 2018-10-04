@@ -67,6 +67,12 @@ assetSubtract a b =
         |> floatToAsset
 
 
+
+-- NOTE(boseok): if it needs other digit scales, then it shoud be changed like belows
+-- getRoundedRatio : Int -> Int -> Int -> String
+-- getRoundRatio numerator denominator digit(roundDigit)
+
+
 unitConverterRound2 : Int -> Int -> String
 unitConverterRound2 value unit =
     Round.round 2 (toFloat value / toFloat unit)
