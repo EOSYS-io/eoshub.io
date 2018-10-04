@@ -538,90 +538,6 @@ aside.shrink {
 		}
 	}
 
-}
-
-// type case
-.resource_management .modal.popup {
-	@include media ('>1600px') {
-		left:300px;
-	}
-	@include media ('>1280px','<=1600px') {
-		left:18.75vw;
-	}
-	@include media ('<=1280px') {
-		left:240px;
-	}
-}
-
-
-
-// type case
-.modal.popup.rental_account .result.list {
-	ul,li,p {
-		margin:0;
-		padding:0;
-		list-style-type:none;
-	}
-
-	li {
-		font-size:$x-small;
-		background-color:$xx-dark-gray;
-		padding:16px;
-		position:relative;
-
-		h3 {
-			margin-bottom:8px;
-		}
-
-		p {
-			line-height:1.5;
-		}
-
-		button {
-			color:$red;
-			position:absolute;
-			right:16px;
-			top:50%;
-			transform:translateY(-50%);
-		}
-
-		margin-top:8px;
-		&:first-child {
-			margin-top:0;
-		}
-	}
-}
-// type case
-.modal.popup.buy_ram {
-	form {
-		margin-bottom:0;
-		border-radius:0;
-		border-bottom:1px solid $white;
-	}
-
-	form + .container {
-		margin-top:12px;
-		margin-left:32px;
-	}
-
-	.btn_area {
-		margin:43px 32px 0;
-		button {
-			width:100%;
-		}
-	}
-}
-
-.modal.popup.set_division_manual {
-	.wrapper {
-		background-color:$xx-dark-gray;
-		padding:0 0 32px 0;
-	}
-
-	h2 {
-		@include screen_reader();
-	}
-
 	.token.status {
 		padding:32px;
 		background-color:$xxx-dark-gray;
@@ -666,6 +582,90 @@ aside.shrink {
 				}
 			}
 		}
+	}
+
+	.result.list {
+		ul,li,p {
+			margin:0;
+			padding:0;
+			list-style-type:none;
+		}
+
+		li {
+			font-size:$x-small;
+			background-color:$xxx-dark-gray;
+			padding:16px;
+			position:relative;
+
+			h3 {
+				margin-bottom:8px;
+			}
+
+			p {
+				line-height:1.5;
+			}
+
+			button {
+				color:$red;
+				position:absolute;
+				right:16px;
+				top:50%;
+				transform:translateY(-50%);
+			}
+
+			margin-top:8px;
+			&:first-child {
+				margin-top:0;
+			}
+		}
+	}
+
+}
+
+// type case
+.resource_management .modal.popup {
+	@include media ('>1600px') {
+		left:300px;
+	}
+	@include media ('>1280px','<=1600px') {
+		left:18.75vw;
+	}
+	@include media ('<=1280px') {
+		left:240px;
+	}
+}
+
+
+
+// type case
+.modal.popup.buy_ram {
+	form {
+		margin-bottom:0;
+		border-radius:0;
+		border-bottom:1px solid $white;
+	}
+
+	form + .container {
+		margin-top:12px;
+		margin-left:32px;
+	}
+
+	.btn_area {
+		margin:43px 32px 0;
+		button {
+			width:100%;
+		}
+	}
+}
+
+.modal.popup.set_division_manual {
+	.wrapper {
+		background-color:$xx-dark-gray;
+		padding:0 0 32px 0;
+	}
+
+	h2 {
+		@include screen_reader();
 	}
 
 	.form.container {
@@ -852,6 +852,26 @@ aside.shrink {
 	}
 }
 
+
+.modal.popup.rental_account.cancel {
+	.wrapper {
+		padding-top:0;
+		background-color:$xx-dark-gray;
+	}
+
+	.token.status + h3 {
+		font-size:$small;
+		margin-left:32px;
+		margin-top:24px;
+	}
+
+	form {
+		margin-top:16px;
+		margin-bottom:16px;
+		background-color:$x-dark-gray;
+	}
+}
+// type case
 
 
 
