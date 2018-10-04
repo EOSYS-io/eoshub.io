@@ -253,7 +253,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
     in
     main_ [ class "search" ]
         [ h2 []
-            [ text (translate language TotalAmount) ]
+            [ text (translate language SearchAccount) ]
         , p []
             [ text (translate language SearchResultAccount) ]
         , div [ class "container" ]

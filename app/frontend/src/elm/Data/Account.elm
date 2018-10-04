@@ -24,7 +24,7 @@ import Util.Formatter
         , larimerToEos
         , percentageConverter
         , resourceUnitConverter
-        , unitConverterRound4
+        , unitConverterRound2
         )
 
 
