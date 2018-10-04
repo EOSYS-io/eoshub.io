@@ -258,7 +258,7 @@ main.resource_management {
 		}
 	}
 
-	section {
+	section:not(.modal) {
 		margin:8px 32px;
 		padding:32px;
 		background-color:$xxxx-dark-gray;
@@ -289,7 +289,7 @@ main.resource_management {
 		}
 	}
 
-	section {
+	section:not(.modal) {
 		display:flex;
 		flex-direction:column;
 		height:277px;
