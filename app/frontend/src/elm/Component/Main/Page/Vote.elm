@@ -8,7 +8,7 @@ module Component.Main.Page.Vote exposing
     , view
     )
 
-import Data.Account exposing (Account)
+import Data.Account exposing (Account, defaultAccount)
 import Data.Action exposing (encodeAction)
 import Data.Json
     exposing
@@ -286,16 +286,16 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
 -- VIEW
 
 
-view : Language -> Model -> Html Message
-view _ ({ tab, now } as model) =
+view : Language -> Model -> Account -> Html Message
+view _ ({ tab, now } as model) account =
     let
         ( addedMainClass, tabView, voteTabClass, proxyVoteTabClass ) =
             case tab of
                 VoteTab ->
-                    ( "", voteView model now, " ing", "" )
+                    ( "", voteView model account now, " ing", "" )
 
                 ProxyVoteTab ->
-                    ( " proxy", proxyView model, "", " ing" )
+                    ( " proxy", proxyView model account, "", " ing" )
     in
     main_ [ class ("vote" ++ addedMainClass) ]
         [ h2 []
@@ -318,8 +318,8 @@ view _ ({ tab, now } as model) =
         ]
 
 
-voteView : Model -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } now =
+voteView : Model -> Account -> Time -> List (Html Message)
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } account now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -360,6 +360,9 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
 
             else
                 text ""
+
+        buttonDisabled =
+            account == defaultAccount || Set.size producerNamesToVote == 0
     in
     [ section [ class "vote summary" ]
         [ h3 []
@@ -415,6 +418,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                         , button
                             [ class "vote ok button"
                             , type_ "button"
+                            , disabled buttonDisabled
                             , onClick SubmitVoteProducersAction
                             ]
                             [ text "투표" ]
@@ -502,8 +506,8 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
         ]
 
 
-proxyView : Model -> List (Html Message)
-proxyView { voteStat, producers, proxies } =
+proxyView : Model -> Account -> List (Html Message)
+proxyView { voteStat, producers, proxies } account =
     let
         formattedProxiedEos =
             voteStat.eosysProxyStakedEos
@@ -526,6 +530,7 @@ proxyView { voteStat, producers, proxies } =
             , button
                 [ class "ok button"
                 , type_ "button"
+                , disabled (account == defaultAccount)
                 , onClick SubmitVoteProxyAction
                 ]
                 [ text "대리투표 하기" ]
