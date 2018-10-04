@@ -46,12 +46,12 @@ class EosRamPriceHistory < ApplicationRecord
           low: [new_record.low, price].min
         )
       rescue ActiveRecord::RecordNotUnique
-        # This case can happen in multithreaded environment when active record cannot sync with database.
-        existing_record = where({ intvl: intvl, start_time: start}).first
+        # This case can happen when active record cannot sync with a database in the concurrent environment.
+        existing_record = where(intvl: intvl, start_time: start).first
         existing_record.update(
           close: price,
-          high: [new_record.high, price].max,
-          low: [new_record.low, price].min
+          high: [existing_record.high, price].max,
+          low: [existing_record.low, price].min
         )
         # As it is already inserted, do nothing.
       end
