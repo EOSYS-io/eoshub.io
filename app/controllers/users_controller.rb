@@ -4,8 +4,8 @@ class UsersController < ApiController
   def create
     @user = User.find_by(email: params[:email])
     if @user.present?
-      unless @user.email_saved?
-        render json: { message: I18n.t('users.already_confirmed_email') }, status: :bad_request and return
+      if @user.eos_account_created?
+        render json: { message: I18n.t('users.already_eos_account_created_email') }, status: :bad_request and return
       end
     else
       @user = User.new(email: params[:email])
@@ -25,9 +25,9 @@ class UsersController < ApiController
     user = User.find_by(confirm_token: confirm_token)
     if user.present?
       user.email_confirmed!
-      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}?email=#{user.email}&locale=#{I18n.locale}"
+      render json: { message: I18n.t('users.email_confirmed') }, status: :ok
     else
-      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}?locale=#{I18n.locale}"
+      render json: { message: I18n.t('users.invalid_email_confirm_token') }, status: :bad_request
     end
   end
 

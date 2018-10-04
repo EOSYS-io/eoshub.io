@@ -1,5 +1,6 @@
 module Util.Urls exposing
-    ( createEosAccountUrl
+    ( confirmEmailUrl
+    , createEosAccountUrl
     , getProducersUrl
     , getRecentVoteStatUrl
     , mainnetRpcUrl
@@ -30,6 +31,11 @@ eoshubHost flags =
 usersApiUrl : Flags -> String -> String
 usersApiUrl flags locale =
     eoshubHost flags ++ "/users?locale=" ++ locale
+
+
+confirmEmailUrl : Flags -> String -> String -> String
+confirmEmailUrl flags confirmToken locale =
+    eoshubHost flags ++ "/users/" ++ confirmToken ++ "/confirm_email?locale=" ++ locale
 
 
 createEosAccountUrl : Flags -> String -> String -> String

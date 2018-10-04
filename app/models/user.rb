@@ -37,7 +37,7 @@ class User < ApplicationRecord
     state :email_confirmed, :eos_account_created
 
     event :email_confirmed do
-      transitions from: :email_saved, to: :email_confirmed
+      transitions from: [:email_saved, :email_confirmed], to: :email_confirmed
     end
 
     event :eos_account_created, before_transaction: :reset_confirm_token do

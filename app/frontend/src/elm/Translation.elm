@@ -665,9 +665,9 @@ getMessages i18n =
             }
 
         AccountCreationEmailConfirmed ->
-            { korean = "이메일 인증완료!"
+            { korean = "이메일 인증이 완료되었습니다."
             , english = "Email Confirmed!"
-            , chinese = "电子邮件已确认！"
+            , chinese = "电子邮件验证已完成。"
             }
 
         ClickNext ->
@@ -683,9 +683,9 @@ getMessages i18n =
             }
 
         AccountCreationEmailConfirmFailure ->
-            { korean = "이메일 인증 실패"
-            , english = "Failed to confirm email"
-            , chinese = "电子邮件验证失败"
+            { korean = "일치하지 않는 코드입니다."
+            , english = "Unmatched code"
+            , chinese = "无与伦比的代码。"
             }
 
         AccountCreationKeypairGenerated ->

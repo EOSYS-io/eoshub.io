@@ -16,6 +16,8 @@ import Translation
             , AccountCreationAlreadyHaveAccount
             , AccountCreationClickConfirmLink
             , AccountCreationConfirmEmail
+            , AccountCreationEmailConfirmFailure
+            , AccountCreationEmailConfirmed
             , AccountCreationEmailInvalid
             , AccountCreationEmailValid
             , AccountCreationEnterEmail
@@ -74,6 +76,9 @@ type alias Model =
     , emailValid : Bool
     , confirmToken : String
     , confirmTokenValid : Bool
+    , emailConfirmationRequested : Bool
+    , emailConfirmed : Bool
+    , emailConfirmationMsg : I18n
     , notification : Notification.Model
     }
 
@@ -92,6 +97,9 @@ initModel =
     , emailValid = False
     , confirmToken = ""
     , confirmTokenValid = False
+    , emailConfirmationRequested = False
+    , emailConfirmed = False
+    , emailConfirmationMsg = EmptyMessage
     , notification = Notification.initModel
     }
 
@@ -111,12 +119,14 @@ type Message
     | CreateUser
     | NewUser (Result Http.Error Response)
     | ValidateConfirmToken String
+    | ConfirmEmail
+    | EmailConfirmationResponse (Result Http.Error Response)
     | NotificationMessage Notification.Message
     | ChangeUrl String
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
-update msg ({ confirmToken, notification } as model) flags language =
+update msg ({ notification } as model) flags language =
     case msg of
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -142,7 +152,7 @@ update msg ({ confirmToken, notification } as model) flags language =
             ( { newModel | accountValidation = validate, accountValidationMsg = validateMsg }, Cmd.none )
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags confirmToken language )
+            ( model, createEosAccountRequest model flags language )
 
         NewEosAccount (Ok res) ->
             ( { model | accountRequestSuccess = True }, Navigation.newUrl "/account/created" )
@@ -265,6 +275,17 @@ update msg ({ confirmToken, notification } as model) flags language =
 
         ValidateConfirmToken confirmToken ->
             ( { model | confirmToken = confirmToken, confirmTokenValid = checkConfirmToken confirmToken }, Cmd.none )
+
+        ConfirmEmail ->
+            ( { model | emailConfirmationRequested = False }, confirmEmailRequest model flags language )
+
+        EmailConfirmationResponse response ->
+            case response of
+                Ok res ->
+                    ( { model | emailConfirmationRequested = True, emailConfirmed = True, emailConfirmationMsg = AccountCreationEmailConfirmed }, Cmd.none )
+
+                Err error ->
+                    ( { model | emailConfirmationRequested = True, emailConfirmed = False, emailConfirmationMsg = AccountCreationEmailConfirmFailure }, Cmd.none )
 
         NotificationMessage Notification.CloseNotification ->
             ( { model
@@ -396,13 +417,38 @@ emailConfirmInput { emailValid, confirmTokenValid } language =
             ""
         , id "inputCodeValidate"
         , type_ "button"
+        , onClick ConfirmEmail
         ]
         [ textViewI18n language Confirm ]
     ]
 
 
+emailConfirmationMsgView : Model -> Language -> Html Message
+emailConfirmationMsgView { emailConfirmationRequested, emailConfirmed, emailConfirmationMsg } language =
+    div
+        [ class
+            (if emailConfirmationRequested then
+                "validation bunch viewing"
+
+             else
+                "validation bunch"
+            )
+        ]
+        [ span
+            [ class
+                (if emailConfirmed then
+                    "true validate description"
+
+                 else
+                    "false validate description"
+                )
+            ]
+            [ textViewI18n language emailConfirmationMsg ]
+        ]
+
+
 view : Model -> Language -> Html Message
-view ({ accountValidation, accountName, accountValidationMsg, accountRequestSuccess, email, emailValid, emailValidationMsg, confirmToken, confirmTokenValid, notification } as model) language =
+view model language =
     main_ [ class "join" ]
         [ article []
             [ h2 []
@@ -418,19 +464,7 @@ view ({ accountValidation, accountName, accountValidationMsg, accountRequestSucc
             , div [ class "container" ]
                 [ section [ class "email verification" ]
                     (emailConfirmInput model language)
-                , div [ class "validation bunch" ]
-                    [ span [ class "description" ]
-                        [ time []
-                            [ text "3:00" ]
-                        , text "안으로 코드를 입력해주세요.  "
-                        ]
-                    , span [ class "false validate description" ]
-                        [ text "일치하지 않는 코드입니다." ]
-                    , span [ class "true validate description" ]
-                        [ text "이메일 인증이 완료됐습니다." ]
-                    , button [ class "re_send button", type_ "button" ]
-                        [ text "코드 재전송" ]
-                    ]
+                , emailConfirmationMsgView model language
                 ]
             , div [ class "confirm area" ]
                 [ section []
@@ -456,13 +490,33 @@ view ({ accountValidation, accountName, accountValidationMsg, accountRequestSucc
 
 
 type alias Response =
-    { msg : String }
+    { message : String }
 
 
-accountResponseDecoder : Decoder Response
-accountResponseDecoder =
+decodeResponseBodyMsg : Http.Response String -> String
+decodeResponseBodyMsg response =
+    case decodeString responseDecoder response.body of
+        Ok body ->
+            body.message
+
+        Err body ->
+            body
+
+
+responseDecoder : Decoder Response
+responseDecoder =
     decode Response
-        |> required "msg" string
+        |> required "message" string
+
+
+confirmEmailRequest : Model -> Flags -> Language -> Cmd Message
+confirmEmailRequest { confirmToken } flags language =
+    let
+        url =
+            Urls.confirmEmailUrl flags confirmToken (toLocale language)
+    in
+    Http.send EmailConfirmationResponse <|
+        Http.post url Http.emptyBody responseDecoder
 
 
 createEosAccountBodyParams : Model -> Http.Body
@@ -474,8 +528,8 @@ createEosAccountBodyParams { accountName, keys } =
         |> Http.jsonBody
 
 
-postCreateEosAccount : Model -> Flags -> String -> Language -> Http.Request Response
-postCreateEosAccount model flags confirmToken language =
+postCreateEosAccount : Model -> Flags -> Language -> Http.Request Response
+postCreateEosAccount ({ confirmToken } as model) flags language =
     let
         url =
             Urls.createEosAccountUrl flags confirmToken (toLocale language)
@@ -483,44 +537,28 @@ postCreateEosAccount model flags confirmToken language =
         params =
             createEosAccountBodyParams model
     in
-    Http.post url params accountResponseDecoder
+    Http.post url params responseDecoder
 
 
-createEosAccountRequest : Model -> Flags -> String -> Language -> Cmd Message
-createEosAccountRequest model flags confirmToken language =
-    Http.send NewEosAccount <| postCreateEosAccount model flags confirmToken language
-
-
-emailResponseDecoder : Decoder Response
-emailResponseDecoder =
-    decode Response
-        |> required "msg" string
+createEosAccountRequest : Model -> Flags -> Language -> Cmd Message
+createEosAccountRequest model flags language =
+    Http.send NewEosAccount <| postCreateEosAccount model flags language
 
 
 createUserBodyParams : Model -> Http.Body
-createUserBodyParams model =
-    Encode.object [ ( "email", Encode.string model.email ) ]
+createUserBodyParams { email } =
+    Encode.object [ ( "email", Encode.string email ) ]
         |> Http.jsonBody
 
 
 postUsers : Model -> Flags -> Language -> Http.Request Response
 postUsers model flags language =
-    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) emailResponseDecoder
+    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) responseDecoder
 
 
 createUserRequest : Model -> Flags -> Language -> Cmd Message
 createUserRequest model flags language =
     Http.send NewUser <| postUsers model flags language
-
-
-decodeResponseBodyMsg : Http.Response String -> String
-decodeResponseBodyMsg response =
-    case decodeString emailResponseDecoder response.body of
-        Ok body ->
-            body.msg
-
-        Err body ->
-            body
 
 
 
