@@ -17,8 +17,9 @@ import Translation
             , AccountCreationClickConfirmLink
             , AccountCreationConfirmEmail
             , AccountCreationEmailInvalid
-            , AccountCreationEmailSend
             , AccountCreationEmailValid
+            , AccountCreationEnterEmail
+            , AccountCreationEnterVerificationCode
             , AccountCreationFailure
             , AccountCreationInput
             , AccountCreationKeypairCaution
@@ -33,6 +34,8 @@ import Translation
             , AccountCreationProgressCreateNew
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
+            , AccountCreationSendEmail
+            , Confirm
             , ConfirmEmailSent
             , CopyAll
             , DebugMessage
@@ -48,7 +51,7 @@ import Translation
         )
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
-import Util.Validation exposing (checkAccountName)
+import Util.Validation exposing (checkAccountName, checkConfirmToken)
 import Validate exposing (isValidEmail)
 import View.I18nViews exposing (textViewI18n)
 import View.Notification as Notification
@@ -66,11 +69,11 @@ type alias Model =
     , keys : KeyPair
     , keyCopied : Bool
     , email : String
-    , confirmToken : String
     , emailValidationMsg : I18n
     , emailRequested : Bool
     , emailValid : Bool
-    , emailInputValid : String
+    , confirmToken : String
+    , confirmTokenValid : Bool
     , notification : Notification.Model
     }
 
@@ -84,11 +87,11 @@ initModel =
     , keys = { privateKey = "", publicKey = "" }
     , keyCopied = False
     , email = ""
-    , confirmToken = ""
     , emailValidationMsg = EmptyMessage
     , emailRequested = False
     , emailValid = False
-    , emailInputValid = "invalid"
+    , confirmToken = ""
+    , confirmTokenValid = False
     , notification = Notification.initModel
     }
 
@@ -107,6 +110,7 @@ type Message
     | ValidateEmail String
     | CreateUser
     | NewUser (Result Http.Error Response)
+    | ValidateConfirmToken String
     | NotificationMessage Notification.Message
     | ChangeUrl String
 
@@ -197,7 +201,7 @@ update msg ({ confirmToken, notification } as model) flags language =
                     else
                         "invalid"
             in
-            ( { newModel | emailValidationMsg = validationMsg, emailValid = emailValid, emailInputValid = inputValid }, Cmd.none )
+            ( { newModel | emailValidationMsg = validationMsg, emailValid = emailValid }, Cmd.none )
 
         CreateUser ->
             ( { model | emailRequested = True }, createUserRequest model flags language )
@@ -258,6 +262,9 @@ update msg ({ confirmToken, notification } as model) flags language =
                       }
                     , Cmd.none
                     )
+
+        ValidateConfirmToken confirmToken ->
+            ( { model | confirmToken = confirmToken, confirmTokenValid = checkConfirmToken confirmToken }, Cmd.none )
 
         NotificationMessage Notification.CloseNotification ->
             ( { model
@@ -344,8 +351,58 @@ keypairGenerationView { keys } language =
     ]
 
 
+emailConfirmInput : Model -> Language -> List (Html Message)
+emailConfirmInput { emailValid, confirmTokenValid } language =
+    [ input
+        [ name ""
+        , pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+        , placeholder (translate language AccountCreationEnterEmail)
+        , type_ "email"
+        , onInput ValidateEmail
+        ]
+        []
+    , button
+        [ class "action button"
+        , id "sendCode"
+        , type_ "button"
+        , onClick CreateUser
+        , attribute
+            (if emailValid then
+                "enabled"
+
+             else
+                "disabled"
+            )
+            ""
+        ]
+        [ textViewI18n language AccountCreationSendEmail ]
+    , input
+        [ id "inputCode"
+        , name ""
+        , placeholder (translate language AccountCreationEnterVerificationCode)
+        , type_ "text"
+        , onInput ValidateConfirmToken
+        ]
+        []
+    , button
+        [ class "action button"
+        , attribute
+            (if confirmTokenValid then
+                "enabled"
+
+             else
+                "disabled"
+            )
+            ""
+        , id "inputCodeValidate"
+        , type_ "button"
+        ]
+        [ textViewI18n language Confirm ]
+    ]
+
+
 view : Model -> Language -> Html Message
-view ({ accountValidation, accountName, accountValidationMsg, accountRequestSuccess, notification } as model) language =
+view ({ accountValidation, accountName, accountValidationMsg, accountRequestSuccess, email, emailValid, emailValidationMsg, confirmToken, confirmTokenValid, notification } as model) language =
     main_ [ class "join" ]
         [ article []
             [ h2 []
@@ -357,18 +414,10 @@ view ({ accountValidation, accountName, accountValidationMsg, accountRequestSucc
             , div [ class "container" ]
                 (keypairGenerationView model language)
             , h3 []
-                [ text "이메일 인증" ]
+                [ textViewI18n language AccountCreationConfirmEmail ]
             , div [ class "container" ]
                 [ section [ class "email verification" ]
-                    [ input [ name "", pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$", placeholder "이메일을 입력해주세요.", type_ "email", value "" ]
-                        []
-                    , button [ class "action button", id "sendCode", type_ "button" ]
-                        [ text "코드 전송" ]
-                    , input [ id "inputCode", name "", placeholder "메일로 전송된 코드를 입력해주세요.", type_ "text", value "" ]
-                        []
-                    , button [ class "action button", attribute "disabled" "", id "inputCodeValidate", type_ "button" ]
-                        [ text "확인" ]
-                    ]
+                    (emailConfirmInput model language)
                 , div [ class "validation bunch" ]
                     [ span [ class "description" ]
                         [ time []

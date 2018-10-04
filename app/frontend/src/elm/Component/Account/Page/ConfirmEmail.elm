@@ -15,12 +15,12 @@ import Translation
             , AccountCreationClickConfirmLink
             , AccountCreationConfirmEmail
             , AccountCreationEmailInvalid
-            , AccountCreationEmailSend
             , AccountCreationEmailValid
             , AccountCreationLoginLink
             , AccountCreationProgressCreateNew
             , AccountCreationProgressEmail
             , AccountCreationProgressKeypair
+            , AccountCreationSendEmail
             , ConfirmEmailSent
             , DebugMessage
             , EmptyMessage
@@ -232,7 +232,7 @@ view ({ validationMsg, requested, emailValid, inputValid, notification } as mode
                     , type_ "button"
                     , onClick CreateUser
                     ]
-                    [ textViewI18n language AccountCreationEmailSend ]
+                    [ textViewI18n language AccountCreationSendEmail ]
                 ]
             , p [ class "exist_account" ]
                 [ textViewI18n language AccountCreationAlreadyHaveAccount

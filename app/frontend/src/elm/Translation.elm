@@ -96,6 +96,7 @@ type I18n
     | CheckDetail
     | CheckError
     | Close
+    | Confirm
     | TransferInfo1
     | TransferInfo2
     | TransferHelp
@@ -119,10 +120,12 @@ type I18n
     | AccountCreationProgressKeypair
     | AccountCreationProgressCreateNew
     | AccountCreationConfirmEmail
+    | AccountCreationEnterEmail
     | AccountCreationClickConfirmLink
+    | AccountCreationEnterVerificationCode
     | AccountCreationEmailValid
     | AccountCreationEmailInvalid
-    | AccountCreationEmailSend
+    | AccountCreationSendEmail
     | AccountCreationAlreadyHaveAccount
     | AccountCreationLoginLink
     | AccountCreationEmailConfirmed
@@ -469,6 +472,12 @@ getMessages i18n =
             , chinese = "关"
             }
 
+        Confirm ->
+            { korean = "확인"
+            , english = "Confirm"
+            , chinese = "确认"
+            }
+
         TransferInfo1 ->
             { korean = "총 보유수량과 전송가능한 수량은"
             , english = "Total amount and transferable amount can be "
@@ -602,9 +611,21 @@ getMessages i18n =
             }
 
         AccountCreationConfirmEmail ->
-            { korean = "새로운 계정을 만들기 위해 이메일을 인증하세요!"
-            , english = "Type in your email address to make a new account!"
-            , chinese = "验证您的电子邮件以创建新帐户！"
+            { korean = "이메일 인증"
+            , english = "Email Authentication"
+            , chinese = "邮件验证"
+            }
+
+        AccountCreationEnterEmail ->
+            { korean = "이메일을 입력해주세요."
+            , english = "Please enter your e-mail."
+            , chinese = "请输入您的电子邮件。"
+            }
+
+        AccountCreationEnterVerificationCode ->
+            { korean = "메일로 전송된 코드를 입력해주세요."
+            , english = "Please enter the code sent by e-mail."
+            , chinese = "请输入通过电子邮件发送的代码。"
             }
 
         AccountCreationClickConfirmLink ->
@@ -625,10 +646,10 @@ getMessages i18n =
             , chinese = "电子邮件地址无效。"
             }
 
-        AccountCreationEmailSend ->
-            { korean = "링크 보내기"
-            , english = "Send Link"
-            , chinese = "发送链接"
+        AccountCreationSendEmail ->
+            { korean = "코드 전송"
+            , english = "Send Code"
+            , chinese = "代码转移"
             }
 
         AccountCreationAlreadyHaveAccount ->

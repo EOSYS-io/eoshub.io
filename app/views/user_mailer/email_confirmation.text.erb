@@ -2,4 +2,4 @@ Hi <%= @user.name %>,
 
 <%= I18n.t('user_mailer.body') %>
 
-<%= confirm_email_user_url(id: @user.confirm_token, locale: I18n.locale) %>
+<%= @user.confirm_token %>

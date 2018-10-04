@@ -1,4 +1,4 @@
 en:
   user_mailer:
     subject: "[EOSHUB.IO] Email Confirmation"
-    body: 'Thanks for the EOS account creation! To confirm your EOS account creation click the URL below.'
+    body: 'Thanks for the EOS account creation! To confirm your EOS account creation enter the code below.'
