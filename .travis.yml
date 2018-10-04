@@ -36,6 +36,7 @@ jobs:
         - psql -c 'create database eoshub_test;' -U postgres
         - bundle exec rake db:migrate
         - bundle exec rake assets:precompile
+        - export TZ=Asia/Seoul
       script:
         - bundle exec rake test
         # Test elm.
