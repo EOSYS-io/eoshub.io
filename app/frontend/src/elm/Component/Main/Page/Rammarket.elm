@@ -10,8 +10,7 @@ module Component.Main.Page.Rammarket exposing
     , view
     )
 
-import Array
-import Data.Account exposing (Account, getResource, getResourceColorClass)
+import Data.Account exposing (Account)
 import Data.Action
     exposing
         ( Action
@@ -33,7 +32,6 @@ import Html
         , form
         , h2
         , h3
-        , i
         , input
         , main_
         , p
@@ -57,7 +55,6 @@ import Html.Attributes
         , id
         , placeholder
         , scope
-        , style
         , title
         , type_
         , value
@@ -69,7 +66,7 @@ import Port
 import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (giga, kilo, mega)
+import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, resourceUnitConverter, timeFormatter)
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 import Util.Validation as Validation
@@ -115,20 +112,11 @@ initBuyModel =
     }
 
 
-type ByteUnit
-    = KB
-    | MB
-    | Byte
-
-
 type alias SellModel =
     { params : SellramParameters
     , distribution : Distribution
-    , byteUnits : Array.Array ByteUnit
-    , byteUnitIndex : Int
     , quantityValidation : QuantityStatus
     , isValid : Bool
-    , byteUnitIndex : Int
     }
 
 
@@ -136,8 +124,6 @@ initSellModel : SellModel
 initSellModel =
     { params = initSellramParameters
     , distribution = Manual
-    , byteUnits = Array.fromList [ Byte, KB, MB ]
-    , byteUnitIndex = 0
     , quantityValidation = EmptyQuantity
     , isValid = False
     }
@@ -193,7 +179,6 @@ type Message
     | TypeBytesAmount String
     | ClickDistribution Distribution
     | SubmitAction String
-    | ChangeByteUnit Bool
 
 
 getActions : Cmd Message
@@ -365,15 +350,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                                         floatAvailableRam
 
                             denominator =
-                                case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
-                                    Byte ->
-                                        1.0
-
-                                    KB ->
-                                        kilo |> toFloat
-
-                                    MB ->
-                                        mega |> toFloat
+                                kilo |> toFloat
                         in
                         ( SetSellFormField ((newQuantity / denominator) |> Round.round 8)
                         , { model
@@ -382,20 +359,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                         )
             in
             update msg newModel account
-
-        ChangeByteUnit isForward ->
-            let
-                length =
-                    Array.length sellModel.byteUnits
-
-                newIndex =
-                    if isForward then
-                        (sellModel.byteUnitIndex + 1) % length
-
-                    else
-                        (sellModel.byteUnitIndex - 1 + length) % length
-            in
-            ( { model | sellModel = { sellModel | byteUnitIndex = newIndex } }, Cmd.none )
 
         SetProxyBuy ->
             let
@@ -451,7 +414,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota, ramUsage } as account) =
+view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
@@ -460,7 +423,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
                         [ h3 [] [ text "이오스 램 가격" ]
-                        , p [] [ text (rammarketTable |> calculateEosRamPrice) ]
+                        , p [] [ text (rammarketTable |> calculateEosRamPrice |> formatEosPrice) ]
                         ]
                     , div [ class "wrapper" ]
                         [ h3 [] [ text "램 점유율" ]
@@ -473,7 +436,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                         [ h3 []
                             [ text "나의 램"
                             , span []
-                                [ text (resourceUnitConverter "ram" ramQuota) ]
+                                [ text ((((ramQuota |> toFloat) / (kilo |> toFloat)) |> Round.round 3) ++ " KB") ]
                             ]
                         ]
                     , buySellTab model account
@@ -583,7 +546,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
 
 
 buySellTab : Model -> Account -> Html Message
-buySellTab ({ isBuyTab, buyModel, sellModel } as model) { ramQuota, ramUsage, accountName, coreLiquidBalance } =
+buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuota, ramUsage, accountName, coreLiquidBalance } =
     let
         availableRam =
             ramQuota - ramUsage
@@ -592,15 +555,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) { ramQuota, ramUsage, ac
             coreLiquidBalance |> assetToFloat
 
         ( byteText, byteQuant ) =
-            case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
-                Byte ->
-                    ( "Bytes", sellModel.params.bytes |> toString )
-
-                KB ->
-                    ( "KB", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 4 )
-
-                MB ->
-                    ( "MB", (toFloat sellModel.params.bytes / toFloat mega) |> Round.floor 8 )
+            ( "KB", (toFloat sellModel.params.bytes / toFloat kilo) |> Round.floor 3 )
 
         ( buyClass, sellClass, buyOthersRamTab, buttonText, inputText, inputMsg, inputQuant, inputPlaceholder, buttonDisabled ) =
             if isBuyTab then
@@ -635,17 +590,28 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) { ramQuota, ramUsage, ac
                 , not sellModel.isValid
                 )
 
-        ( availableText, availableAmount, descText ) =
+        ramPrice =
+            rammarketTable |> calculateEosRamPrice
+
+        ( availableText, availableAmount, descText, approximateValue ) =
             if isBuyTab then
                 ( "구매가능수량"
                 , (availableEos |> toString) ++ " EOS"
                 , "* 구매시 0.5%의 수수료가 발생합니다."
+                , "약 "
+                    ++ (((1 / ramPrice)
+                            * (buyModel.params.quant |> String.toFloat |> Result.withDefault 0)
+                        )
+                            |> Round.round 3
+                       )
+                    ++ " KB"
                 )
 
             else
                 ( "판매가능수량"
-                , ((((ramQuota - ramUsage) |> toFloat) / 1024) |> Round.round 3) ++ " KB"
+                , (((availableRam |> toFloat) / 1024) |> Round.round 3) ++ " KB"
                 , "* 판매시 0.5%의 수수료가 발생합니다. "
+                , ((ramPrice * ((sellModel.params.bytes |> toFloat) / 1024)) |> Round.round 4) ++ " EOS"
                 )
 
         selectDiv =
@@ -696,7 +662,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) { ramQuota, ramUsage, ac
                     []
                 , span [ class "unit" ] [ text inputText ]
                 ]
-            , div [ class "amount" ] [ text "123123123123 KB" ]
+            , div [ class "amount" ] [ text approximateValue ]
             , div []
                 [ distributionButton model Percentage10
                 , distributionButton model Percentage50
@@ -803,7 +769,12 @@ actionToTableRow language { blockTime, data, trxId } =
             tr [] []
 
 
-calculateEosRamPrice : RammarketFields -> String
+formatEosPrice : Float -> String
+formatEosPrice price =
+    (price |> Round.round 8) ++ " EOS/KB"
+
+
+calculateEosRamPrice : RammarketFields -> Float
 calculateEosRamPrice { base, quote } =
     let
         denominator =
@@ -824,10 +795,10 @@ calculateEosRamPrice { base, quote } =
     in
     -- This case means no data loaded yet.
     if denominator < 0 || numerator < 0 then
-        "Loading..."
+        0.0
 
     else
-        ((numerator / denominator) * toFloat kilo |> Round.round 8) ++ " EOS/KB"
+        (numerator / denominator) * toFloat kilo
 
 
 calculateEosRamYield : GlobalFields -> String
@@ -883,20 +854,10 @@ setBuyFormField field ({ params } as buyModel) availableQuantity val requestStat
 
 
 setSellFormField : SellModel -> Int -> String -> SellModel
-setSellFormField ({ params, byteUnitIndex, byteUnits } as sellModel) availableRam val =
+setSellFormField ({ params } as sellModel) availableRam val =
     let
         multiplier =
-            (case Array.get byteUnitIndex byteUnits |> Maybe.withDefault KB of
-                KB ->
-                    kilo
-
-                MB ->
-                    mega
-
-                Byte ->
-                    1
-            )
-                |> toFloat
+            kilo |> toFloat
 
         intValue =
             val |> String.toFloat |> Result.withDefault 0 |> (*) multiplier |> floor
