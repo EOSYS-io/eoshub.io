@@ -39,6 +39,7 @@ import Html
         , p
         , section
         , span
+        , strong
         , table
         , tbody
         , td
@@ -450,19 +451,12 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) { ramQuota, ramUsage, accountName } =
+view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota, ramUsage } as account) =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc) ]
         , div [ class "container" ]
-            [ let
-                ( _, _, _, ramPercent, ramColorCode ) =
-                    getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
-
-                ramColor =
-                    getResourceColorClass ramColorCode
-              in
-              section [ class "dashboard" ]
+            [ section [ class "dashboard" ]
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
                         [ h3 [] [ text "이오스 램 가격" ]
@@ -481,20 +475,8 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                             , span []
                                 [ text (resourceUnitConverter "ram" ramQuota) ]
                             ]
-                        , p []
-                            [ text
-                                ("사용가능한 용량이 "
-                                    ++ ramPercent
-                                    ++ " 남았어요"
-                                )
-                            ]
-                        , div [ class "status" ]
-                            [ span [ class ramColor, style [ ( "height", ramPercent ) ] ]
-                                []
-                            , text ramPercent
-                            ]
                         ]
-                    , buySellTab model accountName
+                    , buySellTab model account
                     ]
                 ]
             , let
@@ -600,9 +582,15 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
         ]
 
 
-buySellTab : Model -> String -> Html Message
-buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
+buySellTab : Model -> Account -> Html Message
+buySellTab ({ isBuyTab, buyModel, sellModel } as model) { ramQuota, ramUsage, accountName, coreLiquidBalance } =
     let
+        availableRam =
+            ramQuota - ramUsage
+
+        availableEos =
+            coreLiquidBalance |> assetToFloat
+
         ( byteText, byteQuant ) =
             case Array.get sellModel.byteUnitIndex sellModel.byteUnits |> Maybe.withDefault KB of
                 Byte ->
@@ -647,19 +635,24 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
                 , not sellModel.isValid
                 )
 
-        selectChilds =
+        ( availableText, availableAmount, descText ) =
             if isBuyTab then
-                [ i [ attribute "data-value" "0" ] [ text inputText ] ]
+                ( "구매가능수량"
+                , (availableEos |> toString) ++ " EOS"
+                , "* 구매시 0.5%의 수수료가 발생합니다."
+                )
 
             else
-                [ i [ attribute "data-value" "0" ] [ text inputText ]
-                , button [ type_ "button", class "prev button", onClick (ChangeByteUnit False) ] [ text "이전 단위 고르기" ]
-                , button [ type_ "button", class "next button", onClick (ChangeByteUnit True) ] [ text "다음 단위 고르기" ]
-                ]
+                ( "판매가능수량"
+                , ((((ramQuota - ramUsage) |> toFloat) / 1024) |> Round.round 3) ++ " KB"
+                , "* 판매시 0.5%의 수수료가 발생합니다. "
+                )
 
         selectDiv =
-            div [ class "select period" ]
-                selectChilds
+            div [ class "available" ]
+                [ span [] [ text availableText ]
+                , strong [] [ text availableAmount ]
+                ]
     in
     div [ class "sell_buy" ]
         [ div [ class "tab" ]
@@ -703,6 +696,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
                     []
                 , span [ class "unit" ] [ text inputText ]
                 ]
+            , div [ class "amount" ] [ text "123123123123 KB" ]
             , div []
                 [ distributionButton model Percentage10
                 , distributionButton model Percentage50
@@ -718,6 +712,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel } as model) accountName =
                 , onClick (SubmitAction accountName)
                 ]
                 [ text buttonText ]
+            , p [ class "description" ] [ text descText ]
             ]
         ]
 
