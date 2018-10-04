@@ -36,8 +36,7 @@ import Time exposing (Time)
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
 import Util.Formatter as Formatter
     exposing
-        ( Message(..)
-        , deleteFromBack
+        ( deleteFromBack
         , floatToAsset
         , getNow
         , larimerToEos
@@ -103,7 +102,7 @@ type Message
     | OpenConfigPanel Bool
     | AndThen Message Message
     | OnFetchAccount (Result Http.Error Account)
-    | FormatterMessage Formatter.Message
+    | OnTime Time.Time
 
 
 
@@ -114,7 +113,7 @@ initCmd : Cmd Message
 initCmd =
     Cmd.batch
         [ Port.checkWalletStatus ()
-        , getTimeCmd
+        , getNow OnTime
         ]
 
 
@@ -128,11 +127,6 @@ accountCmd state accountName =
 
         _ ->
             Cmd.none
-
-
-getTimeCmd : Cmd Message
-getTimeCmd =
-    Cmd.map FormatterMessage getNow
 
 
 
@@ -405,10 +399,8 @@ update message ({ fold, wallet } as model) =
         OnFetchAccount (Err error) ->
             ( model, Cmd.none )
 
-        FormatterMessage msg ->
-            case msg of
-                OnTime now ->
-                    ( { model | now = now }, Cmd.none )
+        OnTime now ->
+            ( { model | now = now }, Cmd.none )
 
 
 getLeftTime : String -> Time -> String

@@ -1,6 +1,5 @@
 module Util.Formatter exposing
-    ( Message(..)
-    , assetAdd
+    ( assetAdd
     , assetSubtract
     , assetToFloat
     , deleteFromBack
@@ -24,10 +23,6 @@ import Round
 import Task
 import Time exposing (Time)
 import Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
-
-
-type Message
-    = OnTime Time.Time
 
 
 larimerToEos : Int -> Float
@@ -175,9 +170,9 @@ formatAsset value =
 -- Time
 
 
-getNow : Cmd Message
-getNow =
-    Task.perform OnTime Time.now
+getNow : (Time -> msg) -> Cmd msg
+getNow msg =
+    Task.perform msg Time.now
 
 
 timeFormatter : String -> String

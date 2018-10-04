@@ -100,7 +100,7 @@ type Message
     | OnFetchVoteStat (Result Http.Error VoteStat)
     | OnFetchAccount (Result Http.Error Account)
     | OnFetchProducers (Result Http.Error (List Producer))
-    | FormatterMessage Formatter.Message
+    | OnTime Time.Time
     | ExpandProducers
     | OnSearchInput String
     | SubmitVoteProxyAction
@@ -171,11 +171,6 @@ getProxyAccount proxyAccount =
         |> Http.send OnFetchAccount
 
 
-getNowCmd : Cmd Message
-getNowCmd =
-    Cmd.map FormatterMessage getNow
-
-
 initCmd : Flags -> Cmd Message
 initCmd flags =
     Cmd.batch
@@ -183,7 +178,7 @@ initCmd flags =
         , getTokenStatTable
         , getProducers flags
         , getRecentVoteStat flags
-        , getNowCmd
+        , getNow OnTime
         , getProxyAccount eosysProxyAccount
         ]
 
@@ -230,10 +225,8 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
         OnFetchAccount (Err _) ->
             ( model, Cmd.none )
 
-        FormatterMessage msg ->
-            case msg of
-                Formatter.OnTime now ->
-                    ( { model | now = now }, Cmd.none )
+        OnTime now ->
+            ( { model | now = now }, Cmd.none )
 
         ExpandProducers ->
             ( { model | producersLimit = producersLimit + 100 }, Cmd.none )
@@ -283,7 +276,7 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
                 , getTokenStatTable
                 , getProducers flags
                 , getRecentVoteStat flags
-                , getNowCmd
+                , getNow OnTime
                 , getProxyAccount eosysProxyAccount
                 ]
             )
