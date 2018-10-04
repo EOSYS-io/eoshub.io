@@ -53,7 +53,6 @@ class EosRamPriceHistory < ApplicationRecord
           high: [existing_record.high, price].max,
           low: [existing_record.low, price].min
         )
-        # As it is already inserted, do nothing.
       end
     end
   end
