@@ -466,10 +466,10 @@ accountResponseDecoder =
 
 
 createEosAccountBodyParams : Model -> Http.Body
-createEosAccountBodyParams model =
+createEosAccountBodyParams { accountName, keys } =
     Encode.object
-        [ ( "account_name", Encode.string model.accountName )
-        , ( "pubkey", Encode.string model.keys.publicKey )
+        [ ( "account_name", Encode.string accountName )
+        , ( "pubkey", Encode.string keys.publicKey )
         ]
         |> Http.jsonBody
 
