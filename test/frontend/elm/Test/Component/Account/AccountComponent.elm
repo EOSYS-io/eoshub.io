@@ -38,7 +38,15 @@ tests =
     describe "Page module"
         [ describe "getPage"
             [ test "CreatedRoute" <|
-                \() -> Expect.equal (CreatedPage Created.initModel) (getPage Route.CreatedRoute)
+                \() ->
+                    let
+                        eosAccount =
+                            Just "testtesttest"
+
+                        publicKey =
+                            Just "lasdihgalsghasldgihasggasdgasdgagsafgas"
+                    in
+                    Expect.equal (CreatedPage <| Created.initModel eosAccount publicKey) (getPage <| Route.CreatedRoute eosAccount publicKey)
             , test "EventCreationRoute" <|
                 \() ->
                     Expect.equal (EventCreationPage EventCreation.initModel) (getPage <| Route.EventCreationRoute <| Just "ko")
