@@ -1,7 +1,7 @@
 module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, br, div, h2, h3, main_, p, section, text)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
 

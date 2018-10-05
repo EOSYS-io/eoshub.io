@@ -3,7 +3,7 @@ module Component.Account.AccountComponent exposing (Message(..), Model, Page(..)
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Main.Page.NotFound as NotFound
-import Html exposing (Attribute, Html, a, button, div, form, h1, input, li, section, span, text, ul)
+import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
 import Navigation exposing (Location)
@@ -205,7 +205,7 @@ update message ({ page, language, flags } as model) =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Sub.map EventCreationMessage EventCreation.subscriptions
         ]

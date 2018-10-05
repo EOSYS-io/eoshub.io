@@ -350,7 +350,7 @@ main.vote {
 main.proxy.vote {
 
 	h3 {
-		font-size:$x-large;
+		font-size:$large;
 
 		+ p {
 			margin-top:24px;
@@ -363,7 +363,7 @@ main.proxy.vote {
 
 	.philosophy {
 		background-color:$xxx-dark-gray;
-		padding:32px;
+		padding:60px 48px;
 
 		display:flex;
 		align-items:center;
@@ -375,7 +375,7 @@ main.proxy.vote {
 
 		div.animated.image {
 			min-width:313px;
-			height:301px;
+			height:200px;
 			background:url('../image/bg-proxy-vote.svg') center center no-repeat;
 			background-size:auto 186px;
 			border-radius:2px;

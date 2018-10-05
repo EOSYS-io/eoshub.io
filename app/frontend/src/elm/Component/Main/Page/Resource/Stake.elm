@@ -17,21 +17,21 @@ module Component.Main.Page.Resource.Stake exposing
     , viewStakeAmountModal
     )
 
-import Data.Account
-    exposing
-        ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
-        , defaultAccount
-        , getTotalAmount
-        , getUnstakingAmount
-        , keyAccountsDecoder
-        )
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, button, div, em, h2, h3, input, label, p, section, span, strong, text)
+import Html.Attributes
+    exposing
+        ( action
+        , attribute
+        , class
+        , disabled
+        , for
+        , id
+        , placeholder
+        , step
+        , type_
+        )
 import Html.Events exposing (onClick, onInput)
 import Port
 import Round
@@ -41,17 +41,13 @@ import Util.Formatter
         ( assetAdd
         , assetSubtract
         , assetToFloat
-        , floatToAsset
-        , formatAsset
-        , larimerToEos
         , removeSymbolIfExists
         )
-import Util.Validation as Validation
+import Util.Validation
     exposing
         ( AccountStatus(..)
         , MemoStatus(..)
         , QuantityStatus(..)
-        , validateMemo
         , validateQuantity
         )
 
@@ -149,7 +145,7 @@ type StakeAmountMessage
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
+update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) { coreLiquidBalance, accountName } =
     case message of
         TotalAmountInput value ->
             let
@@ -282,7 +278,7 @@ update message ({ delegatebw, totalQuantity, distributionRatio, stakeAmountModal
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ coreLiquidBalance } as account) =
     div [ class "stake container" ]
         [ p []
             [ text "스테이크 가능한 토큰 수량"
@@ -306,7 +302,7 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
                     , step "0.0001"
                     , type_ "number"
                     , onInput TotalAmountInput
-                    , value totalQuantity
+                    , Html.Attributes.value totalQuantity
                     ]
                     []
                 , quantityWarningSpan totalQuantityValidation language model
@@ -337,7 +333,7 @@ view language ({ delegatebw, totalQuantity, percentageOfLiquid, totalQuantityVal
 
 
 viewStakeAmountModal : Language -> Model -> Account -> Bool -> Html StakeAmountMessage
-viewStakeAmountModal language ({ distributionRatio, stakeAmountModal } as model) ({ totalResources } as account) opened =
+viewStakeAmountModal _ { distributionRatio, stakeAmountModal } { totalResources } opened =
     let
         cpuValidateAttr =
             modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.cpuQuantityValidation
@@ -466,7 +462,7 @@ getPercentageOfLiquid percentageOfLiquid =
 
 
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
-quantityWarningSpan quantityStatus language ({ delegatebw, manuallySet } as model) =
+quantityWarningSpan quantityStatus language { delegatebw, manuallySet } =
     let
         -- TODO(boseok): it needs to be translated
         manualText =
@@ -555,10 +551,10 @@ validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
 
 
 distributeCpuNet : String -> Float -> Float -> ( String, String )
-distributeCpuNet totalQuantity a b =
+distributeCpuNet totalQuantity alpha beta =
     let
         cpuQuantity =
-            Round.round 4 <| assetToFloat totalQuantity * (a / (a + b))
+            Round.round 4 <| assetToFloat totalQuantity * (alpha / (alpha + beta))
 
         netQuantity =
             assetSubtract totalQuantity cpuQuantity

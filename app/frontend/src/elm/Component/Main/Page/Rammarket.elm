@@ -65,7 +65,7 @@ import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
-import Util.Formatter exposing (assetToFloat, deleteFromBack, resourceUnitConverter, timeFormatter)
+import Util.Formatter exposing (assetToFloat, deleteFromBack, timeFormatter)
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 import Util.Validation as Validation
     exposing
@@ -119,6 +119,7 @@ type alias SellramParameters =
     }
 
 
+initSellramParameters : SellramParameters
 initSellramParameters =
     { kiloBytes = "0"
     }
@@ -506,9 +507,6 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                             InexistentAccount ->
                                 ( "true", "존재하지 않는 계정입니다." )
 
-                            AccountToBeVerified ->
-                                ( "true", "존재 여부를 확인하는 중입니다." )
-
                             _ ->
                                 ( "", "" )
                 in
@@ -623,7 +621,13 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                 ( "판매가능수량"
                 , (((availableRam |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB"
                 , "* 판매시 0.5%의 수수료가 발생합니다. "
-                , ((ramPrice * (sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0)) |> Round.round 4) ++ " EOS"
+                , "약 "
+                    ++ ((ramPrice
+                            * (sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0)
+                        )
+                            |> Round.round 4
+                       )
+                    ++ " EOS"
                 )
 
         selectDiv =
@@ -755,7 +759,7 @@ subscriptions =
 
 
 actionToTableRow : Language -> Action -> Html Message
-actionToTableRow language { blockTime, data, trxId } =
+actionToTableRow _ { blockTime, data, trxId } =
     case data of
         Ok (Data.Action.Transfer { from, to, quantity }) ->
             let

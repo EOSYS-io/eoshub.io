@@ -48,7 +48,9 @@ port receivePushActionResponse : (PushActionResponse -> message) -> Sub message
 
 
 type alias KeyPair =
-    { privateKey : String, publicKey : String }
+    { privateKey : String
+    , publicKey : String
+    }
 
 
 port generateKeys : () -> Cmd message

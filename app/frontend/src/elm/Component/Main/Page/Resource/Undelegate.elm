@@ -14,44 +14,34 @@ module Component.Main.Page.Resource.Undelegate exposing
     , view
     )
 
-import Component.Main.Page.Resource.Modal.DelegateList as DelegateList
-    exposing
-        ( Message(..)
-        , view
-        )
-import Data.Account
-    exposing
-        ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
-        , defaultAccount
-        
-        , getTotalAmount
-        , getUnstakingAmount
-        , keyAccountsDecoder
-        )
+import Component.Main.Page.Resource.Modal.DelegateList as DelegateList exposing (Message(..))
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (UndelegatebwParameters, encodeAction)
-import Data.Table exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Data.Table exposing (Row)
+import Html exposing (Html, button, div, h3, input, label, p, section, span, strong, text)
+import Html.Attributes
+    exposing
+        ( attribute
+        , class
+        , disabled
+        , for
+        , id
+        , placeholder
+        , readonly
+        , step
+        , type_
+        )
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Round
-import Translation exposing (I18n(..), Language, translate)
+import Translation exposing (I18n(..), Language)
 import Util.Formatter
     exposing
-        ( assetAdd
-        , assetSubtract
-        , assetToFloat
-        , floatToAsset
-        , formatAsset
-        , larimerToEos
+        ( assetToFloat
         , removeSymbolIfExists
         )
-import Util.HttpRequest exposing (getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getTableRows)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -135,12 +125,12 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePossibleNet } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePossibleNet } as model) { accountName } =
     case message of
         OnFetchTableRows (Ok rows) ->
             ( { model | delbandTable = rows }, Cmd.none )
 
-        OnFetchTableRows (Err str) ->
+        OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
 
         CpuAmountInput value ->
@@ -245,6 +235,8 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                                     }
                                 , unstakePossibleCpu = cpu
                                 , unstakePossibleNet = net
+                                , percentageOfCpu = Percentage100
+                                , percentageOfNet = Percentage100
                                 , delegateListModal =
                                     { delegateListModal
                                         | isDelegateListModalOpened = False
@@ -266,22 +258,10 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, cpuQuantityValidation, netQuantityValidation, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid, delegateListModal } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegatebw, isFormValid, delegateListModal } as model) { accountName } =
     let
-        unstakedAmount =
-            floatToAsset (larimerToEos account.voterInfo.staked)
-
-        unstakePossibleAmount =
-            assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
-
         ( validatedText, validatedAttr ) =
             validateText model
-
-        cpuValidateAttr =
-            validateAttr cpuQuantityValidation
-
-        netValidateAttr =
-            validateAttr netQuantityValidation
 
         modalHtml =
             Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
@@ -295,7 +275,7 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, cpuQuanti
                     , attribute "maxlength" "12"
                     , placeholder "임대취소할 계정을 선택하세요"
                     , type_ "text"
-                    , value undelegatebw.receiver
+                    , Html.Attributes.value undelegatebw.receiver
                     , readonly True
                     ]
                     []
@@ -375,7 +355,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
 
 
 resourceInputDiv : Model -> ResourceType -> Html Message
-resourceInputDiv ({ undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityValidation, netQuantityValidation } as model) resourceType =
+resourceInputDiv { undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityValidation, netQuantityValidation } resourceType =
     let
         cpuValidateAttr =
             validateAttr cpuQuantityValidation
@@ -400,7 +380,7 @@ resourceInputDiv ({ undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityV
             , step "0.0001"
             , type_ "number"
             , onInput inputMessage
-            , value resourceQuantity
+            , Html.Attributes.value resourceQuantity
             ]
             []
         , span [ class "unit" ]
@@ -413,7 +393,7 @@ resourceInputDiv ({ undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityV
 
 
 
--- NOTE(boseok): consider integration with Delegate.validateEach
+-- NOTE(boseok): Consider integration with Delegate.validateEach
 
 
 validateEach : AccountStatus -> QuantityStatus -> QuantityStatus -> ( Bool, Bool, Bool, Bool )
@@ -437,8 +417,9 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation =
 validate : Model -> String -> String -> Model
 validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
+        -- NOTE(boseok): Because receiver must be one of delegate list accounts, requestStatus is passed as Succeed.
         accountValidation =
-            validateAccount undelegatebw.receiver Validation.NotSent
+            validateAccount undelegatebw.receiver Validation.Succeed
 
         netQuantityValidation =
             validateQuantity
@@ -484,7 +465,7 @@ validateAttr resourceQuantityStatus =
 
 
 validateText : Model -> ( String, String )
-validateText ({ cpuQuantityValidation, netQuantityValidation } as model) =
+validateText { cpuQuantityValidation, netQuantityValidation } =
     let
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)

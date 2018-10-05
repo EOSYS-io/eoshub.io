@@ -40,7 +40,6 @@ import Html
         ( Html
         , button
         , em
-        , node
         , span
         , strong
         , td
@@ -50,13 +49,12 @@ import Html.Attributes
     exposing
         ( attribute
         , class
-        , name
         , title
         , type_
         )
 import Html.Events exposing (onClick)
-import Json.Decode as Decode exposing (Decoder, decodeString, oneOf)
-import Json.Decode.Pipeline exposing (decode, hardcoded, optional, required, requiredAt)
+import Json.Decode as Decode exposing (Decoder, oneOf)
+import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
 import Util.Formatter exposing (formatAsset)
 
@@ -362,7 +360,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "sellram" ) ->
                     case actionParameters of
-                        Sellram params ->
+                        Sellram _ ->
                             let
                                 actionTag =
                                     "Sell Ram"
@@ -374,7 +372,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "buyram" ) ->
                     case actionParameters of
-                        Buyram params ->
+                        Buyram _ ->
                             let
                                 actionTag =
                                     "Buy Ram"
@@ -386,7 +384,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "buyrambytes" ) ->
                     case actionParameters of
-                        Buyrambytes params ->
+                        Buyrambytes _ ->
                             let
                                 actionTag =
                                     "Buy Ram Bytes"
@@ -398,7 +396,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "delegatebw" ) ->
                     case actionParameters of
-                        Delegatebw params ->
+                        Delegatebw _ ->
                             let
                                 actionTag =
                                     "Delegate"
@@ -410,7 +408,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "undelegatebw" ) ->
                     case actionParameters of
-                        Undelegatebw params ->
+                        Undelegatebw _ ->
                             let
                                 actionTag =
                                     "Undelegate"
@@ -456,7 +454,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
                 ( "eosio", "newaccount" ) ->
                     case actionParameters of
-                        Newaccount params ->
+                        Newaccount _ ->
                             let
                                 actionTag =
                                     "New Account"
@@ -470,7 +468,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                     { model | actionTag = contractAccount ++ ":" ++ actionName }
 
         -- undefined actions in eoshub
-        Err str ->
+        Err _ ->
             { model | actionTag = contractAccount ++ ":" ++ actionName }
 
 
@@ -479,7 +477,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
 
 
 viewActionInfo : String -> Action -> Int -> Html Message
-viewActionInfo accountName ({ accountActionSeq, contractAccount, actionName, data } as model) openedActionSeq =
+viewActionInfo _ { accountActionSeq, contractAccount, actionName, data } openedActionSeq =
     case data of
         -- controlled actions
         Ok actionParameters ->

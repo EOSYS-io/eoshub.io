@@ -17,9 +17,9 @@ module Component.Main.Page.Transfer exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, button, div, em, h2, input, li, main_, p, span, text, ul)
+import Html.Attributes exposing (autofocus, class, disabled, placeholder, step, type_)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
@@ -78,7 +78,6 @@ type Message
 
 
 -- VIEW
--- TODO(heejae): Consider making nav as a separate component.
 
 
 view : Language -> Model -> String -> Html Message
@@ -117,7 +116,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                             , placeholder (translate language ReceiverAccountName)
                             , autofocus True
                             , onInput <| SetTransferMessageField To
-                            , value to
+                            , Html.Attributes.value to
                             ]
                             []
                         , accountWarning
@@ -128,7 +127,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                             , placeholder (translate language TransferAmount)
                             , step ".0001"
                             , onInput <| SetTransferMessageField Quantity
-                            , value quantity
+                            , Html.Attributes.value quantity
                             ]
                             []
                         , quantityWarning
@@ -138,7 +137,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                             [ type_ "text"
                             , placeholder (translate language Translation.Memo)
                             , onInput <| SetTransferMessageField Memo
-                            , value memo
+                            , Html.Attributes.value memo
                             ]
                             []
                         , memoWarning
@@ -166,7 +165,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
 
 
 
--- TODO(boseok): be separated to another view model
+-- TODO(boseok): The accountWaringSpan can be separated to another view model.
 
 
 accountWarningSpan : AccountStatus -> Language -> Html msg
@@ -181,13 +180,13 @@ accountWarningSpan accountStatus language =
                     ( " false", translate language CheckAccountName )
 
                 ValidAccount ->
-                    ( " true", translate language AccountExample )
+                    ( " true", translate language ValidAccountI18n )
 
                 InexistentAccount ->
                     ( " false", "존재하지 않는 계정입니다." )
 
                 AccountToBeVerified ->
-                    ( " false", "존재 여부를 확인하는 중입니다." )
+                    ( "", "" )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]

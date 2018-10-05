@@ -6,11 +6,11 @@ module Component.Main.Page.Resource.Modal.DelegateList exposing
     , view
     )
 
-import Data.Table exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
-import Translation exposing (I18n(..), Language, translate)
+import Data.Table exposing (Row(..), initDelbandFields)
+import Html exposing (Html, button, div, h2, h3, input, li, p, section, text, ul)
+import Html.Attributes exposing (action, attribute, class, id, name, placeholder, type_)
+import Html.Events exposing (onClick, onInput)
+import Translation exposing (I18n(..), Language)
 
 
 
@@ -58,7 +58,7 @@ update message model =
 
 
 view : Language -> Model -> List Row -> String -> Html Message
-view language ({ isDelegateListModalOpened, query } as model) list accountName =
+view language { isDelegateListModalOpened, query } list accountName =
     section
         [ attribute "aria-live" "true"
         , class
@@ -84,7 +84,7 @@ view language ({ isDelegateListModalOpened, query } as model) list accountName =
                     , placeholder "계정명 검색하기"
                     , type_ "text"
                     , onInput AccountInput
-                    , value query
+                    , Html.Attributes.value query
                     ]
                     []
                 , button [ type_ "button" ]
@@ -119,7 +119,7 @@ viewDelbandList language list query accountName =
 
 
 viewDelbandLi : Language -> String -> Row -> Html Message
-viewDelbandLi language accountName row =
+viewDelbandLi _ accountName row =
     let
         delband =
             case row of
