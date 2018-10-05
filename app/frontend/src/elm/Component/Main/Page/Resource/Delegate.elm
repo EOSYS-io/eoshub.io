@@ -344,6 +344,7 @@ view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityVal
                     , onInput ReceiverInput
                     , type_ "text"
                     , value delegatebw.receiver
+                    , attribute "maxlength" "12"
                     ]
                     []
                 , accountWarning

@@ -104,6 +104,7 @@ type I18n
     | CheckAccountName
     | ReceiverAccountName
     | AccountExample
+    | ValidAccountI18n
     | TransferAmount
     | InvalidAmount
     | OverTransferableAmount
@@ -512,6 +513,12 @@ getMessages i18n =
             { korean = "계정이름 예시: eoshubby"
             , english = "Example: eoshubby"
             , chinese = "例子: eoshubby"
+            }
+
+        ValidAccountI18n ->
+            { korean = "올바른 계정입니다."
+            , english = "Valid Account"
+            , chinese = ""
             }
 
         TransferAmount ->
