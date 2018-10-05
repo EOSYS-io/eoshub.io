@@ -6,6 +6,8 @@ class UsersController < ApiController
     if @user.present?
       if @user.eos_account_created?
         render json: { message: I18n.t('users.already_eos_account_created_email') }, status: :bad_request and return
+      else
+        @user.regenerate_confirm_token!
       end
     else
       @user = User.new(email: params[:email])

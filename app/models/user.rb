@@ -55,6 +55,11 @@ class User < ApplicationRecord
     email.split('@').dig(0)
   end
 
+  def regenerate_confirm_token!
+    confirmation_token
+    save!
+  end
+
   private
 
   def confirmation_token
