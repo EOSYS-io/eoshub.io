@@ -10,7 +10,7 @@ class UsersController < ApiController
     else
       @user = User.new(email: params[:email])
       unless @user.save
-        render json: { message: I18n.t('user.failed_to_create_email_verification_log') }, status: :internal_server_error and return
+        render json: { message: I18n.t('users.failed_to_create_email_verification_log') }, status: :internal_server_error and return
       end
     end
 
