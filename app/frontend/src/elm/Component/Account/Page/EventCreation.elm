@@ -315,8 +315,8 @@ update msg ({ notification } as model) flags language =
 -- VIEW
 
 
-accountInput : Model -> Language -> List (Html Message)
-accountInput { accountName, accountValidation, accountValidationMsg } language =
+accountInputViews : Model -> Language -> List (Html Message)
+accountInputViews { accountName, accountValidation, accountValidationMsg } language =
     [ h3 []
         [ textViewI18n language AccountCreationInput ]
     , input
@@ -357,8 +357,8 @@ accountInput { accountName, accountValidation, accountValidationMsg } language =
     ]
 
 
-keypairGenerationView : Model -> Language -> List (Html Message)
-keypairGenerationView { keys } language =
+keypairGenerationViews : Model -> Language -> List (Html Message)
+keypairGenerationViews { keys } language =
     [ h3 []
         [ textViewI18n language AccountCreationKeypairGeneration ]
     , dl [ class "keybox" ]
@@ -384,55 +384,56 @@ keypairGenerationView { keys } language =
     ]
 
 
-emailConfirmInput : Model -> Language -> List (Html Message)
-emailConfirmInput { emailValid, confirmTokenValid } language =
-    [ input
-        [ name ""
-        , pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
-        , placeholder (translate language AccountCreationEnterEmail)
-        , type_ "email"
-        , onInput ValidateEmail
-        ]
-        []
-    , button
-        [ class "action button"
-        , id "sendCode"
-        , type_ "button"
-        , onClick CreateUser
-        , attribute
-            (if emailValid then
-                "enabled"
+emailConfirmSection : Model -> Language -> Html Message
+emailConfirmSection { emailValid, confirmTokenValid } language =
+    section [ class "email verification" ]
+        [ input
+            [ name ""
+            , pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
+            , placeholder (translate language AccountCreationEnterEmail)
+            , type_ "email"
+            , onInput ValidateEmail
+            ]
+            []
+        , button
+            [ class "action button"
+            , id "sendCode"
+            , type_ "button"
+            , onClick CreateUser
+            , attribute
+                (if emailValid then
+                    "enabled"
 
-             else
-                "disabled"
-            )
-            ""
-        ]
-        [ textViewI18n language AccountCreationSendEmail ]
-    , input
-        [ id "inputCode"
-        , name ""
-        , placeholder (translate language AccountCreationEnterVerificationCode)
-        , type_ "text"
-        , onInput ValidateConfirmToken
-        ]
-        []
-    , button
-        [ class "action button"
-        , attribute
-            (if confirmTokenValid then
-                "enabled"
+                 else
+                    "disabled"
+                )
+                ""
+            ]
+            [ textViewI18n language AccountCreationSendEmail ]
+        , input
+            [ id "inputCode"
+            , name ""
+            , placeholder (translate language AccountCreationEnterVerificationCode)
+            , type_ "text"
+            , onInput ValidateConfirmToken
+            ]
+            []
+        , button
+            [ class "action button"
+            , attribute
+                (if confirmTokenValid then
+                    "enabled"
 
-             else
-                "disabled"
-            )
-            ""
-        , id "inputCodeValidate"
-        , type_ "button"
-        , onClick ConfirmEmail
+                 else
+                    "disabled"
+                )
+                ""
+            , id "inputCodeValidate"
+            , type_ "button"
+            , onClick ConfirmEmail
+            ]
+            [ textViewI18n language Confirm ]
         ]
-        [ textViewI18n language Confirm ]
-    ]
 
 
 emailConfirmationMsgView : Model -> Language -> Html Message
@@ -501,14 +502,13 @@ view ({ agreeEosConstitution, notification } as model) language =
             , p []
                 [ textViewI18n language AccountCreationNameCondition ]
             , div [ class "container" ]
-                (accountInput model language)
+                (accountInputViews model language)
             , div [ class "container" ]
-                (keypairGenerationView model language)
+                (keypairGenerationViews model language)
             , h3 []
                 [ textViewI18n language AccountCreationConfirmEmail ]
             , div [ class "container" ]
-                [ section [ class "email verification" ]
-                    (emailConfirmInput model language)
+                [ emailConfirmSection model language
                 , emailConfirmationMsgView model language
                 ]
             , div [ class "confirm area" ]
