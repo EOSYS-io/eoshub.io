@@ -3,24 +3,12 @@ module Component.Account.AccountComponent exposing (Message(..), Model, Page(..)
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Main.Page.NotFound as NotFound
-import Html
-    exposing
-        ( Attribute
-        , Html
-        , button
-        , div
-        , form
-        , input
-        , li
-        , section
-        , span
-        , text
-        , ul
-        )
-import Html.Attributes exposing (class)
+import Html exposing (Attribute, Html, a, button, div, form, h1, input, li, section, span, text, ul)
+import Html.Attributes exposing (attribute, class, type_)
+import Html.Events exposing (onClick)
 import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (Language)
+import Translation exposing (Language(..))
 import Util.Flags exposing (Flags)
 
 
@@ -82,6 +70,8 @@ type Message
     = CreatedMessage Created.Message
     | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
+    | ChangeUrl String
+    | UpdateLanguage Language
 
 
 initCmd : Model -> Cmd Message
@@ -108,6 +98,43 @@ initCmd { page, flags, language } =
 view : Model -> Html Message
 view { language, page } =
     let
+        getLanguageClass lang =
+            if lang == language then
+                class "selected"
+
+            else
+                class ""
+
+        headerView =
+            Html.header []
+                [ h1 []
+                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
+                    ]
+                , div [ class "language" ]
+                    [ button
+                        [ type_ "button"
+                        , getLanguageClass Korean
+                        , attribute "data-lang" "ko"
+                        , onClick (UpdateLanguage Korean)
+                        ]
+                        [ text "한글" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass English
+                        , attribute "data-lang" "en"
+                        , onClick (UpdateLanguage English)
+                        ]
+                        [ text "ENG" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass Chinese
+                        , attribute "data-lang" "cn"
+                        , onClick (UpdateLanguage Chinese)
+                        ]
+                        [ text "中文" ]
+                    ]
+                ]
+
         newContentHtml =
             case page of
                 CreatedPage subModel ->
@@ -119,8 +146,11 @@ view { language, page } =
                 _ ->
                     NotFound.view language
     in
-    section [ class "content" ]
-        [ newContentHtml ]
+    div []
+        [ headerView
+        , section [ class "content" ]
+            [ newContentHtml ]
+        ]
 
 
 
@@ -159,6 +189,12 @@ update message ({ page, language, flags } as model) =
                     initCmd newModel
             in
             ( newModel, cmd )
+
+        ( ChangeUrl url, _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateLanguage language, _ ) ->
+            ( { model | language = language }, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
