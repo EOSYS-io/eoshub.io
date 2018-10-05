@@ -357,7 +357,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
         viewMoreButton =
             if List.length filteredProducers > producersLimit then
                 div [ class "btn_area" ]
-                    [ button [ type_ "button", class "view more button", onClick ExpandProducers ]
+                    [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
                         [ text "더 보기" ]
                     ]
 
