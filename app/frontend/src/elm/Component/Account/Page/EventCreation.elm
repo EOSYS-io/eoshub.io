@@ -1,11 +1,65 @@
-module Component.Account.Page.EventCreation exposing (Message(..), Model, createEosAccountBodyParams, createUserBodyParams, initModel, subscriptions, update, view)
+module Component.Account.Page.EventCreation exposing
+    ( Message(..)
+    , Model
+    , createEosAccountBodyParams
+    , initModel
+    , sendCodeBodyParams
+    , subscriptions
+    , update
+    , view
+    )
 
-import Html exposing (Html, a, article, br, button, dd, div, dl, dt, form, h2, h3, img, input, label, li, main_, ol, p, section, span, strong, text, textarea, time, ul)
-import Html.Attributes exposing (action, alt, attribute, checked, class, for, href, id, name, pattern, placeholder, src, style, title, type_, value)
+import Data.Json exposing (RailsResponse, decodeRailsResponseBodyMsg, railsResponseDecoder)
+import Html
+    exposing
+        ( Html
+        , a
+        , article
+        , br
+        , button
+        , dd
+        , div
+        , dl
+        , dt
+        , form
+        , h2
+        , h3
+        , img
+        , input
+        , label
+        , li
+        , main_
+        , ol
+        , p
+        , section
+        , span
+        , strong
+        , text
+        , textarea
+        , time
+        , ul
+        )
+import Html.Attributes
+    exposing
+        ( action
+        , alt
+        , attribute
+        , checked
+        , class
+        , disabled
+        , for
+        , href
+        , id
+        , name
+        , placeholder
+        , src
+        , style
+        , title
+        , type_
+        , value
+        )
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
-import Json.Decode exposing (Decoder, decodeString, string)
-import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 import Navigation
 import Port exposing (KeyPair)
@@ -113,16 +167,16 @@ initModel =
 type Message
     = ValidateAccountName String
     | CreateEosAccount
-    | NewEosAccount (Result Http.Error Response)
+    | NewEosAccount (Result Http.Error RailsResponse)
     | GenerateKeys
     | UpdateKeys KeyPair
     | Copy
     | ValidateEmail String
-    | CreateUser
-    | NewUser (Result Http.Error Response)
+    | SendCode
+    | SendCodeResponse (Result Http.Error RailsResponse)
     | ValidateConfirmToken String
     | ConfirmEmail
-    | EmailConfirmationResponse (Result Http.Error Response)
+    | EmailConfirmationResponse (Result Http.Error RailsResponse)
     | ToggleAgreeEosConstitution
     | NotificationMessage Notification.Message
     | ChangeUrl String
@@ -170,7 +224,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
                         , notification =
                             { content =
                                 Notification.Error
-                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
                                     , detail = EmptyMessage
                                     }
                             , open = True
@@ -183,7 +237,11 @@ update msg ({ accountName, keys, notification } as model) flags language =
                     ( { model
                         | accountRequestSuccess = False
                         , notification =
-                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body) }
+                            { content =
+                                Notification.Error
+                                    { message = AccountCreationFailure
+                                    , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
+                                    }
                             , open = True
                             }
                       }
@@ -194,7 +252,11 @@ update msg ({ accountName, keys, notification } as model) flags language =
                     ( { model
                         | accountRequestSuccess = False
                         , notification =
-                            { content = Notification.Error { message = AccountCreationFailure, detail = DebugMessage (toString error) }
+                            { content =
+                                Notification.Error
+                                    { message = AccountCreationFailure
+                                    , detail = DebugMessage (toString error)
+                                    }
                             , open = True
                             }
                       }
@@ -212,20 +274,13 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
                     else
                         emailValidation newModel
-
-                inputValid =
-                    if emailValid then
-                        "valid"
-
-                    else
-                        "invalid"
             in
             ( { newModel | emailValidationMsg = validationMsg, emailValid = emailValid }, Cmd.none )
 
-        CreateUser ->
-            ( { model | emailRequested = True }, createUserRequest model flags language )
+        SendCode ->
+            ( { model | emailRequested = True }, sendCodeRequest model flags language )
 
-        NewUser (Ok res) ->
+        SendCodeResponse (Ok res) ->
             ( { model
                 | notification =
                     { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
@@ -235,7 +290,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
             , Cmd.none
             )
 
-        NewUser (Err error) ->
+        SendCodeResponse (Err error) ->
             case error of
                 Http.BadStatus response ->
                     ( { model
@@ -243,7 +298,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
                         , notification =
                             { content =
                                 Notification.Error
-                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
                                     , detail = EmptyMessage
                                     }
                             , open = True
@@ -258,7 +313,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
                         , notification =
                             { content =
                                 Notification.Error
-                                    { message = DebugMessage (decodeResponseBodyMsg response)
+                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
                                     , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
                                     }
                             , open = True
@@ -291,10 +346,22 @@ update msg ({ accountName, keys, notification } as model) flags language =
         EmailConfirmationResponse response ->
             case response of
                 Ok res ->
-                    ( { model | emailConfirmationRequested = True, emailConfirmed = True, emailConfirmationMsg = AccountCreationEmailConfirmed }, Cmd.none )
+                    ( { model
+                        | emailConfirmationRequested = True
+                        , emailConfirmed = True
+                        , emailConfirmationMsg = AccountCreationEmailConfirmed
+                      }
+                    , Cmd.none
+                    )
 
                 Err error ->
-                    ( { model | emailConfirmationRequested = True, emailConfirmed = False, emailConfirmationMsg = AccountCreationEmailConfirmFailure }, Cmd.none )
+                    ( { model
+                        | emailConfirmationRequested = True
+                        , emailConfirmed = False
+                        , emailConfirmationMsg = AccountCreationEmailConfirmFailure
+                      }
+                    , Cmd.none
+                    )
 
         ToggleAgreeEosConstitution ->
             ( { model | agreeEosConstitution = not model.agreeEosConstitution }, Cmd.none )
@@ -322,15 +389,6 @@ accountInputViews { accountName, accountValidation, accountValidationMsg } langu
     , input
         [ class "account_name"
         , placeholder (translate language AccountCreationNamePlaceholder)
-        , attribute "required" ""
-        , attribute
-            (if accountValidation then
-                "valid"
-
-             else
-                "invalid"
-            )
-            ""
         , type_ "text"
         , onInput ValidateAccountName
         ]
@@ -371,7 +429,7 @@ keypairGenerationViews { keys } language =
         , dd []
             [ text keys.privateKey ]
         ]
-    , textarea [ class "hidden_copy_field", id "key", attribute "wai-aria" "hidden" ]
+    , textarea [ class "hidden_copy_field", id "key" ]
         [ text ("PublicKey:" ++ keys.publicKey ++ " \nPrivateKey:" ++ keys.privateKey) ]
     , button [ class "refresh button", type_ "button", onClick GenerateKeys ]
         [ textViewI18n language AccountCreationKeypairRegenerate ]
@@ -389,7 +447,6 @@ emailConfirmSection { emailValid, confirmTokenValid } language =
     section [ class "email verification" ]
         [ input
             [ name ""
-            , pattern "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}$"
             , placeholder (translate language AccountCreationEnterEmail)
             , type_ "email"
             , onInput ValidateEmail
@@ -397,38 +454,20 @@ emailConfirmSection { emailValid, confirmTokenValid } language =
             []
         , button
             [ class "action button"
-            , id "sendCode"
             , type_ "button"
-            , onClick CreateUser
-            , attribute
-                (if emailValid then
-                    "enabled"
-
-                 else
-                    "disabled"
-                )
-                ""
+            , onClick SendCode
+            , disabled (not emailValid)
             ]
             [ textViewI18n language AccountCreationSendEmail ]
         , input
-            [ id "inputCode"
-            , name ""
-            , placeholder (translate language AccountCreationEnterVerificationCode)
+            [ placeholder (translate language AccountCreationEnterVerificationCode)
             , type_ "text"
             , onInput ValidateConfirmToken
             ]
             []
         , button
             [ class "action button"
-            , attribute
-                (if confirmTokenValid then
-                    "enabled"
-
-                 else
-                    "disabled"
-                )
-                ""
-            , id "inputCodeValidate"
+            , disabled (not confirmTokenValid)
             , type_ "button"
             , onClick ConfirmEmail
             ]
@@ -529,26 +568,6 @@ view ({ agreeEosConstitution, notification } as model) language =
 -- HTTP
 
 
-type alias Response =
-    { message : String }
-
-
-decodeResponseBodyMsg : Http.Response String -> String
-decodeResponseBodyMsg response =
-    case decodeString responseDecoder response.body of
-        Ok body ->
-            body.message
-
-        Err body ->
-            body
-
-
-responseDecoder : Decoder Response
-responseDecoder =
-    decode Response
-        |> required "message" string
-
-
 confirmEmailRequest : Model -> Flags -> Language -> Cmd Message
 confirmEmailRequest { confirmToken } flags language =
     let
@@ -556,7 +575,7 @@ confirmEmailRequest { confirmToken } flags language =
             Urls.confirmEmailUrl flags confirmToken (toLocale language)
     in
     Http.send EmailConfirmationResponse <|
-        Http.post url Http.emptyBody responseDecoder
+        Http.post url Http.emptyBody railsResponseDecoder
 
 
 createEosAccountBodyParams : Model -> Http.Body
@@ -568,7 +587,7 @@ createEosAccountBodyParams { accountName, keys } =
         |> Http.jsonBody
 
 
-postCreateEosAccount : Model -> Flags -> Language -> Http.Request Response
+postCreateEosAccount : Model -> Flags -> Language -> Http.Request RailsResponse
 postCreateEosAccount ({ confirmToken } as model) flags language =
     let
         url =
@@ -577,7 +596,7 @@ postCreateEosAccount ({ confirmToken } as model) flags language =
         params =
             createEosAccountBodyParams model
     in
-    Http.post url params responseDecoder
+    Http.post url params railsResponseDecoder
 
 
 createEosAccountRequest : Model -> Flags -> Language -> Cmd Message
@@ -585,20 +604,20 @@ createEosAccountRequest model flags language =
     Http.send NewEosAccount <| postCreateEosAccount model flags language
 
 
-createUserBodyParams : Model -> Http.Body
-createUserBodyParams { email } =
+sendCodeBodyParams : Model -> Http.Body
+sendCodeBodyParams { email } =
     Encode.object [ ( "email", Encode.string email ) ]
         |> Http.jsonBody
 
 
-postUsers : Model -> Flags -> Language -> Http.Request Response
+postUsers : Model -> Flags -> Language -> Http.Request RailsResponse
 postUsers model flags language =
-    Http.post (Urls.usersApiUrl flags (toLocale language)) (createUserBodyParams model) responseDecoder
+    Http.post (Urls.usersApiUrl flags (toLocale language)) (sendCodeBodyParams model) railsResponseDecoder
 
 
-createUserRequest : Model -> Flags -> Language -> Cmd Message
-createUserRequest model flags language =
-    Http.send NewUser <| postUsers model flags language
+sendCodeRequest : Model -> Flags -> Language -> Cmd Message
+sendCodeRequest model flags language =
+    Http.send SendCodeResponse <| postUsers model flags language
 
 
 

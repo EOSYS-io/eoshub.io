@@ -3,14 +3,18 @@
 
 module Data.Json exposing
     ( Producer
+    , RailsResponse
     , VoteStat
+    , decodeRailsResponseBodyMsg
     , initProducer
     , initVoteStat
     , producerDecoder
     , producersDecoder
+    , railsResponseDecoder
     , voteStatDecoder
     )
 
+import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
@@ -100,3 +104,23 @@ producerDecoder =
 producersDecoder : Decoder (List Producer)
 producersDecoder =
     Decode.list producerDecoder
+
+
+type alias RailsResponse =
+    { message : String }
+
+
+decodeRailsResponseBodyMsg : Http.Response String -> String
+decodeRailsResponseBodyMsg response =
+    case Decode.decodeString railsResponseDecoder response.body of
+        Ok body ->
+            body.message
+
+        Err body ->
+            body
+
+
+railsResponseDecoder : Decoder RailsResponse
+railsResponseDecoder =
+    decode RailsResponse
+        |> required "message" Decode.string

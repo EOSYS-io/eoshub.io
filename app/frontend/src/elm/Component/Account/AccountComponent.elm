@@ -221,7 +221,7 @@ getPage route =
         CreatedRoute maybeEosAccount maybePublicKey ->
             CreatedPage (Created.initModel maybeEosAccount maybePublicKey)
 
-        EventCreationRoute maybeLocale ->
+        EventCreationRoute _ ->
             EventCreationPage EventCreation.initModel
 
         _ ->
