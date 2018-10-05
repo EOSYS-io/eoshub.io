@@ -95,7 +95,7 @@ update message ({ currentComponent, flags } as model) =
         ( AccountComponentMessage accountComponentMessage, AccountComponent subModel ) ->
             let
                 ( newComponentModel, newCmd ) =
-                    AccountComponent.update accountComponentMessage subModel flags
+                    AccountComponent.update accountComponentMessage subModel
 
                 newComponent =
                     AccountComponent newComponentModel
@@ -167,7 +167,7 @@ initComponent location flags =
         Route.AccountComponentRoute ->
             let
                 componentModel =
-                    AccountComponent.initModel location
+                    AccountComponent.initModel location flags
 
                 componentCmd =
                     AccountComponent.initCmd componentModel
@@ -206,9 +206,9 @@ updateComponent currentComponent location flags =
                             subModel
 
                         _ ->
-                            AccountComponent.initModel location
+                            AccountComponent.initModel location flags
 
                 ( newComponentModel, componentCmd ) =
-                    AccountComponent.update (AccountComponent.OnLocationChange location) componentModel flags
+                    AccountComponent.update (AccountComponent.OnLocationChange location) componentModel
             in
             ( AccountComponent newComponentModel, Cmd.map AccountComponentMessage componentCmd )

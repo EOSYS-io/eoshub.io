@@ -5,7 +5,7 @@
 #  id            :bigint(8)        not null, primary key
 #  confirm_token :string(22)       default("")
 #  email         :string
-#  eos_account   :string           default(""), not null
+#  eos_account   :string
 #  state         :integer          default("email_saved")
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
@@ -23,7 +23,6 @@ class User < ApplicationRecord
   has_many :orders
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
-  validates :eos_account, uniqueness: true
   before_create :confirmation_token
 
   enum state: {
@@ -37,7 +36,7 @@ class User < ApplicationRecord
     state :email_confirmed, :eos_account_created
 
     event :email_confirmed do
-      transitions from: :email_saved, to: :email_confirmed
+      transitions from: [:email_saved, :email_confirmed], to: :email_confirmed
     end
 
     event :eos_account_created, before_transaction: :reset_confirm_token do

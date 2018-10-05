@@ -1,17 +1,14 @@
 module Component.Account.AccountComponent exposing (Message(..), Model, Page(..), getPage, initCmd, initModel, subscriptions, toLanguage, update, view)
 
-import Component.Account.Page.ConfirmEmail as ConfirmEmail
-import Component.Account.Page.Create as Create
-import Component.Account.Page.CreateKeys as CreateKeys
 import Component.Account.Page.Created as Created
-import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
-import Component.Account.Page.EmailConfirmed as EmailConfirmed
+import Component.Account.Page.EventCreation as EventCreation
 import Component.Main.Page.NotFound as NotFound
-import Html exposing (Html, section)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, button, div, h1, section, text)
+import Html.Attributes exposing (attribute, class, type_)
+import Html.Events exposing (onClick)
 import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
-import Translation exposing (Language)
+import Translation exposing (Language(..))
 import Util.Flags exposing (Flags)
 
 
@@ -20,19 +17,15 @@ import Util.Flags exposing (Flags)
 
 
 type Page
-    = ConfirmEmailPage ConfirmEmail.Model
-    | EmailConfirmedPage EmailConfirmed.Model
-    | EmailConfirmFailurePage EmailConfirmFailure.Model
-    | CreatedPage Created.Model
-    | CreateKeysPage CreateKeys.Model
-    | CreatePage Create.Model
+    = CreatedPage Created.Model
+    | EventCreationPage EventCreation.Model
     | NotFoundPage
 
 
 type alias Model =
     { page : Page
-    , confirmToken : String
     , language : Language
+    , flags : Flags
     }
 
 
@@ -46,8 +39,8 @@ toLanguage maybeLocale =
             Translation.Korean
 
 
-initModel : Location -> Model
-initModel location =
+initModel : Location -> Flags -> Model
+initModel location flags =
     let
         route =
             location |> parseLocation
@@ -56,22 +49,16 @@ initModel location =
             getPage route
     in
     case route of
-        ConfirmEmailRoute maybeLocale ->
+        EventCreationRoute maybeLocale ->
             { page = page
-            , confirmToken = ""
             , language = toLanguage maybeLocale
-            }
-
-        EmailConfirmedRoute confirmToken _ maybeLocale ->
-            { page = page
-            , confirmToken = confirmToken
-            , language = toLanguage maybeLocale
+            , flags = flags
             }
 
         _ ->
             { page = page
-            , confirmToken = ""
             , language = Translation.Korean
+            , flags = flags
             }
 
 
@@ -80,25 +67,23 @@ initModel location =
 
 
 type Message
-    = ConfirmEmailMessage ConfirmEmail.Message
-    | EmailConfirmedMessage EmailConfirmed.Message
-    | EmailConfirmFailureMessage EmailConfirmFailure.Message
-    | CreateKeysMessage CreateKeys.Message
-    | CreatedMessage Created.Message
-    | CreateMessage Create.Message
+    = CreatedMessage Created.Message
+    | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
+    | ChangeUrl String
+    | UpdateLanguage Language
 
 
 initCmd : Model -> Cmd Message
-initCmd { page } =
+initCmd { page, flags, language } =
     case page of
-        CreateKeysPage subModel ->
+        EventCreationPage subModel ->
             let
                 ( _, subCmd ) =
-                    CreateKeys.update CreateKeys.GenerateKeys subModel
+                    EventCreation.update EventCreation.GenerateKeys subModel flags language
 
                 cmd =
-                    Cmd.map CreateKeysMessage subCmd
+                    Cmd.map EventCreationMessage subCmd
             in
             cmd
 
@@ -113,68 +98,68 @@ initCmd { page } =
 view : Model -> Html Message
 view { language, page } =
     let
+        getLanguageClass lang =
+            if lang == language then
+                class "selected"
+
+            else
+                class ""
+
+        headerView =
+            Html.header []
+                [ h1 []
+                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
+                    ]
+                , div [ class "language" ]
+                    [ button
+                        [ type_ "button"
+                        , getLanguageClass Korean
+                        , attribute "data-lang" "ko"
+                        , onClick (UpdateLanguage Korean)
+                        ]
+                        [ text "한글" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass English
+                        , attribute "data-lang" "en"
+                        , onClick (UpdateLanguage English)
+                        ]
+                        [ text "ENG" ]
+                    , button
+                        [ type_ "button"
+                        , getLanguageClass Chinese
+                        , attribute "data-lang" "cn"
+                        , onClick (UpdateLanguage Chinese)
+                        ]
+                        [ text "中文" ]
+                    ]
+                ]
+
         newContentHtml =
             case page of
-                ConfirmEmailPage subModel ->
-                    Html.map ConfirmEmailMessage (ConfirmEmail.view subModel language)
-
-                EmailConfirmedPage subModel ->
-                    Html.map EmailConfirmedMessage (EmailConfirmed.view subModel language)
-
-                EmailConfirmFailurePage subModel ->
-                    Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel language)
-
-                CreateKeysPage subModel ->
-                    Html.map CreateKeysMessage (CreateKeys.view subModel language)
-
                 CreatedPage subModel ->
                     Html.map CreatedMessage (Created.view subModel language)
 
-                CreatePage subModel ->
-                    Html.map CreateMessage (Create.view subModel language)
+                EventCreationPage subModel ->
+                    Html.map EventCreationMessage (EventCreation.view subModel language)
 
                 _ ->
                     NotFound.view language
     in
-    section [ class "content" ]
-        [ newContentHtml ]
+    div []
+        [ headerView
+        , section [ class "content" ]
+            [ newContentHtml ]
+        ]
 
 
 
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, confirmToken, language } as model) flags =
+update : Message -> Model -> ( Model, Cmd Message )
+update message ({ page, language, flags } as model) =
     case ( message, page ) of
-        ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    ConfirmEmail.update subMessage subModel flags language
-            in
-            ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
-
-        ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    EmailConfirmed.update subMessage subModel confirmToken
-            in
-            ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
-
-        ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
-            let
-                newPage =
-                    EmailConfirmFailure.update subMessage subModel
-            in
-            ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
-
-        ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    CreateKeys.update subMessage subModel
-            in
-            ( { model | page = newPage |> CreateKeysPage }, Cmd.map CreateKeysMessage subCmd )
-
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
                 ( newPage, subCmd ) =
@@ -182,12 +167,12 @@ update message ({ page, confirmToken, language } as model) flags =
             in
             ( { model | page = newPage |> CreatedPage }, Cmd.map CreatedMessage subCmd )
 
-        ( CreateMessage subMessage, CreatePage subModel ) ->
+        ( EventCreationMessage subMessage, EventCreationPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags confirmToken language
+                    EventCreation.update subMessage subModel flags language
             in
-            ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
+            ( { model | page = newPage |> EventCreationPage }, Cmd.map EventCreationMessage subCmd )
 
         ( OnLocationChange location, _ ) ->
             let
@@ -205,6 +190,12 @@ update message ({ page, confirmToken, language } as model) flags =
             in
             ( newModel, cmd )
 
+        ( ChangeUrl url, _ ) ->
+            ( model, Navigation.newUrl url )
+
+        ( UpdateLanguage language, _ ) ->
+            ( { model | language = language }, Cmd.none )
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
@@ -216,7 +207,8 @@ update message ({ page, confirmToken, language } as model) flags =
 subscriptions : Model -> Sub Message
 subscriptions _ =
     Sub.batch
-        [ Sub.map CreateKeysMessage CreateKeys.subscriptions ]
+        [ Sub.map EventCreationMessage EventCreation.subscriptions
+        ]
 
 
 
@@ -226,27 +218,11 @@ subscriptions _ =
 getPage : Route -> Page
 getPage route =
     case route of
-        ConfirmEmailRoute _ ->
-            ConfirmEmailPage ConfirmEmail.initModel
+        CreatedRoute maybeEosAccount maybePublicKey ->
+            CreatedPage (Created.initModel maybeEosAccount maybePublicKey)
 
-        EmailConfirmedRoute _ email _ ->
-            EmailConfirmedPage (EmailConfirmed.initModel email)
-
-        EmailConfirmFailureRoute ->
-            EmailConfirmFailurePage EmailConfirmFailure.initModel
-
-        CreateKeysRoute ->
-            let
-                createKeysModel =
-                    CreateKeys.initModel
-            in
-            CreateKeysPage createKeysModel
-
-        CreatedRoute ->
-            CreatedPage Created.initModel
-
-        CreateRoute pubkey ->
-            CreatePage (Create.initModel pubkey)
+        EventCreationRoute _ ->
+            EventCreationPage EventCreation.initModel
 
         _ ->
             NotFoundPage

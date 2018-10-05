@@ -96,6 +96,7 @@ type I18n
     | CheckDetail
     | CheckError
     | Close
+    | Confirm
     | TransferInfo1
     | TransferInfo2
     | TransferHelp
@@ -120,26 +121,30 @@ type I18n
     | AccountCreationProgressKeypair
     | AccountCreationProgressCreateNew
     | AccountCreationConfirmEmail
-    | AccountCreationClickConfirmLink
+    | AccountCreationEnterEmail
+    | AccountCreationEnterVerificationCode
     | AccountCreationEmailValid
     | AccountCreationEmailInvalid
-    | AccountCreationEmailSend
+    | AccountCreationSendEmail
     | AccountCreationAlreadyHaveAccount
     | AccountCreationLoginLink
     | AccountCreationEmailConfirmed
+    | AccountCreationAgreeEosConstitution
+    | AccountCreationButton
     | ClickNext
     | Next
     | AccountCreationEmailConfirmFailure
-    | AccountCreationKeypairGenerated
+    | AccountCreationKeypairGeneration
+    | AccountCreationKeypairRegenerate
     | AccountCreationKeypairCaution
     | PublicKey
     | PrivateKey
     | CopyAll
     | AccountCreationNameValid
     | AccountCreationNameInvalid
-    | AccountCreationTypeName
+    | AccountCreation
     | AccountCreationNameCondition
-    | AccountCreationNameConditionExample
+    | AccountCreationInput
     | AccountCreationNamePlaceholder
     | AccountCreationCongratulation
     | AccountCreationWelcome
@@ -474,6 +479,12 @@ getMessages i18n =
             , chinese = "关"
             }
 
+        Confirm ->
+            { korean = "확인"
+            , english = "Confirm"
+            , chinese = "确认"
+            }
+
         TransferInfo1 ->
             { korean = "총 보유수량과 전송가능한 수량은"
             , english = "Total amount and transferable amount can be "
@@ -613,15 +624,21 @@ getMessages i18n =
             }
 
         AccountCreationConfirmEmail ->
-            { korean = "새로운 계정을 만들기 위해 이메일을 인증하세요!"
-            , english = "Type in your email address to make a new account!"
-            , chinese = "验证您的电子邮件以创建新帐户！"
+            { korean = "이메일 인증"
+            , english = "Email Authentication"
+            , chinese = "邮件验证"
             }
 
-        AccountCreationClickConfirmLink ->
-            { korean = "받으신 메일의 링크를 클릭해주세요."
-            , english = "Confirm by clicking the link in the email you receive"
-            , chinese = "单击您收到的电子邮件中的链接进行确认"
+        AccountCreationEnterEmail ->
+            { korean = "이메일을 입력해주세요."
+            , english = "Please enter your e-mail."
+            , chinese = "请输入您的电子邮件。"
+            }
+
+        AccountCreationEnterVerificationCode ->
+            { korean = "메일로 전송된 코드를 입력해주세요."
+            , english = "Please enter the code sent by e-mail."
+            , chinese = "请输入通过电子邮件发送的代码。"
             }
 
         AccountCreationEmailValid ->
@@ -636,10 +653,10 @@ getMessages i18n =
             , chinese = "电子邮件地址无效。"
             }
 
-        AccountCreationEmailSend ->
-            { korean = "링크 보내기"
-            , english = "Send Link"
-            , chinese = "发送链接"
+        AccountCreationSendEmail ->
+            { korean = "코드 전송"
+            , english = "Send Code"
+            , chinese = "代码转移"
             }
 
         AccountCreationAlreadyHaveAccount ->
@@ -655,9 +672,9 @@ getMessages i18n =
             }
 
         AccountCreationEmailConfirmed ->
-            { korean = "이메일 인증완료!"
+            { korean = "이메일 인증이 완료되었습니다."
             , english = "Email Confirmed!"
-            , chinese = "电子邮件已确认！"
+            , chinese = "电子邮件验证已完成。"
             }
 
         ClickNext ->
@@ -673,21 +690,27 @@ getMessages i18n =
             }
 
         AccountCreationEmailConfirmFailure ->
-            { korean = "이메일 인증 실패"
-            , english = "Failed to confirm email"
-            , chinese = "电子邮件验证失败"
+            { korean = "일치하지 않는 코드입니다."
+            , english = "Unmatched code"
+            , chinese = "无与伦比的代码。"
             }
 
-        AccountCreationKeypairGenerated ->
-            { korean = "키 쌍을 꼭 안전한 곳에 복사해두세요!"
-            , english = "Please copy and save key pair!"
-            , chinese = "确保将密钥对复制到安全的地方！"
+        AccountCreationKeypairGeneration ->
+            { korean = "키 생성"
+            , english = "Key pair generation"
+            , chinese = "密钥生成"
+            }
+
+        AccountCreationKeypairRegenerate ->
+            { korean = "새로 고침"
+            , english = "Regenerate"
+            , chinese = "刷新"
             }
 
         AccountCreationKeypairCaution ->
-            { korean = "계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
-            , english = "Make sure you save the key pair somewhere safe! It is used to verify your account."
-            , chinese = "确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
+            { korean = "* 계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
+            , english = "* Make sure you save the key pair somewhere safe! It is used to verify your account."
+            , chinese = "* 确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
             }
 
         PublicKey ->
@@ -720,28 +743,40 @@ getMessages i18n =
             , chinese = "这是一个不可能的帐户。"
             }
 
-        AccountCreationTypeName ->
-            { korean = "원하는 계정의 이름을 입력해주세요!"
-            , english = "Type in the name of your account!"
-            , chinese = "请输入您想要的帐户名称！"
+        AccountCreation ->
+            { korean = "계정생성하기"
+            , english = "Create an account"
+            , chinese = "创建一个帐户"
             }
 
         AccountCreationNameCondition ->
-            { korean = "계정명은 1~5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다!"
+            { korean = "1-5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다."
             , english = "An account name can contain lowercase english characters or numbers 1~5, in total 12 characters :)"
             , chinese = "帐户名称是1到5之间的数字和英文小写字母的组合，只有12个字母！"
             }
 
-        AccountCreationNameConditionExample ->
-            { korean = "(예시: eoshuby12345)"
-            , english = "ex) eoshuby12345"
-            , chinese = "(示例：eoshuby12345)"
+        AccountCreationInput ->
+            { korean = "계정명 입력"
+            , english = "Enter account name"
+            , chinese = "输入帐户名称"
             }
 
         AccountCreationNamePlaceholder ->
-            { korean = "계정이름은 반드시 12글자로 입력해주세요"
-            , english = "Type in 12 characters"
-            , chinese = "帐户名称必须为12个字符"
+            { korean = "ex) eoshuby12345"
+            , english = "ex) eoshuby12345"
+            , chinese = "ex) eoshuby12345"
+            }
+
+        AccountCreationAgreeEosConstitution ->
+            { korean = "EOS Consitution에 동의합니다."
+            , english = "I agree to the EOS Consitution."
+            , chinese = "我同意EOS Consitution。"
+            }
+
+        AccountCreationButton ->
+            { korean = "생성하기"
+            , english = "Create"
+            , chinese = "创建"
             }
 
         AccountCreationCongratulation ->

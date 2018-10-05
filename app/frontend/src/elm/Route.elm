@@ -6,12 +6,8 @@ import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, strin
 
 type Route
     = IndexRoute
-    | ConfirmEmailRoute (Maybe String)
-    | EmailConfirmedRoute String (Maybe String) (Maybe String)
-    | EmailConfirmFailureRoute
-    | CreateKeysRoute
-    | CreatedRoute
-    | CreateRoute String
+    | CreatedRoute (Maybe String) (Maybe String)
+    | EventCreationRoute (Maybe String)
     | SearchRoute (Maybe String)
     | SearchKeyRoute (Maybe String)
     | VoteRoute
@@ -25,12 +21,8 @@ matchRoute : Parser (Route -> a) a
 matchRoute =
     oneOf
         [ map IndexRoute top
-        , map ConfirmEmailRoute (s "account" </> s "confirm_email" <?> stringParam "locale")
-        , map EmailConfirmedRoute (s "account" </> s "email_confirmed" </> string <?> stringParam "email" <?> stringParam "locale")
-        , map EmailConfirmFailureRoute (s "account" </> s "email_confirm_failure")
-        , map CreateKeysRoute (s "account" </> s "create_keys")
-        , map CreatedRoute (s "account" </> s "created")
-        , map CreateRoute (s "account" </> s "create" </> string)
+        , map CreatedRoute (s "account" </> s "created" <?> stringParam "eos_account" <?> stringParam "public_key")
+        , map EventCreationRoute (s "account" </> s "event_creation" <?> stringParam "locale")
         , map SearchRoute (s "search" <?> stringParam "query")
         , map SearchKeyRoute (s "searchkey" <?> stringParam "query")
         , map VoteRoute (s "vote")

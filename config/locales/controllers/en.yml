@@ -1,15 +1,18 @@
 en:
   users:
     create_ok: 'Verification mail sent! Please check your email.'
-    already_confirmed_email: 'This email has already been used to create an EOS account.'
+    already_eos_account_created_email: 'This email has already been used to create an EOS account.'
     failed_to_create_email_verification_log: 'Failed to create an email verification log'
     smtp_authentication_error: 'Failed to send a verification email'
+    email_confirmed: 'Email is confirmed'
+    invalid_email_confirm_token: 'Invalid email confirm token'
     eos_account_already_exist: 'The account already exists in the EOS block chain'
     eos_account_created: "Welcome to the EOS! \"%{account_name}\" has been created."
     eos_account_creation_failure_no_such_email: 'User does not exist with this email'
     eos_account_creation_failure_email_not_confirmed: 'Email is not confirmed'
     eos_account_creation_failure_already_created: 'EOS account already created with this email'
     eos_node_connection_failed: 'Failed to connect EOS node'
+    eos_wallet_connection_failed: 'Failed to connect EOS wallet'
   orders:
     deactivated_product: "You can't order this item for now."
   eos_ram_price_histores:

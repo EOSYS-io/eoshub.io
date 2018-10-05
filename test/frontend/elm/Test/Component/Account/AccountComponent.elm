@@ -1,12 +1,8 @@
 module Test.Component.Account.AccountComponent exposing (location, tests)
 
 import Component.Account.AccountComponent exposing (..)
-import Component.Account.Page.ConfirmEmail as ConfirmEmail
-import Component.Account.Page.Create as Create
-import Component.Account.Page.CreateKeys as CreateKeys
 import Component.Account.Page.Created as Created
-import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
-import Component.Account.Page.EmailConfirmed as EmailConfirmed
+import Component.Account.Page.EventCreation as EventCreation
 import Expect
 import Navigation exposing (Location)
 import Route
@@ -36,67 +32,47 @@ tests =
         flags =
             { node_env = "test" }
 
-        confirmToken =
-            "testToken"
+        language =
+            Translation.Korean
     in
     describe "Page module"
         [ describe "getPage"
-            [ test "ConfirmEmailRoute" <|
-                \() -> Expect.equal (ConfirmEmailPage ConfirmEmail.initModel) (Just "ko" |> Route.ConfirmEmailRoute |> getPage)
-            , test "EmailConfirmedRoute" <|
+            [ test "CreatedRoute" <|
                 \() ->
                     let
-                        email =
-                            Just "test@chain.partners"
-                    in
-                    Expect.equal (EmailConfirmedPage (EmailConfirmed.initModel email)) (Just "ko" |> Route.EmailConfirmedRoute confirmToken email |> getPage)
-            , test "EmailConfirmFailureRoute" <|
-                \() -> Expect.equal (EmailConfirmFailurePage EmailConfirmFailure.initModel) (getPage Route.EmailConfirmFailureRoute)
-            , test "CreateKeysRoute" <|
-                \() ->
-                    let
-                        createKeysModel =
-                            CreateKeys.initModel
+                        eosAccount =
+                            Just "testtesttest"
 
-                        ( newCreateKeysModel, subCmd ) =
-                            CreateKeys.update CreateKeys.GenerateKeys createKeysModel
-
-                        expectedPage =
-                            CreateKeysPage newCreateKeysModel
+                        publicKey =
+                            Just "lasdihgalsghasldgihasggasdgasdgagsafgas"
                     in
-                    Expect.equal expectedPage (getPage Route.CreateKeysRoute)
-            , test "CreatedRoute" <|
-                \() -> Expect.equal (CreatedPage Created.initModel) (getPage Route.CreatedRoute)
-            , test "CreateRoute" <|
+                    Expect.equal (CreatedPage <| Created.initModel eosAccount publicKey) (getPage <| Route.CreatedRoute eosAccount publicKey)
+            , test "EventCreationRoute" <|
                 \() ->
-                    let
-                        pubkey =
-                            "testpubkey"
-                    in
-                    Expect.equal (CreatePage (Create.initModel pubkey)) (getPage (Route.CreateRoute pubkey))
+                    Expect.equal (EventCreationPage EventCreation.initModel) (getPage <| Route.EventCreationRoute <| Just "ko")
             , test "NotFoundRoute" <|
                 \() -> Expect.equal NotFoundPage (getPage Route.NotFoundRoute)
             ]
         , describe "initCmd"
-            [ test "CreateKeysRoute" <|
+            [ test "EventCreationRoute" <|
                 \() ->
                     let
-                        createKeysModel =
-                            CreateKeys.initModel
+                        eventCreationModel =
+                            EventCreation.initModel
 
-                        ( newCreateKeysModel, subCmd ) =
-                            CreateKeys.update CreateKeys.GenerateKeys createKeysModel
+                        ( newEventCreationModel, subCmd ) =
+                            EventCreation.update EventCreation.GenerateKeys eventCreationModel flags language
 
                         expectedPage =
-                            CreateKeysPage newCreateKeysModel
+                            EventCreationPage newEventCreationModel
 
                         expectedCmd =
-                            Cmd.map CreateKeysMessage subCmd
+                            Cmd.map EventCreationMessage subCmd
 
                         model =
                             { page = expectedPage
-                            , confirmToken = confirmToken
                             , language = Translation.Korean
+                            , flags = { node_env = "test" }
                             }
                     in
                     Expect.equal expectedCmd (initCmd model)

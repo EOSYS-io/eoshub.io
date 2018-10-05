@@ -6,14 +6,22 @@ class UsersControllerTest < ActionController::TestCase
   test "should get confirm_email" do
     alice = users(:alice)
     get :confirm_email, params: { id: alice.confirm_token }
-    assert_redirected_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{alice.confirm_token}?email=#{alice.email}&locale=#{I18n.locale}"
+    
+    assert_response :ok
+    
+    expect_body = { message: I18n.t('users.email_confirmed') }.to_json
+    assert_equal expect_body, @response.body
+    
     assert alice.reload.email_confirmed?
   end
 
   test "should fail to get confirm_email" do
     bob = users(:bob)
     get :confirm_email, params: { id: 'not_exist' }
-    assert_redirected_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}?locale=#{I18n.locale}"
+    
+    assert_response :bad_request
+    expect_body = { message: I18n.t('users.invalid_email_confirm_token') }.to_json
+    assert_equal expect_body, @response.body
   end
 
   test "should fail to create aleady exist eos account" do

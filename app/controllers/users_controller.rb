@@ -4,13 +4,13 @@ class UsersController < ApiController
   def create
     @user = User.find_by(email: params[:email])
     if @user.present?
-      unless @user.email_saved?
-        render json: { message: I18n.t('users.already_confirmed_email') }, status: :bad_request and return
+      if @user.eos_account_created?
+        render json: { message: I18n.t('users.already_eos_account_created_email') }, status: :bad_request and return
       end
     else
       @user = User.new(email: params[:email])
       unless @user.save
-        render json: { message: I18n.t('user.failed_to_create_email_verification_log') }, status: :internal_server_error and return
+        render json: { message: I18n.t('users.failed_to_create_email_verification_log') }, status: :internal_server_error and return
       end
     end
 
@@ -25,9 +25,9 @@ class UsersController < ApiController
     user = User.find_by(confirm_token: confirm_token)
     if user.present?
       user.email_confirmed!
-      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirmed_url']}/#{confirm_token}?email=#{user.email}&locale=#{I18n.locale}"
+      render json: { message: I18n.t('users.email_confirmed') }, status: :ok
     else
-      redirect_to "#{Rails.configuration.urls['host_url']}#{Rails.configuration.urls['account_create_email_confirm_failure_url']}?locale=#{I18n.locale}"
+      render json: { message: I18n.t('users.invalid_email_confirm_token') }, status: :bad_request
     end
   end
 
@@ -47,6 +47,8 @@ class UsersController < ApiController
       if response.code == 200
         user.eos_account_created!
         render json: { message: I18n.t('users.eos_account_created') }, status: :ok
+      elsif response.return_code == :couldnt_connect
+        render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
       elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
         render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
       else

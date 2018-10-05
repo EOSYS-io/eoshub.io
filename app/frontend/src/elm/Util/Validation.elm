@@ -4,6 +4,7 @@ module Util.Validation exposing
     , QuantityStatus(..)
     , VerificationRequestStatus(..)
     , checkAccountName
+    , checkConfirmToken
     , isAccount
     , isPublicKey
     , validateAccount
@@ -29,6 +30,11 @@ isPublicKey query =
 checkAccountName : String -> Bool
 checkAccountName query =
     contains (regex "^[a-z.1-5]{12,12}$") query
+
+
+checkConfirmToken : String -> Bool
+checkConfirmToken query =
+    contains (regex "^[a-zA-Z0-9_-]{22}$") query
 
 
 

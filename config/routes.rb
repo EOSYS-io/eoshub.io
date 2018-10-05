@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   resources :users do
     member do
-      get :confirm_email
+      post :confirm_email
       post :create_eos_account
     end
   end
