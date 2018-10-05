@@ -23,7 +23,6 @@ class User < ApplicationRecord
   has_many :orders
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
-  validates :eos_account, uniqueness: true
   before_create :confirmation_token
 
   enum state: {
