@@ -504,7 +504,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                                 ( "true", "올바르지 않은 계정입니다." )
 
                             InexistentAccount ->
-                                ( "true", "존재하지 않는 계정입니다." )
+                                ( "true", "" )
 
                             _ ->
                                 ( "", "" )
@@ -618,7 +618,7 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
 
             else
                 ( "판매가능수량"
-                , (((availableRam |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB"
+                , "약 " ++ (((availableRam |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB"
                 , "* 판매시 0.5%의 수수료가 발생합니다. "
                 , ((ramPrice * (sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0)) |> Round.round 4) ++ " EOS"
                 )
