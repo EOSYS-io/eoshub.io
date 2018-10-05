@@ -287,11 +287,7 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, cpuQuanti
             Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
     in
     div [ class "rental cancel container" ]
-        [ div [ class "available status" ]
-            [ a [ id "viewRentalListAccount", onClick OpenDelegateListModal ]
-                [ text "임대해준 계정 리스트 보기" ]
-            ]
-        , section []
+        [ section [ class "search" ]
             [ div [ class "input field" ]
                 [ input
                     [ attribute "autofocus" ""
@@ -300,26 +296,32 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, cpuQuanti
                     , placeholder "임대취소할 계정을 선택하세요"
                     , type_ "text"
                     , value undelegatebw.receiver
-                    , disabled True
+                    , readonly True
                     ]
                     []
-                , span [ class "validate description" ]
-                    [ text "계정이름 예시:eoshubby" ]
+                , button [ id "viewRentalListAccount", class "choice button", type_ "button", onClick OpenDelegateListModal ]
+                    [ text "임대 계정 리스트" ]
+                ]
+            ]
+        , div [ class "my resource" ]
+            [ div []
+                [ h3 []
+                    [ text "임대해준 CPU"
+                    , strong []
+                        [ text unstakePossibleCpu ]
+                    ]
+                ]
+            , div []
+                [ h3 []
+                    [ text "임대해준 NET"
+                    , strong []
+                        [ text unstakePossibleNet ]
+                    ]
                 ]
             ]
         , section []
-            [ div [ class "wallet status" ]
-                [ h3 []
-                    [ text "언스테이크 가능한 CPU" ]
-                , p []
-                    [ text unstakePossibleCpu ]
-                , h3 []
-                    [ text "언스테이크 가능한 NET" ]
-                , p []
-                    [ text unstakePossibleNet ]
-                , p [ class ("validate description" ++ validatedAttr) ]
-                    [ text validatedText ]
-                ]
+            [ p [ class ("validate description" ++ validatedAttr) ]
+                [ text validatedText ]
             , div [ class "field group" ]
                 [ resourceInputDiv model Cpu
                 , resourceInputDiv model Net

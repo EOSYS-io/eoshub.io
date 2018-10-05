@@ -15,7 +15,7 @@ main.resource_management {
 
 	h3 ~ p {
 		font-size:$small;
-		margin:5px 0 0 0;
+		margin:0px;
 	}
 
 	div.tab {
@@ -83,7 +83,7 @@ main.resource_management {
 
 		label {
 			position:absolute;
-			top:calc(-1em - 4px);
+			top:calc(-1em - 8px);
 			font-size:$x-small;
 			color:$white;
 		}
@@ -167,7 +167,7 @@ main.resource_management {
 		}
 
 		input.size.large + span.description ~ button {
-			margin-top:37px;
+			margin-top:45px;
 		}
 
 	}
@@ -185,7 +185,7 @@ main.resource_management {
 			background-color: $xxxx-dark-gray;
 
 			box-sizing:border-box;
-			padding:28px;
+			padding:24px 28px;
 
 			&:first-child {
 				margin-right:8px;
@@ -194,7 +194,7 @@ main.resource_management {
 			h3 {
 				strong {
 					display:block;
-					font-size:$large;
+					font-size:$xx-large;
 					font-weight:100;
 					color:$white;
 					margin-top:4px;
@@ -258,7 +258,7 @@ main.resource_management {
 		}
 	}
 
-	section {
+	section:not(.modal) {
 		margin:8px 32px;
 		padding:32px;
 		background-color:$xxxx-dark-gray;
@@ -289,9 +289,12 @@ main.resource_management {
 		}
 	}
 
-	section {
+	section:not(.modal) {
 		display:flex;
 		flex-direction:column;
+		height:277px;
+		box-sizing:border-box;
+		justify-content:space-between;
 
 		> .btn_area {
 			position:absolute;
@@ -309,12 +312,26 @@ main.resource_management {
 }
 
 // typecase :: stake
-main.resource_management
-	.stake.container {
-		.input.field {
-			margin-top:45px;
+main.resource_management .stake.container {
+
+	p  {
+		font-size: $small;
+		color: $gray;
+		margin:0 0 32px 32px;
+
+		em {
+			margin-top:12px;
+			display:block;
+			font-size: $xx-large;
+			font-weight: 300;
+			color: $white;
 		}
 	}
+
+	.input.field {
+		margin-top:67px;
+	}
+}
 
 // typecase :: unstake,rental
 main.resource_management {
@@ -348,9 +365,9 @@ main.resource_management {
 main.resource_management {
 	.rental.container {
 
-		.container {
+		> section:nth-of-type(1) {
+			height:initial;
 		}
-
 		.available.status {
 			margin:0 32px 32px;
 
@@ -383,5 +400,46 @@ main.resource_management {
 		section {
 			padding:30px 32px;
 		}
+	}
+}
+
+// typecase :: rental cancel
+main.resource_management {
+	.rental.cancel.container {
+		section.search {
+			margin: 0 0 32px 32px;
+			padding:0;
+			background:transparent;
+
+			.input.field {
+				> * {
+					height:48px;
+					vertical-align:top;
+				}
+
+				> button {
+					line-height:46px;
+					background-color:$x-dark-gray;
+					color:$white;
+					border-radius:0;
+				}
+
+				input[type='text'] {
+					font-weight:normal;
+					width:294px;
+
+					font-size:$small;
+					background-color:$xxx-dark-gray;
+
+					padding:0 12px;
+
+					margin-right:8px;
+				}
+			}
+		}
+
+		// .my.resource strong {
+		//     color:$dark-gray;
+		// }
 	}
 }
