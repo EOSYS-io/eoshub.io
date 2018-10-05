@@ -121,7 +121,6 @@ type I18n
     | AccountCreationProgressCreateNew
     | AccountCreationConfirmEmail
     | AccountCreationEnterEmail
-    | AccountCreationClickConfirmLink
     | AccountCreationEnterVerificationCode
     | AccountCreationEmailValid
     | AccountCreationEmailInvalid
@@ -134,7 +133,6 @@ type I18n
     | ClickNext
     | Next
     | AccountCreationEmailConfirmFailure
-    | AccountCreationKeypairGenerated
     | AccountCreationKeypairGeneration
     | AccountCreationKeypairRegenerate
     | AccountCreationKeypairCaution
@@ -146,7 +144,6 @@ type I18n
     | AccountCreation
     | AccountCreationNameCondition
     | AccountCreationInput
-    | AccountCreationNameConditionExample
     | AccountCreationNamePlaceholder
     | AccountCreationCongratulation
     | AccountCreationWelcome
@@ -630,12 +627,6 @@ getMessages i18n =
             , chinese = "请输入通过电子邮件发送的代码。"
             }
 
-        AccountCreationClickConfirmLink ->
-            { korean = "받으신 메일의 링크를 클릭해주세요."
-            , english = "Confirm by clicking the link in the email you receive"
-            , chinese = "单击您收到的电子邮件中的链接进行确认"
-            }
-
         AccountCreationEmailValid ->
             { korean = "올바른 이메일 주소입니다."
             , english = "Valid email address"
@@ -688,12 +679,6 @@ getMessages i18n =
             { korean = "일치하지 않는 코드입니다."
             , english = "Unmatched code"
             , chinese = "无与伦比的代码。"
-            }
-
-        AccountCreationKeypairGenerated ->
-            { korean = "키 쌍을 꼭 안전한 곳에 복사해두세요!"
-            , english = "Please copy and save key pair!"
-            , chinese = "确保将密钥对复制到安全的地方！"
             }
 
         AccountCreationKeypairGeneration ->
@@ -760,12 +745,6 @@ getMessages i18n =
             { korean = "계정명 입력"
             , english = "Enter account name"
             , chinese = "输入帐户名称"
-            }
-
-        AccountCreationNameConditionExample ->
-            { korean = "(예시: eoshuby12345)"
-            , english = "ex) eoshuby12345"
-            , chinese = "(示例：eoshuby12345)"
             }
 
         AccountCreationNamePlaceholder ->

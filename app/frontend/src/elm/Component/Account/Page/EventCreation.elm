@@ -16,7 +16,6 @@ import Translation
             , AccountCreationAgreeEosConstitution
             , AccountCreationAlreadyHaveAccount
             , AccountCreationButton
-            , AccountCreationClickConfirmLink
             , AccountCreationConfirmEmail
             , AccountCreationEmailConfirmFailure
             , AccountCreationEmailConfirmed
@@ -31,7 +30,6 @@ import Translation
             , AccountCreationKeypairRegenerate
             , AccountCreationLoginLink
             , AccountCreationNameCondition
-            , AccountCreationNameConditionExample
             , AccountCreationNameInvalid
             , AccountCreationNamePlaceholder
             , AccountCreationNameValid

@@ -1,11 +1,6 @@
 module Component.Account.AccountComponent exposing (Message(..), Model, Page(..), getPage, initCmd, initModel, subscriptions, toLanguage, update, view)
 
-import Component.Account.Page.ConfirmEmail as ConfirmEmail
-import Component.Account.Page.Create as Create
-import Component.Account.Page.CreateKeys as CreateKeys
 import Component.Account.Page.Created as Created
-import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
-import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Main.Page.NotFound as NotFound
 import Html
@@ -34,12 +29,7 @@ import Util.Flags exposing (Flags)
 
 
 type Page
-    = ConfirmEmailPage ConfirmEmail.Model
-    | EmailConfirmedPage EmailConfirmed.Model
-    | EmailConfirmFailurePage EmailConfirmFailure.Model
-    | CreatedPage Created.Model
-    | CreateKeysPage CreateKeys.Model
-    | CreatePage Create.Model
+    = CreatedPage Created.Model
     | EventCreationPage EventCreation.Model
     | NotFoundPage
 
@@ -71,18 +61,6 @@ initModel location flags =
             getPage route
     in
     case route of
-        ConfirmEmailRoute maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
-        EmailConfirmedRoute confirmToken email maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
         EventCreationRoute maybeLocale ->
             { page = page
             , language = toLanguage maybeLocale
@@ -101,12 +79,7 @@ initModel location flags =
 
 
 type Message
-    = ConfirmEmailMessage ConfirmEmail.Message
-    | EmailConfirmedMessage EmailConfirmed.Message
-    | EmailConfirmFailureMessage EmailConfirmFailure.Message
-    | CreateKeysMessage CreateKeys.Message
-    | CreatedMessage Created.Message
-    | CreateMessage Create.Message
+    = CreatedMessage Created.Message
     | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
 
@@ -114,16 +87,6 @@ type Message
 initCmd : Model -> Cmd Message
 initCmd { page, flags, language } =
     case page of
-        CreateKeysPage subModel ->
-            let
-                ( _, subCmd ) =
-                    CreateKeys.update CreateKeys.GenerateKeys subModel
-
-                cmd =
-                    Cmd.map CreateKeysMessage subCmd
-            in
-            cmd
-
         EventCreationPage subModel ->
             let
                 ( _, subCmd ) =
@@ -147,23 +110,8 @@ view { language, page } =
     let
         newContentHtml =
             case page of
-                ConfirmEmailPage subModel ->
-                    Html.map ConfirmEmailMessage (ConfirmEmail.view subModel language)
-
-                EmailConfirmedPage subModel ->
-                    Html.map EmailConfirmedMessage (EmailConfirmed.view subModel language)
-
-                EmailConfirmFailurePage subModel ->
-                    Html.map EmailConfirmFailureMessage (EmailConfirmFailure.view subModel language)
-
-                CreateKeysPage subModel ->
-                    Html.map CreateKeysMessage (CreateKeys.view subModel language)
-
                 CreatedPage subModel ->
                     Html.map CreatedMessage (Created.view subModel language)
-
-                CreatePage subModel ->
-                    Html.map CreateMessage (Create.view subModel language)
 
                 EventCreationPage subModel ->
                     Html.map EventCreationMessage (EventCreation.view subModel language)
@@ -182,47 +130,12 @@ view { language, page } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message ({ page, language, flags } as model) =
     case ( message, page ) of
-        ( ConfirmEmailMessage subMessage, ConfirmEmailPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    ConfirmEmail.update subMessage subModel flags language
-            in
-            ( { model | page = newPage |> ConfirmEmailPage }, Cmd.map ConfirmEmailMessage subCmd )
-
-        ( EmailConfirmedMessage subMessage, EmailConfirmedPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    EmailConfirmed.update subMessage subModel "confirmToken"
-            in
-            ( { model | page = newPage |> EmailConfirmedPage }, Cmd.map EmailConfirmedMessage subCmd )
-
-        ( EmailConfirmFailureMessage subMessage, EmailConfirmFailurePage subModel ) ->
-            let
-                newPage =
-                    EmailConfirmFailure.update subMessage subModel
-            in
-            ( { model | page = newPage |> EmailConfirmFailurePage }, Cmd.none )
-
-        ( CreateKeysMessage subMessage, CreateKeysPage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    CreateKeys.update subMessage subModel
-            in
-            ( { model | page = newPage |> CreateKeysPage }, Cmd.map CreateKeysMessage subCmd )
-
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
                 ( newPage, subCmd ) =
                     Created.update subMessage subModel
             in
             ( { model | page = newPage |> CreatedPage }, Cmd.map CreatedMessage subCmd )
-
-        ( CreateMessage subMessage, CreatePage subModel ) ->
-            let
-                ( newPage, subCmd ) =
-                    Create.update subMessage subModel flags "confirmToken" language
-            in
-            ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
 
         ( EventCreationMessage subMessage, EventCreationPage subModel ) ->
             let
@@ -258,8 +171,7 @@ update message ({ page, language, flags } as model) =
 subscriptions : Model -> Sub Message
 subscriptions model =
     Sub.batch
-        [ Sub.map CreateKeysMessage CreateKeys.subscriptions
-        , Sub.map EventCreationMessage EventCreation.subscriptions
+        [ Sub.map EventCreationMessage EventCreation.subscriptions
         ]
 
 
@@ -270,23 +182,8 @@ subscriptions model =
 getPage : Route -> Page
 getPage route =
     case route of
-        ConfirmEmailRoute maybeLocale ->
-            ConfirmEmailPage ConfirmEmail.initModel
-
-        EmailConfirmedRoute confirmToken email maybeLocale ->
-            EmailConfirmedPage (EmailConfirmed.initModel email)
-
-        EmailConfirmFailureRoute ->
-            EmailConfirmFailurePage EmailConfirmFailure.initModel
-
-        CreateKeysRoute ->
-            CreateKeysPage CreateKeys.initModel
-
         CreatedRoute ->
             CreatedPage Created.initModel
-
-        CreateRoute pubkey ->
-            CreatePage (Create.initModel pubkey)
 
         EventCreationRoute maybeLocale ->
             EventCreationPage EventCreation.initModel
