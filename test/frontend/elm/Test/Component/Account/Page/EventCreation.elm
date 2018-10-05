@@ -40,7 +40,7 @@ tests =
                         expectedJson =
                             "{\"email\":\"" ++ model.email ++ "\"}"
                     in
-                    Expect.equal (Http.stringBody "application/json" expectedJson) (createUserBodyParams model)
+                    Expect.equal (Http.stringBody "application/json" expectedJson) (sendCodeBodyParams model)
             , test "createEosAccountBodyParams" <|
                 \() ->
                     let
