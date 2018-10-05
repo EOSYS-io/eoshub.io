@@ -81,19 +81,22 @@ app.ports.invalidateAccount.subscribe(async () => {
 });
 
 app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
-  let response = createPushActionReponse(200, action);
   try {
     const { eosjsClient } = getScatter();
     const contract = await eosjsClient.contract(account);
     await contract[action](payload);
+    app.ports.receivePushActionResponse.send(createPushActionReponse(200, action));
   } catch (err) {
     if (err.isError && err.isError === true) {
       // Deal with scatter error.
       const { code, type, message } = err;
-      response = createPushActionReponse(code, action, type, message);
+      if (type === 'signature_rejected') { return; }
+
+      app.ports.receivePushActionResponse.send(
+        createPushActionReponse(code, action, type, message),
+      );
     }
   }
-  app.ports.receivePushActionResponse.send(response);
 });
 
 app.ports.generateKeys.subscribe(async () => {

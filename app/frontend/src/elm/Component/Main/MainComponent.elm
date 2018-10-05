@@ -234,7 +234,12 @@ view { page, header, notification, sidebar, selectedNav } =
                     Html.map SearchKeyMessage (SearchKey.view language subModel)
 
                 VotePage subModel ->
-                    Html.map VoteMessage (Vote.view language subModel)
+                    Html.map VoteMessage
+                        (Vote.view
+                            language
+                            subModel
+                            sidebar.account
+                        )
 
                 TransferPage subModel ->
                     Html.map TransferMessage

@@ -14,11 +14,11 @@ tests =
                 [ test "default value." <|
                     \() ->
                         Expect.equal
-                            "Loading..."
+                            0
                             (calculateEosRamPrice initRammarketFields)
                 , test "calculate ram price." <|
                     \() ->
-                        Expect.equal "0.10358351 EOS/KB"
+                        Expect.equal 0.1035835123259491
                             (calculateEosRamPrice
                                 { initRammarketFields
                                     | base =
