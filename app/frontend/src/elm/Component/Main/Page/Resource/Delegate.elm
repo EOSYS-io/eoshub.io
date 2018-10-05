@@ -333,7 +333,7 @@ view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityVal
                     [ text coreLiquidBalance ]
                 ]
             , a [ id "viewRentalListAccount", onClick OpenDelegateListModal ]
-                [ text "임대해준 계정 리스트 보기" ]
+                [ text "해준 계정 리스트 보기" ]
             ]
         , section []
             [ div [ class "input field" ]
@@ -344,6 +344,7 @@ view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityVal
                     , onInput ReceiverInput
                     , type_ "text"
                     , value delegatebw.receiver
+                    , attribute "maxlength" "12"
                     ]
                     []
                 , accountWarning

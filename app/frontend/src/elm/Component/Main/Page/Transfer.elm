@@ -181,13 +181,13 @@ accountWarningSpan accountStatus language =
                     ( " false", translate language CheckAccountName )
 
                 ValidAccount ->
-                    ( " true", translate language AccountExample )
+                    ( " true", translate language ValidAccountI18n )
 
                 InexistentAccount ->
                     ( " false", "존재하지 않는 계정입니다." )
 
                 AccountToBeVerified ->
-                    ( " false", "존재 여부를 확인하는 중입니다." )
+                    ( "", "" )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]

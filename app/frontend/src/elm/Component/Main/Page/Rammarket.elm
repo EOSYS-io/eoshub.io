@@ -506,9 +506,6 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                             InexistentAccount ->
                                 ( "true", "존재하지 않는 계정입니다." )
 
-                            AccountToBeVerified ->
-                                ( "true", "존재 여부를 확인하는 중입니다." )
-
                             _ ->
                                 ( "", "" )
                 in
