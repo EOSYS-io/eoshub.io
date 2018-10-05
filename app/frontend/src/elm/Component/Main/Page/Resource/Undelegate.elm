@@ -414,7 +414,7 @@ resourceInputDiv ({ undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityV
 
 
 
--- NOTE(boseok): consider integration with Delegate.validateEach
+-- NOTE(boseok): Consider integration with Delegate.validateEach
 
 
 validateEach : AccountStatus -> QuantityStatus -> QuantityStatus -> ( Bool, Bool, Bool, Bool )
@@ -438,7 +438,7 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation =
 validate : Model -> String -> String -> Model
 validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
-        -- NOTE(boseok): because receiver must be one of delegate list accounts, requestStatus is passed as Succeed
+        -- NOTE(boseok): Because receiver must be one of delegate list accounts, requestStatus is passed as Succeed.
         accountValidation =
             validateAccount undelegatebw.receiver Validation.Succeed
 
