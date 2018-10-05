@@ -11,17 +11,23 @@ import Dict exposing (Dict, fromList)
 import Translation
     exposing
         ( I18n
-            ( CheckDetail
+            ( BuyramFailed
+            , BuyramSucceeded
+            , CheckDetail
             , CheckError
             , DebugMessage
             , DelegatebwFailed
             , DelegatebwSucceeded
             , EmptyMessage
+            , SellramFailed
+            , SellramSucceeded
             , TransferFailed
             , TransferSucceeded
             , UndelegatebwFailed
             , UndelegatebwSucceeded
             , UnknownError
+            , VoteFailed
+            , VoteSucceeded
             )
         )
 import View.Notification as Notification
@@ -65,6 +71,9 @@ actionSuccessMessages =
         [ ( "transfer", TransferSucceeded )
         , ( "delegatebw", DelegatebwSucceeded )
         , ( "undelegatebw", UndelegatebwSucceeded )
+        , ( "buyram", BuyramSucceeded )
+        , ( "sellram", SellramSucceeded )
+        , ( "voteproducer", VoteSucceeded )
         ]
 
 
@@ -74,6 +83,9 @@ actionFailMessages =
         [ ( "transfer", TransferFailed )
         , ( "delegatebw", DelegatebwFailed )
         , ( "undelegatebw", UndelegatebwFailed )
+        , ( "buyram", BuyramFailed )
+        , ( "sellram", SellramFailed )
+        , ( "voteproducer", VoteFailed )
         ]
 
 

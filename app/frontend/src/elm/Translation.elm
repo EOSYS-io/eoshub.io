@@ -170,6 +170,12 @@ type I18n
     | UnstakeInvalidQuantity String
     | UnstakeOverValidQuantity String
     | UnstakePossible
+    | BuyramSucceeded String
+    | BuyramFailed String
+    | SellramSucceeded String
+    | SellramFailed String
+    | VoteSucceeded String
+    | VoteFailed String
 
 
 translate : Language -> I18n -> String
@@ -909,4 +915,40 @@ getMessages i18n =
             { korean = "언스테이크 가능합니다 :)"
             , english = ""
             , chinese = "可以进行Unstake：）"
+            }
+
+        BuyramSucceeded str ->
+            { korean = str ++ " 에게 구매 완료."
+            , english = ""
+            , chinese = ""
+            }
+
+        BuyramFailed code ->
+            { korean = code ++ " 코드오류로 램 구매 실패"
+            , english = ""
+            , chinese = ""
+            }
+
+        SellramSucceeded _ ->
+            { korean = "판매 완료!"
+            , english = ""
+            , chinese = ""
+            }
+
+        SellramFailed code ->
+            { korean = code ++ " 코드오류로 램 판매 실패"
+            , english = ""
+            , chinese = ""
+            }
+
+        VoteSucceeded _ ->
+            { korean = "투표 성공"
+            , english = ""
+            , chinese = ""
+            }
+
+        VoteFailed code ->
+            { korean = code ++ " 코드오류로 투표 실패"
+            , english = ""
+            , chinese = ""
             }

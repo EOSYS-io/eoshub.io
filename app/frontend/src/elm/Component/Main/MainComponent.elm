@@ -62,6 +62,7 @@ import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), Language(..), translate)
+import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
 import Util.Validation exposing (isAccount, isPublicKey)
@@ -486,6 +487,25 @@ update message ({ page, notification, header, sidebar } as model) flags =
 
                                 Resource.Undelegate { undelegatebw } ->
                                     undelegatebw.receiver
+
+                        RammarketPage { isBuyTab, buyModel } ->
+                            if isBuyTab then
+                                if buyModel.proxyBuy then
+                                    buyModel.params.receiver
+
+                                else
+                                    sidebar.account.accountName
+
+                            else
+                                ""
+
+                        VotePage { tab, producerNamesToVote } ->
+                            case tab of
+                                Vote.VoteTab ->
+                                    ""
+
+                                Vote.ProxyVoteTab ->
+                                    eosysProxyAccount
 
                         _ ->
                             ""

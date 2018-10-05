@@ -1,6 +1,7 @@
 module Component.Main.Page.Vote exposing
     ( Message
     , Model
+    , Tab(..)
     , initCmd
     , initModel
     , subscriptions
