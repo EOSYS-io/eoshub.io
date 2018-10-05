@@ -60,12 +60,15 @@ class User < ApplicationRecord
     save!
   end
 
+  def clear_confirm_token!
+    self.update!(confirm_token: nil)
+  end
+
   private
 
   def confirmation_token
-    if self.confirm_token.blank?
-      self.confirm_token = SecureRandom.urlsafe_base64.to_s
-    end
+    self.confirm_token = SecureRandom.urlsafe_base64.to_s
+    ExpireUserConfirmTokenJob.perform_in(10.minutes, self.id)
   end
 
   def reset_confirm_token
