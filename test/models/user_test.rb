@@ -5,7 +5,7 @@
 #  id            :bigint(8)        not null, primary key
 #  confirm_token :string(22)       default("")
 #  email         :string
-#  eos_account   :string           default(""), not null
+#  eos_account   :string
 #  state         :integer          default("email_saved")
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
