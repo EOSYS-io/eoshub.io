@@ -471,11 +471,15 @@ emailConfirmationMsgView : Model -> Language -> Html Message
 emailConfirmationMsgView { emailConfirmationRequested, emailConfirmed } language =
     let
         emailConfirmationMsg =
-            if emailConfirmed then
-                AccountCreationEmailConfirmed
+            if emailConfirmationRequested then
+                if emailConfirmed then
+                    AccountCreationEmailConfirmed
+
+                else
+                    AccountCreationEmailConfirmFailure
 
             else
-                AccountCreationEmailConfirmFailure
+                EmptyMessage
     in
     div
         [ class
