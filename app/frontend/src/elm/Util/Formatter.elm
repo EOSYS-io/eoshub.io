@@ -18,7 +18,7 @@ module Util.Formatter exposing
 import Date.Extra as Date
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Regex exposing (..)
+import Regex exposing (regex, replace)
 import Round
 import Task
 import Time exposing (Time)
@@ -37,7 +37,7 @@ floatToAsset valFloat =
 
 removeSymbolIfExists : String -> String
 removeSymbolIfExists asset =
-    asset |> replace All (regex " EOS") (\_ -> "")
+    asset |> replace Regex.All (regex " EOS") (\_ -> "")
 
 
 assetToFloat : String -> Float
@@ -58,15 +58,15 @@ assetToFloat str =
 
 assetAdd : String -> String -> String
 assetAdd a b =
-    (+) (assetToFloat a)
-        (assetToFloat b)
+    assetToFloat a
+        + assetToFloat b
         |> floatToAsset
 
 
 assetSubtract : String -> String -> String
 assetSubtract a b =
-    (-) (assetToFloat a)
-        (assetToFloat b)
+    assetToFloat a
+        - assetToFloat b
         |> floatToAsset
 
 

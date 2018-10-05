@@ -11,7 +11,7 @@ module Util.Validation exposing
     , validateQuantity
     )
 
-import Regex exposing (..)
+import Regex exposing (contains, regex)
 import String.UTF8 as UTF8
 import Util.Formatter exposing (removeSymbolIfExists)
 
@@ -87,14 +87,14 @@ validateAccount accountName requestStatus =
 
 
 validateQuantity : String -> Float -> QuantityStatus
-validateQuantity quantity maxAmount =
-    if quantity == "" then
+validateQuantity quantityStr maxAmount =
+    if quantityStr == "" then
         EmptyQuantity
 
     else
         let
             maybeQuantity =
-                quantity
+                quantityStr
                     |> removeSymbolIfExists
                     |> String.toFloat
         in

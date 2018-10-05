@@ -54,18 +54,18 @@ import Html.Attributes
         , id
         , placeholder
         , rel
-        , style
         , type_
         )
-import Html.Events exposing (on, onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (I18n(..), Language(..), translate)
+import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
 import Util.Validation exposing (isAccount, isPublicKey)
-import Util.WalletDecoder exposing (PushActionResponse, Wallet, decodePushActionResponse)
+import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
 
 
@@ -487,6 +487,25 @@ update message ({ page, notification, header, sidebar } as model) flags =
                                 Resource.Undelegate { undelegatebw } ->
                                     undelegatebw.receiver
 
+                        RammarketPage { isBuyTab, buyModel } ->
+                            if isBuyTab then
+                                if buyModel.proxyBuy then
+                                    buyModel.params.receiver
+
+                                else
+                                    sidebar.account.accountName
+
+                            else
+                                ""
+
+                        VotePage { tab } ->
+                            case tab of
+                                Vote.VoteTab ->
+                                    ""
+
+                                Vote.ProxyVoteTab ->
+                                    eosysProxyAccount
+
                         _ ->
                             ""
 
@@ -585,7 +604,7 @@ parseQuery query =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar, page } =
+subscriptions { page } =
     Sub.batch
         [ Port.receivePushActionResponse UpdatePushActionResponse
         , Sub.map SidebarMessage Sidebar.subscriptions

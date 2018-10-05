@@ -17,31 +17,30 @@ module Component.Main.Sidebar exposing
 import Data.Account
     exposing
         ( Account
-        , accountDecoder
         , defaultAccount
         , getResource
         , getResourceColorClass
         , getTotalAmount
         , getUnstakingAmount
         )
-import Date exposing (fromTime)
+import Date
 import Date.Extra as Date exposing (Interval(..))
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
+import Html.Attributes exposing (attribute, class, type_)
+import Html.Events exposing (onClick)
 import Http
 import Navigation
 import Port
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
-import Util.Formatter as Formatter
+import Util.Formatter
     exposing
         ( deleteFromBack
         , floatToAsset
         , getNow
         , larimerToEos
         )
-import Util.HttpRequest exposing (getAccount, getFullPath, post)
+import Util.HttpRequest exposing (getAccount)
 import Util.WalletDecoder
     exposing
         ( Wallet
@@ -305,7 +304,7 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             [ span [ class "title" ] [ text "stake" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
 
-            -- TODO(boseok): wording should be decided
+            -- TODO(boseok): Translation i18n should be decided.
             , span [ class ("status " ++ colorCode) ] [ text (translate language TransactionPossible) ]
 
             -- span [ class "status unavailable" ] [ text "" ]
@@ -396,7 +395,7 @@ update message ({ fold, wallet } as model) =
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
 
-        OnFetchAccount (Err error) ->
+        OnFetchAccount (Err _) ->
             ( model, Cmd.none )
 
         OnTime now ->

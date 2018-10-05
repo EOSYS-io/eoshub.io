@@ -9,15 +9,15 @@ module Component.Main.Page.SearchKey exposing
     , viewAccountCardList
     )
 
-import Data.Account exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Data.Account exposing (keyAccountsDecoder)
+import Html exposing (Html, button, dd, div, dt, h2, main_, p, span, strong, text)
+import Html.Attributes exposing (class, title, type_)
+import Html.Events exposing (onClick)
 import Http
 import Json.Encode as JE
-import Navigation exposing (..)
+import Navigation
 import Translation exposing (I18n(..), Language, translate)
-import Util.HttpRequest exposing (..)
+import Util.HttpRequest exposing (getFullPath, post)
 
 
 
@@ -68,7 +68,7 @@ update message model =
         OnFetchKeyAccounts (Ok data) ->
             ( { model | accounts = data }, Cmd.none )
 
-        OnFetchKeyAccounts (Err error) ->
+        OnFetchKeyAccounts (Err _) ->
             ( model, Cmd.none )
 
         ChangeUrl url ->

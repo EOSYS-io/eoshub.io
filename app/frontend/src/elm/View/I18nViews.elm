@@ -1,7 +1,7 @@
 module View.I18nViews exposing (textViewI18n)
 
 import Html exposing (Html, text)
-import Translation exposing (I18n, Language, toLocale, translate)
+import Translation exposing (I18n, Language, translate)
 
 
 textViewI18n : Language -> I18n -> Html msg

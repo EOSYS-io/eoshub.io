@@ -1,7 +1,7 @@
 module Component.Account.Page.Created exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, a, article, br, button, dd, div, dl, dt, h2, img, li, main_, ol, p, text)
-import Html.Attributes exposing (alt, attribute, class, href, src)
+import Html exposing (Html, a, article, br, dd, div, dl, dt, h2, main_, p, text)
+import Html.Attributes exposing (attribute, class)
 import Html.Events exposing (onClick)
 import Navigation
 import Translation
@@ -9,9 +9,6 @@ import Translation
         ( I18n
             ( AccountCreationCongratulation
             , AccountCreationGoHome
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , AccountCreationWelcome
             , AccountCreationYouCanSignIn
             )
@@ -53,7 +50,7 @@ update msg model =
 
 
 view : Model -> Language -> Html Message
-view model language =
+view _ language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "done" ]
             [ h2 []

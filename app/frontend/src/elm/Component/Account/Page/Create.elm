@@ -1,8 +1,21 @@
 module Component.Account.Page.Create exposing (Message(..), Model, createEosAccountBodyParams, initModel, update, view)
 
-import Html exposing (Html, article, br, button, div, form, h2, img, input, li, main_, ol, p, span, text, ul)
-import Html.Attributes exposing (action, alt, attribute, class, placeholder, src, style, type_)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html
+    exposing
+        ( Html
+        , article
+        , button
+        , div
+        , form
+        , h2
+        , input
+        , main_
+        , p
+        , span
+        , text
+        )
+import Html.Attributes exposing (attribute, class, placeholder, type_)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode exposing (Decoder, string)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -15,15 +28,10 @@ import Translation
             , AccountCreationNameCondition
             , AccountCreationNameConditionExample
             , AccountCreationNameInvalid
-            , AccountCreationNamePlaceholder
             , AccountCreationNameValid
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , AccountCreationTypeName
             , DebugMessage
             , EmptyMessage
-            , Next
             )
         , Language
         , toLocale
@@ -92,12 +100,12 @@ update msg ({ notification } as model) flags confirmToken language =
         CreateEosAccount ->
             ( model, createEosAccountRequest model flags confirmToken language )
 
-        NewUser (Ok res) ->
+        NewUser (Ok _) ->
             ( { model | requestSuccess = True }, Navigation.newUrl "/account/created" )
 
         NewUser (Err error) ->
             case error of
-                Http.BadStatus response ->
+                Http.BadStatus _ ->
                     ( { model
                         | requestSuccess = False
                         , notification =
@@ -144,7 +152,7 @@ update msg ({ notification } as model) flags confirmToken language =
 
 
 view : Model -> Language -> Html Message
-view { validation, accountName, validationMsg, requestSuccess, notification } language =
+view { validation, requestSuccess, notification } language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "make-account" ]
             [ span [ class "progress", attribute "data-progress" "01" ]

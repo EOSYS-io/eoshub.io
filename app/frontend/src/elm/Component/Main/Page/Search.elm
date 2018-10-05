@@ -3,16 +3,11 @@ module Component.Main.Page.Search exposing (Message(..), Model, Pagination, Sele
 import Data.Account
     exposing
         ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
         , defaultAccount
         , getResource
         , getResourceColorClass
         , getTotalAmount
         , getUnstakingAmount
-        , keyAccountsDecoder
         )
 import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
 import Html
@@ -20,19 +15,14 @@ import Html
         ( Html
         , br
         , button
-        , caption
         , dd
         , div
         , dl
         , dt
-        , em
         , h2
         , h3
         , h4
-        , input
-        , li
         , main_
-        , node
         , option
         , p
         , section
@@ -46,7 +36,6 @@ import Html
         , th
         , thead
         , tr
-        , ul
         )
 import Html.Attributes
     exposing
@@ -55,7 +44,6 @@ import Html.Attributes
         , hidden
         , id
         , name
-        , placeholder
         , scope
         , title
         , type_
@@ -165,12 +153,12 @@ type Message
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ query, account, actions, pagination, openedActionSeq } as model) =
+update message ({ query, pagination, openedActionSeq } as model) =
     case message of
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )
 
-        OnFetchAccount (Err error) ->
+        OnFetchAccount (Err _) ->
             ( model, Cmd.none )
 
         OnFetchActions (Ok actions) ->
@@ -193,7 +181,7 @@ update message ({ query, account, actions, pagination, openedActionSeq } as mode
                 -- no more action to load
                 ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
 
-        OnFetchActions (Err error) ->
+        OnFetchActions (Err _) ->
             ( model, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
@@ -393,7 +381,7 @@ viewActionList language selectedActionCategory accountName openedActionSeq actio
 
 
 viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction language selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]

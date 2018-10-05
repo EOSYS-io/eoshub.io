@@ -1,7 +1,22 @@
 module Component.Account.Page.CreateKeys exposing (Message(..), Model, initModel, subscriptions, update, view)
 
-import Html exposing (Html, article, button, dd, div, dl, dt, h2, img, li, main_, node, ol, p, span, text, textarea)
-import Html.Attributes exposing (alt, attribute, class, id, src, type_)
+import Html
+    exposing
+        ( Html
+        , article
+        , button
+        , dd
+        , div
+        , dl
+        , dt
+        , h2
+        , main_
+        , p
+        , span
+        , text
+        , textarea
+        )
+import Html.Attributes exposing (attribute, class, id, type_)
 import Html.Events exposing (onClick)
 import Navigation
 import Port exposing (KeyPair)
@@ -10,9 +25,6 @@ import Translation
         ( I18n
             ( AccountCreationKeypairCaution
             , AccountCreationKeypairGenerated
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , CopyAll
             , PrivateKey
             , PublicKey

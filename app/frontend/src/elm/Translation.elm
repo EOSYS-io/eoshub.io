@@ -170,6 +170,13 @@ type I18n
     | UnstakeInvalidQuantity String
     | UnstakeOverValidQuantity String
     | UnstakePossible
+    | BuyramSucceeded String
+    | BuyramFailed String
+    | SellramSucceeded String
+    | SellramFailed String
+    | VoteSucceeded String
+    | VoteFailed String
+    | VoteProxyPhilosophy
 
 
 translate : Language -> I18n -> String
@@ -909,4 +916,46 @@ getMessages i18n =
             { korean = "언스테이크 가능합니다 :)"
             , english = ""
             , chinese = "可以进行Unstake：）"
+            }
+
+        BuyramSucceeded str ->
+            { korean = str ++ " 에게 구매 완료."
+            , english = ""
+            , chinese = ""
+            }
+
+        BuyramFailed code ->
+            { korean = code ++ " 코드오류로 램 구매 실패"
+            , english = ""
+            , chinese = ""
+            }
+
+        SellramSucceeded _ ->
+            { korean = "판매 완료!"
+            , english = ""
+            , chinese = ""
+            }
+
+        SellramFailed code ->
+            { korean = code ++ " 코드오류로 램 판매 실패"
+            , english = ""
+            , chinese = ""
+            }
+
+        VoteSucceeded _ ->
+            { korean = "투표 성공"
+            , english = ""
+            , chinese = ""
+            }
+
+        VoteFailed code ->
+            { korean = code ++ " 코드오류로 투표 실패"
+            , english = ""
+            , chinese = ""
+            }
+
+        VoteProxyPhilosophy ->
+            { korean = "DPOS 기반의 EOS 블록체인은 신뢰 받는 블록 생성자들에 의해서 운영이 될 때 비로소 그 가치를 발휘할 수있습니다. 신뢰의 척도로는 다음과 같은 3가지 기준을 세웠습니다. 첫번째는 기술적인 역량 보유 여부이며, 두번째는 거버넌스 및 커뮤니티 기여 여부이고, 마지막으로 세번째는 올바른 비전과 방향성 제시 여부입니다. 우리 eoshub는 EOS 생태계의 발전적 가치를 지향하며, 이를 위해 가장 신뢰할 수 있고 블록 생성의 자격이 있는 BP들에게 투표합니다."
+            , english = "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own. We, the Eoshub, aim for the advancement and improvement of EOS ecosystem and will vote for BPs who deserve the empowerment."
+            , chinese = ""
             }
