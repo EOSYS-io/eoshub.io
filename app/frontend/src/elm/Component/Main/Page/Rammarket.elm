@@ -505,7 +505,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                                 ( "true", "올바르지 않은 계정입니다." )
 
                             InexistentAccount ->
-                                ( "true", "" )
+                                ( "true", "존재하지 않는 계정입니다." )
 
                             _ ->
                                 ( "", "" )
