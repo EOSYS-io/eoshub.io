@@ -24,7 +24,7 @@ class UsersController < ApiController
 
   def confirm_email
     confirm_token = params[:id]
-    render json: { message: I18n.t('users.invalid_email_confirm_token') }, status: :bad_request and return if confirm_token.nil?
+    render json: { message: I18n.t('users.invalid_email_confirm_token') }, status: :bad_request and return if confirm_token.blank?
 
     user = User.find_by(confirm_token: confirm_token)
     if user.present?
