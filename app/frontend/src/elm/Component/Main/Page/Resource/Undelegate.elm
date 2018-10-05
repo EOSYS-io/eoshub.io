@@ -27,7 +27,6 @@ import Data.Account
         , ResourceInEos
         , accountDecoder
         , defaultAccount
-        
         , getTotalAmount
         , getUnstakingAmount
         , keyAccountsDecoder
@@ -245,6 +244,8 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                                     }
                                 , unstakePossibleCpu = cpu
                                 , unstakePossibleNet = net
+                                , percentageOfCpu = Percentage100
+                                , percentageOfNet = Percentage100
                                 , delegateListModal =
                                     { delegateListModal
                                         | isDelegateListModalOpened = False
@@ -437,8 +438,9 @@ validateEach accountValidation cpuQuantityValidation netQuantityValidation =
 validate : Model -> String -> String -> Model
 validate ({ undelegatebw } as model) unstakePossibleCpu unstakePossibleNet =
     let
+        -- NOTE(boseok): because receiver must be one of delegate list accounts, requestStatus is passed as Succeed
         accountValidation =
-            validateAccount undelegatebw.receiver Validation.NotSent
+            validateAccount undelegatebw.receiver Validation.Succeed
 
         netQuantityValidation =
             validateQuantity
