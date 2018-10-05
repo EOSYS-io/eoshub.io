@@ -20,41 +20,25 @@ module Component.Main.Page.Resource.Delegate exposing
 import Component.Main.Page.Resource.Modal.DelegateList as DelegateList
     exposing
         ( Message(..)
-        , view
         )
 import Component.Main.Page.Resource.Stake exposing (modalValidateAttr)
 import Component.Main.Page.Transfer exposing (accountWarningSpan)
-import Data.Account
-    exposing
-        ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
-        , defaultAccount
-        , getTotalAmount
-        , getUnstakingAmount
-        , keyAccountsDecoder
-        )
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
-import Data.Table exposing (..)
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (..)
+import Data.Table exposing (Row)
+import Html exposing (Html, a, button, div, h3, input, label, p, section, span, strong, text)
+import Html.Attributes exposing (attribute, class, disabled, for, id, placeholder, step, type_)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Round
-import Translation exposing (I18n(..), Language, translate)
+import Translation exposing (I18n(..), Language)
 import Util.Formatter
     exposing
         ( assetAdd
-        , assetSubtract
         , assetToFloat
-        , floatToAsset
-        , formatAsset
-        , larimerToEos
         )
-import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -62,7 +46,6 @@ import Util.Validation as Validation
         , QuantityStatus(..)
         , VerificationRequestStatus
         , validateAccount
-        , validateMemo
         , validateQuantity
         )
 
@@ -143,7 +126,7 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ delegatebw, delegateListModal } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
+update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance, accountName } =
     let
         eosLiquidAmount =
             assetToFloat coreLiquidBalance
@@ -152,7 +135,7 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
         OnFetchTableRows (Ok rows) ->
             ( { model | delbandTable = rows }, Cmd.none )
 
-        OnFetchTableRows (Err str) ->
+        OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
 
         OnFetchAccountToVerify (Ok _) ->
@@ -308,19 +291,13 @@ update message ({ delegatebw, delegateListModal } as model) ({ totalResources, s
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityValidation, accountValidation, totalQuantityValidation, totalQuantity, percentageOfCpu, percentageOfNet, isFormValid, delegateListModal } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ delegatebw, delbandTable, accountValidation, totalQuantity, isFormValid, delegateListModal } as model) { accountName, coreLiquidBalance } =
     let
         accountWarning =
             accountWarningSpan accountValidation language
 
         ( validatedText, validatedAttr ) =
             validateText model
-
-        cpuValidateAttr =
-            modalValidateAttr totalQuantityValidation cpuQuantityValidation
-
-        netValidateAttr =
-            modalValidateAttr totalQuantityValidation netQuantityValidation
 
         modalHtml =
             Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
@@ -343,8 +320,8 @@ view language ({ delegatebw, delbandTable, cpuQuantityValidation, netQuantityVal
                     , placeholder "임대해줄 계정의 이름을 입력하세요"
                     , onInput ReceiverInput
                     , type_ "text"
-                    , value delegatebw.receiver
                     , attribute "maxlength" "12"
+                    , Html.Attributes.value delegatebw.receiver
                     ]
                     []
                 , accountWarning
@@ -410,7 +387,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
 
 
 resourceInputDiv : Model -> ResourceType -> Html Message
-resourceInputDiv ({ delegatebw, percentageOfCpu, percentageOfNet, totalQuantityValidation, cpuQuantityValidation, netQuantityValidation } as model) resourceType =
+resourceInputDiv { delegatebw, percentageOfCpu, percentageOfNet, totalQuantityValidation, cpuQuantityValidation, netQuantityValidation } resourceType =
     let
         cpuValidateAttr =
             modalValidateAttr totalQuantityValidation cpuQuantityValidation
@@ -435,7 +412,7 @@ resourceInputDiv ({ delegatebw, percentageOfCpu, percentageOfNet, totalQuantityV
             , step "0.0001"
             , type_ "number"
             , onInput inputMessage
-            , value resourceQuantity
+            , Html.Attributes.value resourceQuantity
             ]
             []
         , span [ class "unit" ]
@@ -519,7 +496,7 @@ validateQuantityFields ({ delegatebw, totalQuantity } as model) eosLiquidAmount 
 
 
 validateText : Model -> ( String, String )
-validateText ({ cpuQuantityValidation, netQuantityValidation, totalQuantityValidation, accountValidation } as model) =
+validateText { cpuQuantityValidation, netQuantityValidation, totalQuantityValidation, accountValidation } =
     let
         ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
             validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation

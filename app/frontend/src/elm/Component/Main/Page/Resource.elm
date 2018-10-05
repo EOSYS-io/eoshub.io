@@ -16,19 +16,11 @@ import Component.Main.Page.Resource.Unstake as UnstakeTab
 import Data.Account
     exposing
         ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
-        , defaultAccount
-        , getTotalAmount
-        , getUnstakingAmount
-        , keyAccountsDecoder
         )
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, div, h2, main_, p, text)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Translation exposing (I18n(..), Language, translate)
+import Translation exposing (I18n(..), Language)
 
 
 
@@ -76,7 +68,7 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance, accountName } as account) =
+update message ({ tab } as model) ({ accountName } as account) =
     case ( message, tab ) of
         ( StakeMessage stakeMessage, Stake stakeModel ) ->
             let
@@ -120,20 +112,20 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
 
         ( ChangeTab newTab, _ ) ->
             case newTab of
-                Stake stakeModel ->
+                Stake _ ->
                     ( { model | tab = newTab, selectedTab = StakeSelected }, Cmd.none )
 
-                Unstake unstakeModel ->
+                Unstake _ ->
                     ( { model | tab = newTab, selectedTab = UnstakeSelected }, Cmd.none )
 
-                Delegate delegateModel ->
+                Delegate _ ->
                     let
                         cmd =
                             Cmd.map DelegateMessage (DelegateTab.initCmd accountName)
                     in
                     ( { model | tab = newTab, selectedTab = DelegateSelected }, cmd )
 
-                Undelegate undelegateModel ->
+                Undelegate _ ->
                     let
                         cmd =
                             Cmd.map UndelegateMessage (UndelegateTab.initCmd accountName)
@@ -149,7 +141,7 @@ update message ({ tab } as model) ({ totalResources, selfDelegatedBandwidth, cor
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ selectedTab, tab } as model) account =
+view language ({ tab } as model) account =
     let
         tabHtml =
             case tab of
@@ -183,7 +175,7 @@ view language ({ selectedTab, tab } as model) account =
 
 
 resourceTabA : Model -> SelectedTab -> Html Message
-resourceTabA ({ selectedTab } as model) selected =
+resourceTabA { selectedTab } selected =
     let
         aText =
             case selected of

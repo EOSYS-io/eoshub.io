@@ -15,35 +15,20 @@ module Component.Main.Page.Resource.Unstake exposing
     , view
     )
 
-import Data.Account
-    exposing
-        ( Account
-        , Refund
-        , Resource
-        , ResourceInEos
-        , accountDecoder
-        , defaultAccount
-        , getTotalAmount
-        , getUnstakingAmount
-        , keyAccountsDecoder
-        )
+import Data.Account exposing (Account)
 import Data.Action as Action exposing (UndelegatebwParameters, encodeAction)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, button, div, h3, input, label, p, section, span, strong, text)
+import Html.Attributes exposing (attribute, class, disabled, for, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
 import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( assetAdd
-        , assetSubtract
+        ( assetSubtract
         , assetToFloat
-        , floatToAsset
-        , formatAsset
-        , larimerToEos
         )
-import Util.Validation as Validation
+import Util.Validation
     exposing
         ( AccountStatus(..)
         , QuantityStatus(..)
@@ -67,7 +52,9 @@ type alias Model =
 
 
 type alias MinimumResource =
-    { cpu : String, net : String }
+    { cpu : String
+    , net : String
+    }
 
 
 type PercentageOfResource
@@ -108,7 +95,7 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ undelegatebw, minimumResource } as model) ({ accountName, totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+update message ({ undelegatebw, minimumResource } as model) { accountName, selfDelegatedBandwidth } =
     let
         unstakePossibleCpu =
             getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
@@ -201,20 +188,8 @@ update message ({ undelegatebw, minimumResource } as model) ({ accountName, tota
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) ({ totalResources, selfDelegatedBandwidth, coreLiquidBalance } as account) =
+view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) { selfDelegatedBandwidth } =
     let
-        unstakedAmount =
-            floatToAsset (larimerToEos account.voterInfo.staked)
-
-        unstakePossibleAmount =
-            assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
-
-        unstakePossibleCpu =
-            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
-
-        unstakePossibleNet =
-            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
-
         ( validatedText, validatedAttr ) =
             validateText language model
 
@@ -257,7 +232,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         , step "0.0001"
                         , type_ "number"
                         , onInput CpuAmountInput
-                        , value undelegatebw.unstakeCpuQuantity
+                        , Html.Attributes.value undelegatebw.unstakeCpuQuantity
                         ]
                         []
                     , span [ class "unit" ]
@@ -276,7 +251,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         , step "0.0001"
                         , type_ "number"
                         , onInput NetAmountInput
-                        , value undelegatebw.unstakeNetQuantity
+                        , Html.Attributes.value undelegatebw.unstakeNetQuantity
                         ]
                         []
                     , span [ class "unit" ]
@@ -394,7 +369,7 @@ validateAttr resourceQuantityStatus =
 
 
 validateText : Language -> Model -> ( String, String )
-validateText language ({ cpuQuantityValidation, netQuantityValidation, minimumResource } as model) =
+validateText language { cpuQuantityValidation, netQuantityValidation } =
     let
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)

@@ -1,7 +1,20 @@
 module Component.Account.Page.ConfirmEmail exposing (Message(..), Model, createUserBodyParams, initModel, update, view)
 
-import Html exposing (Html, a, article, button, div, form, h2, img, input, li, main_, node, ol, p, span, text, ul)
-import Html.Attributes exposing (action, alt, attribute, class, href, placeholder, rel, src, type_)
+import Html
+    exposing
+        ( Html
+        , a
+        , article
+        , button
+        , div
+        , form
+        , h2
+        , input
+        , main_
+        , p
+        , span
+        )
+import Html.Attributes exposing (attribute, class, placeholder, type_)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Json.Decode exposing (Decoder, decodeString, string)
@@ -18,9 +31,6 @@ import Translation
             , AccountCreationEmailSend
             , AccountCreationEmailValid
             , AccountCreationLoginLink
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , ConfirmEmailSent
             , DebugMessage
             , EmptyMessage
@@ -100,7 +110,7 @@ update msg ({ notification } as model) flags language =
         CreateUser ->
             ( { model | requested = True }, createUserRequest model flags language )
 
-        NewUser (Ok res) ->
+        NewUser (Ok _) ->
             ( { model
                 | notification =
                     { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
@@ -196,7 +206,7 @@ emailInput { inputValid } =
 
 
 emailForm : Model -> Language -> List (Html Message)
-emailForm ({ inputValid, validationMsg } as model) language =
+emailForm ({ validationMsg } as model) language =
     if validationMsg == EmptyMessage then
         [ emailInput model ]
 
@@ -208,7 +218,7 @@ emailForm ({ inputValid, validationMsg } as model) language =
 
 
 view : Model -> Language -> Html Message
-view ({ validationMsg, requested, emailValid, inputValid, notification } as model) language =
+view ({ requested, emailValid, notification } as model) language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "validate-email" ]
             [ h2 []

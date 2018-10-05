@@ -18,7 +18,6 @@ import Translation
             , DebugMessage
             , DelegatebwFailed
             , DelegatebwSucceeded
-            , EmptyMessage
             , SellramFailed
             , SellramSucceeded
             , TransferFailed

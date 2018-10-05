@@ -1,16 +1,13 @@
 module Component.Account.Page.EmailConfirmed exposing (Message(..), Model, initModel, update, view)
 
-import Html exposing (Html, article, button, div, h1, h2, img, input, li, main_, ol, p, text, ul)
-import Html.Attributes exposing (alt, attribute, class, src, type_)
-import Html.Events exposing (onClick, onInput)
+import Html exposing (Html, article, button, div, h2, main_, p)
+import Html.Attributes exposing (attribute, class, type_)
+import Html.Events exposing (onClick)
 import Navigation
 import Translation
     exposing
         ( I18n
             ( AccountCreationEmailConfirmed
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , ClickNext
             )
         , Language
@@ -49,7 +46,7 @@ type Message
 
 
 update : Message -> Model -> String -> ( Model, Cmd Message )
-update msg model confirmToken =
+update msg model _ =
     case msg of
         Next ->
             ( model, Navigation.newUrl "/account/create_keys" )
@@ -60,7 +57,7 @@ update msg model confirmToken =
 
 
 view : Model -> Language -> Html Message
-view model language =
+view _ language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "validate-email-ok" ]
             [ h2 []

@@ -15,7 +15,7 @@ module Data.Account exposing
     , keyAccountsDecoder
     )
 
-import Json.Decode as JD exposing (Decoder, at, oneOf)
+import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, optional, required)
 import Round
 import Util.Formatter
@@ -25,7 +25,6 @@ import Util.Formatter
         , larimerToEos
         , percentageConverter
         , resourceUnitConverter
-        , unitConverterRound2
         )
 
 
@@ -175,7 +174,7 @@ integerStringDecoder =
                 Ok value ->
                     value
 
-                Err str ->
+                Err _ ->
                     0
         )
         JD.string

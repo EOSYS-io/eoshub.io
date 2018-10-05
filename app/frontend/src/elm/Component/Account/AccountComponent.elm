@@ -7,20 +7,7 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EmailConfirmFailure as EmailConfirmFailure
 import Component.Account.Page.EmailConfirmed as EmailConfirmed
 import Component.Main.Page.NotFound as NotFound
-import Html
-    exposing
-        ( Attribute
-        , Html
-        , button
-        , div
-        , form
-        , input
-        , li
-        , section
-        , span
-        , text
-        , ul
-        )
+import Html exposing (Html, section)
 import Html.Attributes exposing (class)
 import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
@@ -75,7 +62,7 @@ initModel location =
             , language = toLanguage maybeLocale
             }
 
-        EmailConfirmedRoute confirmToken email maybeLocale ->
+        EmailConfirmedRoute confirmToken _ maybeLocale ->
             { page = page
             , confirmToken = confirmToken
             , language = toLanguage maybeLocale
@@ -103,7 +90,7 @@ type Message
 
 
 initCmd : Model -> Cmd Message
-initCmd { page, confirmToken } =
+initCmd { page } =
     case page of
         CreateKeysPage subModel ->
             let
@@ -227,7 +214,7 @@ update message ({ page, confirmToken, language } as model) flags =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
+subscriptions _ =
     Sub.batch
         [ Sub.map CreateKeysMessage CreateKeys.subscriptions ]
 
@@ -239,10 +226,10 @@ subscriptions model =
 getPage : Route -> Page
 getPage route =
     case route of
-        ConfirmEmailRoute maybeLocale ->
+        ConfirmEmailRoute _ ->
             ConfirmEmailPage ConfirmEmail.initModel
 
-        EmailConfirmedRoute confirmToken email maybeLocale ->
+        EmailConfirmedRoute _ email _ ->
             EmailConfirmedPage (EmailConfirmed.initModel email)
 
         EmailConfirmFailureRoute ->

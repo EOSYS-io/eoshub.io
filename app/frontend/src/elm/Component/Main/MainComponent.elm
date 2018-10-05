@@ -54,10 +54,9 @@ import Html.Attributes
         , id
         , placeholder
         , rel
-        , style
         , type_
         )
-import Html.Events exposing (on, onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
@@ -66,7 +65,7 @@ import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
 import Util.Validation exposing (isAccount, isPublicKey)
-import Util.WalletDecoder exposing (PushActionResponse, Wallet, decodePushActionResponse)
+import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
 
 
@@ -499,7 +498,7 @@ update message ({ page, notification, header, sidebar } as model) flags =
                             else
                                 ""
 
-                        VotePage { tab, producerNamesToVote } ->
+                        VotePage { tab } ->
                             case tab of
                                 Vote.VoteTab ->
                                     ""
@@ -605,7 +604,7 @@ parseQuery query =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { sidebar, page } =
+subscriptions { page } =
     Sub.batch
         [ Port.receivePushActionResponse UpdatePushActionResponse
         , Sub.map SidebarMessage Sidebar.subscriptions
