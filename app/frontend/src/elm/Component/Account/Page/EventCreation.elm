@@ -1,4 +1,4 @@
-module Component.Account.Page.EventCreation exposing (Message(..), Model, createEosAccountBodyParams, initModel, subscriptions, update, view)
+module Component.Account.Page.EventCreation exposing (Message(..), Model, createEosAccountBodyParams, createUserBodyParams, initModel, subscriptions, update, view)
 
 import Html exposing (Html, a, article, br, button, dd, div, dl, dt, form, h2, h3, img, input, label, li, main_, ol, p, section, span, strong, text, textarea, time, ul)
 import Html.Attributes exposing (action, alt, attribute, checked, class, for, href, id, name, pattern, placeholder, src, style, title, type_, value)
