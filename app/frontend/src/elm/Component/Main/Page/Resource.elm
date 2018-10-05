@@ -21,7 +21,6 @@ import Data.Account
         , ResourceInEos
         , accountDecoder
         , defaultAccount
-        , getResource
         , getTotalAmount
         , getUnstakingAmount
         , keyAccountsDecoder

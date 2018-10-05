@@ -11,7 +11,7 @@ module Component.Main.Page.Rammarket exposing
     )
 
 import Array
-import Data.Account exposing (Account, getResource)
+import Data.Account exposing (Account, getResource, getResourceColorClass)
 import Data.Action
     exposing
         ( Action
@@ -456,8 +456,11 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
         , p [] [ text (translate language RamMarketDesc) ]
         , div [ class "container" ]
             [ let
-                ( _, _, _, ramPercent, ramColor ) =
+                ( _, _, _, ramPercent, ramColorCode ) =
                     getResource "ram" ramUsage (ramQuota - ramUsage) ramQuota
+
+                ramColor =
+                    getResourceColorClass ramColorCode
               in
               section [ class "dashboard" ]
                 [ div [ class "ram status" ]

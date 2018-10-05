@@ -76,12 +76,11 @@ import Json.Decode
 import Port
 import Round
 import Set exposing (Set)
-import Task
 import Time exposing (Time)
 import Translation exposing (Language)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
-import Util.Formatter exposing (assetToFloat, formatWithUsLocale)
+import Util.Formatter as Formatter exposing (assetToFloat, formatWithUsLocale, getNow)
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
@@ -172,11 +171,6 @@ getProxyAccount proxyAccount =
         |> Http.send OnFetchAccount
 
 
-getNow : Cmd Message
-getNow =
-    Task.perform OnTime Time.now
-
-
 initCmd : Flags -> Cmd Message
 initCmd flags =
     Cmd.batch
@@ -184,7 +178,7 @@ initCmd flags =
         , getTokenStatTable
         , getProducers flags
         , getRecentVoteStat flags
-        , getNow
+        , getNow OnTime
         , getProxyAccount eosysProxyAccount
         ]
 
@@ -282,7 +276,7 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
                 , getTokenStatTable
                 , getProducers flags
                 , getRecentVoteStat flags
-                , getNow
+                , getNow OnTime
                 , getProxyAccount eosysProxyAccount
                 ]
             )

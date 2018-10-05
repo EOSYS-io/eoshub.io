@@ -19,21 +19,26 @@ import Data.Account
         ( Account
         , accountDecoder
         , defaultAccount
+        , getResource
+        , getResourceColorClass
         , getTotalAmount
         , getUnstakingAmount
         )
+import Date exposing (fromTime)
+import Date.Extra as Date exposing (Interval(..))
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Encode as Encode
 import Navigation
 import Port
+import Time exposing (Time)
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
-import Util.Formatter
+import Util.Formatter as Formatter
     exposing
         ( deleteFromBack
         , floatToAsset
+        , getNow
         , larimerToEos
         )
 import Util.HttpRequest exposing (getAccount, getFullPath, post)
@@ -63,6 +68,7 @@ type alias Model =
     , fold : Bool
     , configPanelOpen : Bool
     , account : Account
+    , now : Time
     }
 
 
@@ -77,6 +83,7 @@ initModel =
     , fold = False
     , configPanelOpen = False
     , account = defaultAccount
+    , now = 0
     }
 
 
@@ -95,6 +102,7 @@ type Message
     | OpenConfigPanel Bool
     | AndThen Message Message
     | OnFetchAccount (Result Http.Error Account)
+    | OnTime Time.Time
 
 
 
@@ -103,7 +111,10 @@ type Message
 
 initCmd : Cmd Message
 initCmd =
-    Port.checkWalletStatus ()
+    Cmd.batch
+        [ Port.checkWalletStatus ()
+        , getNow OnTime
+        ]
 
 
 accountCmd : State -> String -> Cmd Message
@@ -217,7 +228,7 @@ pairWalletView language =
 
 
 accountInfoView : Model -> Language -> List (Html Message)
-accountInfoView { wallet, account, configPanelOpen } language =
+accountInfoView { wallet, account, configPanelOpen, now } language =
     let
         { coreLiquidBalance, voterInfo, refundRequest } =
             account
@@ -245,6 +256,15 @@ accountInfoView { wallet, account, configPanelOpen } language =
                             ""
                        )
                 )
+
+        ( _, _, _, _, cpuColorCode ) =
+            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
+
+        ( _, _, _, _, netColorCode ) =
+            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
+
+        colorCode =
+            Basics.min cpuColorCode netColorCode |> getResourceColorClass
     in
     [ h2 []
         [ text wallet.account
@@ -284,16 +304,16 @@ accountInfoView { wallet, account, configPanelOpen } language =
         , li []
             [ span [ class "title" ] [ text "stake" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
-            , span [ class "status available" ] [ text (translate language TransactionPossible) ]
+
+            -- TODO(boseok): wording should be decided
+            , span [ class ("status " ++ colorCode) ] [ text (translate language TransactionPossible) ]
 
             -- span [ class "status unavailable" ] [ text "" ]
             ]
         , li []
             [ span [ class "title" ] [ text "refunding" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
-
-            -- TODO(boseok): 72.3 hours hard coding should be changed
-            , span [ class "remaining time" ] [ text "72.3 hours" ]
+            , span [ class "remaining time" ] [ text (getLeftTime refundRequest.requestTime now) ]
             ]
         ]
     , button
@@ -378,6 +398,36 @@ update message ({ fold, wallet } as model) =
 
         OnFetchAccount (Err error) ->
             ( model, Cmd.none )
+
+        OnTime now ->
+            ( { model | now = now }, Cmd.none )
+
+
+getLeftTime : String -> Time -> String
+getLeftTime requestTime now =
+    case Date.fromIsoString (requestTime ++ "+00:00") of
+        Ok time ->
+            let
+                expectedDate =
+                    Date.add Hour 72 time
+
+                nowDate =
+                    Date.fromTime now
+
+                leftHours =
+                    Date.diff Hour nowDate expectedDate
+
+                leftMinutes =
+                    Date.diff Minute nowDate expectedDate
+            in
+            if leftHours < 1 then
+                (leftMinutes |> toString) ++ " minutes"
+
+            else
+                (leftHours |> toString) ++ " hours"
+
+        Err _ ->
+            ""
 
 
 

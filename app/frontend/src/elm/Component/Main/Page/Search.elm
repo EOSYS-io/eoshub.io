@@ -9,6 +9,7 @@ import Data.Account
         , accountDecoder
         , defaultAccount
         , getResource
+        , getResourceColorClass
         , getTotalAmount
         , getUnstakingAmount
         , keyAccountsDecoder
@@ -242,13 +243,13 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
         stakedAmount =
             floatToAsset (larimerToEos account.voterInfo.staked)
 
-        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColor ) =
+        ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColorCode ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
 
-        ( netUsed, netAvailable, netTotal, netPercent, netColor ) =
+        ( netUsed, netAvailable, netTotal, netPercent, netColorCode ) =
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
-        ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColor ) =
+        ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColorCode ) =
             getResource "ram" account.ramUsage (account.ramQuota - account.ramUsage) account.ramQuota
     in
     main_ [ class "search" ]
@@ -306,7 +307,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             , text ("Available: " ++ cpuAvailable)
                             ]
                         , div [ class "status" ]
-                            [ span [ class cpuColor, attribute "style" ("height:" ++ cpuPercent) ]
+                            [ span [ class (getResourceColorClass cpuColorCode), attribute "style" ("height:" ++ cpuPercent) ]
                                 []
                             , text cpuPercent
                             ]
@@ -325,7 +326,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             , text ("Available: " ++ netAvailable)
                             ]
                         , div [ class "status" ]
-                            [ span [ class netColor, attribute "style" ("height:" ++ netPercent) ]
+                            [ span [ class (getResourceColorClass netColorCode), attribute "style" ("height:" ++ netPercent) ]
                                 []
                             , text netPercent
                             ]
@@ -344,7 +345,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             , text ("Available: " ++ ramAvailable)
                             ]
                         , div [ class "status" ]
-                            [ span [ class ramColor, attribute "style" ("height:" ++ ramPercent) ]
+                            [ span [ class (getResourceColorClass ramColorCode), attribute "style" ("height:" ++ ramPercent) ]
                                 []
                             , text ramPercent
                             ]

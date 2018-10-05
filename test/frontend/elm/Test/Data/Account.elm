@@ -116,7 +116,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1000 bytes", "0 bytes", "1000 bytes", "0.00%", "hell" )
+                            ( "1000 bytes", "0 bytes", "1000 bytes", "0.00%", 1 )
 
                         resourceType =
                             "net"
@@ -135,7 +135,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "950 bytes", "50 bytes", "1000 bytes", "5.00%", "hell" )
+                            ( "950 bytes", "50 bytes", "1000 bytes", "5.00%", 1 )
 
                         resourceType =
                             "net"
@@ -154,7 +154,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "800 bytes", "200 bytes", "1000 bytes", "20.00%", "bad" )
+                            ( "800 bytes", "200 bytes", "1000 bytes", "20.00%", 2 )
 
                         resourceType =
                             "net"
@@ -173,7 +173,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "300 bytes", "700 bytes", "1000 bytes", "70.00%", "good" )
+                            ( "300 bytes", "700 bytes", "1000 bytes", "70.00%", 3 )
 
                         resourceType =
                             "net"
@@ -192,7 +192,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "0 bytes", "1000 bytes", "1000 bytes", "100%", "fine" )
+                            ( "0 bytes", "1000 bytes", "1000 bytes", "100%", 4 )
 
                         resourceType =
                             "net"
@@ -211,7 +211,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", "hell" )
+                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", 1 )
 
                         resourceType =
                             "net"
@@ -230,7 +230,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", "hell" )
+                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", 1 )
 
                         resourceType =
                             "net"
@@ -249,7 +249,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", "hell" )
+                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", 1 )
 
                         resourceType =
                             "net"
@@ -268,7 +268,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", "hell" )
+                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", 1 )
 
                         resourceType =
                             "net"
@@ -287,7 +287,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "430 ms", "0 ms", "430 ms", "0.00%", "hell" )
+                            ( "430 ms", "0 ms", "430 ms", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -306,7 +306,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "4.30 s", "0 ms", "4.30 s", "0.00%", "hell" )
+                            ( "4.30 s", "0 ms", "4.30 s", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -325,7 +325,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "7.17 min", "0 ms", "7.17 min", "0.00%", "hell" )
+                            ( "7.17 min", "0 ms", "7.17 min", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -344,7 +344,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.19 hour", "0 ms", "1.19 hour", "0.00%", "hell" )
+                            ( "1.19 hour", "0 ms", "1.19 hour", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -363,7 +363,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "4.98 day", "0 ms", "4.98 day", "0.00%", "hell" )
+                            ( "4.98 day", "0 ms", "4.98 day", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -382,7 +382,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1000 bytes", "0 bytes", "1000 bytes", "0.00%", "hell" )
+                            ( "1000 bytes", "0 bytes", "1000 bytes", "0.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -401,7 +401,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "950 bytes", "50 bytes", "1000 bytes", "5.00%", "hell" )
+                            ( "950 bytes", "50 bytes", "1000 bytes", "5.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -420,7 +420,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "800 bytes", "200 bytes", "1000 bytes", "20.00%", "bad" )
+                            ( "800 bytes", "200 bytes", "1000 bytes", "20.00%", 2 )
 
                         resourceType =
                             "ram"
@@ -439,7 +439,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "300 bytes", "700 bytes", "1000 bytes", "70.00%", "good" )
+                            ( "300 bytes", "700 bytes", "1000 bytes", "70.00%", 3 )
 
                         resourceType =
                             "ram"
@@ -458,7 +458,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "0 bytes", "1000 bytes", "1000 bytes", "100%", "fine" )
+                            ( "0 bytes", "1000 bytes", "1000 bytes", "100%", 4 )
 
                         resourceType =
                             "ram"
@@ -477,7 +477,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", "hell" )
+                            ( "1.00 KB", "0 bytes", "1.00 KB", "0.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -496,7 +496,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", "hell" )
+                            ( "1.00 MB", "0 bytes", "1.00 MB", "0.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -515,7 +515,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", "hell" )
+                            ( "1.00 GB", "0 bytes", "1.00 GB", "0.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -534,7 +534,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", "hell" )
+                            ( "1.00 TB", "0 bytes", "1.00 TB", "0.00%", 1 )
 
                         resourceType =
                             "ram"
@@ -549,5 +549,19 @@ tests =
                             1024 * 1024 * 1024 * 1024
                     in
                     Expect.equal expected (getResource resourceType used available max)
+            ]
+        , describe "getResourceColorClass"
+            [ test "code 1, hell" <|
+                \() ->
+                    Expect.equal "hell" (getResourceColorClass 1)
+            , test "code 2, bad" <|
+                \() ->
+                    Expect.equal "bad" (getResourceColorClass 2)
+            , test "code 3, good" <|
+                \() ->
+                    Expect.equal "good" (getResourceColorClass 3)
+            , test "code 4, fine" <|
+                \() ->
+                    Expect.equal "fine" (getResourceColorClass 4)
             ]
         ]

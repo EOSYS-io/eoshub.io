@@ -6,6 +6,7 @@ module Util.Formatter exposing
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
+    , getNow
     , larimerToEos
     , percentageConverter
     , removeSymbolIfExists
@@ -19,6 +20,8 @@ import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
 import Regex exposing (..)
 import Round
+import Task
+import Time exposing (Time)
 import Util.Constant exposing (day, giga, hour, kilo, mega, minute, second, tera)
 
 
@@ -167,11 +170,16 @@ formatAsset value =
 -- Time
 
 
+getNow : (Time -> msg) -> Cmd msg
+getNow msg =
+    Task.perform msg Time.now
+
+
 timeFormatter : String -> String
 timeFormatter time =
-    case Date.fromIsoString time of
+    case Date.fromIsoString (time ++ "+00:00") of
         Ok date ->
-            Date.toFormattedString "YYYY/MM/dd HH:mm:ss" date
+            Date.toFormattedString "HH:mm:ss YYYY/MM/dd" date
 
         Err str ->
             str

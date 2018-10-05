@@ -2,7 +2,6 @@ module Test.Util.Formatter exposing (tests)
 
 import Expect
 import Test exposing (..)
-import Translation exposing (Language(..))
 import Util.Constant exposing (..)
 import Util.Formatter exposing (..)
 
@@ -53,16 +52,16 @@ tests =
         , describe "timeFormatter"
             [ test "AM, Ok" <|
                 \() ->
-                    Expect.equal "2018/08/17 02:16:21" (timeFormatter "2018-08-17T02:16:21.500")
+                    Expect.equal "11:16:21 2018/08/17" (timeFormatter "2018-08-17T02:16:21.500")
             , test "PM, Ok" <|
                 \() ->
-                    Expect.equal "2018/08/17 17:16:21" (timeFormatter "2018-08-17T17:16:21.500")
+                    Expect.equal "02:16:21 2018/08/18" (timeFormatter "2018-08-17T17:16:21.500")
             , test "invalid time, Err" <|
                 \() ->
-                    Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500': Invalid ISO 8601 format" (timeFormatter "2018-108-17T17:16:21.500")
+                    Expect.equal "Failed to create a Date from string '2018-108-17T17:16:21.500+00:00': Invalid ISO 8601 format" (timeFormatter "2018-108-17T17:16:21.500")
             , test "no time, Err" <|
                 \() ->
-                    Expect.equal "Failed to create a Date from string '': Invalid ISO 8601 format" (timeFormatter "")
+                    Expect.equal "Failed to create a Date from string '+00:00': Invalid ISO 8601 format" (timeFormatter "")
             ]
         , describe "deleteFromBack"
             [ test "remove 4 characters." <|

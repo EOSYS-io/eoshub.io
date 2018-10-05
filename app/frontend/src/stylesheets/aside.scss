@@ -212,11 +212,19 @@ aside {
 					vertical-align:baseline;
 				}
 
-				&.status.available:before {
+				&.status.fine:before {
+					background-color:#536dfe;
+				}
+
+				&.status.good:before {
 					background-color:#79c720;
 				}
 
-				&.status.unavailable:before {
+				&.status.bad:before {
+					background-color:#f5cb23;
+				}
+
+				&.status.hell:before {
 					background-color:#ff6b64;
 				}
 			}
