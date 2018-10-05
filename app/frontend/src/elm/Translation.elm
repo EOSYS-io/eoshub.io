@@ -129,6 +129,8 @@ type I18n
     | AccountCreationAlreadyHaveAccount
     | AccountCreationLoginLink
     | AccountCreationEmailConfirmed
+    | AccountCreationAgreeEosConstitution
+    | AccountCreationButton
     | ClickNext
     | Next
     | AccountCreationEmailConfirmFailure
@@ -770,6 +772,18 @@ getMessages i18n =
             { korean = "ex) eoshuby12345"
             , english = "ex) eoshuby12345"
             , chinese = "ex) eoshuby12345"
+            }
+
+        AccountCreationAgreeEosConstitution ->
+            { korean = "EOS Consitution에 동의합니다."
+            , english = "I agree to the EOS Consitution."
+            , chinese = "我同意EOS Consitution。"
+            }
+
+        AccountCreationButton ->
+            { korean = "생성하기"
+            , english = "Create"
+            , chinese = "创建"
             }
 
         AccountCreationCongratulation ->

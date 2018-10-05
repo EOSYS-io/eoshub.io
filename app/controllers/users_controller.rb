@@ -44,9 +44,11 @@ class UsersController < ApiController
       raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:account_name])
 
       response = request_eos_account_creation(params[:account_name], params[:pubkey])
-      if response.code == 200
+      if response.return_code == :ok
         user.eos_account_created!
         render json: { message: I18n.t('users.eos_account_created') }, status: :ok
+      elsif response.return_code == :couldnt_connect
+        render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
       elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
         render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
       else
