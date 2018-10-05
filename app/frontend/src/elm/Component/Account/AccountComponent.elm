@@ -182,8 +182,8 @@ subscriptions model =
 getPage : Route -> Page
 getPage route =
     case route of
-        CreatedRoute ->
-            CreatedPage Created.initModel
+        CreatedRoute maybeEosAccount maybePublicKey ->
+            CreatedPage (Created.initModel maybeEosAccount maybePublicKey)
 
         EventCreationRoute maybeLocale ->
             EventCreationPage EventCreation.initModel

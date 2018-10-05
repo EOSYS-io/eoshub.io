@@ -7,13 +7,12 @@ import Navigation
 import Translation
     exposing
         ( I18n
-            ( AccountCreationCongratulation
+            ( Account
+            , AccountCreationCongratulation
             , AccountCreationGoHome
-            , AccountCreationProgressCreateNew
-            , AccountCreationProgressEmail
-            , AccountCreationProgressKeypair
             , AccountCreationWelcome
             , AccountCreationYouCanSignIn
+            , PublicKey
             )
         , Language
         )
@@ -25,12 +24,33 @@ import View.I18nViews exposing (textViewI18n)
 
 
 type alias Model =
-    {}
+    { eosAccount : String
+    , publicKey : String
+    }
 
 
-initModel : Model
-initModel =
-    {}
+initModel : Maybe String -> Maybe String -> Model
+initModel maybeEosAccount maybePublicKey =
+    let
+        eosAccount =
+            case maybeEosAccount of
+                Just string ->
+                    string
+
+                Nothing ->
+                    ""
+
+        publicKey =
+            case maybePublicKey of
+                Just string ->
+                    string
+
+                Nothing ->
+                    ""
+    in
+    { eosAccount = eosAccount
+    , publicKey = publicKey
+    }
 
 
 
@@ -53,7 +73,7 @@ update msg model =
 
 
 view : Model -> Language -> Html Message
-view model language =
+view { eosAccount, publicKey } language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "done" ]
             [ h2 []
@@ -66,13 +86,13 @@ view model language =
                 [ textViewI18n language AccountCreationYouCanSignIn ]
             , dl [ class "keybox" ]
                 [ dt []
-                    [ text "계정" ]
+                    [ textViewI18n language Account ]
                 , dd []
-                    [ text "eosyskoreabp" ]
+                    [ text eosAccount ]
                 , dt []
-                    [ text "공개키" ]
+                    [ textViewI18n language PublicKey ]
                 , dd []
-                    [ text "EOS55bzfeUCMvJuDZM4hxZbApSMsrdavAR18VuodiyYN5ARVVJBLy" ]
+                    [ text publicKey ]
                 ]
             , div [ class "btn_area" ]
                 [ a [ class "go main button", onClick Home ]

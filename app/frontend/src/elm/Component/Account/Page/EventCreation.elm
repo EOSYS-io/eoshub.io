@@ -129,7 +129,7 @@ type Message
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
-update msg ({ notification } as model) flags language =
+update msg ({ accountName, keys, notification } as model) flags language =
     case msg of
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -158,7 +158,9 @@ update msg ({ notification } as model) flags language =
             ( model, createEosAccountRequest model flags language )
 
         NewEosAccount (Ok res) ->
-            ( { model | accountRequestSuccess = True }, Navigation.newUrl "/account/created" )
+            ( { model | accountRequestSuccess = True }
+            , Navigation.newUrl ("/account/created?eos_account=" ++ accountName ++ "&public_key=" ++ keys.publicKey)
+            )
 
         NewEosAccount (Err error) ->
             case error of
