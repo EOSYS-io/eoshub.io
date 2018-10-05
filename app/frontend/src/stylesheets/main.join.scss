@@ -341,3 +341,29 @@ main.join {
 
 	}
 }
+
+main.join {
+	article[data-step="validate-email-ok"] {
+		.btn_area button {
+			flex:1;
+		}
+	}
+}
+
+main.join {
+	article[data-step="done"] {
+		position:absolute;
+		top:50%;
+		left:50%;
+		transform:translate(-50%,-50%);
+		background:url('../image/bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
+		background-size:61px 67px;
+
+		.button {
+			flex:1;
+			&:last-child {
+				margin-left:4px;
+			}
+		}
+	}
+}
