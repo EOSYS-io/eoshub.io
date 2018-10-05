@@ -12,19 +12,16 @@ model : Model
 model =
     { accountName = "testtesttest"
     , accountValidation = False
-    , accountValidationMsg = EmptyMessage
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "12o9347512f1oh923" }
     , keyCopied = False
     , email = "test@chain.partners"
-    , emailValidationMsg = EmptyMessage
     , emailRequested = False
     , emailValid = False
     , confirmToken = ""
     , confirmTokenValid = False
     , emailConfirmationRequested = False
     , emailConfirmed = False
-    , emailConfirmationMsg = EmptyMessage
     , agreeEosConstitution = False
     , notification = Notification.initModel
     }

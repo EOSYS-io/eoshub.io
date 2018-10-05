@@ -120,19 +120,16 @@ import View.Notification as Notification
 type alias Model =
     { accountName : String
     , accountValidation : Bool
-    , accountValidationMsg : I18n
     , accountRequestSuccess : Bool
     , keys : KeyPair
     , keyCopied : Bool
     , email : String
-    , emailValidationMsg : I18n
     , emailRequested : Bool
     , emailValid : Bool
     , confirmToken : String
     , confirmTokenValid : Bool
     , emailConfirmationRequested : Bool
     , emailConfirmed : Bool
-    , emailConfirmationMsg : I18n
     , agreeEosConstitution : Bool
     , notification : Notification.Model
     }
@@ -142,19 +139,16 @@ initModel : Model
 initModel =
     { accountName = ""
     , accountValidation = False
-    , accountValidationMsg = EmptyMessage
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "" }
     , keyCopied = False
     , email = ""
-    , emailValidationMsg = EmptyMessage
     , emailRequested = False
     , emailValid = False
     , confirmToken = ""
     , confirmTokenValid = False
     , emailConfirmationRequested = False
     , emailConfirmed = False
-    , emailConfirmationMsg = EmptyMessage
     , agreeEosConstitution = False
     , notification = Notification.initModel
     }
@@ -199,14 +193,10 @@ update msg ({ accountName, keys, notification } as model) flags language =
                 newModel =
                     { model | accountName = accountName }
 
-                ( validateMsg, validate ) =
-                    if checkAccountName accountName then
-                        ( AccountCreationNameValid, True )
-
-                    else
-                        ( AccountCreationNameInvalid, False )
+                validate =
+                    checkAccountName accountName
             in
-            ( { newModel | accountValidation = validate, accountValidationMsg = validateMsg }, Cmd.none )
+            ( { newModel | accountValidation = validate }, Cmd.none )
 
         CreateEosAccount ->
             ( model, createEosAccountRequest model flags language )
@@ -268,14 +258,10 @@ update msg ({ accountName, keys, notification } as model) flags language =
                 newModel =
                     { model | email = email }
 
-                ( validationMsg, emailValid ) =
-                    if String.isEmpty email then
-                        ( EmptyMessage, False )
-
-                    else
-                        emailValidation newModel
+                emailValid =
+                    not (String.isEmpty email) && isValidEmail email
             in
-            ( { newModel | emailValidationMsg = validationMsg, emailValid = emailValid }, Cmd.none )
+            ( { newModel | emailValid = emailValid }, Cmd.none )
 
         SendCode ->
             ( { model | emailRequested = True }, sendCodeRequest model flags language )
@@ -349,7 +335,6 @@ update msg ({ accountName, keys, notification } as model) flags language =
                     ( { model
                         | emailConfirmationRequested = True
                         , emailConfirmed = True
-                        , emailConfirmationMsg = AccountCreationEmailConfirmed
                       }
                     , Cmd.none
                     )
@@ -358,7 +343,6 @@ update msg ({ accountName, keys, notification } as model) flags language =
                     ( { model
                         | emailConfirmationRequested = True
                         , emailConfirmed = False
-                        , emailConfirmationMsg = AccountCreationEmailConfirmFailure
                       }
                     , Cmd.none
                     )
@@ -383,7 +367,15 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
 
 accountInputViews : Model -> Language -> List (Html Message)
-accountInputViews { accountName, accountValidation, accountValidationMsg } language =
+accountInputViews { accountName, accountValidation } language =
+    let
+        accountValidationMsg =
+            if accountValidation then
+                AccountCreationNameValid
+
+            else
+                AccountCreationNameInvalid
+    in
     [ h3 []
         [ textViewI18n language AccountCreationInput ]
     , input
@@ -476,7 +468,15 @@ emailConfirmSection { emailValid, confirmTokenValid } language =
 
 
 emailConfirmationMsgView : Model -> Language -> Html Message
-emailConfirmationMsgView { emailConfirmationRequested, emailConfirmed, emailConfirmationMsg } language =
+emailConfirmationMsgView { emailConfirmationRequested, emailConfirmed } language =
+    let
+        emailConfirmationMsg =
+            if emailConfirmed then
+                AccountCreationEmailConfirmed
+
+            else
+                AccountCreationEmailConfirmFailure
+    in
     div
         [ class
             (if emailConfirmationRequested then
@@ -618,19 +618,6 @@ postUsers model flags language =
 sendCodeRequest : Model -> Flags -> Language -> Cmd Message
 sendCodeRequest model flags language =
     Http.send SendCodeResponse <| postUsers model flags language
-
-
-
--- VALIDATION
-
-
-emailValidation : Model -> ( I18n, Bool )
-emailValidation { email } =
-    if isValidEmail email then
-        ( AccountCreationEmailValid, True )
-
-    else
-        ( AccountCreationEmailInvalid, False )
 
 
 
