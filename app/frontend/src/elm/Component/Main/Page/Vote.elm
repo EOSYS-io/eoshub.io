@@ -64,9 +64,11 @@ import Html.Attributes
         , class
         , disabled
         , for
+        , href
         , id
         , placeholder
         , scope
+        , target
         , title
         , type_
         , value
@@ -78,10 +80,10 @@ import Port
 import Round
 import Set exposing (Set)
 import Time exposing (Time)
-import Translation exposing (Language)
+import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
-import Util.Formatter as Formatter exposing (assetToFloat, formatWithUsLocale, getNow)
+import Util.Formatter exposing (assetToFloat, formatWithUsLocale, getNow)
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Urls exposing (getProducersUrl, getRecentVoteStatUrl)
 
@@ -288,15 +290,15 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
 
 
 view : Language -> Model -> Account -> Html Message
-view _ ({ tab, now } as model) account =
+view language ({ tab, now } as model) account =
     let
         ( addedMainClass, tabView, voteTabClass, proxyVoteTabClass ) =
             case tab of
                 VoteTab ->
-                    ( "", voteView model account now, " ing", "" )
+                    ( "", voteView model account language now, " ing", "" )
 
                 ProxyVoteTab ->
-                    ( " proxy", proxyView model account, "", " ing" )
+                    ( " proxy", proxyView model account language, "", " ing" )
     in
     main_ [ class ("vote" ++ addedMainClass) ]
         [ h2 []
@@ -319,8 +321,8 @@ view _ ({ tab, now } as model) account =
         ]
 
 
-voteView : Model -> Account -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } account now =
+voteView : Model -> Account -> Language -> Time -> List (Html Message)
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } account _ now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -507,8 +509,8 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
         ]
 
 
-proxyView : Model -> Account -> List (Html Message)
-proxyView { voteStat, producers, proxies } account =
+proxyView : Model -> Account -> Language -> List (Html Message)
+proxyView { voteStat, producers, proxies } account language =
     let
         formattedProxiedEos =
             voteStat.eosysProxyStakedEos
@@ -527,7 +529,7 @@ proxyView { voteStat, producers, proxies } account =
             [ h3 []
                 [ text "Vote Philosophy" ]
             , p []
-                [ text "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own." ]
+                [ text (translate language VoteProxyPhilosophy) ]
             , button
                 [ class "ok button"
                 , type_ "button"
@@ -572,7 +574,7 @@ proxyView { voteStat, producers, proxies } account =
 producerSimplifiedView : List Producer -> String -> Html Message
 producerSimplifiedView producers accountName =
     let
-        { country } =
+        { country, url } =
             List.filter (\producer -> producer.owner == accountName) producers
                 |> List.head
                 |> Maybe.withDefault initProducer
@@ -584,6 +586,7 @@ producerSimplifiedView producers accountName =
             [ text accountName ]
         , span []
             [ text country ]
+        , a [ href url, target "_blank" ] [ text url ]
         ]
 
 
