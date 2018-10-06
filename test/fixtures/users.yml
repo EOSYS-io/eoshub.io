@@ -21,9 +21,9 @@
 
 alice:
   email: alice@chain.partners
-  state: 0
+  state: 1
   confirm_token: Sp6pKEQ8DMpRWrYOZGxmTw
-  eos_account: testtesttest
+  eos_account:
 
 bob:
   email: bob@chain.partners
