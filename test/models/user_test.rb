@@ -20,7 +20,12 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  # test "the truth" do
-  #   assert true
-  # end
+  test "eos_account_created!" do
+    alice = users(:alice)
+    assert_equal alice.eos_account, nil
+
+    eos_account = 'testtesttest'
+    alice.eos_account_created!(eos_account)
+    assert_equal alice.eos_account, eos_account
+  end
 end

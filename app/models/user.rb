@@ -40,7 +40,7 @@ class User < ApplicationRecord
     end
 
     event :eos_account_created, before_transaction: :reset_confirm_token do
-      transitions from: :email_confirmed, to: :eos_account_created
+      transitions from: :email_confirmed, to: :eos_account_created, guard: :eos_account_present?
     end
 
     event :reset do
@@ -55,12 +55,25 @@ class User < ApplicationRecord
     email.split('@').dig(0)
   end
 
+  def regenerate_confirm_token!
+    confirmation_token
+    save!
+  end
+
+  def clear_confirm_token!
+    self.update!(confirm_token: nil)
+  end
+
   private
 
+  def eos_account_present?(eos_account)
+    self.eos_account = eos_account
+    self.eos_account.present?
+  end
+  
   def confirmation_token
-    if self.confirm_token.blank?
-      self.confirm_token = SecureRandom.urlsafe_base64.to_s
-    end
+    self.confirm_token = SecureRandom.urlsafe_base64.to_s
+    ExpireUserConfirmTokenJob.perform_in(10.minutes, self.id)
   end
 
   def reset_confirm_token
