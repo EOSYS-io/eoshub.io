@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_05_050102) do
+ActiveRecord::Schema.define(version: 2018_10_06_092957) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -132,6 +132,7 @@ ActiveRecord::Schema.define(version: 2018_10_05_050102) do
     t.datetime "updated_at", null: false
     t.integer "state", default: 0
     t.string "eos_account"
+    t.datetime "confirm_token_created_at"
     t.index ["confirm_token"], name: "index_users_on_confirm_token"
     t.index ["email"], name: "index_users_on_email"
     t.index ["eos_account"], name: "index_users_on_eos_account", unique: true

@@ -3,9 +3,9 @@ require 'test_helper'
 class UsersControllerTest < ActionController::TestCase
   fixtures :users
 
-  test "should get confirm_email" do
+  test "should post confirm_email" do
     alice = users(:alice)
-    get :confirm_email, params: { id: alice.confirm_token }
+    post :confirm_email, params: { id: alice.confirm_token }
     
     assert_response :ok
     
@@ -15,9 +15,9 @@ class UsersControllerTest < ActionController::TestCase
     assert alice.reload.email_confirmed?
   end
 
-  test "should fail to get confirm_email" do
+  test "should fail to post confirm_email" do
     bob = users(:bob)
-    get :confirm_email, params: { id: 'not_exist' }
+    post :confirm_email, params: { id: 'not_exist' }
     
     assert_response :bad_request
     expect_body = { message: I18n.t('users.invalid_email_confirm_token') }.to_json
@@ -26,7 +26,7 @@ class UsersControllerTest < ActionController::TestCase
 
   test "should fail to create aleady exist eos account" do
     alice = users(:alice)
-    get :confirm_email, params: { id: alice.confirm_token }
+    post :confirm_email, params: { id: alice.confirm_token }
 
     @controller.stub :eos_account_exist?, true do
       post :create_eos_account, params: { id: alice.confirm_token }, body: { account_name: 'chainpartner', pubkey: 'EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3' }.to_json, as: :json
@@ -53,7 +53,7 @@ class UsersControllerTest < ActionController::TestCase
       mock_body = file_fixture('eos_create_account_response_success.json').read
       @controller.stub :request_eos_account_creation, MockResponse.new(mock_body) do
         alice = users(:alice)
-        get :confirm_email, params: { id: alice.confirm_token }
+        post :confirm_email, params: { id: alice.confirm_token }
     
         eos_account = 'chainpartner'
         post :create_eos_account, params: { id: alice.confirm_token }, body: { account_name: eos_account, pubkey: 'EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3' }.to_json, as: :json

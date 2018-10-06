@@ -2,13 +2,14 @@
 #
 # Table name: users
 #
-#  id            :bigint(8)        not null, primary key
-#  confirm_token :string(22)       default("")
-#  email         :string
-#  eos_account   :string
-#  state         :integer          default("email_saved")
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
+#  id                       :bigint(8)        not null, primary key
+#  confirm_token            :string(22)       default("")
+#  confirm_token_created_at :datetime
+#  email                    :string
+#  eos_account              :string
+#  state                    :integer          default("email_saved")
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
 #
 # Indexes
 #
@@ -23,7 +24,7 @@ class User < ApplicationRecord
   has_many :orders
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
-  before_create :confirmation_token
+  before_create :generate_confirm_token
 
   enum state: {
     email_saved: 0,
@@ -51,17 +52,21 @@ class User < ApplicationRecord
     end
   end
 
+  class << self
+    def has_valid_confirm_token(confirm_token)
+      return nil if confirm_token.blank?
+
+      where(confirm_token: confirm_token).where(confirm_token_created_at: (Time.now - 10.minutes)..Time.now).take
+    end
+  end
+
   def name
     email.split('@').dig(0)
   end
 
   def regenerate_confirm_token!
-    confirmation_token
+    generate_confirm_token
     save!
-  end
-
-  def clear_confirm_token!
-    self.update!(confirm_token: nil)
   end
 
   private
@@ -70,10 +75,10 @@ class User < ApplicationRecord
     self.eos_account = eos_account
     self.eos_account.present?
   end
-  
-  def confirmation_token
+
+  def generate_confirm_token
     self.confirm_token = SecureRandom.urlsafe_base64.to_s
-    ExpireUserConfirmTokenJob.perform_in(10.minutes, self.id)
+    self.confirm_token_created_at = Time.now
   end
 
   def reset_confirm_token
