@@ -1,4 +1,25 @@
-module Component.Main.Page.Search exposing (Message(..), Model, Pagination, SelectedActionCategory, actionHidden, getActions, initCmd, initModel, update, view, viewAction, viewActionList)
+module Component.Main.Page.Search exposing
+    ( Message(..)
+    , Model
+    , Pagination
+    , SelectedActionCategory
+    , actionHidden
+    , filterDelbandTableSelf
+    , getActions
+    , initCmd
+    , initModel
+    , sumStakedToList
+    , update
+    , view
+    , viewAccountSpan
+    , viewAction
+    , viewActionList
+    , viewKeyAccountPermList
+    , viewKeyPermSpan
+    , viewPermission
+    , viewPermissionSection
+    , viewStakedDetail
+    )
 
 import Data.Account
     exposing
