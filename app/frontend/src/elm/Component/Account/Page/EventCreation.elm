@@ -546,7 +546,7 @@ okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstituti
     button
         [ class "ok button"
         , attribute
-            (if (accountValidation == ValidAccount) && emailRequested && emailConfirmed && agreeEosConstitution then
+            (if (accountValidation == InexistentAccount) && emailRequested && emailConfirmed && agreeEosConstitution then
                 "enabled"
 
              else
