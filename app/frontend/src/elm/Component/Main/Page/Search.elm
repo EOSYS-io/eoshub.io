@@ -3,6 +3,12 @@ module Component.Main.Page.Search exposing (Message(..), Model, Pagination, Sele
 import Data.Account
     exposing
         ( Account
+        , AccountPerm
+        , KeyPerm
+        , Permission
+        , PermissionShortened
+        , Refund
+        , RequiredAuth
         , defaultAccount
         , getResource
         , getResourceColorClass
@@ -13,6 +19,7 @@ import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, 
 import Html
     exposing
         ( Html
+        , b
         , br
         , button
         , dd
@@ -22,9 +29,12 @@ import Html
         , h2
         , h3
         , h4
+        , i
+        , li
         , main_
         , option
         , p
+        , s
         , section
         , select
         , span
@@ -36,6 +46,8 @@ import Html
         , th
         , thead
         , tr
+        , u
+        , ul
         )
 import Html.Attributes
     exposing
@@ -246,32 +258,51 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
         , p []
             [ text (translate language SearchResultAccount) ]
         , div [ class "container" ]
+            -- TODO(boseok): Separate sections into functions which return Html Message
             [ section [ class "summary" ]
                 [ dl []
-                    [ dt []
+                    [ dt [ class "id" ]
                         [ text (translate language Translation.Account) ]
                     , dd []
                         [ text account.accountName ]
-                    , dt []
+                    , dt [ class "total" ]
                         [ text (translate language TotalAmount) ]
                     , dd []
                         [ text totalAmount ]
                     ]
-                ]
-            , section [ class "account status" ]
-                [ div [ class "wrapper" ]
-                    [ div []
-                        [ text "Unstaked"
+                , ul []
+                    [ li []
+                        [ span [] [ text "Staked" ]
+                        , strong [ title stakedAmount ]
+                            [ text stakedAmount ]
+                        , i [] [ text "more infomation" ]
+                        , b []
+                            -- TODO(boseok): Get the real data with new request
+                            [ u []
+                                [ text "스테이크함:a1234567890" ]
+                            , u []
+                                [ text "스테이크 받음:a1234567890" ]
+                            , u []
+                                [ text "스테이크 해줌:a1234567890" ]
+                            , s []
+                                [ text "eosyskoreabp : 0.005 EOS" ]
+                            , s []
+                                [ text "eosyskoreabp : 0.005 EOS" ]
+                            , s []
+                                [ text "eosyskoreabp : 0.005 EOS" ]
+                            , s []
+                                [ text "eosyskoreabp : 0.005 EOS" ]
+                            , s []
+                                [ text "eosyskoreabp : 0.005 EOS" ]
+                            ]
+                        ]
+                    , li []
+                        [ span [] [ text "Unstaked" ]
                         , strong [ title account.coreLiquidBalance ]
                             [ text account.coreLiquidBalance ]
                         ]
-                    , div []
-                        [ text "staked"
-                        , strong [ title stakedAmount ]
-                            [ text stakedAmount ]
-                        ]
-                    , div []
-                        [ text "refunding"
+                    , li []
+                        [ span [] [ text "Refunding" ]
                         , strong [ title unstakingAmount ]
                             [ text unstakingAmount ]
                         ]
@@ -286,14 +317,15 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             [ text "CPU"
                             ]
                         , p []
-                            [ text ("Total: " ++ cpuTotal)
+                            [ text "Available"
                             , br []
                                 []
-                            , text ("Used: " ++ cpuUsed)
-                            , br []
-                                []
-                            , text ("Available: " ++ cpuAvailable)
+                            , text cpuAvailable
                             ]
+                        , p []
+                            [ text ("Total: " ++ cpuTotal) ]
+                        , p []
+                            [ text ("Used: " ++ cpuUsed) ]
                         , div [ class "status" ]
                             [ span [ class (getResourceColorClass cpuColorCode), attribute "style" ("height:" ++ cpuPercent) ]
                                 []
@@ -305,14 +337,15 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             [ text "NET"
                             ]
                         , p []
-                            [ text ("Total: " ++ netTotal)
+                            [ text "Available"
                             , br []
                                 []
-                            , text ("Used: " ++ netUsed)
-                            , br []
-                                []
-                            , text ("Available: " ++ netAvailable)
+                            , text netAvailable
                             ]
+                        , p []
+                            [ text ("Total: " ++ netTotal) ]
+                        , p []
+                            [ text ("Used: " ++ netUsed) ]
                         , div [ class "status" ]
                             [ span [ class (getResourceColorClass netColorCode), attribute "style" ("height:" ++ netPercent) ]
                                 []
@@ -324,14 +357,15 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                             [ text "RAM"
                             ]
                         , p []
-                            [ text ("Total: " ++ ramTotal)
+                            [ text "Available"
                             , br []
                                 []
-                            , text ("Used: " ++ ramUsed)
-                            , br []
-                                []
-                            , text ("Available: " ++ ramAvailable)
+                            , text ramAvailable
                             ]
+                        , p []
+                            [ text ("Total: " ++ ramTotal) ]
+                        , p []
+                            [ text ("Used: " ++ ramUsed) ]
                         , div [ class "status" ]
                             [ span [ class (getResourceColorClass ramColorCode), attribute "style" ("height:" ++ ramPercent) ]
                                 []
@@ -340,6 +374,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                         ]
                     ]
                 ]
+            , viewPermissionSection language account
             , section [ class "transaction history" ]
                 [ h3 []
                     [ text (translate language Transactions) ]
@@ -371,6 +406,77 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                     ]
                 ]
             ]
+        ]
+
+
+viewPermissionSection : Language -> Account -> Html Message
+viewPermissionSection language account =
+    section [ class "permission" ]
+        [ h3 []
+            [ text "퍼미션" ]
+        , table []
+            [ thead []
+                [ tr []
+                    [ th [ scope "col" ]
+                        [ text "Permission" ]
+                    , th [ scope "col" ]
+                        [ text "Threshold" ]
+                    , th [ scope "col" ]
+                        [ text "Keys" ]
+                    ]
+                ]
+            , tbody []
+                (List.map (viewPermission account.accountName) account.permissions)
+            ]
+        ]
+
+
+viewPermission : String -> Permission -> Html Message
+viewPermission accountName { permName, requiredAuth } =
+    tr []
+        [ td []
+            [ text (accountName ++ "@" ++ permName) ]
+        , td []
+            [ text (requiredAuth.threshold |> toString) ]
+
+        -- TODO(boseok): Several perms
+        , td []
+            (viewKeyAccountPermList requiredAuth)
+        ]
+
+
+viewKeyAccountPermList : RequiredAuth -> List (Html Message)
+viewKeyAccountPermList requiredAuth =
+    let
+        keyList =
+            List.map viewKeyPermSpan requiredAuth.keys
+
+        accountList =
+            List.map viewAccountSpan requiredAuth.accounts
+    in
+    List.append keyList accountList
+
+
+viewKeyPermSpan : KeyPerm -> Html Message
+viewKeyPermSpan value =
+    span []
+        [ text ("+" ++ (value.weight |> toString) ++ " " ++ value.key)
+        , br [] []
+        ]
+
+
+viewAccountSpan : AccountPerm -> Html Message
+viewAccountSpan value =
+    span []
+        [ text
+            ("+"
+                ++ (value.weight |> toString)
+                ++ " "
+                ++ value.permission.actor
+                ++ "@"
+                ++ value.permission.permission
+            )
+        , br [] []
         ]
 
 

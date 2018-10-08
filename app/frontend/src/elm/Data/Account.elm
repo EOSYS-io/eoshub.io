@@ -1,6 +1,11 @@
 module Data.Account exposing
     ( Account
+    , AccountPerm
+    , KeyPerm
+    , Permission
+    , PermissionShortened
     , Refund
+    , RequiredAuth
     , Resource
     , ResourceInEos
     , VoterInfo
@@ -36,6 +41,7 @@ type alias Account =
     , ramUsage : Int
     , netLimit : Resource
     , cpuLimit : Resource
+    , permissions : List Permission
     , totalResources : ResourceInEos
     , selfDelegatedBandwidth : ResourceInEos
     , refundRequest : Refund
@@ -53,6 +59,38 @@ type alias Resource =
     { used : Int
     , available : Int
     , max : Int
+    }
+
+
+type alias Permission =
+    { permName : String
+    , parent : String
+    , requiredAuth : RequiredAuth
+    }
+
+
+type alias RequiredAuth =
+    { threshold : Int
+    , keys : List KeyPerm
+    , accounts : List AccountPerm
+    }
+
+
+type alias KeyPerm =
+    { key : String
+    , weight : Int
+    }
+
+
+type alias AccountPerm =
+    { permission : PermissionShortened
+    , weight : Int
+    }
+
+
+type alias PermissionShortened =
+    { actor : String
+    , permission : String
     }
 
 
@@ -84,6 +122,7 @@ defaultAccount =
         { used = 0, available = 0, max = 0 }
     , cpuLimit =
         { used = 0, available = 0, max = 0 }
+    , permissions = []
     , totalResources =
         { netWeight = "0 EOS"
         , cpuWeight = "0 EOS"
@@ -127,6 +166,35 @@ accountDecoder =
                 |> required "used" intOrStringDecoder
                 |> required "available" intOrStringDecoder
                 |> required "max" intOrStringDecoder
+            )
+        |> required "permissions"
+            (JD.list
+                (decode Permission
+                    |> required "perm_name" JD.string
+                    |> required "parent" JD.string
+                    |> required "required_auth"
+                        (decode RequiredAuth
+                            |> required "threshold" JD.int
+                            |> required "keys"
+                                (JD.list
+                                    (decode KeyPerm
+                                        |> required "key" JD.string
+                                        |> required "weight" JD.int
+                                    )
+                                )
+                            |> required "accounts"
+                                (JD.list
+                                    (decode AccountPerm
+                                        |> required "permission"
+                                            (decode PermissionShortened
+                                                |> required "actor" JD.string
+                                                |> required "permission" JD.string
+                                            )
+                                        |> required "weight" JD.int
+                                    )
+                                )
+                        )
+                )
             )
         |> optional "total_resources"
             (decode ResourceInEos

@@ -186,7 +186,7 @@ main.search {
 
 			> div {
 				h4 {
-					font-size: $small;
+					font-size: $normal;
 					color: $white;
 					line-height:1.6;
 				}
@@ -195,7 +195,12 @@ main.search {
 					font-size: $small;
 					color: $gray;
 					line-height:1.6;
-					margin:1.5em 0 0 0;
+					margin:0;
+
+					&:nth-of-type(1) {
+						margin:0.6em 0;
+						color:$white;
+					}
 				}
 
 				position:relative;
@@ -249,7 +254,7 @@ main.search {
 						// 기포로 변경하자
 						&:before,
 						&:after {
-							opacity:0.2;
+							opacity:0.4;
 							content:'';
 							display:block;
 							position:absolute;
