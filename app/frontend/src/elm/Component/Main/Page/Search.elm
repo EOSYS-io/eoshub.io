@@ -426,14 +426,9 @@ viewPermissionSection language account =
                     ]
                 ]
             , tbody []
-                (viewPermissionList account.accountName account.permissions)
+                (List.map (viewPermission account.accountName) account.permissions)
             ]
         ]
-
-
-viewPermissionList : String -> List Permission -> List (Html Message)
-viewPermissionList accountName permissions =
-    List.map (viewPermission accountName) permissions
 
 
 viewPermission : String -> Permission -> Html Message
