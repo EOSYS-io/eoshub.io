@@ -4,7 +4,6 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 require('dotenv').config();
 
 environment.loaders.append('elm', elm)
-
 environment.plugins.append(
   'CopyWebpackPlugin',
   new CopyWebpackPlugin([
@@ -12,7 +11,12 @@ environment.plugins.append(
       from: 'charting_library/static',
       to: 'charting_library/static',
       context: 'vendor/assets/charting_library',
-    }
+	},
+    {
+      from: 'conf',
+      to: 'conf',
+      context: 'app/frontend/src',
+	}
   ])
 );
 
