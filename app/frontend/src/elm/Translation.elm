@@ -708,19 +708,19 @@ getMessages i18n =
             }
 
         AccountCreationKeypairCaution ->
-            { korean = "* 계정을 증명할 중요한 정보니 복사하여 안전하게 보관하세요!"
-            , english = "* Make sure you save the key pair somewhere safe! It is used to verify your account."
-            , chinese = "* 确保将密钥对保存在安全的地方！ 它用于验证您的帐户。"
+            { korean = "* 계정의 소유권을 증명하는 정보이니 꼭 복사하여 안전하게 보관하세요!"
+            , english = "* Make sure you copy it and keep it safe, as this information proves ownership of your account!"
+            , chinese = "* 请确保您复制并保证其安全，因为此信息证明了您帐户的所有权！"
             }
 
         PublicKey ->
-            { korean = "공개 키"
+            { korean = "퍼블릭 키"
             , english = "Public Key"
             , chinese = "公钥"
             }
 
         PrivateKey ->
-            { korean = "개인 키"
+            { korean = "프라이빗 키"
             , english = "Private Key"
             , chinese = "私钥"
             }
@@ -744,15 +744,15 @@ getMessages i18n =
             }
 
         AccountCreation ->
-            { korean = "계정생성하기"
-            , english = "Create an account"
-            , chinese = "创建一个帐户"
+            { korean = "신규계정 만들기"
+            , english = "Create a new account"
+            , chinese = "创建一个新帐户"
             }
 
         AccountCreationNameCondition ->
-            { korean = "1-5 사이의 숫자와 영어 소문자의 조합으로 12글자만 가능합니다."
-            , english = "An account name can contain lowercase english characters or numbers 1~5, in total 12 characters :)"
-            , chinese = "帐户名称是1到5之间的数字和英文小写字母的组合，只有12个字母！"
+            { korean = "영어 소문자와 숫자(1~5)의 조합으로 12글자만 가능합니다."
+            , english = "The combination of English lower case letters and numbers (1 to 5) allows only 12 letters."
+            , chinese = "英文小写字母和数字（1到5）的组合仅允许12个字母。"
             }
 
         AccountCreationInput ->
@@ -768,13 +768,13 @@ getMessages i18n =
             }
 
         AccountCreationAgreeEosConstitution ->
-            { korean = "EOS Consitution에 동의합니다."
-            , english = "I agree to the EOS Consitution."
-            , chinese = "我同意EOS Consitution。"
+            { korean = "EOS Constitution에 동의합니다."
+            , english = "I agree to the EOS Constitution."
+            , chinese = "我同意EOS Constitution。"
             }
 
         AccountCreationButton ->
-            { korean = "생성하기"
+            { korean = "계정 만들기"
             , english = "Create"
             , chinese = "创建"
             }
