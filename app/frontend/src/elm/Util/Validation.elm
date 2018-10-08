@@ -3,11 +3,11 @@ module Util.Validation exposing
     , MemoStatus(..)
     , QuantityStatus(..)
     , VerificationRequestStatus(..)
-    , checkAccountName
     , checkConfirmToken
     , isAccount
     , isPublicKey
     , validateAccount
+    , validateAccountForCreation
     , validateMemo
     , validateQuantity
     )
@@ -22,14 +22,14 @@ isAccount query =
     contains (regex "^[a-z.1-5]{1,12}$") query
 
 
+isValidAccountToCreate : String -> Bool
+isValidAccountToCreate query =
+    contains (regex "^[a-z.1-5]{12}$") query
+
+
 isPublicKey : String -> Bool
 isPublicKey query =
     contains (regex "^EOS[\\w]{50}$") query
-
-
-checkAccountName : String -> Bool
-checkAccountName query =
-    contains (regex "^[a-z.1-5]{12,12}$") query
 
 
 checkConfirmToken : String -> Bool
@@ -74,6 +74,26 @@ validateAccount accountName requestStatus =
         EmptyAccount
 
     else if isAccount accountName then
+        case requestStatus of
+            Succeed ->
+                ValidAccount
+
+            Fail ->
+                InexistentAccount
+
+            NotSent ->
+                AccountToBeVerified
+
+    else
+        InvalidAccount
+
+
+validateAccountForCreation : String -> VerificationRequestStatus -> AccountStatus
+validateAccountForCreation accountName requestStatus =
+    if accountName == "" then
+        EmptyAccount
+
+    else if isValidAccountToCreate accountName then
         case requestStatus of
             Succeed ->
                 ValidAccount

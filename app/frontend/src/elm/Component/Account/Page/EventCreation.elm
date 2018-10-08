@@ -9,6 +9,7 @@ module Component.Account.Page.EventCreation exposing
     , view
     )
 
+import Data.Account exposing (Account)
 import Data.Json exposing (RailsResponse, decodeRailsResponseBodyMsg, railsResponseDecoder)
 import Html
     exposing
@@ -80,9 +81,11 @@ import Translation
             , AccountCreationFailure
             , AccountCreationInput
             , AccountCreationKeypairCaution
+            , AccountCreationKeypairCopiedToClipboard
             , AccountCreationKeypairGeneration
             , AccountCreationKeypairRegenerate
             , AccountCreationLoginLink
+            , AccountCreationNameAlreadyExist
             , AccountCreationNameCondition
             , AccountCreationNameInvalid
             , AccountCreationNamePlaceholder
@@ -106,8 +109,15 @@ import Translation
         , translate
         )
 import Util.Flags exposing (Flags)
+import Util.HttpRequest exposing (getAccount)
 import Util.Urls as Urls
-import Util.Validation exposing (checkAccountName, checkConfirmToken)
+import Util.Validation
+    exposing
+        ( AccountStatus(..)
+        , VerificationRequestStatus(..)
+        , checkConfirmToken
+        , validateAccountForCreation
+        )
 import Validate exposing (isValidEmail)
 import View.I18nViews exposing (textViewI18n)
 import View.Notification as Notification
@@ -119,7 +129,7 @@ import View.Notification as Notification
 
 type alias Model =
     { accountName : String
-    , accountValidation : Bool
+    , accountValidation : AccountStatus
     , accountRequestSuccess : Bool
     , keys : KeyPair
     , email : String
@@ -137,7 +147,7 @@ type alias Model =
 initModel : Model
 initModel =
     { accountName = ""
-    , accountValidation = False
+    , accountValidation = EmptyAccount
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "" }
     , email = ""
@@ -157,7 +167,8 @@ initModel =
 
 
 type Message
-    = ValidateAccountName String
+    = ValidateAccountNameInput String
+    | OnFetchAccountToVerify (Result Http.Error Account)
     | CreateEosAccount
     | NewEosAccount (Result Http.Error RailsResponse)
     | GenerateKeys
@@ -184,17 +195,27 @@ update msg ({ accountName, keys, notification } as model) flags language =
             ( { model | keys = keyPair }, Cmd.none )
 
         Copy ->
-            ( model, Port.copy () )
+            ( { model
+                | notification =
+                    { content =
+                        Notification.Ok
+                            { message = AccountCreationKeypairCopiedToClipboard
+                            , detail = EmptyMessage
+                            }
+                    , open = True
+                    }
+              }
+            , Port.copy ()
+            )
 
-        ValidateAccountName accountName ->
-            let
-                newModel =
-                    { model | accountName = accountName }
+        ValidateAccountNameInput accountName ->
+            validateAccountNameInput { model | accountName = accountName } NotSent
 
-                validate =
-                    checkAccountName accountName
-            in
-            ( { newModel | accountValidation = validate }, Cmd.none )
+        OnFetchAccountToVerify (Ok _) ->
+            validateAccountNameInput model Succeed
+
+        OnFetchAccountToVerify (Err _) ->
+            validateAccountNameInput model Fail
 
         CreateEosAccount ->
             ( model, createEosAccountRequest model flags language )
@@ -368,11 +389,15 @@ accountInputViews : Model -> Language -> List (Html Message)
 accountInputViews { accountName, accountValidation } language =
     let
         accountValidationMsg =
-            if accountValidation then
-                AccountCreationNameValid
+            case accountValidation of
+                ValidAccount ->
+                    AccountCreationNameAlreadyExist
 
-            else
-                AccountCreationNameInvalid
+                InexistentAccount ->
+                    AccountCreationNameValid
+
+                _ ->
+                    AccountCreationNameInvalid
     in
     [ h3 []
         [ textViewI18n language AccountCreationInput ]
@@ -380,13 +405,13 @@ accountInputViews { accountName, accountValidation } language =
         [ class "account_name"
         , placeholder (translate language AccountCreationNamePlaceholder)
         , type_ "text"
-        , onInput ValidateAccountName
+        , onInput ValidateAccountNameInput
         ]
         []
     , span
         [ style
             [ ( "visibility"
-              , if String.isEmpty accountName then
+              , if accountValidation == EmptyAccount then
                     "hidden"
 
                 else
@@ -394,7 +419,7 @@ accountInputViews { accountName, accountValidation } language =
               )
             ]
         , class
-            (if accountValidation then
+            (if accountValidation == InexistentAccount then
                 "true validate"
 
              else
@@ -521,7 +546,7 @@ okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstituti
     button
         [ class "ok button"
         , attribute
-            (if accountValidation && emailRequested && emailConfirmed && agreeEosConstitution then
+            (if (accountValidation == InexistentAccount) && emailRequested && emailConfirmed && agreeEosConstitution then
                 "enabled"
 
              else
@@ -620,6 +645,28 @@ postUsers model flags language =
 sendCodeRequest : Model -> Flags -> Language -> Cmd Message
 sendCodeRequest model flags language =
     Http.send SendCodeResponse <| postUsers model flags language
+
+
+
+-- Util
+
+
+validateAccountNameInput : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
+validateAccountNameInput ({ accountName } as model) requestStatus =
+    let
+        accountValidation =
+            validateAccountForCreation accountName requestStatus
+
+        accountCmd =
+            if accountValidation == AccountToBeVerified then
+                accountName
+                    |> getAccount
+                    |> Http.send OnFetchAccountToVerify
+
+            else
+                Cmd.none
+    in
+    ( { model | accountValidation = accountValidation }, accountCmd )
 
 
 
