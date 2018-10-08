@@ -22,8 +22,8 @@ isAccount query =
     contains (regex "^[a-z.1-5]{1,12}$") query
 
 
-posibbleAccountToCreate : String -> Bool
-posibbleAccountToCreate query =
+isValidAccountToCreate : String -> Bool
+isValidAccountToCreate query =
     contains (regex "^[a-z.1-5]{12}$") query
 
 
@@ -93,7 +93,7 @@ validateAccountForCreation accountName requestStatus =
     if accountName == "" then
         EmptyAccount
 
-    else if posibbleAccountToCreate accountName then
+    else if isValidAccountToCreate accountName then
         case requestStatus of
             Succeed ->
                 ValidAccount
