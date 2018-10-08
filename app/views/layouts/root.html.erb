@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html>
+	<%# Head %>
   <head>
-    <title>EoshubIo</title>
+    <title>Eoshub</title>
+	<link rel="shortcut icon" type="image/x-icon" href="/assets/packs/conf/hubby.ico">
+	<meta property="og:title" content="Eoshub.io" />
+	<meta property="og:description" content="Toolkit For Eoshub" />
+	<meta property="og:image" content="/asstes/packs/hubby.png" />
+	<meta property="og:url" content="https://eoshub.io" />
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -11,6 +17,5 @@
   <body>
     <%= yield %>
   </body>
-  
   <%= javascript_pack_tag 'index' %>
 </html>
