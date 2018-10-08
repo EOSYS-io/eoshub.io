@@ -25,6 +25,23 @@ tests =
                                 2996
                                 (Resource 0 0 0)
                                 (Resource 0 0 0)
+                                [ Permission
+                                    "active"
+                                    "owner"
+                                    (RequiredAuth
+                                        1
+                                        [ KeyPerm "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        []
+                                    )
+                                , Permission
+                                    "owner"
+                                    ""
+                                    (RequiredAuth
+                                        1
+                                        [ KeyPerm "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        []
+                                    )
+                                ]
                                 (ResourceInEos "0.0000 EOS" "0.0000 EOS" 3050)
                                 (ResourceInEos "0 EOS" "0 EOS" 0)
                                 (Refund "" "" "0 EOS" "0 EOS")
@@ -47,6 +64,23 @@ tests =
                                 4223
                                 (Resource 105 778970655 778970760)
                                 (Resource 11533 148290056 148301589)
+                                [ Permission
+                                    "active"
+                                    "owner"
+                                    (RequiredAuth
+                                        1
+                                        [ KeyPerm "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ]
+                                        []
+                                    )
+                                , Permission
+                                    "owner"
+                                    ""
+                                    (RequiredAuth
+                                        1
+                                        [ KeyPerm "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ]
+                                        []
+                                    )
+                                ]
                                 (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" 65741)
                                 (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" 0)
                                 (Refund "" "" "0 EOS" "0 EOS")
@@ -69,6 +103,23 @@ tests =
                                 38299755
                                 (Resource -1 -1 -1)
                                 (Resource -1 -1 -1)
+                                [ Permission
+                                    "active"
+                                    "owner"
+                                    (RequiredAuth
+                                        1
+                                        []
+                                        [ AccountPerm (PermissionShortened "eosio.prods" "active") 1 ]
+                                    )
+                                , Permission
+                                    "owner"
+                                    ""
+                                    (RequiredAuth
+                                        1
+                                        []
+                                        [ AccountPerm (PermissionShortened "eosio.prods" "active") 1 ]
+                                    )
+                                ]
                                 (ResourceInEos "0 EOS" "0 EOS" 0)
                                 (ResourceInEos "0 EOS" "0 EOS" 0)
                                 (Refund "" "" "0 EOS" "0 EOS")
@@ -91,6 +142,15 @@ tests =
                                 3012341234
                                 (Resource 3012341234 3012341234 3012341234)
                                 (Resource 3012341234 3012341234 3012341234)
+                                [ Permission
+                                    "active"
+                                    "owner"
+                                    (RequiredAuth 1 [ KeyPerm "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ] [])
+                                , Permission
+                                    "owner"
+                                    ""
+                                    (RequiredAuth 1 [ KeyPerm "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ] [])
+                                ]
                                 (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" 3012341234)
                                 (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" 0)
                                 (Refund "" "" "0 EOS" "0 EOS")
