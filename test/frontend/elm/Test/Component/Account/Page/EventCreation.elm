@@ -14,7 +14,6 @@ model =
     , accountValidation = False
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "12o9347512f1oh923" }
-    , keyCopied = False
     , email = "test@chain.partners"
     , emailRequested = False
     , emailValid = False

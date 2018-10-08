@@ -122,7 +122,6 @@ type alias Model =
     , accountValidation : Bool
     , accountRequestSuccess : Bool
     , keys : KeyPair
-    , keyCopied : Bool
     , email : String
     , emailRequested : Bool
     , emailValid : Bool
@@ -141,7 +140,6 @@ initModel =
     , accountValidation = False
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "" }
-    , keyCopied = False
     , email = ""
     , emailRequested = False
     , emailValid = False
@@ -186,7 +184,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
             ( { model | keys = keyPair }, Cmd.none )
 
         Copy ->
-            ( { model | keyCopied = True }, Port.copy () )
+            ( model, Port.copy () )
 
         ValidateAccountName accountName ->
             let
@@ -519,11 +517,11 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
 
 
 okButton : Model -> Language -> Html Message
-okButton { accountValidation, keyCopied, emailRequested, emailConfirmed, agreeEosConstitution } language =
+okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstitution } language =
     button
         [ class "ok button"
         , attribute
-            (if accountValidation && keyCopied && emailRequested && emailConfirmed && agreeEosConstitution then
+            (if accountValidation && emailRequested && emailConfirmed && agreeEosConstitution then
                 "enabled"
 
              else
