@@ -2,13 +2,14 @@
 #
 # Table name: users
 #
-#  id            :bigint(8)        not null, primary key
-#  confirm_token :string(22)       default("")
-#  email         :string
-#  eos_account   :string
-#  state         :integer          default("email_saved")
-#  created_at    :datetime         not null
-#  updated_at    :datetime         not null
+#  id                       :bigint(8)        not null, primary key
+#  confirm_token            :string(22)       default("")
+#  confirm_token_created_at :datetime
+#  email                    :string
+#  eos_account              :string
+#  state                    :integer          default("email_saved")
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
 #
 # Indexes
 #
@@ -23,7 +24,7 @@ class User < ApplicationRecord
   has_many :orders
 
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }, allow_nil: true
-  before_create :confirmation_token
+  before_create :generate_confirm_token
 
   enum state: {
     email_saved: 0,
@@ -40,7 +41,7 @@ class User < ApplicationRecord
     end
 
     event :eos_account_created, before_transaction: :reset_confirm_token do
-      transitions from: :email_confirmed, to: :eos_account_created
+      transitions from: :email_confirmed, to: :eos_account_created, guard: :eos_account_present?
     end
 
     event :reset do
@@ -51,16 +52,33 @@ class User < ApplicationRecord
     end
   end
 
+  class << self
+    def has_valid_confirm_token(confirm_token)
+      return nil if confirm_token.blank?
+
+      where(confirm_token: confirm_token).where(confirm_token_created_at: (Time.now - 10.minutes)..Time.now).take
+    end
+  end
+
   def name
     email.split('@').dig(0)
   end
 
+  def regenerate_confirm_token!
+    generate_confirm_token
+    save!
+  end
+
   private
 
-  def confirmation_token
-    if self.confirm_token.blank?
-      self.confirm_token = SecureRandom.urlsafe_base64.to_s
-    end
+  def eos_account_present?(eos_account)
+    self.eos_account = eos_account
+    self.eos_account.present?
+  end
+
+  def generate_confirm_token
+    self.confirm_token = SecureRandom.urlsafe_base64.to_s
+    self.confirm_token_created_at = Time.now
   end
 
   def reset_confirm_token

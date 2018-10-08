@@ -6,6 +6,8 @@ class UsersController < ApiController
     if @user.present?
       if @user.eos_account_created?
         render json: { message: I18n.t('users.already_eos_account_created_email') }, status: :bad_request and return
+      else
+        @user.regenerate_confirm_token!
       end
     else
       @user = User.new(email: params[:email])
@@ -22,7 +24,8 @@ class UsersController < ApiController
 
   def confirm_email
     confirm_token = params[:id]
-    user = User.find_by(confirm_token: confirm_token)
+
+    user = User.has_valid_confirm_token(confirm_token)
     if user.present?
       user.email_confirmed!
       render json: { message: I18n.t('users.email_confirmed') }, status: :ok
@@ -43,9 +46,10 @@ class UsersController < ApiController
     else
       raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:account_name])
 
-      response = request_eos_account_creation(params[:account_name], params[:pubkey])
+      eos_account = params[:account_name]
+      response = request_eos_account_creation(eos_account, params[:pubkey])
       if response.code == 200
-        user.eos_account_created!
+        user.eos_account_created!(eos_account)
         render json: { message: I18n.t('users.eos_account_created') }, status: :ok
       elsif response.return_code == :couldnt_connect
         render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
