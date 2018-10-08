@@ -142,6 +142,7 @@ type I18n
     | CopyAll
     | AccountCreationNameValid
     | AccountCreationNameInvalid
+    | AccountCreationNameAlreadyExist
     | AccountCreation
     | AccountCreationNameCondition
     | AccountCreationInput
@@ -741,6 +742,12 @@ getMessages i18n =
             { korean = "불가능한 계정이에요"
             , english = "Unavailable"
             , chinese = "这是一个不可能的帐户。"
+            }
+
+        AccountCreationNameAlreadyExist ->
+            { korean = "이미 존재하는 계정입니다."
+            , english = "This account already exists."
+            , chinese = "此帐户已存在。"
             }
 
         AccountCreation ->
