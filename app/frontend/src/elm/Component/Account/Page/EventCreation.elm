@@ -81,6 +81,7 @@ import Translation
             , AccountCreationFailure
             , AccountCreationInput
             , AccountCreationKeypairCaution
+            , AccountCreationKeypairCopiedToClipboard
             , AccountCreationKeypairGeneration
             , AccountCreationKeypairRegenerate
             , AccountCreationLoginLink
@@ -194,7 +195,18 @@ update msg ({ accountName, keys, notification } as model) flags language =
             ( { model | keys = keyPair }, Cmd.none )
 
         Copy ->
-            ( model, Port.copy () )
+            ( { model
+                | notification =
+                    { content =
+                        Notification.Ok
+                            { message = AccountCreationKeypairCopiedToClipboard
+                            , detail = EmptyMessage
+                            }
+                    , open = True
+                    }
+              }
+            , Port.copy ()
+            )
 
         ValidateAccountNameInput accountName ->
             validateAccountNameInput { model | accountName = accountName } NotSent

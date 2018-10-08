@@ -137,6 +137,7 @@ type I18n
     | AccountCreationKeypairGeneration
     | AccountCreationKeypairRegenerate
     | AccountCreationKeypairCaution
+    | AccountCreationKeypairCopiedToClipboard
     | PublicKey
     | PrivateKey
     | CopyAll
@@ -712,6 +713,12 @@ getMessages i18n =
             { korean = "* 계정의 소유권을 증명하는 정보이니 꼭 복사하여 안전하게 보관하세요!"
             , english = "* Ensure safe storage of your keypair, as it proves the account ownership."
             , chinese = "* 唯一能够证明账户的所属权的信息，一定要把它复制并保管在安全的地方！"
+            }
+
+        AccountCreationKeypairCopiedToClipboard ->
+            { korean = "키가 클립보드에 복사되었습니다. 안전한 곳에 붙여넣어 보관하세요!"
+            , english = "The key has been copied to the clipboard. Please paste it in a safe place!"
+            , chinese = "密钥已复制到剪贴板。 请将它粘贴在安全的地方！"
             }
 
         PublicKey ->
