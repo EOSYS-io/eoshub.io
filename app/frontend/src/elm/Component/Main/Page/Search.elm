@@ -4,7 +4,7 @@ module Component.Main.Page.Search exposing
     , Pagination
     , SelectedActionCategory
     , actionHidden
-    , filterDelbandTableSelf
+    , filterDelbandWithAccountName
     , getActions
     , initCmd
     , initModel
@@ -472,25 +472,17 @@ viewStakedDetail language ({ account, delbandTable } as model) =
 
         delbandList =
             delbandTable
-                |> filterDelbandTableSelf account.accountName
+                |> filterDelbandWithAccountName account.accountName
                 |> List.map
-                    (\x ->
+                    (\maybeDelband ->
                         let
-                            receiver =
-                                case x of
+                            ( receiver, sum ) =
+                                case maybeDelband of
                                     Delband value ->
-                                        value.receiver
+                                        ( value.receiver, assetAdd value.cpuWeight value.netWeight )
 
                                     _ ->
-                                        ""
-
-                            sum =
-                                case x of
-                                    Delband value ->
-                                        assetAdd value.cpuWeight value.netWeight
-
-                                    _ ->
-                                        "0 EOS"
+                                        ( "", "0 EOS" )
                         in
                         s [] [ text (receiver ++ ": " ++ sum) ]
                     )
@@ -504,10 +496,10 @@ sumStakedToList delbandTable accountName =
     let
         delbandEachSumList =
             delbandTable
-                |> filterDelbandTableSelf accountName
+                |> filterDelbandWithAccountName accountName
                 |> List.map
-                    (\x ->
-                        case x of
+                    (\maybeDelband ->
+                        case maybeDelband of
                             Delband value ->
                                 assetAdd value.cpuWeight value.netWeight
 
@@ -518,11 +510,11 @@ sumStakedToList delbandTable accountName =
     List.foldl assetAdd "0 EOS" delbandEachSumList
 
 
-filterDelbandTableSelf : String -> List Row -> List Row
-filterDelbandTableSelf accountName delbandTable =
+filterDelbandWithAccountName : String -> List Row -> List Row
+filterDelbandWithAccountName accountName delbandTable =
     List.filter
-        (\x ->
-            case x of
+        (\maybeDelband ->
+            case maybeDelband of
                 Delband value ->
                     value.receiver /= accountName
 

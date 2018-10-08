@@ -1,7 +1,6 @@
 module Test.Component.Main.Page.Search exposing (tests)
 
-import Component.Main.Page.Search exposing (filterDelbandTableSelf, sumStakedToList)
-import Data.Account exposing (..)
+import Component.Main.Page.Search exposing (filterDelbandWithAccountName, sumStakedToList)
 import Data.Table exposing (..)
 import Expect
 import Test exposing (..)
@@ -42,7 +41,7 @@ tests =
     in
     describe "Page.Search module"
         [ describe "utility functions"
-            [ test "filterDelbandTableSelf" <|
+            [ test "filterDelbandWithAccountName" <|
                 \() ->
                     let
                         expected =
@@ -66,7 +65,7 @@ tests =
                                 }
                             ]
                     in
-                    Expect.equal expected (filterDelbandTableSelf defaultFilter defaultDelbandTable)
+                    Expect.equal expected (filterDelbandWithAccountName defaultFilter defaultDelbandTable)
             , test "sumStakedToList" <|
                 \() ->
                     Expect.equal "0.2004 EOS" (sumStakedToList defaultDelbandTable defaultFilter)
