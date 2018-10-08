@@ -81,7 +81,7 @@ jobs:
         - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$DEPLOYMENT_ENV -i $EOSHUB_DOCKER_IMAGE -t 900
         # Sidekiq
         - export SIDEKIQ_DOCKER_IMAGE=$DOCKER_HUB_REPO_SIDEKIQ-$DEPLOYMENT_ENV:$DOCKER_TAG
-        - docker build -f deploy/@DEPLOYMENT_ENV-sidekiq/dockerfile -t $SIDEKIQ_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY --build-arg EOSHUB_DOCKER_IMAGE=$EOSHUB_DOCKER_IMAGE .
+        - docker build -f deploy/$DEPLOYMENT_ENV-sidekiq/dockerfile -t $SIDEKIQ_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY --build-arg EOSHUB_DOCKER_IMAGE=$EOSHUB_DOCKER_IMAGE .
         - docker push $SIDEKIQ_DOCKER_IMAGE
         - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME_SIDEKIQ-$DEPLOYMENT_ENV -i $SIDEKIQ_DOCKER_IMAGE -t 900
 
