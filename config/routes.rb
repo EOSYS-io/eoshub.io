@@ -1,3 +1,6 @@
+require 'sidekiq/web'
+require 'sidekiq/cron/web'
+
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config.merge(controllers: { confirmations: "admin/admin_users/confirmations",
                                                                            sessions: "admin/admin_users/sessions" })
@@ -33,6 +36,10 @@ Rails.application.routes.draw do
 
   devise_scope :admin_user do
     patch "/admin/confirmation" => "admin/admin_users/confirmations#confirm", as: :confirm_admin_user_confirmation
+  end
+
+  authenticate :admin_user do
+    mount Sidekiq::Web => '/admin/sidekiq'
   end
 
   get '*path', to: 'root#index'

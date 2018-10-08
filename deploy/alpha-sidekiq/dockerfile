@@ -1,0 +1,12 @@
+ARG EOSHUB_DOCKER_IMAGE
+FROM $EOSHUB_DOCKER_IMAGE
+
+ARG RAILS_MASTER_KEY
+ARG EMAIL_USER
+ARG EMAIL_PASS
+
+# Setting supervisor
+COPY deploy/production-sidekiq/supervisord.conf /etc/supervisord.conf
+
+# Command
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
