@@ -7,6 +7,7 @@
 #  confirm_token_created_at :datetime
 #  email                    :string
 #  eos_account              :string
+#  ip_address               :string           default(""), not null
 #  state                    :integer          default("email_saved")
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
@@ -26,12 +27,14 @@ alice:
   confirm_token: Sp6pKEQ8DMpRWrYOZGxmTw
   confirm_token_created_at: <%= Time.now %>
   eos_account:
+  ip_address: 1.1.1.1
 
 bob:
   email: bob@chain.partners
   state: 0
   confirm_token:
   eos_account: goodgoodgood
+  ip_address: 1.1.1.1
 
 charlie:
   email: charlie@chain.partners
@@ -39,3 +42,4 @@ charlie:
   confirm_token: aUbyE05CZwvAT1JUw4vGEA
   confirm_token_created_at: <%= Time.now - 1.hours %>
   eos_account:
+  ip_address: 1.1.1.1
