@@ -207,7 +207,7 @@ input[type='checkbox'] {
 	&:checked {
 		& + label:before {
 			border-color:transparent;
-			background:url('../image/check.svg') center center no-repeat $pink;
+			background:url('check.svg') center center no-repeat $pink;
 		}
 	}
 }
@@ -235,7 +235,7 @@ select {
 	height: 42px;
 
 	display:inline-block;
-	background: url(../image/icon-dropdown.svg) calc(100% - 16px) calc(50%) no-repeat #161616;
+	background: url('icon-dropdown.svg') calc(100% - 16px) calc(50%) no-repeat #161616;
 	background-size: 20px 20px;
 	border:0;
 	border-radius: 2px;

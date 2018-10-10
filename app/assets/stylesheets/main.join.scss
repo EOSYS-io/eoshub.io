@@ -57,7 +57,7 @@ main.join {
 			top:50%;
 			right:0;
 			margin-top:-11px;
-			background:url('../image/icon-refresh.svg#dark-gray') right center no-repeat;
+			background:url('icon-refresh.svg#dark-gray') right center no-repeat;
 
 			transition:transform 1s;
 		}
@@ -66,7 +66,7 @@ main.join {
 			color:$white;
 			&:after {
 				transform:rotate(180deg);
-				background:url('../image/icon-refresh.svg#white') right center no-repeat;
+				background:url('icon-refresh.svg#white') right center no-repeat;
 			}
 		}
 
@@ -138,13 +138,13 @@ main.join {
 		&.true {
 			visibility:visible;
 			color: #79c720;
-			background: url(../image/icon-check-circle.svg) left center no-repeat;
+			background: url(icon-check-circle.svg) left center no-repeat;
 		}
 
 		&.false {
 			visibility:visible;
 			color: #ff6b64;
-			background: url(../image/icon-x-circle.svg) left center no-repeat;
+			background: url(icon-x-circle.svg) left center no-repeat;
 		}
 	}
 
@@ -331,7 +331,7 @@ main.join {
 		text-align:center;
 
 		padding-top:67px + 32px;
-		background:url('../image/bi-hubby.svg#white') center calc(50% - 67px - 32px) no-repeat;
+		background:url('bi-hubby.svg#white') center calc(50% - 67px - 32px) no-repeat;
 		background-size:61px 67px;
 
 		display:flex;
@@ -355,7 +355,7 @@ main.join {
 		top:50%;
 		left:50%;
 		transform:translate(-50%,-50%);
-		background:url('../image/bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
+		background:url('bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
 		background-size:61px 67px;
 
 		.button {
