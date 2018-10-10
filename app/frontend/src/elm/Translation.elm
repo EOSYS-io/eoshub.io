@@ -233,6 +233,13 @@ type I18n
     | Regproxy
     | Voteproducer
     | NewaccountTx
+    | AvailableCapacity
+    | TotalCapacity String
+    | UsedCapacity String
+    | Permissions
+    | Permission
+    | Threshold
+    | Keys
 
 
 translate : Language -> I18n -> String
@@ -375,7 +382,7 @@ getMessages i18n =
             }
 
         TotalAmount ->
-            { korean = "총 보유 수량"
+            { korean = "총 보유량"
             , english = "Total Amount"
             , chinese = "总数量"
             }
@@ -1350,4 +1357,46 @@ getMessages i18n =
             { korean = "계정 생성"
             , english = "Newaccount"
             , chinese = "Newaccount"
+            }
+
+        AvailableCapacity ->
+            { korean = "사용 가능 용량"
+            , english = "Available"
+            , chinese = "能够使用"
+            }
+
+        TotalCapacity capacity ->
+            { korean = "총 용량: " ++ capacity
+            , english = "Total: " ++ capacity
+            , chinese = "总量: " ++ capacity
+            }
+
+        UsedCapacity capacity ->
+            { korean = "사용된 용량: " ++ capacity
+            , english = "Used: " ++ capacity
+            , chinese = "已被使用: " ++ capacity
+            }
+
+        Permissions ->
+            { korean = "보유 권한"
+            , english = "Permissions"
+            , chinese = "保有权限"
+            }
+
+        Permission ->
+            { korean = "권한"
+            , english = "Permission"
+            , chinese = "权限"
+            }
+
+        Threshold ->
+            { korean = "임계값"
+            , english = "Threshold"
+            , chinese = "临界值"
+            }
+
+        Keys ->
+            { korean = "키값"
+            , english = "Keys"
+            , chinese = "Key值"
             }

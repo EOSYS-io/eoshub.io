@@ -112,5 +112,5 @@ viewAccountCard language index account =
             [ title account ]
             [ text account ]
         , button [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
-            [ text "자세한 검색 보기" ]
+            []
         ]
