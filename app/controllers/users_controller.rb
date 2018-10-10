@@ -2,6 +2,10 @@ class UsersController < ApiController
   include EosAccount
 
   def create
+    unless User.qualify_for_event(request.remote_ip)
+      render json: { message: I18n.t('users.too_many_request_with_same_ip_address') }, status: :precondition_failed and return
+    end
+
     @user = User.find_by(email: params[:email])
     if @user.present?
       if @user.eos_account_created?
@@ -49,7 +53,8 @@ class UsersController < ApiController
       eos_account = params[:account_name]
       response = request_eos_account_creation(eos_account, params[:pubkey])
       if response.code == 200
-        user.eos_account_created!(eos_account)
+        user.assign_attributes(eos_account: eos_account, ip_address: request.remote_ip)
+        user.eos_account_created!
         render json: { message: I18n.t('users.eos_account_created') }, status: :ok
       elsif response.return_code == :couldnt_connect
         render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error

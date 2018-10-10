@@ -7,6 +7,7 @@
 #  confirm_token_created_at :datetime
 #  email                    :string
 #  eos_account              :string
+#  ip_address               :string           default(""), not null
 #  state                    :integer          default("email_saved")
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
@@ -41,7 +42,7 @@ class User < ApplicationRecord
     end
 
     event :eos_account_created, before_transaction: :reset_confirm_token do
-      transitions from: :email_confirmed, to: :eos_account_created, guard: :eos_account_present?
+      transitions from: :email_confirmed, to: :eos_account_created
     end
 
     event :reset do
@@ -58,6 +59,10 @@ class User < ApplicationRecord
 
       where(confirm_token: confirm_token).where(confirm_token_created_at: (Time.now - 10.minutes)..Time.now).take
     end
+
+    def qualify_for_event(ip_address)
+      User.eos_account_created.where(ip_address: ip_address).count < 3
+    end
   end
 
   def name
@@ -70,11 +75,6 @@ class User < ApplicationRecord
   end
 
   private
-
-  def eos_account_present?(eos_account)
-    self.eos_account = eos_account
-    self.eos_account.present?
-  end
 
   def generate_confirm_token
     self.confirm_token = SecureRandom.urlsafe_base64.to_s

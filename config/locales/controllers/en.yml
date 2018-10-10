@@ -8,6 +8,7 @@ en:
     invalid_email_confirm_token: 'Invalid email confirm token'
     eos_account_already_exist: 'The account already exists in the EOS block chain'
     eos_account_created: "Welcome to the EOS! \"%{account_name}\" has been created."
+    too_many_request_with_same_ip_address: 'You can not participate in the event more than 3 times with the same IP address.'
     eos_account_creation_failure_no_such_email: 'User does not exist with this email'
     eos_account_creation_failure_email_not_confirmed: 'Email is not confirmed'
     eos_account_creation_failure_already_created: 'EOS account already created with this email'

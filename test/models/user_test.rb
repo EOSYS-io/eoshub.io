@@ -7,6 +7,7 @@
 #  confirm_token_created_at :datetime
 #  email                    :string
 #  eos_account              :string
+#  ip_address               :string           default(""), not null
 #  state                    :integer          default("email_saved")
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
@@ -21,13 +22,11 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
-  test "eos_account_created!" do
-    alice = users(:alice)
-    assert_equal alice.eos_account, nil
-
-    eos_account = 'testtesttest'
-    alice.eos_account_created!(eos_account)
-    assert_equal alice.eos_account, eos_account
+  test "should return false for qualify_for_event" do
+    (1..3).each do |i|
+      User.create!(email: "test#{i}@test.net", state: :eos_account_created, eos_account: "testtesttes#{i}", ip_address: '1.1.1.1')
+    end
+    assert_not User.qualify_for_event('1.1.1.1')
   end
 
   test "should succeed to call has_valid_confirm_token" do
