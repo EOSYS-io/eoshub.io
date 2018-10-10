@@ -77,7 +77,7 @@ class Order < ApplicationRecord
 
   class << self
     def permit_attributes_on_create
-      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date]
+      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date, :cid]
     end
 
     def generate_order_no

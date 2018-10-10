@@ -16,6 +16,7 @@ en:
     eos_wallet_connection_failed: 'Failed to connect EOS wallet'
   orders:
     deactivated_product: "You can't order this item for now."
+    order_not_exist: "The order does not exist"
   eos_ram_price_histores:
     unsupported_intvl: 'Unsupported interval.'
   vote_stats:

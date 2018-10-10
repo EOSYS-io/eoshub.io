@@ -1,0 +1,99 @@
+button[type='button'],
+a.button,
+input[type='submit'] {
+	// reset
+	cursor:pointer;
+	border-width:0;
+	border-style:solid;
+	border-color:transparent;
+
+	font-family:inherit;
+	background-color:transparent;
+
+	appearance:none;
+
+	display:inline-block;
+	line-height:1.1;
+	box-sizing:border-box;
+	text-align: center;
+	font-family:inherit;
+	border-radius:0;
+	padding:0;
+
+	&:first-letter {
+		text-transform:uppercase;
+	}
+}
+
+button[type="button"].button,
+a.button {
+	// flex:1;
+	outline:0;
+	display:inline-block;
+	border-radius: 2px;
+
+	font-size:$small;
+
+	transition:background-color 0.3s, color 0.3s, background-image 0.3s;
+
+	// size
+	&.ok,
+	&.undo,
+	&.choice,
+	&.tab,
+	&.login,
+	&.go.main,
+	&.copy {
+		line-height:50px;
+		height: 52px;
+	}
+
+	// type case
+	&.ok,
+	&.login {
+		background-image: $pink-gradient;
+		color:$white;
+		border-width:0;
+	}
+
+	&.undo,
+	&.choice,
+	&.join,
+	&.copy {
+		border:1px solid $gray;
+	}
+
+	&.choice.ing,
+	&.go.main {
+		color:$white;
+		border-color:transparent;
+		background-color:$x-dark-gray;
+	}
+
+	// pesudo deco
+	&:disabled {
+		color:$dark-gray;
+		border-color:$dark-gray;
+		background:transparent;
+		border:1px solid $dark-gray;
+		cursor:not-allowed;
+	}
+
+	&.select,
+	&.view_more,
+	&.action {
+		padding:0 40px;
+		height: 52px;
+		border-radius: 2px;
+		background-color: #161616;
+		min-width:152px;
+	}
+
+	&.view_more {
+		&:before {
+			content:'+ ';
+		}
+	}
+}
+
+

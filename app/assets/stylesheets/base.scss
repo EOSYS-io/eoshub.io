@@ -1,0 +1,313 @@
+// reset
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, address, cite, code, del, dfn, em, font, img, ins, q, s, samp, strike, strong, sub, sup, dl, dt, dd, ol, ul, li, fieldset, form, label, legend {
+    line-height: 1.3em;
+    border: 0 none;
+}
+
+body {
+    margin: 0 auto;
+    font-size: 100%;
+    line-height: 1.3em;
+    font-family: $font-base-stack;
+    word-break: normal;
+    text-size-adjust: 100%;
+}
+
+sub,sup {
+    font-family:inherit;
+}
+
+i {
+	font-style:normal;
+	font-size:inherit;
+	font-family:inherit;
+}
+
+// for screen reader
+.skip_nav {
+    position: absolute;
+    z-index: 9999;
+    width: 100%;
+
+    a {
+        display: block;
+        overflow: hidden;
+        width: inherit;
+        height: 0;
+        margin: 0 auto;
+        height: 1px;
+        margin-bottom: -1px;
+        white-space: nowrap;
+        text-align: center;
+        text-indent: -9999px;
+    }
+
+    a:focus,
+    a:active {
+        height: 34px;
+        padding: 1px;
+        border-bottom: 2px solid #ebe8e7;
+        background: #666;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+        text-indent: 0;
+        line-height: 33px;
+    }
+}
+
+
+// heading group
+h1,h2,h3,h4,h5,h6 {
+    font-family:inherit;
+    line-height:1.1;
+    font-weight:normal;
+	margin:0;
+}
+
+h2 {
+	font-weight:$light;
+	color:$white;
+	+ p {
+		margin-top:10px;
+		font-size:$small;	//default type
+	}
+}
+
+h3 {
+	font-weight:$light;
+	color:$white
+}
+
+
+
+// zero club
+h1,h2,h3,h4,h5,h6,
+figure, figcaption,
+dt,dd,dl,
+iframe,
+fieldset
+{
+    padding:0;
+    margin:0;
+}
+
+iframe {
+    border:0;
+}
+
+// typo
+address, em {
+    font-style:normal;
+}
+
+em {
+    font-weight:500;
+}
+
+
+// Inheritance font size
+input,textarea,table,th,td,fieldset,button,select {
+	background-color:inherit;
+    font-size:inherit;
+}
+
+
+// base ux feedback (GUI - mouse)
+input[type='checkbox']+label,
+input[type='radio']+label,
+input[type="submit"],
+button {
+    cursor:pointer;
+}
+
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+
+
+
+// link
+a {
+	color:inherit;
+    cursor:pointer;
+}
+
+a:link {
+    text-decoration:none;
+}
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+// input
+input[type="text"],
+input[type="email"] {
+	color:inherit;
+	border-color:transparent;
+}
+
+
+input[type="email"]::placeholder {
+	color:$gray;
+}
+
+
+input[type="number"] {
+	&::-webkit-inner-spin-button,
+	&::-webkit-outer-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
+	}
+}
+
+input[type='checkbox'] {
+	@include screen_reader();
+	visibility:hidden;
+
+	+ label {
+
+		transition:color 0.4s;
+		&:before {
+			content:'';
+			vertical-align:calc((1em - 20px) / 2);
+			display:inline-block;
+			font-size:inherit;
+			width:1rem;
+			height:1rem;
+			line-height:inherit;
+			border-radius:2px;
+			margin-right:0.6em;
+
+			border:1px solid $dark-gray;
+			transition:background-image 0.4s, background-color 0.2s;
+		}
+
+		// uncheck
+		&:before {
+			// background-color:$gray;
+		}
+
+	}
+
+	+ label:hover,
+	&:checked + label {
+		color:$white;
+	}
+
+	&:checked {
+		& + label:before {
+			border-color:transparent;
+			background:url('../image/check.svg') center center no-repeat $pink;
+		}
+	}
+}
+
+// button
+button {
+	color:inherit;
+	border-color:transparent;
+	outline:0;
+}
+
+
+
+// select
+// --------------------------------------------------------------------------------
+select {
+	outline:0;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+
+select {
+	color:$white;
+	font-size:$small;
+	height: 42px;
+
+	display:inline-block;
+	background: url(../image/icon-dropdown.svg) calc(100% - 16px) calc(50%) no-repeat #161616;
+	background-size: 20px 20px;
+	border:0;
+	border-radius: 2px;
+	width:160px;
+	padding:0 14px;
+
+	option:disabled {
+		display:none;
+	}
+}
+
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+// table
+// reset to related table
+table {
+    border-collapse: collapse;
+	border-spacing: 0;
+    width:100%;
+
+    th:first-letter {
+        text-transform:uppercase;
+    }
+
+	caption {
+		@include screen_reader();
+	}
+}
+
+// for eoshub.io
+table {
+	border-collapse:collapse;
+	background-color:$xxx-dark-gray;
+
+	thead tr {
+		border-bottom:1px solid $xx-dark-gray;
+	}
+
+	th,td {
+		padding:16px 12px;;
+	}
+
+	th {
+		font-size:$small;
+		color:$white;
+		font-weight:$light;
+		text-align:left;
+		&:first-child {
+			text-align:center;
+		}
+	}
+
+	td {
+		font-size:$x-small;
+		em {
+			color:$pink;
+		}
+	}
+
+	td:first-child {
+		text-align:center;
+	}
+
+	tbody tr {
+		border-top:1px solid $xxxx-dark-gray;
+	}
+
+}
+

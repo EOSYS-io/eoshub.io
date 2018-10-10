@@ -16,7 +16,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :orders, only: [:create] do
+  resources :orders, only: [:create, :show] do
     collection do
       post 'request_payment'
     end

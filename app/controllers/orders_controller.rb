@@ -38,7 +38,7 @@ class OrdersController < ApplicationController
     @order_params = create_params
 
     if @order_params&.dig(:cid).present?
-      Order.create!(
+      order = Order.create!(
         eos_account: @order_params[:user_id],
         order_no: @order_params[:order_no],
         pgcode: @order_params[:pgcode],
@@ -50,7 +50,14 @@ class OrdersController < ApplicationController
         bank_name: @order_params[:bank_name],
         expire_date: Date.parse(@order_params[:expire_date])
       )
+
+      redirect_to action: 'show', id: order.id
     end
+  end
+
+  def show
+    @order = Order.find_by(id: params[:id])
+    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
   end
 
   private
