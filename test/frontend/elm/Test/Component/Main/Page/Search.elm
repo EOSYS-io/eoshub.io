@@ -2,7 +2,8 @@ module Test.Component.Main.Page.Search exposing (tests)
 
 import Component.Main.Page.Search
     exposing
-        ( actionHidden
+        ( actionCategory
+        , actionHidden
         , filterDelbandWithAccountName
         , initModel
         , sumStakedToList
@@ -81,55 +82,55 @@ tests =
             , describe "actionHidden"
                 [ test "transfer, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "transfer" defaultAccount.actionCategory "transfer")
+                        Expect.equal False (actionHidden "transfer" actionCategory "transfer")
                 , test "transfer, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "transfer" defaultAccount.actionCategory "not transfer")
+                        Expect.equal True (actionHidden "transfer" actionCategory "not transfer")
                 , test "claimrewards, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "claimrewards" defaultAccount.actionCategory "claimrewards")
+                        Expect.equal False (actionHidden "claimrewards" actionCategory "claimrewards")
                 , test "claimrewards, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "claimrewards" defaultAccount.actionCategory "not claimrewards")
+                        Expect.equal True (actionHidden "claimrewards" actionCategory "not claimrewards")
                 , test "ram, buyram, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" defaultAccount.actionCategory "buyram")
+                        Expect.equal False (actionHidden "ram" actionCategory "buyram")
                 , test "ram, buyrambytes hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" defaultAccount.actionCategory "buyrambytes")
+                        Expect.equal False (actionHidden "ram" actionCategory "buyrambytes")
                 , test "ram, sellram hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" defaultAccount.actionCategory "sellram")
+                        Expect.equal False (actionHidden "ram" actionCategory "sellram")
                 , test "ram, not ram, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "ram" defaultAccount.actionCategory "not ram")
+                        Expect.equal True (actionHidden "ram" actionCategory "not ram")
                 , test "resource, delegatebw, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "resource" defaultAccount.actionCategory "delegatebw")
+                        Expect.equal False (actionHidden "resource" actionCategory "delegatebw")
                 , test "resource, undelegatebw hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "resource" defaultAccount.actionCategory "undelegatebw")
+                        Expect.equal False (actionHidden "resource" actionCategory "undelegatebw")
                 , test "resource, not resource, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "resource" defaultAccount.actionCategory "not resource")
+                        Expect.equal True (actionHidden "resource" actionCategory "not resource")
                 , test "regproxy, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "regproxy" defaultAccount.actionCategory "regproxy")
+                        Expect.equal False (actionHidden "regproxy" actionCategory "regproxy")
                 , test "regproxy, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "regproxy" defaultAccount.actionCategory "not regproxy")
+                        Expect.equal True (actionHidden "regproxy" actionCategory "not regproxy")
                 , test "voteproducer, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "voteproducer" defaultAccount.actionCategory "voteproducer")
+                        Expect.equal False (actionHidden "voteproducer" actionCategory "voteproducer")
                 , test "voteproducer, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "voteproducer" defaultAccount.actionCategory "not voteproducer")
+                        Expect.equal True (actionHidden "voteproducer" actionCategory "not voteproducer")
                 , test "newaccount, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "newaccount" defaultAccount.actionCategory "newaccount")
+                        Expect.equal False (actionHidden "newaccount" actionCategory "newaccount")
                 , test "newaccount, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "newaccount" defaultAccount.actionCategory "not newaccount")
+                        Expect.equal True (actionHidden "newaccount" actionCategory "not newaccount")
                 ]
             ]
         ]

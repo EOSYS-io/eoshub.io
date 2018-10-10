@@ -3,6 +3,7 @@ module Component.Main.Page.Search exposing
     , Model
     , Pagination
     , SelectedActionCategory
+    , actionCategory
     , actionHidden
     , filterDelbandWithAccountName
     , getActions
@@ -88,7 +89,6 @@ import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
-import Set exposing (Set)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
@@ -111,7 +111,6 @@ type alias Model =
     , delbandTable : List Row
     , actions : List Action
     , pagination : Pagination
-    , actionCategory : Dict String (Set String)
     , selectedActionCategory : SelectedActionCategory
     , openedActionSeq : Int
     }
@@ -147,19 +146,22 @@ initModel accountName =
         , offset = -30
         , isEnd = False
         }
-    , actionCategory =
-        Dict.fromList
-            [ ( "transfer", Set.fromList [ "transfer" ] )
-            , ( "claimrewards", Set.fromList [ "claimrewards" ] )
-            , ( "ram", Set.fromList [ "buyram", "buyrambytes", "sellram" ] )
-            , ( "resource", Set.fromList [ "delegatebw", "undelegatebw" ] )
-            , ( "regproxy", Set.fromList [ "regproxy" ] )
-            , ( "voteproducer", Set.fromList [ "voteproducer" ] )
-            , ( "newaccount", Set.fromList [ "newaccount" ] )
-            ]
     , selectedActionCategory = "all"
     , openedActionSeq = -1
     }
+
+
+actionCategory : Dict String (List String)
+actionCategory =
+    Dict.fromList
+        [ ( "transfer", [ "transfer" ] )
+        , ( "claimrewards", [ "claimrewards" ] )
+        , ( "ram", [ "buyram", "buyrambytes", "sellram" ] )
+        , ( "resource", [ "delegatebw", "undelegatebw" ] )
+        , ( "regproxy", [ "regproxy" ] )
+        , ( "voteproducer", [ "voteproducer" ] )
+        , ( "newaccount", [ "newaccount" ] )
+        ]
 
 
 initCmd : String -> Model -> Cmd Message
@@ -278,7 +280,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, delbandTable, actions, actionCategory, selectedActionCategory, openedActionSeq } as model) =
+view language ({ account, delbandTable, actions, selectedActionCategory, openedActionSeq } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -442,7 +444,7 @@ view language ({ account, delbandTable, actions, actionCategory, selectedActionC
                             ]
                         ]
                     , tbody []
-                        (viewActionList language selectedActionCategory actionCategory account.accountName openedActionSeq actions)
+                        (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
                     ]
                 , div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ShowMore ]
@@ -609,14 +611,14 @@ viewAccountSpan value =
         ]
 
 
-viewActionList : Language -> SelectedActionCategory -> Dict String (Set String) -> String -> Int -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory actionCategory accountName openedActionSeq actions =
-    List.map (viewAction language selectedActionCategory actionCategory accountName openedActionSeq) actions
+viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
+viewActionList language selectedActionCategory accountName openedActionSeq actions =
+    List.map (viewAction language selectedActionCategory accountName openedActionSeq) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> Dict String (Set String) -> String -> Int -> Action -> Html Message
-viewAction _ selectedActionCategory actionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
+viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
@@ -628,23 +630,19 @@ viewAction _ selectedActionCategory actionCategory accountName openedActionSeq (
         ]
 
 
-actionHidden : SelectedActionCategory -> Dict String (Set String) -> String -> Bool
+actionHidden : SelectedActionCategory -> Dict String (List String) -> String -> Bool
 actionHidden selectedActionCategory actionCategory currentAction =
     let
         maybeSet =
-            case Dict.get selectedActionCategory actionCategory of
-                Just set ->
-                    set
-
-                Nothing ->
-                    Set.empty
+            Dict.get selectedActionCategory actionCategory
+                |> Maybe.withDefault []
     in
     case selectedActionCategory of
         "all" ->
             False
 
         _ ->
-            if Set.member currentAction maybeSet then
+            if List.member currentAction maybeSet then
                 False
 
             else
