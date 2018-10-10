@@ -214,6 +214,7 @@ type I18n
     | VoteRate
     | TotalVotedEos
     | TotalEosSupply
+    | TypeSellAmount
     | Rank
     | SearchBpCandidate
     | Poll
@@ -462,7 +463,7 @@ getMessages i18n =
 
         ProxyVote ->
             { korean = "대리투표"
-            , english = "Proxy Voting"
+            , english = "Proxy Vote"
             , chinese = "代理投票"
             }
 
@@ -1116,7 +1117,7 @@ getMessages i18n =
 
         BuyableAmount ->
             { korean = "구매 가능 수량"
-            , english = "Buyable Amount"
+            , english = "Available Balance"
             , chinese = "可购买数量"
             }
 
@@ -1130,6 +1131,12 @@ getMessages i18n =
             { korean = "구매할 수량을 입력하세요"
             , english = "Enter amount to buy"
             , chinese = "请输入要购买的数量"
+            }
+
+        TypeSellAmount ->
+            { korean = "판매할 수량을 입력하세요"
+            , english = "Enter amount to sell"
+            , chinese = "请输入要销售的数量"
             }
 
         BuyFeeCharged ->
@@ -1146,7 +1153,7 @@ getMessages i18n =
 
         SellableAmount ->
             { korean = "판매 가능 수량"
-            , english = "Sellable Amount"
+            , english = "Available RAM Amount"
             , chinese = "可销售数量"
             }
 
@@ -1188,7 +1195,7 @@ getMessages i18n =
 
         ApproximateQuantity quantity unit ->
             { korean = "약 " ++ quantity ++ " " ++ unit
-            , english = "Approximately " ++ quantity ++ " " ++ unit
+            , english = "approx. " ++ quantity ++ " " ++ unit
             , chinese = "大约" ++ quantity ++ " " ++ unit
             }
 

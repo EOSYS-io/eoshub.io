@@ -119,7 +119,7 @@ type alias SellramParameters =
 
 initSellramParameters : SellramParameters
 initSellramParameters =
-    { kiloBytes = "0"
+    { kiloBytes = ""
     }
 
 
@@ -587,7 +587,7 @@ buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model)
                 , byteText
                 , TypeBytesAmount
                 , byteQuant
-                , ""
+                , translate language TypeSellAmount
                 , not sellModel.isValid
                 )
 
