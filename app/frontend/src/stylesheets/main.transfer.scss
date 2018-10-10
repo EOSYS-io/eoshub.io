@@ -106,6 +106,29 @@ main.transfer .wallet.status {
 			font-weight: 300;
 			color: $white;
 		}
+
+		span.validate.description {
+			display:block;
+			margin-top:12px;
+			&:before {
+				content:'';
+				display:inline-block;
+				width:10px;
+				height:10px;
+				border-radius:100%;
+				margin-right:0.4em;
+
+				vertical-align:baseline;
+			}
+		}
+
+		span.validate.description.true:before {
+			background-color:$green
+		}
+
+		span.validate.description.false:before {
+			background-color:$red
+		}
 	}
 
 	a {

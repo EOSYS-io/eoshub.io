@@ -151,20 +151,21 @@ main.index .menu_area .container {
 // --------------------------------------------------------------------------------
 // details :: index > dapps
 // --------------------------------------------------------------------------------
-main.index .dapps {
+main.index .dashboard {
 	position:relative;
-	margin-top:40px;
+	margin-top:64px;
 
 	h2 {
 		font-size: rem(20);
 		color: $white;
-		padding-left:32px;
-		background:url('../image/icon-application.svg') left center no-repeat;
-		background-size:22px 22px;
+		// padding-left:32px;
+		// background:url('../image/icon-application.svg') left center no-repeat;
+		// background-size:22px 22px;
 
 		+ p {
 			font-size:rem(14);
 		}
+
 	}
 
 	.rolling.banner {
@@ -177,6 +178,12 @@ main.index .dapps {
 		color:$white;
 
 		margin-top:24px;
+	}
+
+	ul,li {
+		margin:0;
+		padding:0;
+		list-style-type:none;
 	}
 
 	.container {
@@ -215,7 +222,37 @@ main.index .dapps {
 				color:#999;
 			}
 		}
+	}
 
+	.mainnet.status {
+		display:grid;
+		grid-template-columns:repeat(4,25%);
+		grid-template-rows:112px;
+		margin:24px -6px;
+
+		li {
+			padding:0 32px;
+			box-sizing:border-box;
+			display:flex;
+			justify-content:center;
+			flex-direction:column;
+			border-radius:4px;
+			margin:6px;
+			background-color:$xx-dark-gray;
+
+			strong {
+				color:$white;
+				font-weight:$light;
+			}
+
+			span {
+				margin-top:6px;
+				font-size:$small;
+				max-width:100%;
+				overflow:hidden;
+				text-overflow:ellipsis;
+			}
+		}
 	}
 }
 
