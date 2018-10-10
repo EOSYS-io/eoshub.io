@@ -158,6 +158,9 @@ type I18n
     | SearchAccount
     | SearchResultAccount
     | Account
+    | SelfStaked
+    | StakedTo
+    | StakedBy
     | Resource
     | Transactions
     | Number
@@ -885,6 +888,24 @@ getMessages i18n =
             { korean = "계정 이름"
             , english = "Account"
             , chinese = "账户名"
+            }
+
+        SelfStaked ->
+            { korean = "셀프 스테이크"
+            , english = "Self Staked"
+            , chinese = "Self Staked"
+            }
+
+        StakedTo ->
+            { korean = "스테이크 해준 양"
+            , english = "Self Staked"
+            , chinese = "Self Staked"
+            }
+
+        StakedBy ->
+            { korean = "스테이크 받은 양"
+            , english = "Staked by others"
+            , chinese = "Staked by others"
             }
 
         Resource ->

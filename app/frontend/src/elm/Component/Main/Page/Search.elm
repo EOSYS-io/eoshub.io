@@ -1,4 +1,25 @@
-module Component.Main.Page.Search exposing (Message(..), Model, Pagination, SelectedActionCategory, actionHidden, getActions, initCmd, initModel, update, view, viewAction, viewActionList)
+module Component.Main.Page.Search exposing
+    ( Message(..)
+    , Model
+    , Pagination
+    , SelectedActionCategory
+    , actionHidden
+    , filterDelbandWithAccountName
+    , getActions
+    , initCmd
+    , initModel
+    , sumStakedToList
+    , update
+    , view
+    , viewAccountSpan
+    , viewAction
+    , viewActionList
+    , viewKeyAccountPermList
+    , viewKeyPermSpan
+    , viewPermission
+    , viewPermissionSection
+    , viewStakedDetail
+    )
 
 import Data.Account
     exposing
@@ -16,6 +37,7 @@ import Data.Account
         , getUnstakingAmount
         )
 import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
+import Data.Table exposing (Row(..))
 import Html
     exposing
         ( Html
@@ -68,11 +90,13 @@ import Json.Encode as Encode
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( floatToAsset
+        ( assetAdd
+        , assetSubtract
+        , floatToAsset
         , larimerToEos
         , timeFormatter
         )
-import Util.HttpRequest exposing (getAccount, getFullPath, post)
+import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 
 
 
@@ -82,6 +106,7 @@ import Util.HttpRequest exposing (getAccount, getFullPath, post)
 type alias Model =
     { query : String
     , account : Account
+    , delbandTable : List Row
     , actions : List Action
     , pagination : Pagination
     , selectedActionCategory : SelectedActionCategory
@@ -111,6 +136,7 @@ initModel : String -> Model
 initModel accountName =
     { query = accountName
     , account = defaultAccount
+    , delbandTable = []
     , actions = []
     , pagination =
         { latestActionSeq = 0
@@ -133,8 +159,12 @@ initCmd query { pagination } =
 
         actionsCmd =
             getActions query pagination.nextPos pagination.offset
+
+        delbandCmd =
+            getTableRows "eosio" query "delband"
+                |> Http.send OnFetchTableRows
     in
-    Cmd.batch [ accountCmd, actionsCmd ]
+    Cmd.batch [ accountCmd, actionsCmd, delbandCmd ]
 
 
 getActions : String -> Int -> Int -> Cmd Message
@@ -158,6 +188,7 @@ getActions query nextPos offset =
 
 type Message
     = OnFetchAccount (Result Http.Error Account)
+    | OnFetchTableRows (Result Http.Error (List Row))
     | OnFetchActions (Result Http.Error (List Action))
     | SelectActionCategory SelectedActionCategory
     | ShowMore
@@ -171,6 +202,12 @@ update message ({ query, pagination, openedActionSeq } as model) =
             ( { model | account = data }, Cmd.none )
 
         OnFetchAccount (Err _) ->
+            ( model, Cmd.none )
+
+        OnFetchTableRows (Ok rows) ->
+            ( { model | delbandTable = rows }, Cmd.none )
+
+        OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
 
         OnFetchActions (Ok actions) ->
@@ -190,7 +227,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
 
             else
-                -- no more action to load
+                -- NOTE(boseok): There're no more actions to load
                 ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
 
         OnFetchActions (Err _) ->
@@ -228,7 +265,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language { account, actions, selectedActionCategory, openedActionSeq } =
+view language ({ account, delbandTable, actions, selectedActionCategory, openedActionSeq } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -276,25 +313,7 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
                         , strong [ title stakedAmount ]
                             [ text stakedAmount ]
                         , i [] [ text "more infomation" ]
-                        , b []
-                            -- TODO(boseok): Get the real data with new request
-                            [ u []
-                                [ text "스테이크함:a1234567890" ]
-                            , u []
-                                [ text "스테이크 받음:a1234567890" ]
-                            , u []
-                                [ text "스테이크 해줌:a1234567890" ]
-                            , s []
-                                [ text "eosyskoreabp : 0.005 EOS" ]
-                            , s []
-                                [ text "eosyskoreabp : 0.005 EOS" ]
-                            , s []
-                                [ text "eosyskoreabp : 0.005 EOS" ]
-                            , s []
-                                [ text "eosyskoreabp : 0.005 EOS" ]
-                            , s []
-                                [ text "eosyskoreabp : 0.005 EOS" ]
-                            ]
+                        , viewStakedDetail language model
                         ]
                     , li []
                         [ span [] [ text "Unstaked" ]
@@ -409,6 +428,93 @@ view language { account, actions, selectedActionCategory, openedActionSeq } =
         ]
 
 
+viewStakedDetail : Language -> Model -> Html Message
+viewStakedDetail language ({ account, delbandTable } as model) =
+    let
+        { totalResources, selfDelegatedBandwidth } =
+            account
+
+        totalResourceAmount =
+            assetAdd totalResources.cpuWeight totalResources.netWeight
+
+        selfStakedAmount =
+            assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
+
+        stakedByAmount =
+            assetSubtract totalResourceAmount selfStakedAmount
+
+        stakedToAmount =
+            sumStakedToList delbandTable account.accountName
+
+        totalList =
+            [ uElement language SelfStaked selfStakedAmount
+            , uElement language StakedBy stakedByAmount
+            , uElement language StakedTo stakedToAmount
+            ]
+
+        uElement language i18n amount =
+            u []
+                [ text
+                    (translate language i18n
+                        ++ ": "
+                        ++ amount
+                    )
+                ]
+
+        delbandList =
+            delbandTable
+                |> filterDelbandWithAccountName account.accountName
+                |> List.map
+                    (\maybeDelband ->
+                        let
+                            ( receiver, sum ) =
+                                case maybeDelband of
+                                    Delband value ->
+                                        ( value.receiver, assetAdd value.cpuWeight value.netWeight )
+
+                                    _ ->
+                                        ( "", "0 EOS" )
+                        in
+                        s [] [ text (receiver ++ ": " ++ sum) ]
+                    )
+    in
+    b []
+        (List.append totalList delbandList)
+
+
+sumStakedToList : List Row -> String -> String
+sumStakedToList delbandTable accountName =
+    let
+        delbandEachSumList =
+            delbandTable
+                |> filterDelbandWithAccountName accountName
+                |> List.map
+                    (\maybeDelband ->
+                        case maybeDelband of
+                            Delband value ->
+                                assetAdd value.cpuWeight value.netWeight
+
+                            _ ->
+                                "0 EOS"
+                    )
+    in
+    List.foldl assetAdd "0 EOS" delbandEachSumList
+
+
+filterDelbandWithAccountName : String -> List Row -> List Row
+filterDelbandWithAccountName accountName delbandTable =
+    List.filter
+        (\maybeDelband ->
+            case maybeDelband of
+                Delband value ->
+                    value.receiver /= accountName
+
+                _ ->
+                    False
+        )
+        delbandTable
+
+
 viewPermissionSection : Language -> Account -> Html Message
 viewPermissionSection language account =
     section [ class "permission" ]
@@ -438,8 +544,6 @@ viewPermission accountName { permName, requiredAuth } =
             [ text (accountName ++ "@" ++ permName) ]
         , td []
             [ text (requiredAuth.threshold |> toString) ]
-
-        -- TODO(boseok): Several perms
         , td []
             (viewKeyAccountPermList requiredAuth)
         ]
