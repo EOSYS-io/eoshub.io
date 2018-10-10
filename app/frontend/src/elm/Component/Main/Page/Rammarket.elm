@@ -568,12 +568,7 @@ buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model)
                 ( " ing"
                 , ""
                 , a
-                    (if not buyModel.proxyBuy then
-                        [ onClick ToggleModal ]
-
-                     else
-                        []
-                    )
+                    [ onClick ToggleModal, hidden buyModel.proxyBuy ]
                     [ text (translate language BuyForOtherAccount) ]
                 , translate language Buy
                 , "EOS"
