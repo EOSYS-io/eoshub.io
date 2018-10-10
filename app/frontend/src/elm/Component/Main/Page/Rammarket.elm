@@ -481,7 +481,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                             , th [ scope "col" ]
                                 [ text (translate language Time) ]
                             , th [ scope "col" ]
-                                [ text "Tx Id" ]
+                                [ text "Tx ID" ]
                             ]
                         ]
                     , tbody [] actionTableRows
