@@ -163,7 +163,7 @@ type I18n
     | StakedBy
     | Resource
     | Transactions
-    | Number
+    | TxId
     | Type
     | Time
     | Info
@@ -929,10 +929,10 @@ getMessages i18n =
             , chinese = "交易"
             }
 
-        Number ->
-            { korean = "번호"
-            , english = "No."
-            , chinese = "号码"
+        TxId ->
+            { korean = "트랜잭션 id"
+            , english = "Tx id"
+            , chinese = "Tx id"
             }
 
         Type ->

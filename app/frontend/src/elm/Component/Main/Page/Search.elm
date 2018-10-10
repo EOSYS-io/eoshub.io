@@ -434,7 +434,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                     [ thead []
                         [ tr []
                             [ th [ scope "col" ]
-                                [ text (translate language Number) ]
+                                [ text (translate language TxId) ]
                             , th [ scope "col" ]
                                 [ text (translate language Type) ]
                             , th [ scope "col" ]
@@ -618,10 +618,10 @@ viewActionList language selectedActionCategory accountName openedActionSeq actio
 
 
 viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction _ selectedActionCategory accountName openedActionSeq ({ trxId, accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
-        [ td []
-            [ text (toString accountActionSeq) ]
+        [ td [ title trxId ]
+            [ text trxId ]
         , td []
             [ text actionTag ]
         , td []
