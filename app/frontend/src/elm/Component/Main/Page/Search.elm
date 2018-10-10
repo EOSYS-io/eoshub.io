@@ -288,7 +288,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, delbandTable, actions, selectedActionCategory, openedActionSeq } as model) =
+view language ({ account, actions, selectedActionCategory, openedActionSeq } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -429,7 +429,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
 
 
 viewStakedDetail : Language -> Model -> Html Message
-viewStakedDetail language ({ account, delbandTable } as model) =
+viewStakedDetail language { account, delbandTable } =
     let
         { totalResources, selfDelegatedBandwidth } =
             account
@@ -446,13 +446,7 @@ viewStakedDetail language ({ account, delbandTable } as model) =
         stakedToAmount =
             sumStakedToList delbandTable account.accountName
 
-        totalList =
-            [ uElement language SelfStaked selfStakedAmount
-            , uElement language StakedBy stakedByAmount
-            , uElement language StakedTo stakedToAmount
-            ]
-
-        uElement language i18n amount =
+        uElement i18n amount =
             u []
                 [ text
                     (translate language i18n
@@ -460,6 +454,12 @@ viewStakedDetail language ({ account, delbandTable } as model) =
                         ++ amount
                     )
                 ]
+
+        totalList =
+            [ uElement SelfStaked selfStakedAmount
+            , uElement StakedBy stakedByAmount
+            , uElement StakedTo stakedToAmount
+            ]
 
         delbandList =
             delbandTable
