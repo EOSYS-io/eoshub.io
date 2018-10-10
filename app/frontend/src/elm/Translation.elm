@@ -240,6 +240,30 @@ type I18n
     | Permission
     | Threshold
     | Keys
+    | Stake
+    | Unstake
+    | Delegate
+    | Undelegate
+    | AutoAllocation
+    | StakeAvailableAmount
+    | SetManually
+    | TypeStakeAmount
+    | NeverExceedStakeAmount
+    | AutoStakeAmountDesc String String
+    | ExceedStakeAmount
+    | InvalidInputAmount
+    | RecommendedStakeAmount String String
+    | Cancel
+    | TypeUnstakeAmount
+    | DelegateAvailableAmount
+    | DelegatedList
+    | TypeAccountToDelegate
+    | TypeDelegateAmount
+    | ExceedDelegateAmount
+    | NeverExceedDelegateAmount
+    | DelegatedAmount String
+    | Select
+    | TypeAccount
 
 
 translate : Language -> I18n -> String
@@ -448,15 +472,15 @@ getMessages i18n =
             }
 
         ManageResource ->
-            { korean = "리소스 관리"
-            , english = "Manage Resource"
-            , chinese = "管理资源"
+            { korean = "CPU / NET"
+            , english = "CPU / NET"
+            , chinese = "CPU/NET"
             }
 
         ManageResourceDesc ->
-            { korean = "CPU, 네트워크 자원관리를 하실 수 있어요"
-            , english = "Manage CPU, Network"
-            , chinese = "在这儿可以管理CPU和网络资源"
+            { korean = "리소스를 관리할 수 있어요 :)"
+            , english = "Manage your resource here :)"
+            , chinese = "可以管理资源：）"
             }
 
         Vote ->
@@ -563,7 +587,7 @@ getMessages i18n =
 
         Confirm ->
             { korean = "확인"
-            , english = "Verify"
+            , english = "Confirm"
             , chinese = "确认"
             }
 
@@ -1049,19 +1073,19 @@ getMessages i18n =
 
         UnstakeInvalidQuantity resourceType ->
             { korean = resourceType ++ "의 수량입력이 잘못되었습니다"
-            , english = ""
+            , english = "Invalid " ++ resourceType ++ " amount"
             , chinese = resourceType ++ "数量输入有误"
             }
 
         UnstakeOverValidQuantity resourceType ->
             { korean = "언스테이크 가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
-            , english = ""
-            , chinese = ""
+            , english = "The " ++ resourceType ++ " input exceeds the available balance."
+            , chinese = "超过了可输入的" ++ resourceType ++ "数量"
             }
 
         UnstakePossible ->
             { korean = "언스테이크 가능합니다 :)"
-            , english = ""
+            , english = "Unstake available :)"
             , chinese = "可以进行Unstake：）"
             }
 
@@ -1399,4 +1423,148 @@ getMessages i18n =
             { korean = "키값"
             , english = "Keys"
             , chinese = "Key值"
+            }
+
+        Stake ->
+            { korean = "스테이크"
+            , english = "Stake"
+            , chinese = "Stake"
+            }
+
+        Unstake ->
+            { korean = "언스테이크"
+            , english = "Unstake"
+            , chinese = "Unstake"
+            }
+
+        Delegate ->
+            { korean = "임대하기"
+            , english = "Delegate"
+            , chinese = "租出去"
+            }
+
+        Undelegate ->
+            { korean = "임대취소하기"
+            , english = "Undelegate"
+            , chinese = "租回来"
+            }
+
+        AutoAllocation ->
+            { korean = "CPU, NET에 각각 4:1의 비율로 자동 분배됩니다"
+            , english = "Auto-set in 4:1 to CPU, NET"
+            , chinese = "在CPU和NET以4:1的比率进行自动分配"
+            }
+
+        StakeAvailableAmount ->
+            { korean = "스테이크 가능 수량"
+            , english = "Available Balance"
+            , chinese = "可stake数量"
+            }
+
+        SetManually ->
+            { korean = "직접설정"
+            , english = "Edit"
+            , chinese = "亲自设定"
+            }
+
+        TypeStakeAmount ->
+            { korean = "스테이크 할 수량을 입력하세요"
+            , english = "Enter the amount to stake"
+            , chinese = "请输入要stake的数量"
+            }
+
+        NeverExceedStakeAmount ->
+            { korean = "스테이크 가능 수량만큼 입력 가능합니다"
+            , english = "The input cannot exceed the available balance"
+            , chinese = "只能输入可stake的数量范围内"
+            }
+
+        AutoStakeAmountDesc cpu net ->
+            { korean = "CPU " ++ cpu ++ " EOS / NET " ++ net ++ " EOS 만큼 스테이크 됩니다 (자동설정)"
+            , english = "The input cannot exceed the available balance"
+            , chinese = "只能输入可stake的数量范围内"
+            }
+
+        ExceedStakeAmount ->
+            { korean = "스테이크 가능 수량을 초과했습니다"
+            , english = "The input exceeds the available balance"
+            , chinese = "超过了可输入数量"
+            }
+
+        InvalidInputAmount ->
+            { korean = "수량 입력이 잘못되었습니다"
+            , english = "Invalid input amount"
+            , chinese = "输入数量有误"
+            }
+
+        RecommendedStakeAmount cpu net ->
+            { korean = "CPU와 NET에 각각 최소 " ++ cpu ++ ", " ++ net ++ " EOS 이상 스테이크 해주세요"
+            , english = "Please stake over " ++ cpu ++ " and " ++ net ++ " for CPU and NET"
+            , chinese = "请各在CPU和NET至少stake" ++ cpu ++ "和" ++ net ++ "以上"
+            }
+
+        Cancel ->
+            { korean = "취소"
+            , english = "Cancel"
+            , chinese = "取消"
+            }
+
+        TypeUnstakeAmount ->
+            { korean = "언스테이크 할 수량을 입력하세요"
+            , english = "Enter amount to unstake"
+            , chinese = "请输入要unstake的数量"
+            }
+
+        DelegateAvailableAmount ->
+            { korean = "임대 가능 수량"
+            , english = "Available Balance"
+            , chinese = "可租数量"
+            }
+
+        NeverExceedDelegateAmount ->
+            { korean = "임대 가능 수량만큼 입력 가능합니다"
+            , english = "The input cannot exceed the available balance"
+            , chinese = "输入数量不能超过可租数量"
+            }
+
+        DelegatedList ->
+            { korean = "임대 받은 계정 리스트"
+            , english = "List of delegated accounts"
+            , chinese = "被租的账户名单"
+            }
+
+        TypeAccountToDelegate ->
+            { korean = "임대 받을 계정명을 입력하세요"
+            , english = "Enter account name to delegate"
+            , chinese = "请输入被租的账户名"
+            }
+
+        TypeDelegateAmount ->
+            { korean = "임대 할 수량을 입력하세요"
+            , english = "Enter amount to delegate"
+            , chinese = "请输入要租的数量"
+            }
+
+        ExceedDelegateAmount ->
+            { korean = "임대 가능 수량을 초과했습니다"
+            , english = "The input exceeds the available balance"
+            , chinese = "超过了可租数量"
+            }
+
+        DelegatedAmount resourceType ->
+            { korean = resourceType ++ " 임대 수량"
+            , english = resourceType ++ " delegated"
+            , chinese = resourceType ++ "的可租数量"
+            }
+
+        Select ->
+            { korean = "선택"
+            , english = "Select"
+            , chinese = "选择"
+            }
+
+        TypeAccount ->
+            { korean = "계정명을 입력하세요"
+            , english = "Enter account name"
+            , chinese = "请输入账户名"
             }

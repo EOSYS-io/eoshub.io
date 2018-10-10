@@ -203,14 +203,14 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         [ div [ class "my resource" ]
             [ div []
                 [ h3 []
-                    [ text "SELF CPU 스테이크 양"
+                    [ text "CPU self-staked"
                     , strong []
                         [ text selfDelegatedBandwidth.cpuWeight ]
                     ]
                 ]
             , div []
                 [ h3 []
-                    [ text "SELF NET 스테이크 양"
+                    [ text "NET self-staked"
                     , strong []
                         [ text selfDelegatedBandwidth.netWeight ]
                     ]
@@ -219,7 +219,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         , section []
             -- NOTE(boseok): new design is needed
             [ h3 []
-                [ text ("CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.") ]
+                [ text (translate language (RecommendedStakeAmount minimumResource.cpu minimumResource.net)) ]
             , p [ class ("validate description" ++ validatedAttr) ]
                 [ text validatedText ]
             , div [ class "field group" ]
@@ -228,7 +228,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "CPU" ]
                     , input
                         [ attribute "data-validate" cpuValidateAttr
-                        , placeholder "CPU 언스테이크 할 수량 입력"
+                        , placeholder (translate language TypeUnstakeAmount)
                         , step "0.0001"
                         , type_ "number"
                         , onInput CpuAmountInput
@@ -237,17 +237,17 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , percentageButton Cpu percentageOfCpu Percentage10
-                    , percentageButton Cpu percentageOfCpu Percentage50
-                    , percentageButton Cpu percentageOfCpu Percentage70
-                    , percentageButton Cpu percentageOfCpu Percentage100
+                    , percentageButton language Cpu percentageOfCpu Percentage10
+                    , percentageButton language Cpu percentageOfCpu Percentage50
+                    , percentageButton language Cpu percentageOfCpu Percentage70
+                    , percentageButton language Cpu percentageOfCpu Percentage100
                     ]
                 , div [ class "input field" ]
                     [ label [ for "net" ]
                         [ text "NET" ]
                     , input
                         [ attribute "data-validate" netValidateAttr
-                        , placeholder "NET 언스테이크할 수량 입력"
+                        , placeholder (translate language TypeUnstakeAmount)
                         , step "0.0001"
                         , type_ "number"
                         , onInput NetAmountInput
@@ -256,10 +256,10 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , percentageButton Net percentageOfNet Percentage10
-                    , percentageButton Net percentageOfNet Percentage50
-                    , percentageButton Net percentageOfNet Percentage70
-                    , percentageButton Net percentageOfNet Percentage100
+                    , percentageButton language Net percentageOfNet Percentage10
+                    , percentageButton language Net percentageOfNet Percentage50
+                    , percentageButton language Net percentageOfNet Percentage70
+                    , percentageButton language Net percentageOfNet Percentage100
                     ]
                 ]
             , div [ class "btn_area" ]
@@ -269,14 +269,14 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                     , type_ "button"
                     , onClick SubmitAction
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
         ]
 
 
-percentageButton : ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
-percentageButton resourceType modelPercentageOfResource thisPercentageOfResource =
+percentageButton : Language -> ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
+percentageButton language resourceType modelPercentageOfResource thisPercentageOfResource =
     let
         ratio =
             getPercentageOfResource thisPercentageOfResource
@@ -286,7 +286,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
                 Round.round 0 (ratio * 100) ++ "%"
 
             else
-                "최대"
+                translate language Max
     in
     button
         [ type_ "button"
@@ -398,7 +398,7 @@ validateText language { cpuQuantityValidation, netQuantityValidation } =
                     ( translate language (UnstakeOverValidQuantity "CPU"), " false" )
 
                 _ ->
-                    ( "발생 불가 케이스", "" )
+                    ( "This case should not happen!", "" )
 
         else if not isNetValid then
             case netQuantityValidation of
@@ -409,10 +409,10 @@ validateText language { cpuQuantityValidation, netQuantityValidation } =
                     ( translate language (UnstakeOverValidQuantity "NET"), " false" )
 
                 _ ->
-                    ( "발생 불가 케이스", "" )
+                    ( "This case should not happen!", "" )
 
         else
-            ( "발생 불가 케이스", "" )
+            ( "This case should not happen!", "" )
 
     else
         ( "", "" )

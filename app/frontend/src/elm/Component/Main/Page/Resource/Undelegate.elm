@@ -35,7 +35,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Round
-import Translation exposing (I18n(..), Language)
+import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
         ( assetToFloat
@@ -280,20 +280,20 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegat
                     ]
                     []
                 , button [ id "viewRentalListAccount", class "choice button", type_ "button", onClick OpenDelegateListModal ]
-                    [ text "임대 계정 리스트" ]
+                    [ text (translate language DelegatedList) ]
                 ]
             ]
         , div [ class "my resource" ]
             [ div []
                 [ h3 []
-                    [ text "임대해준 CPU"
+                    [ text (translate language (DelegatedAmount "CPU"))
                     , strong []
                         [ text unstakePossibleCpu ]
                     ]
                 ]
             , div []
                 [ h3 []
-                    [ text "임대해준 NET"
+                    [ text (translate language (DelegatedAmount "NET"))
                     , strong []
                         [ text unstakePossibleNet ]
                     ]
@@ -303,8 +303,8 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegat
             [ p [ class ("validate description" ++ validatedAttr) ]
                 [ text validatedText ]
             , div [ class "field group" ]
-                [ resourceInputDiv model Cpu
-                , resourceInputDiv model Net
+                [ resourceInputDiv language model Cpu
+                , resourceInputDiv language model Net
                 ]
             , div [ class "btn_area" ]
                 [ button
@@ -313,15 +313,15 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegat
                     , type_ "button"
                     , onClick SubmitAction
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
         , modalHtml
         ]
 
 
-percentageButton : ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
-percentageButton resourceType modelPercentageOfResource thisPercentageOfResource =
+percentageButton : Language -> ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
+percentageButton language resourceType modelPercentageOfResource thisPercentageOfResource =
     let
         ratio =
             getPercentageOfResource thisPercentageOfResource
@@ -331,7 +331,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
                 Round.round 0 (ratio * 100) ++ "%"
 
             else
-                "최대"
+                translate language Max
     in
     button
         [ type_ "button"
@@ -354,8 +354,8 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
         [ text buttonText ]
 
 
-resourceInputDiv : Model -> ResourceType -> Html Message
-resourceInputDiv { undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityValidation, netQuantityValidation } resourceType =
+resourceInputDiv : Language -> Model -> ResourceType -> Html Message
+resourceInputDiv language { undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityValidation, netQuantityValidation } resourceType =
     let
         cpuValidateAttr =
             validateAttr cpuQuantityValidation
@@ -385,10 +385,10 @@ resourceInputDiv { undelegatebw, percentageOfCpu, percentageOfNet, cpuQuantityVa
             []
         , span [ class "unit" ]
             [ text "EOS" ]
-        , percentageButton resourceType percentageOfResource Percentage10
-        , percentageButton resourceType percentageOfResource Percentage50
-        , percentageButton resourceType percentageOfResource Percentage70
-        , percentageButton resourceType percentageOfResource Percentage100
+        , percentageButton language resourceType percentageOfResource Percentage10
+        , percentageButton language resourceType percentageOfResource Percentage50
+        , percentageButton language resourceType percentageOfResource Percentage70
+        , percentageButton language resourceType percentageOfResource Percentage100
         ]
 
 
@@ -495,7 +495,7 @@ validateText { cpuQuantityValidation, netQuantityValidation } =
             ( "NET의 수량입력이 잘못되었습니다", " false" )
 
         else
-            ( "발생 불가 케이스", "" )
+            ( "This case should not happen!", "" )
 
     else
         ( "", "" )
