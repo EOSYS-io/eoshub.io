@@ -424,7 +424,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                             , disabled buttonDisabled
                             , onClick SubmitVoteProducersAction
                             ]
-                            [ text (translate language Vote) ]
+                            [ text (translate language SimplifiedVote) ]
                         ]
                     ]
                 ]

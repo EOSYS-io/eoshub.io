@@ -81,6 +81,7 @@ type I18n
     | ManageResource
     | ManageResourceDesc
     | Vote
+    | SimplifiedVote
     | VoteDesc
     | RamMarket
     | RamMarketDesc
@@ -419,6 +420,12 @@ getMessages i18n =
 
         Vote ->
             { korean = "투표하기"
+            , english = "Vote"
+            , chinese = "投票"
+            }
+
+        SimplifiedVote ->
+            { korean = "투표"
             , english = "Vote"
             , chinese = "投票"
             }
