@@ -447,28 +447,19 @@ viewStakedDetail language ({ account, delbandTable } as model) =
             sumStakedToList delbandTable account.accountName
 
         totalList =
-            [ u []
-                [ text
-                    (translate language SelfStaked
-                        ++ ": "
-                        ++ selfStakedAmount
-                    )
-                ]
-            , u []
-                [ text
-                    (translate language StakedBy
-                        ++ ": "
-                        ++ stakedByAmount
-                    )
-                ]
-            , u []
-                [ text
-                    (translate language StakedTo
-                        ++ ": "
-                        ++ stakedToAmount
-                    )
-                ]
+            [ uElement language SelfStaked selfStakedAmount
+            , uElement language StakedBy stakedByAmount
+            , uElement language StakedTo stakedToAmount
             ]
+
+        uElement language i18n amount =
+            u []
+                [ text
+                    (translate language i18n
+                        ++ ": "
+                        ++ amount
+                    )
+                ]
 
         delbandList =
             delbandTable
