@@ -3,6 +3,7 @@ module Test.Component.Main.Page.Resource.Delegate exposing (tests)
 import Component.Main.Page.Resource.Delegate exposing (..)
 import Expect
 import Test exposing (..)
+import Translation exposing (Language(..))
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -169,9 +170,9 @@ tests =
                                 initModel
 
                             expected =
-                                ( "임대가능한 토큰 수만큼 임대가 가능합니다", "" )
+                                ( "임대 가능 수량만큼 입력 가능합니다", "" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity" <|
                     \() ->
                         let
@@ -184,9 +185,9 @@ tests =
                                 }
 
                             expected =
-                                ( "임대해줄 계정을 입력하세요", " false" )
+                                ( "임대 받을 계정명을 입력하세요", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 ]
             , describe "accountValidation Invalid or Empty"
                 [ test "cpu OverValidQuantity, net EmptyQuantity" <|
@@ -200,7 +201,7 @@ tests =
                             expected =
                                 ( "CPU의 수량입력이 잘못되었습니다", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu EmptyQuantity, net OverValidQuantity" <|
                     \() ->
                         let
@@ -212,7 +213,7 @@ tests =
                             expected =
                                 ( "NET의 수량입력이 잘못되었습니다", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu OverValidQuantity, net OverValidQuantity" <|
                     \() ->
                         let
@@ -225,7 +226,7 @@ tests =
                             expected =
                                 ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity, total OverValidQuantity" <|
                     \() ->
                         let
@@ -237,9 +238,9 @@ tests =
                                 }
 
                             expected =
-                                ( "임대가능 토큰수량을 초과하였습니다", " false" )
+                                ( "임대 가능 수량을 초과했습니다", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity, total ValidQuantity" <|
                     \() ->
                         let
@@ -251,9 +252,9 @@ tests =
                                 }
 
                             expected =
-                                ( "임대해줄 계정을 입력하세요", " false" )
+                                ( "임대 받을 계정명을 입력하세요", " false" )
                         in
-                        Expect.equal expected (validateText defaultModel)
+                        Expect.equal expected (validateText Korean defaultModel)
                 ]
             ]
         ]
