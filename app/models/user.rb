@@ -61,11 +61,7 @@ class User < ApplicationRecord
     end
 
     def qualify_for_event(ip_address)
-      if User.eos_account_created.where(ip_address: ip_address).count >= 3
-        false
-      else
-        true
-      end
+      User.eos_account_created.where(ip_address: ip_address).count < 3
     end
   end
 
