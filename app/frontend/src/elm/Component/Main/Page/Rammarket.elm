@@ -25,7 +25,6 @@ import Html
         ( Html
         , a
         , button
-        , caption
         , div
         , form
         , h2
@@ -53,7 +52,6 @@ import Html.Attributes
         , id
         , placeholder
         , scope
-        , title
         , type_
         , value
         )
@@ -435,11 +433,11 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
             [ section [ class "dashboard" ]
                 [ div [ class "ram status" ]
                     [ div [ class "wrapper" ]
-                        [ h3 [] [ text "이오스 램 가격" ]
+                        [ h3 [] [ text (translate language RamPrice) ]
                         , p [] [ text (rammarketTable |> calculateEosRamPrice |> formatEosPrice) ]
                         ]
                     , div [ class "wrapper" ]
-                        [ h3 [] [ text "램 점유율" ]
+                        [ h3 [] [ text (translate language RamYield) ]
                         , p [] [ text (globalTable |> calculateEosRamYield) ]
                         ]
                     , div [ class "graph", id "tv-chart-container" ] []
@@ -447,12 +445,12 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                 , div [ class "my status" ]
                     [ div [ class "summary" ]
                         [ h3 []
-                            [ text "나의 램"
+                            [ text (translate language MyRam)
                             , span []
                                 [ text ((((ramQuota |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB") ]
                             ]
                         ]
-                    , buySellTab model account
+                    , buySellTab language model account
                     ]
                 ]
             , let
@@ -466,26 +464,24 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                         ( actions |> List.take 2 |> List.map (actionToTableRow language)
                         , div [ class "btn_area" ]
                             [ button [ type_ "button", class "view_more button", onClick ExpandActions ]
-                                [ text "더 보기" ]
+                                [ text (translate language ShowMore) ]
                             ]
                         )
               in
               section [ class "history list" ]
                 [ table []
-                    [ caption []
-                        [ text "구매/판매 거래내역" ]
-                    , thead []
+                    [ thead []
                         [ tr []
                             [ th [ scope "col" ]
-                                [ text "타입" ]
+                                [ text (translate language Type) ]
                             , th [ scope "col" ]
-                                [ text "거래량" ]
+                                [ text (translate language Volume) ]
                             , th [ scope "col" ]
-                                [ text "계정" ]
+                                [ text (translate language AccountField) ]
                             , th [ scope "col" ]
-                                [ text "시간" ]
+                                [ text (translate language Time) ]
                             , th [ scope "col" ]
-                                [ text "Tx ID" ]
+                                [ text "Tx Id" ]
                             ]
                         ]
                     , tbody [] actionTableRows
@@ -499,13 +495,13 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                     ( validationClass, msg ) =
                         case buyModel.accountValidation of
                             ValidAccount ->
-                                ( "false", "올바른 계정입니다." )
+                                ( "false", translate language AccountIsValid )
 
                             InvalidAccount ->
-                                ( "true", "올바르지 않은 계정입니다." )
+                                ( "true", translate language AccountIsInvalid )
 
                             InexistentAccount ->
-                                ( "true", "존재하지 않는 계정입니다." )
+                                ( "true", translate language AccountNotExist )
 
                             _ ->
                                 ( "", "" )
@@ -525,9 +521,9 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
             ]
             [ div [ class "wrapper" ]
                 [ h2 []
-                    [ text "타계정 구매" ]
+                    [ text (translate language BuyForOtherAccount) ]
                 , p []
-                    [ text "램을 구매해 줄 타계정을 입력하세요." ]
+                    [ text (translate language EnterReceiverAccountName) ]
                 , form []
                     [ input
                         [ class "user"
@@ -555,8 +551,8 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
         ]
 
 
-buySellTab : Model -> Account -> Html Message
-buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuota, ramUsage, accountName, coreLiquidBalance } =
+buySellTab : Language -> Model -> Account -> Html Message
+buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuota, ramUsage, accountName, coreLiquidBalance } =
     let
         availableRam =
             ramQuota - ramUsage
@@ -578,12 +574,12 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                      else
                         []
                     )
-                    [ text "타계정 구매" ]
-                , "구매하기"
+                    [ text (translate language BuyForOtherAccount) ]
+                , translate language Buy
                 , "EOS"
                 , TypeEosAmount
                 , buyModel.params.quant
-                , "구매하실 수량을 입력하세요"
+                , translate language TypeBuyAmount
                 , not buyModel.isValid
                 )
 
@@ -592,11 +588,11 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                 ( ""
                 , " ing"
                 , text ""
-                , "판매하기"
+                , translate language Sell
                 , byteText
                 , TypeBytesAmount
                 , byteQuant
-                , "판매하실 수량을 입력하세요"
+                , ""
                 , not sellModel.isValid
                 )
 
@@ -605,29 +601,33 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
 
         ( availableText, availableAmount, descText, approximateValue ) =
             if isBuyTab then
-                ( "구매가능수량"
+                ( translate language BuyableAmount
                 , (availableEos |> toString) ++ " EOS"
-                , "* 구매시 0.5%의 수수료가 발생합니다."
-                , "약 "
-                    ++ (((1 / ramPrice)
+                , translate language BuyFeeCharged
+                , translate language
+                    (ApproximateQuantity
+                        (((1 / ramPrice)
                             * (buyModel.params.quant |> String.toFloat |> Result.withDefault 0)
-                        )
+                         )
                             |> Round.floor 3
-                       )
-                    ++ " KB"
+                        )
+                        "KB"
+                    )
                 )
 
             else
-                ( "판매가능수량"
+                ( translate language SellableAmount
                 , (((availableRam |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB"
-                , "* 판매시 0.5%의 수수료가 발생합니다. "
-                , "약 "
-                    ++ ((ramPrice
+                , translate language SellFeeCharged
+                , translate language
+                    (ApproximateQuantity
+                        ((ramPrice
                             * (sellModel.params.kiloBytes |> String.toFloat |> Result.withDefault 0)
-                        )
+                         )
                             |> Round.round 4
-                       )
-                    ++ " EOS"
+                        )
+                        "EOS"
+                    )
                 )
 
         selectDiv =
@@ -643,14 +643,14 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                 , class ("buy tab button" ++ buyClass)
                 , onClick SwitchTab
                 ]
-                [ text "구매하기"
+                [ text (translate language Buy)
                 ]
             , button
                 [ type_ "button"
                 , class ("sell tab button" ++ sellClass)
                 , onClick SwitchTab
                 ]
-                [ text "판매하기"
+                [ text (translate language Sell)
                 ]
             ]
         , div [ class "unit" ]
@@ -658,14 +658,13 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
             , buyOthersRamTab
             ]
         , div [ class "target", hidden (not (buyModel.proxyBuy && isBuyTab)) ]
-            [ text (buyModel.params.receiver ++ " 에게")
+            [ text (translate language (To buyModel.params.receiver))
             , button
                 [ type_ "button"
-                , title "타 계정의 구매를 하지 않습니다."
                 , onClick CancelProxy
                 , class "close button"
                 ]
-                [ text "타 계정의 구매를 하지 않습니다." ]
+                []
             ]
         , form [ class "input panel" ]
             [ div []
@@ -680,10 +679,10 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
                 ]
             , div [ class "amount" ] [ text approximateValue ]
             , div []
-                [ distributionButton model Percentage10
-                , distributionButton model Percentage50
-                , distributionButton model Percentage70
-                , distributionButton model Percentage100
+                [ distributionButton language model Percentage10
+                , distributionButton language model Percentage50
+                , distributionButton language model Percentage70
+                , distributionButton language model Percentage100
                 ]
             ]
         , div [ class "btn_area" ]
@@ -699,8 +698,8 @@ buySellTab ({ isBuyTab, buyModel, sellModel, rammarketTable } as model) { ramQuo
         ]
 
 
-distributionButton : Model -> Distribution -> Html Message
-distributionButton model dist =
+distributionButton : Language -> Model -> Distribution -> Html Message
+distributionButton language model dist =
     let
         { buyModel, sellModel, isBuyTab } =
             model
@@ -731,7 +730,7 @@ distributionButton model dist =
                     "70%"
 
                 Percentage100 ->
-                    "최대"
+                    translate language Max
 
                 _ ->
                     ""
@@ -759,16 +758,16 @@ subscriptions =
 
 
 actionToTableRow : Language -> Action -> Html Message
-actionToTableRow _ { blockTime, data, trxId } =
+actionToTableRow language { blockTime, data, trxId } =
     case data of
         Ok (Data.Action.Transfer { from, to, quantity }) ->
             let
                 ( actionClass, actionType, account ) =
                     if from == "eosio.ram" then
-                        ( "log sell", "판매", to )
+                        ( "log sell", translate language Sell, to )
 
                     else
-                        ( "log buy", "구매", from )
+                        ( "log buy", translate language Buy, from )
 
                 formattedDateTime =
                     blockTime |> timeFormatter

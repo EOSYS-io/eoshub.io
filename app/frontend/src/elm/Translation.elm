@@ -184,6 +184,26 @@ type I18n
     | VoteSucceeded String
     | VoteFailed String
     | VoteProxyPhilosophy
+    | RamPrice
+    | RamYield
+    | MyRam
+    | Buy
+    | Sell
+    | BuyableAmount
+    | BuyForOtherAccount
+    | TypeBuyAmount
+    | BuyFeeCharged
+    | SellableAmount
+    | SellFeeCharged
+    | Volume
+    | AccountField
+    | EnterReceiverAccountName
+    | AccountNotExist
+    | AccountIsValid
+    | AccountIsInvalid
+    | ApproximateQuantity String String
+    | Max
+    | To String
 
 
 translate : Language -> I18n -> String
@@ -404,9 +424,9 @@ getMessages i18n =
             }
 
         RamMarketDesc ->
-            { korean = "램을 사고 팔 수 있어요"
-            , english = "Buy or sell RAM here"
-            , chinese = "去买卖RAM"
+            { korean = "램을 사고 팔 수 있어요 :)"
+            , english = "Buy or sell RAM here :)"
+            , chinese = "买卖RAM :)"
             }
 
         Application ->
@@ -1007,4 +1027,124 @@ getMessages i18n =
             { korean = "DPOS 기반의 EOS 블록체인은 신뢰 받는 블록 생성자들에 의해서 운영이 될 때 비로소 그 가치를 발휘할 수있습니다. 신뢰의 척도로는 다음과 같은 3가지 기준을 세웠습니다. 첫번째는 기술적인 역량 보유 여부이며, 두번째는 거버넌스 및 커뮤니티 기여 여부이고, 마지막으로 세번째는 올바른 비전과 방향성 제시 여부입니다. 우리 eoshub는 EOS 생태계의 발전적 가치를 지향하며, 이를 위해 가장 신뢰할 수 있고 블록 생성의 자격이 있는 BP들에게 투표합니다."
             , english = "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own. We, the Eoshub, aim for the advancement and improvement of EOS ecosystem and will vote for BPs who deserve the empowerment."
             , chinese = ""
+            }
+
+        RamPrice ->
+            { korean = "RAM 가격"
+            , english = "RAM Price"
+            , chinese = "RAM价格"
+            }
+
+        RamYield ->
+            { korean = "RAM 점유율"
+            , english = "Overall RAM"
+            , chinese = "RAM占有率"
+            }
+
+        MyRam ->
+            { korean = "나의 RAM"
+            , english = "My RAM"
+            , chinese = "我的RAM"
+            }
+
+        Buy ->
+            { korean = "구매"
+            , english = "Buy"
+            , chinese = "购买"
+            }
+
+        Sell ->
+            { korean = "판매"
+            , english = "Sell"
+            , chinese = "销售"
+            }
+
+        BuyableAmount ->
+            { korean = "구매 가능 수량"
+            , english = "Buyable Amount"
+            , chinese = "可购买数量"
+            }
+
+        BuyForOtherAccount ->
+            { korean = "타계정 구매"
+            , english = "Buy for other account"
+            , chinese = "给其他账户购买"
+            }
+
+        TypeBuyAmount ->
+            { korean = "구매할 수량을 입력하세요"
+            , english = "Enter amount to buy"
+            , chinese = "请输入要购买的数量"
+            }
+
+        BuyFeeCharged ->
+            { korean = "구매시 0.5%의 수수료가 발생합니다"
+            , english = "When buying, 0.5% fee is charged"
+            , chinese = "购买时发生0.5%的手续费"
+            }
+
+        SellFeeCharged ->
+            { korean = "판매시 0.5%의 수수료가 발생합니다"
+            , english = "When selling, 0.5% fee is charged"
+            , chinese = "销售时发生0.5%的手续费"
+            }
+
+        SellableAmount ->
+            { korean = "판매 가능 수량"
+            , english = "Sellable Amount"
+            , chinese = "可销售数量"
+            }
+
+        Volume ->
+            { korean = "거래량"
+            , english = "Quantity"
+            , chinese = "交易量"
+            }
+
+        AccountField ->
+            { korean = "계정"
+            , english = "Account"
+            , chinese = "账户"
+            }
+
+        EnterReceiverAccountName ->
+            { korean = "RAM 구매 받을 계정명을 입력해주세요"
+            , english = "Enter account name"
+            , chinese = "请输入被购买RAM的账户"
+            }
+
+        AccountNotExist ->
+            { korean = "존재하지 않는 계정입니다"
+            , english = "This account does not exist"
+            , chinese = "该账户不存在"
+            }
+
+        AccountIsValid ->
+            { korean = "올바른 계정입니다"
+            , english = "Valid account"
+            , chinese = "账户名正确"
+            }
+
+        AccountIsInvalid ->
+            { korean = "잘못된 입력입니다"
+            , english = "Invalid account"
+            , chinese = "输入有误"
+            }
+
+        ApproximateQuantity quantity unit ->
+            { korean = "약 " ++ quantity ++ " " ++ unit
+            , english = "Approximately " ++ quantity ++ " " ++ unit
+            , chinese = "大约" ++ quantity ++ " " ++ unit
+            }
+
+        Max ->
+            { korean = "최대"
+            , english = "Max"
+            , chinese = "最多"
+            }
+
+        To target ->
+            { korean = target ++ " 에게"
+            , english = "To " ++ target
+            , chinese = "致" ++ target
             }
