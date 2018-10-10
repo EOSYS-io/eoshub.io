@@ -38,6 +38,7 @@ import Data.Account
         )
 import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
 import Data.Table exposing (Row(..))
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -87,6 +88,7 @@ import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Set exposing (Set)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
@@ -109,6 +111,7 @@ type alias Model =
     , delbandTable : List Row
     , actions : List Action
     , pagination : Pagination
+    , actionCategory : Dict String (Set String)
     , selectedActionCategory : SelectedActionCategory
     , openedActionSeq : Int
     }
@@ -144,6 +147,16 @@ initModel accountName =
         , offset = -30
         , isEnd = False
         }
+    , actionCategory =
+        Dict.fromList
+            [ ( "transfer", Set.fromList [ "transfer" ] )
+            , ( "claimrewards", Set.fromList [ "claimrewards" ] )
+            , ( "ram", Set.fromList [ "buyram", "buyrambytes", "sellram" ] )
+            , ( "resource", Set.fromList [ "delegatebw", "undelegatebw" ] )
+            , ( "regproxy", Set.fromList [ "regproxy" ] )
+            , ( "voteproducer", Set.fromList [ "voteproducer" ] )
+            , ( "newaccount", Set.fromList [ "newaccount" ] )
+            ]
     , selectedActionCategory = "all"
     , openedActionSeq = -1
     }
@@ -265,7 +278,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, delbandTable, actions, selectedActionCategory, openedActionSeq } as model) =
+view language ({ account, delbandTable, actions, actionCategory, selectedActionCategory, openedActionSeq } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -402,6 +415,18 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                         [ text (translate language All) ]
                     , option [ value "transfer" ]
                         [ text (translate language Transfer) ]
+                    , option [ value "claimrewards" ]
+                        [ text (translate language Claimrewards) ]
+                    , option [ value "ram" ]
+                        [ text (translate language Ram) ]
+                    , option [ value "resource" ]
+                        [ text (translate language Resource) ]
+                    , option [ value "regproxy" ]
+                        [ text (translate language Regproxy) ]
+                    , option [ value "voteproducer" ]
+                        [ text (translate language Voteproducer) ]
+                    , option [ value "newaccount" ]
+                        [ text (translate language NewaccountTx) ]
                     ]
                 , table []
                     [ thead []
@@ -417,7 +442,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                             ]
                         ]
                     , tbody []
-                        (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
+                        (viewActionList language selectedActionCategory actionCategory account.accountName openedActionSeq actions)
                     ]
                 , div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ShowMore ]
@@ -584,15 +609,15 @@ viewAccountSpan value =
         ]
 
 
-viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory accountName openedActionSeq actions =
-    List.map (viewAction language selectedActionCategory accountName openedActionSeq) actions
+viewActionList : Language -> SelectedActionCategory -> Dict String (Set String) -> String -> Int -> List Action -> List (Html Message)
+viewActionList language selectedActionCategory actionCategory accountName openedActionSeq actions =
+    List.map (viewAction language selectedActionCategory actionCategory accountName openedActionSeq) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
-    tr [ hidden (actionHidden selectedActionCategory actionName) ]
+viewAction : Language -> SelectedActionCategory -> Dict String (Set String) -> String -> Int -> Action -> Html Message
+viewAction _ selectedActionCategory actionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+    tr [ hidden (actionHidden selectedActionCategory actionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
         , td []
@@ -603,14 +628,23 @@ viewAction _ selectedActionCategory accountName openedActionSeq ({ accountAction
         ]
 
 
-actionHidden : SelectedActionCategory -> String -> Bool
-actionHidden selectedActionCategory currentAction =
+actionHidden : SelectedActionCategory -> Dict String (Set String) -> String -> Bool
+actionHidden selectedActionCategory actionCategory currentAction =
+    let
+        maybeSet =
+            case Dict.get selectedActionCategory actionCategory of
+                Just set ->
+                    set
+
+                Nothing ->
+                    Set.empty
+    in
     case selectedActionCategory of
         "all" ->
             False
 
         _ ->
-            if currentAction == selectedActionCategory then
+            if Set.member currentAction maybeSet then
                 False
 
             else

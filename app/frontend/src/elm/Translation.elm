@@ -221,6 +221,15 @@ type I18n
     | Rank
     | SearchBpCandidate
     | Poll
+    | Sent
+    | Received
+    | Claimrewards
+    | Ram
+    | Delegatebw
+    | Undelegatebw
+    | Regproxy
+    | Voteproducer
+    | NewaccountTx
 
 
 translate : Language -> I18n -> String
@@ -1266,4 +1275,58 @@ getMessages i18n =
             { korean = "득표"
             , english = "Votes"
             , chinese = "得票"
+            }
+
+        Sent ->
+            { korean = "보냄"
+            , english = "Sent"
+            , chinese = "Sent"
+            }
+
+        Received ->
+            { korean = "받음"
+            , english = "Received"
+            , chinese = "Received"
+            }
+
+        Claimrewards ->
+            { korean = "보상 청구"
+            , english = "Claimrewards"
+            , chinese = "Claimrewards"
+            }
+
+        Ram ->
+            { korean = "램"
+            , english = "Ram"
+            , chinese = "Ram"
+            }
+
+        Delegatebw ->
+            { korean = "자원 임대"
+            , english = "Delegatebw"
+            , chinese = "Delegatebw"
+            }
+
+        Undelegatebw ->
+            { korean = "자원 임대 취소"
+            , english = "Undelegatebw"
+            , chinese = "Undelegatebw"
+            }
+
+        Regproxy ->
+            { korean = "프록시 등록"
+            , english = "Regproxy"
+            , chinese = "Regproxy"
+            }
+
+        Voteproducer ->
+            { korean = "블록 생성자 투표"
+            , english = "Voteproducer"
+            , chinese = "Voteproducer"
+            }
+
+        NewaccountTx ->
+            { korean = "계정 생성"
+            , english = "Newaccount"
+            , chinese = "Newaccount"
             }
