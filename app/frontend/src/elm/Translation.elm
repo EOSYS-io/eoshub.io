@@ -183,7 +183,6 @@ type I18n
     | SellramFailed String
     | VoteSucceeded String
     | VoteFailed String
-    | VoteProxyPhilosophy
     | RamPrice
     | RamYield
     | MyRam
@@ -204,6 +203,19 @@ type I18n
     | ApproximateQuantity String String
     | Max
     | To String
+    | DoProxyVote
+    | VotePhilosophy
+    | VotePhilosophyDesc
+    | ProxiedEos
+    | ProxiedAccounts
+    | VotedBp
+    | VoteStatus
+    | VoteRate
+    | TotalVotedEos
+    | TotalEosSupply
+    | Rank
+    | SearchBpCandidate
+    | Poll
 
 
 translate : Language -> I18n -> String
@@ -412,9 +424,9 @@ getMessages i18n =
             }
 
         VoteDesc ->
-            { korean = "토큰 홀더라면 투표하실 수 있어요"
-            , english = "Vote with your EOS"
-            , chinese = "持有EOS币的用户可以进行投票"
+            { korean = "EOS로 투표할 수 있어요 :)"
+            , english = "Vote with your EOS :)"
+            , chinese = "EOS币持有者可以进行投票"
             }
 
         RamMarket ->
@@ -1023,10 +1035,46 @@ getMessages i18n =
             , chinese = ""
             }
 
-        VoteProxyPhilosophy ->
-            { korean = "DPOS 기반의 EOS 블록체인은 신뢰 받는 블록 생성자들에 의해서 운영이 될 때 비로소 그 가치를 발휘할 수있습니다. 신뢰의 척도로는 다음과 같은 3가지 기준을 세웠습니다. 첫번째는 기술적인 역량 보유 여부이며, 두번째는 거버넌스 및 커뮤니티 기여 여부이고, 마지막으로 세번째는 올바른 비전과 방향성 제시 여부입니다. 우리 eoshub는 EOS 생태계의 발전적 가치를 지향하며, 이를 위해 가장 신뢰할 수 있고 블록 생성의 자격이 있는 BP들에게 투표합니다."
-            , english = "EOS Blockchain is secured and utilized only when the Block Producers have the trustworthiness. Trustworthiness could be measured by three important criteria. Technical Excellence, Governance and Community Engagement, and Sharing the Vision and Value of Their Own. We, the Eoshub, aim for the advancement and improvement of EOS ecosystem and will vote for BPs who deserve the empowerment."
+        DoProxyVote ->
+            { korean = "대리투표 하기"
+            , english = "Vote by Proxy"
+            , chinese = "代理投票"
+            }
+
+        VotePhilosophy ->
+            { korean = "투표 철학"
+            , english = "Voting Philosophy"
+            , chinese = "投票哲学"
+            }
+
+        VotePhilosophyDesc ->
+            { korean = "BPGovernance Proxy\nBPGovernance는 블록 프로듀서를 위한 투표를 하기 위해 모든 주체의 동의가 필요한 최초의 다중 서명(Multi-sig) 프록시입니다. 우리는 독립적인 BP로서 이것이 좋은 결정을 하게 하고 부패의 가능성을 줄이기 때문에 이 방식을 택했습니다. 앞으로 우리의 재량에 따라 프록시 관리 멤버를 추가 할 수 있습니다. 각 그룹은 최대한 많은, 다양한 커뮤니티를 포함하기 위해 중국어, 영어 및 한국어를 사용하는 커뮤니티에서 활동합니다. EOS Pacific 은 언어의 장벽이 존재하는 만다린 커뮤니티에 분쟁 해결 교육 및 서비스를 제공하고자 만들어진 ‘EOS 만다린 중재 커뮤니티’인 EMAC의 리더 중 하나입니다. EOS New York은 헌법 문서 초안 작성, 자유 시장 분쟁 해결 체계 제안 및 EOS 툴 개발에 적극적으로 참여해 왔습니다. EOSYS는 커뮤니티 프로젝트인 Worker Proposal 시스템의 리더 중 하나이며 dApp 컨테스트 및 인큐베이션과 같은 이니셔티브를 통해 EOS 개발자에게 기회를 제공합니다.\n\nBPGovernance에 위임함으로써 생태계에 진정으로 기여하는 다양한 능력을 가진 플레이어들에게 투표하고 있다는 것을 확신하실 수 있습니다."
+            , english = "BPGovernance Proxy\nBPGovernance is the first multi-signature proxy which requires unanimous agreement from each managing participant to stake a vote for block producers. We do this because, as three independent parties, this will increase the quality of choices and reduce the likelihood of corruption. In the future, we may add more managing members at our discretion.\n\nEach of these groups has visibility into Mandarin, English, and Korean speaking communities for maximum exposure. EOS Pacific is one of the leaders of EMAC, the EOS Mandarin Arbitration Community, which seeks to provide dispute resolution education and services to the underserved Mandarin communities. EOS New York is actively involved in drafting constitutional documents, providing proposals for a free-market dispute resolution framework, and building EOS tools. EOSYS is one of the leaders of the proposed Worker Proposal system and provides the opportunity to developers through initiatives like paid dApp competitions and incubation.\n\nBy delegating your vote to BPGovernance you are ensuring that you are voting for high-quality contributors to the EOS ecosystem across many disciplines and competencies."
             , chinese = ""
+            }
+
+        ProxiedEos ->
+            { korean = "위임된 EOS"
+            , english = "Proxied EOS"
+            , chinese = "被委托的EOS"
+            }
+
+        ProxiedAccounts ->
+            { korean = "위임된 계정"
+            , english = "Proxied Accounts"
+            , chinese = "被委托的账户"
+            }
+
+        VotedBp ->
+            { korean = "투표 받은 BP"
+            , english = "Voted BP"
+            , chinese = "被投票的节点"
+            }
+
+        VoteStatus ->
+            { korean = "투표 현황"
+            , english = "Vote Status"
+            , chinese = "投票情况"
             }
 
         RamPrice ->
@@ -1147,4 +1195,40 @@ getMessages i18n =
             { korean = target ++ " 에게"
             , english = "To " ++ target
             , chinese = "致" ++ target
+            }
+
+        VoteRate ->
+            { korean = "총 투표율"
+            , english = "Total Vote %"
+            , chinese = "总投票率"
+            }
+
+        TotalVotedEos ->
+            { korean = "EOS 총 투표량"
+            , english = "Total EOS Votes"
+            , chinese = "被投票的EOS"
+            }
+
+        TotalEosSupply ->
+            { korean = "EOS 총 공급량"
+            , english = "Total EOS Supply"
+            , chinese = "全部EOS"
+            }
+
+        Rank ->
+            { korean = "순위"
+            , english = "Rank"
+            , chinese = "排名"
+            }
+
+        SearchBpCandidate ->
+            { korean = "BP 후보 검색"
+            , english = "Search BP Candidate"
+            , chinese = "查询BP候选人"
+            }
+
+        Poll ->
+            { korean = "득표"
+            , english = "Votes"
+            , chinese = "得票"
             }

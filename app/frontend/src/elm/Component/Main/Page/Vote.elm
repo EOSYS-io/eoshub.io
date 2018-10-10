@@ -302,27 +302,27 @@ view language ({ tab, now } as model) account =
     in
     main_ [ class ("vote" ++ addedMainClass) ]
         [ h2 []
-            [ text "투표하기" ]
+            [ text (translate language Vote) ]
         , p []
-            [ text "건강한 이오스 생태계를 위해 투표해주세요." ]
+            [ text (translate language VoteDesc) ]
         , div [ class "tab" ]
             [ a
                 [ class ("vote tab button" ++ voteTabClass)
                 , onClick (SwitchTab VoteTab)
                 ]
-                [ text "투표하기" ]
+                [ text (translate language Vote) ]
             , a
                 [ class ("proxy_vote tab button" ++ proxyVoteTabClass)
                 , onClick (SwitchTab ProxyVoteTab)
                 ]
-                [ text "대리투표" ]
+                [ text (translate language ProxyVote) ]
             ]
         , div [ class "container" ] tabView
         ]
 
 
 voteView : Model -> Account -> Language -> Time -> List (Html Message)
-voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } account _ now =
+voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, searchInput, producerNamesToVote } account language now =
     let
         totalEos =
             tokenStatTable.supply |> assetToFloat
@@ -358,7 +358,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
             if List.length filteredProducers > producersLimit then
                 div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
-                        [ text "더 보기" ]
+                        [ text (translate language ShowMore) ]
                     ]
 
             else
@@ -369,16 +369,16 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
     in
     [ section [ class "vote summary" ]
         [ h3 []
-            [ text "총 투표율" ]
+            [ text (translate language VoteRate) ]
         , p []
             [ text votingPercentage ]
         , dl []
             [ dt []
-                [ text "투표된 EOS" ]
+                [ text (translate language TotalVotedEos) ]
             , dd []
                 [ text (formattedVotedEos ++ " (" ++ votingPercentage ++ ")") ]
             , dt []
-                [ text "전체 EOS 수량" ]
+                [ text (translate language TotalEosSupply) ]
             , dd []
                 [ text formattedTotalEos ]
             ]
@@ -395,26 +395,26 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
             , thead []
                 [ tr []
                     [ th [ scope "col" ]
-                        [ text "순위" ]
+                        [ text (translate language Rank) ]
                     , th [ scope "col" ]
                         [ span []
-                            [ text "변동된 순위" ]
+                            []
                         ]
                     , th [ class "search", scope "col" ]
                         [ form []
                             [ input
-                                [ placeholder "BP 후보 검색"
+                                [ placeholder (translate language SearchBpCandidate)
                                 , type_ "text"
                                 , onInput <| OnSearchInput
                                 , value searchInput
                                 ]
                                 []
                             , button [ type_ "submit" ]
-                                [ text "검색" ]
+                                []
                             ]
                         ]
                     , th [ scope "col" ]
-                        [ text "득표" ]
+                        [ text (translate language Poll) ]
                     , th [ scope "col" ]
                         [ span [ class "count" ]
                             [ text ((producerNamesToVote |> Set.size |> toString) ++ "/30") ]
@@ -424,7 +424,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                             , disabled buttonDisabled
                             , onClick SubmitVoteProducersAction
                             ]
-                            [ text "투표" ]
+                            [ text (translate language Vote) ]
                         ]
                     ]
                 ]
@@ -527,22 +527,22 @@ proxyView { voteStat, producers, proxies } account language =
             []
         , div [ class "description" ]
             [ h3 []
-                [ text "Vote Philosophy" ]
+                [ text (translate language VotePhilosophy) ]
             , p []
-                [ text (translate language VoteProxyPhilosophy) ]
+                [ text (translate language VotePhilosophyDesc) ]
             , button
                 [ class "ok button"
                 , type_ "button"
                 , disabled (account == defaultAccount)
                 , onClick SubmitVoteProxyAction
                 ]
-                [ text "대리투표 하기" ]
+                [ text (translate language DoProxyVote) ]
             ]
         ]
     , section [ class "proxy vote status" ]
         [ ul []
             [ li []
-                [ text "Proxied EOS"
+                [ text (translate language ProxiedEos)
                 , strong []
                     [ text
                         (formattedProxiedEos
@@ -551,12 +551,12 @@ proxyView { voteStat, producers, proxies } account language =
                     ]
                 ]
             , li []
-                [ text "Proxied Accounts"
+                [ text (translate language ProxiedAccounts)
                 , strong []
                     [ text (proxiedAccounts ++ " Accounts") ]
                 ]
             , li []
-                [ text "Proxied BP"
+                [ text (translate language VotedBp)
                 , strong []
                     [ text (proxyingAccountCount ++ " BP") ]
                 ]
@@ -564,7 +564,7 @@ proxyView { voteStat, producers, proxies } account language =
         ]
     , section [ class "voted bp" ]
         [ h3 []
-            [ text "투표한 BP" ]
+            [ text (translate language VotedBp) ]
         , ul [ class "list" ]
             (List.map (producerSimplifiedView producers) proxies)
         ]
