@@ -12,6 +12,7 @@ import Translation
         , toLocale
         , translate
         )
+import Util.Constant exposing (minimumRequiredResources)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -65,7 +66,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            initModel.minimumResource.cpu
+                            minimumRequiredResources.cpu
 
                         selfDelegatedAcount =
                             "1.3000 EOS"
@@ -78,7 +79,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            initModel.minimumResource.cpu
+                            minimumRequiredResources.cpu
 
                         selfDelegatedAcount =
                             "0.3000 EOS"
@@ -91,7 +92,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            initModel.minimumResource.net
+                            minimumRequiredResources.net
 
                         selfDelegatedAcount =
                             "0.3000 EOS"
@@ -104,7 +105,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            initModel.minimumResource.net
+                            minimumRequiredResources.net
 
                         selfDelegatedAcount =
                             "0.1000 EOS"
@@ -247,9 +248,6 @@ tests =
                         defaultModel =
                             initModel
 
-                        minimumResource =
-                            defaultModel.minimumResource
-
                         expected =
                             ( "", "" )
                     in
@@ -262,9 +260,6 @@ tests =
                                 | cpuQuantityValidation = OverValidQuantity
                             }
 
-                        minimumResource =
-                            defaultModel.minimumResource
-
                         expected =
                             ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
@@ -276,9 +271,6 @@ tests =
                             { initModel
                                 | netQuantityValidation = OverValidQuantity
                             }
-
-                        minimumResource =
-                            defaultModel.minimumResource
 
                         expected =
                             ( "언스테이크 가능한 NET 수량을 초과하였습니다.", " false" )
@@ -293,9 +285,6 @@ tests =
                                 , cpuQuantityValidation = OverValidQuantity
                             }
 
-                        minimumResource =
-                            defaultModel.minimumResource
-
                         expected =
                             ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
@@ -308,9 +297,6 @@ tests =
                                 | netQuantityValidation = ValidQuantity
                                 , cpuQuantityValidation = ValidQuantity
                             }
-
-                        minimumResource =
-                            defaultModel.minimumResource
 
                         expected =
                             ( "언스테이크 가능합니다 :)", " true" )
