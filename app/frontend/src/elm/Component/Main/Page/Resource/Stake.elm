@@ -278,7 +278,7 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ coreLiquidBalance } as account) =
+view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) { coreLiquidBalance } =
     div [ class "stake container" ]
         [ p []
             [ text (translate language StakeAvailableAmount)
@@ -288,7 +288,7 @@ view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isS
         , section []
             [ div [ class "wallet status" ]
                 [ h3 []
-                    [ text "최소 1 EOS 이상은 스테이크 해놓으시는게 좋습니다. :)" ]
+                    [ text (translate language AutoAllocation) ]
                 , a [ onClick OpenStakeAmountModal ]
                     [ text (translate language SetManually) ]
                 ]
@@ -328,12 +328,12 @@ view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isS
                     [ text (translate language Confirm) ]
                 ]
             ]
-        , Html.map ModalMessage (viewStakeAmountModal language model isStakeAmountModalOpened)
+        , Html.map ModalMessage (viewStakeAmountModal language model isStakeAmountModalOpened coreLiquidBalance)
         ]
 
 
-viewStakeAmountModal : Language -> Model -> Bool -> Html StakeAmountMessage
-viewStakeAmountModal language { stakeAmountModal } opened =
+viewStakeAmountModal : Language -> Model -> Bool -> String -> Html StakeAmountMessage
+viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
     let
         cpuValidateAttr =
             modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.cpuQuantityValidation
@@ -360,7 +360,7 @@ viewStakeAmountModal language { stakeAmountModal } opened =
                 [ h3 []
                     [ text (translate language StakeAvailableAmount)
                     , strong []
-                        [ text (stakeAmountModal.totalQuantity ++ " EOS") ]
+                        [ text ((coreLiquidBalance |> assetToFloat |> Round.round 4) ++ " EOS") ]
                     ]
                 ]
             , div [ class "form container" ]
@@ -457,34 +457,26 @@ getPercentageOfLiquid percentageOfLiquid =
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
 quantityWarningSpan quantityStatus language { delegatebw, manuallySet } =
     let
-        -- TODO(boseok): it needs to be translated
-        manualText =
-            if manuallySet then
-                "직접설정"
-
-            else
-                "자동설정"
-
         ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
                     ( " false", translate language InvalidAmount )
 
                 OverValidQuantity ->
-                    ( " false", translate language OverStakePossibleAmount )
+                    ( " false", translate language ExceedStakeAmount )
 
                 ValidQuantity ->
                     ( " true"
-                    , manualText
-                        ++ translate language
-                            (StakePossible
-                                delegatebw.stakeCpuQuantity
-                                delegatebw.stakeNetQuantity
-                            )
+                    , translate language
+                        (AutoStakeAmountDesc
+                            delegatebw.stakeCpuQuantity
+                            delegatebw.stakeNetQuantity
+                            manuallySet
+                        )
                     )
 
                 EmptyQuantity ->
-                    ( "", translate language StakePossibleAmountDesc )
+                    ( "", translate language NeverExceedStakeAmount )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]

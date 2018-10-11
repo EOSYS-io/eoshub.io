@@ -174,9 +174,6 @@ type I18n
     | ShowMore
     | SearchPublicKey
     | SearchResultPublicKey
-    | StakePossible String String
-    | StakePossibleAmountDesc
-    | OverStakePossibleAmount
     | DelegatebwSucceeded String
     | DelegatebwFailed String
     | UndelegatebwSucceeded String
@@ -249,7 +246,7 @@ type I18n
     | SetManually
     | TypeStakeAmount
     | NeverExceedStakeAmount
-    | AutoStakeAmountDesc String String
+    | AutoStakeAmountDesc String String Bool
     | ExceedStakeAmount
     | InvalidInputAmount
     | RecommendedStakeAmount String String
@@ -1029,24 +1026,6 @@ getMessages i18n =
             , chinese = "如下为查询到的公匙信息"
             }
 
-        StakePossible cpu net ->
-            { korean = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            , english = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            , chinese = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            }
-
-        StakePossibleAmountDesc ->
-            { korean = "보유한 수량만큼 스테이크 할 수 있습니다."
-            , english = ""
-            , chinese = ""
-            }
-
-        OverStakePossibleAmount ->
-            { korean = "스테이크 가능한 수량보다 많습니다."
-            , english = ""
-            , chinese = ""
-            }
-
         DelegatebwSucceeded receiver ->
             { korean = receiver ++ "에게 스테이크 완료!"
             , english = ""
@@ -1479,8 +1458,19 @@ getMessages i18n =
             , chinese = "只能输入可stake的数量范围内"
             }
 
-        AutoStakeAmountDesc cpu net ->
-            { korean = "CPU " ++ cpu ++ " EOS / NET " ++ net ++ " EOS 만큼 스테이크 됩니다 (자동설정)"
+        AutoStakeAmountDesc cpu net isManual ->
+            { korean =
+                "CPU "
+                    ++ cpu
+                    ++ " EOS / NET "
+                    ++ net
+                    ++ " EOS 만큼 스테이크 됩니다 "
+                    ++ (if isManual then
+                            ""
+
+                        else
+                            "(자동설정)"
+                       )
             , english = "The input cannot exceed the available balance"
             , chinese = "只能输入可stake的数量范围内"
             }
@@ -1498,7 +1488,7 @@ getMessages i18n =
             }
 
         RecommendedStakeAmount cpu net ->
-            { korean = "CPU와 NET에 각각 최소 " ++ cpu ++ ", " ++ net ++ " EOS 이상 스테이크 해주세요"
+            { korean = "CPU와 NET에 각각 최소 " ++ cpu ++ ", " ++ net ++ " 이상 스테이크 해주세요"
             , english = "Please stake over " ++ cpu ++ " and " ++ net ++ " for CPU and NET"
             , chinese = "请各在CPU和NET至少stake" ++ cpu ++ "和" ++ net ++ "以上"
             }
