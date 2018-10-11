@@ -301,7 +301,11 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             , span [ class "amount" ] [ text (deleteFromBack 4 totalAmount) ]
             ]
         , li []
-            [ span [ class "title" ] [ text "stake" ]
+            [ span [ class "title" ] [ text "unstaked" ]
+            , span [ class "amount" ] [ text (deleteFromBack 4 coreLiquidBalance) ]
+            ]
+        , li []
+            [ span [ class "title" ] [ text "staked" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
 
             -- TODO(boseok): Translation i18n should be decided.
