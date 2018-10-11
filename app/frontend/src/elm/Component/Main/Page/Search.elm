@@ -37,7 +37,15 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
-import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
+import Data.Action
+    exposing
+        ( Action
+        , Message(..)
+        , actionsDecoder
+        , refineAction
+        , removeDuplicated
+        , viewActionInfo
+        )
 import Data.Table exposing (Row(..))
 import Dict exposing (Dict)
 import Html
@@ -227,8 +235,11 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
         OnFetchActions (Ok actions) ->
             let
+                uniqueActions =
+                    removeDuplicated actions
+
                 refinedAction =
-                    List.map (refineAction query) actions
+                    List.map (refineAction query) uniqueActions
 
                 smallestActionSeq =
                     case List.head actions of

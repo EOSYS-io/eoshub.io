@@ -27,6 +27,7 @@ module Data.Action exposing
     , newaccountDecoder
     , refineAction
     , regproxyDecoder
+    , removeDuplicated
     , sellramDecoder
     , transferDecoder
     , transferParametersToValue
@@ -56,6 +57,7 @@ import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
+import List.Extra as List exposing (uniqueBy)
 import Util.Formatter exposing (formatAsset)
 
 
@@ -811,3 +813,16 @@ voteproducersParametersToValue { voter, producers, proxy } =
                 ]
           )
         ]
+
+
+
+-- Utility
+
+
+removeDuplicated : List Action -> List Action
+removeDuplicated actionList =
+    let
+        getActionIdentifier action =
+            toString (.trxId action) ++ toString (.data action)
+    in
+    List.uniqueBy getActionIdentifier actionList
