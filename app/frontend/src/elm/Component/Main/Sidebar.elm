@@ -4,6 +4,7 @@ module Component.Main.Sidebar exposing
     , State(..)
     , accountCmd
     , accountInfoView
+    , getResourceStatusText
     , initCmd
     , initModel
     , loadingView
@@ -262,8 +263,11 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
         ( _, _, _, _, netColorCode ) =
             getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
 
-        colorCode =
-            Basics.min cpuColorCode netColorCode |> getResourceColorClass
+        resourceStatusCode =
+            Basics.min cpuColorCode netColorCode
+
+        colorClass =
+            resourceStatusCode |> getResourceColorClass
     in
     [ h2 []
         [ text wallet.account
@@ -309,7 +313,7 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
 
             -- TODO(boseok): Translation i18n should be decided.
-            , span [ class ("status " ++ colorCode) ] [ text (translate language TransactionPossible) ]
+            , span [ class ("status " ++ colorClass) ] [ text (getResourceStatusText language resourceStatusCode) ]
 
             -- span [ class "status unavailable" ] [ text "" ]
             ]
@@ -430,6 +434,25 @@ getLeftTime requestTime now =
                 (leftHours |> toString) ++ " hours"
 
         Err _ ->
+            ""
+
+
+getResourceStatusText : Language -> Int -> String
+getResourceStatusText language resourceStatusCode =
+    case resourceStatusCode of
+        1 ->
+            translate language TransactionWarning
+
+        2 ->
+            translate language TransactionAttention
+
+        3 ->
+            translate language TransactionFine
+
+        4 ->
+            translate language TransactionOptimal
+
+        _ ->
             ""
 
 
