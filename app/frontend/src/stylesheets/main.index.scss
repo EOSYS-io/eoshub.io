@@ -168,18 +168,6 @@ main.index .dashboard {
 
 	}
 
-	.rolling.banner {
-		display:flex;
-		align-items:center;
-		justify-content:center;
-		height:240px;
-		border-radius: 4px;
-		background-image: linear-gradient(97deg, #d735df, #4239fc);
-		color:$white;
-
-		margin-top:24px;
-	}
-
 	ul,li {
 		margin:0;
 		padding:0;
@@ -297,10 +285,120 @@ main.index .promotion {
 		list-style-type:none;
 	}
 
-	height:239px;
-
-	li img {
-		max-width:100%;
+	height:382px;
+	max-height:382px;
+	@include media ('>1280px','<=1920px') {
+		height:19vw;
 	}
 
+	@include media ('<=1280px') {
+		height:236px;
+	}
+
+	h3 {
+		position:absolute;
+		top:16px;
+		left:16px;
+		height:24px;
+		line-height:24px;
+		width:40px;
+		z-index:4;
+		text-align:center;
+		font-size:$x-small;
+		font-weight:$regular;
+		padding:0 10px;
+		background-color:$xxx-dark-gray;
+		box-sizing:border-box;
+		border-radius:4px;
+	}
+
+	.rolling.banner {
+		overflow:hidden;
+		white-space:nowrap;
+		position:relative;
+		height:inherit;
+
+		img {
+			max-width:100%;
+		}
+
+		a {
+			width:100%;
+			height:100%;
+			display:block;
+			opacity:0;
+			transition:opacity 1s;
+			position:absolute;
+			z-index:0;
+			border-radius:4px;
+			background-size:cover;
+			background-repeat:no-repeat;
+			background-position:center center;
+
+			@include ir();
+
+			&.dapp {
+				background-image:url('../image/bnr-dapp@2x.png');
+			}
+
+			&.fuze {
+				background-image:url('../image/bnr-fuze.png');
+			}
+
+			&.nova {
+				background-image:url('../image/bnr-nova.png');
+			}
+		}
+	}
+
+	.banner.handler {
+		background:transparent;
+		width:initial;
+		height:initial;
+		position:absolute;
+		z-index:10;
+		left:50%;
+		transform:translateY(-50%);
+		bottom:16px;
+
+		display:flex;
+		justify-content:center;
+
+		button {
+			position:relative;
+			@include ir();
+
+			width:15px;
+			height:15px;
+
+			margin:0 2px;
+
+			&:before {
+				content:'';
+				width:8px;
+				height:8px;
+				background-color:$dark-gray;
+
+				position:absolute;
+				top:50%;
+				left:50%;
+				transform:translate(-50%,-50%);
+				border-radius:100%;
+			}
+		}
+	}
+
+	// handling for banner interaction
+	@for $i from 1 through 10 {
+		&[data-display="#{$i}"] {
+			.rolling.banner a:nth-of-type(#{$i}) {
+				opacity:1;
+				z-index:2;
+			}
+
+			.banner.handler button:nth-of-type(#{$i}):before {
+				background-color:$white;
+			}
+		}
+	}
 }
