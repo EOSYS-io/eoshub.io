@@ -261,7 +261,7 @@ view : Language -> Model -> Account -> Html Message
 view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegatebw, isFormValid, delegateListModal } as model) { accountName } =
     let
         ( validatedText, validatedAttr ) =
-            validateText model
+            validateText language model
 
         modalHtml =
             Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
@@ -464,8 +464,8 @@ validateAttr resourceQuantityStatus =
             ""
 
 
-validateText : Model -> ( String, String )
-validateText { cpuQuantityValidation, netQuantityValidation } =
+validateText : Language -> Model -> ( String, String )
+validateText language { cpuQuantityValidation, netQuantityValidation } =
     let
         isCpuValid =
             (cpuQuantityValidation == ValidQuantity) || (cpuQuantityValidation == EmptyQuantity)
@@ -482,17 +482,17 @@ validateText { cpuQuantityValidation, netQuantityValidation } =
                 && isNotEmptyBoth
     in
     if isFormValid then
-        ( "언스테이크 가능합니다 :)", " true" )
+        ( translate language UndelegatePossible, " true" )
 
     else if isNotEmptyBoth then
         if not isCpuValid && not isNetValid then
-            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU / NET"), " false" )
 
         else if not isCpuValid then
-            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU"), " false" )
 
         else if not isNetValid then
-            ( "NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "NET"), " false" )
 
         else
             ( "This case should not happen!", "" )

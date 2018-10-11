@@ -178,8 +178,8 @@ type I18n
     | DelegatebwFailed String
     | UndelegatebwSucceeded String
     | UndelegatebwFailed String
-    | UnstakeInvalidQuantity String
-    | UnstakeOverValidQuantity String
+    | InvalidQuantityInput String
+    | OverValidQuantityInput String
     | UnstakePossible
     | BuyramSucceeded String
     | BuyramFailed String
@@ -262,6 +262,9 @@ type I18n
     | Select
     | TypeAccount
     | SelectAccountToUndelegate
+    | StakePossible
+    | DelegatePossible
+    | UndelegatePossible
 
 
 translate : Language -> I18n -> String
@@ -1051,22 +1054,40 @@ getMessages i18n =
             , chinese = ""
             }
 
-        UnstakeInvalidQuantity resourceType ->
+        InvalidQuantityInput resourceType ->
             { korean = resourceType ++ "의 수량입력이 잘못되었습니다"
             , english = "Invalid " ++ resourceType ++ " amount"
             , chinese = resourceType ++ "数量输入有误"
             }
 
-        UnstakeOverValidQuantity resourceType ->
-            { korean = "언스테이크 가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
+        OverValidQuantityInput resourceType ->
+            { korean = "가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
             , english = "The " ++ resourceType ++ " input exceeds the available balance."
             , chinese = "超过了可输入的" ++ resourceType ++ "数量"
             }
 
+        StakePossible ->
+            { korean = "스테이크 가능합니다 :)"
+            , english = "Ready to stake :)"
+            , chinese = "可以进行Stake :）"
+            }
+
         UnstakePossible ->
             { korean = "언스테이크 가능합니다 :)"
-            , english = "Unstake available :)"
-            , chinese = "可以进行Unstake：）"
+            , english = "Ready to unstake :)"
+            , chinese = "可以进行Unstake :）"
+            }
+
+        DelegatePossible ->
+            { korean = "임대 가능합니다 :)"
+            , english = "Ready to delegate :)"
+            , chinese = "可以进行租出去 :）"
+            }
+
+        UndelegatePossible ->
+            { korean = "임대취소 가능합니다 :)"
+            , english = "Ready to undelegate :)"
+            , chinese = "可以进行租回来 :）"
             }
 
         BuyramSucceeded str ->

@@ -505,17 +505,17 @@ validateText language { cpuQuantityValidation, netQuantityValidation, totalQuant
                 && isTotalValid
     in
     if isFormValid then
-        ( "임대 가능합니다 :)", " true" )
+        ( translate language DelegatePossible, " true" )
 
     else if isNotEmptyBoth then
         if not isCpuValid && not isNetValid then
-            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU / NET"), " false" )
 
         else if not isCpuValid then
-            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU"), " false" )
 
         else if not isNetValid then
-            ( "NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "NET"), " false" )
 
         else if not isTotalValid then
             ( translate language ExceedDelegateAmount, " false" )

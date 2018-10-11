@@ -384,10 +384,10 @@ validateText language { cpuQuantityValidation, netQuantityValidation } =
         if not isCpuValid then
             case cpuQuantityValidation of
                 InvalidQuantity ->
-                    ( translate language (UnstakeInvalidQuantity "CPU"), " false" )
+                    ( translate language (InvalidQuantityInput "CPU"), " false" )
 
                 OverValidQuantity ->
-                    ( translate language (UnstakeOverValidQuantity "CPU"), " false" )
+                    ( translate language (OverValidQuantityInput "CPU"), " false" )
 
                 _ ->
                     ( "This case should not happen!", "" )
@@ -395,10 +395,10 @@ validateText language { cpuQuantityValidation, netQuantityValidation } =
         else if not isNetValid then
             case netQuantityValidation of
                 InvalidQuantity ->
-                    ( translate language (UnstakeInvalidQuantity "NET"), " false" )
+                    ( translate language (InvalidQuantityInput "NET"), " false" )
 
                 OverValidQuantity ->
-                    ( translate language (UnstakeOverValidQuantity "NET"), " false" )
+                    ( translate language (OverValidQuantityInput "NET"), " false" )
 
                 _ ->
                     ( "This case should not happen!", "" )
