@@ -88,3 +88,5 @@ gem 'sidekiq'
 gem 'sidekiq-cron'
 
 gem 'hiredis'
+
+gem 'sprockets', '~>3.7.2'
