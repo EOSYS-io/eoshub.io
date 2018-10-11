@@ -273,7 +273,7 @@ view language ({ delbandTable, unstakePossibleCpu, unstakePossibleNet, undelegat
                     [ attribute "autofocus" ""
                     , class "size large"
                     , attribute "maxlength" "12"
-                    , placeholder "임대취소할 계정을 선택하세요"
+                    , placeholder (translate language SelectAccountToUndelegate)
                     , type_ "text"
                     , Html.Attributes.value undelegatebw.receiver
                     , readonly True

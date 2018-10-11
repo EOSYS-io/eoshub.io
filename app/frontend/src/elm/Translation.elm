@@ -261,6 +261,7 @@ type I18n
     | DelegatedAmount String
     | Select
     | TypeAccount
+    | SelectAccountToUndelegate
 
 
 translate : Language -> I18n -> String
@@ -1557,4 +1558,10 @@ getMessages i18n =
             { korean = "계정명을 입력하세요"
             , english = "Enter account name"
             , chinese = "请输入账户名"
+            }
+
+        SelectAccountToUndelegate ->
+            { korean = "임대취소 할 계정명을 선택하세요"
+            , english = "Select account name to undelegate"
+            , chinese = "输入要撤回租借的账户名"
             }
