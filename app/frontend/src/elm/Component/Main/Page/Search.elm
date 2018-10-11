@@ -94,6 +94,7 @@ import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Navigation
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
@@ -271,16 +272,21 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 -- TODO(boseok): alert it is the end of records
                 ( model, Cmd.none )
 
-        ActionMessage (ShowMemo clickedActionSeq) ->
-            let
-                newOpenedActionSeq =
-                    if openedActionSeq == clickedActionSeq then
-                        -1
+        ActionMessage msg ->
+            case msg of
+                ShowMemo clickedActionSeq ->
+                    let
+                        newOpenedActionSeq =
+                            if openedActionSeq == clickedActionSeq then
+                                -1
 
-                    else
-                        clickedActionSeq
-            in
-            ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
+                            else
+                                clickedActionSeq
+                    in
+                    ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
+
+                ChangeUrl url ->
+                    ( model, Navigation.newUrl url )
 
 
 
@@ -599,7 +605,7 @@ viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountA
             [ text actionTag ]
         , td []
             [ text (timeFormatter blockTime) ]
-        , Html.map ActionMessage (viewActionInfo accountName action openedActionSeq)
+        , Html.map ActionMessage (viewActionInfo action openedActionSeq)
         ]
 
 
