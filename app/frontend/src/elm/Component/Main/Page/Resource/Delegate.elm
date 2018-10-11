@@ -509,7 +509,7 @@ validateText language { cpuQuantityValidation, netQuantityValidation, totalQuant
 
     else if isNotEmptyBoth then
         if not isCpuValid && not isNetValid then
-            ( translate language (InvalidQuantityInput "CPU / NET"), " false" )
+            ( translate language (InvalidQuantityInput "CPU, NET"), " false" )
 
         else if not isCpuValid then
             ( translate language (InvalidQuantityInput "CPU"), " false" )

@@ -261,7 +261,7 @@ tests =
                             }
 
                         expected =
-                            ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
+                            ( "가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
                     Expect.equal expected (validateText Korean defaultModel)
             , test "cpu EmptyQuantity, net OverValidQuantity" <|
@@ -273,7 +273,7 @@ tests =
                             }
 
                         expected =
-                            ( "언스테이크 가능한 NET 수량을 초과하였습니다.", " false" )
+                            ( "가능한 NET 수량을 초과하였습니다.", " false" )
                     in
                     Expect.equal expected (validateText Korean defaultModel)
             , test "cpu OverValidQuantity, net OverValidQuantity" <|
@@ -286,7 +286,7 @@ tests =
                             }
 
                         expected =
-                            ( "언스테이크 가능한 CPU 수량을 초과하였습니다.", " false" )
+                            ( "가능한 CPU 수량을 초과하였습니다.", " false" )
                     in
                     Expect.equal expected (validateText Korean defaultModel)
             , test "cpu ValidQuantity, net ValidQuantity" <|
