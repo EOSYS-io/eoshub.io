@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="40" height="24" viewBox="0 0 40 24">
+    <g fill="none" fill-rule="evenodd">
+        <path fill="#none" d="M-343-471H937v720H-343z"/>
+        <g>
+            <rect width="40" height="24" fill="#282828" fill-rule="nonzero" rx="2"/>
+            <text fill="#FFF" font-family="GalanoGrotesque-Regular" font-size="14">
+                <tspan x="10.497" y="16">AD</tspan>
+            </text>
+        </g>
+    </g>
+</svg>
