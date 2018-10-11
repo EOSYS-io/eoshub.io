@@ -2,11 +2,13 @@
 
 
 module Data.Json exposing
-    ( Producer
+    ( CreateEosAccountResponse
+    , Producer
     , Product
     , RailsResponse
     , RequestPaymentResponse
     , VoteStat
+    , createEosAccountResponseDecoder
     , decodeRailsResponseBodyMsg
     , initProducer
     , initProduct
@@ -170,3 +172,15 @@ productDecoder =
         |> required "name" Decode.string
         |> required "price" Decode.int
 
+
+type alias CreateEosAccountResponse =
+    { eosAccount : String
+    , publicKey : String
+    }
+
+
+createEosAccountResponseDecoder : Decoder CreateEosAccountResponse
+createEosAccountResponseDecoder =
+    decode CreateEosAccountResponse
+        |> required "eos_account" Decode.string
+        |> required "public_key" Decode.string

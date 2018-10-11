@@ -3,6 +3,7 @@ module Component.Account.AccountComponent exposing (Message(..), Model, Page(..)
 import Component.Account.Page.Create as Create
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
+import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
@@ -19,6 +20,7 @@ import Util.Flags exposing (Flags)
 
 type Page
     = CreatePage Create.Model
+    | WaitPaymentPage WaitPayment.Model
     | CreatedPage Created.Model
     | EventCreationPage EventCreation.Model
     | NotFoundPage
@@ -76,6 +78,7 @@ initModel location flags =
 
 type Message
     = CreateMessage Create.Message
+    | WaitPaymentMessage WaitPayment.Message
     | CreatedMessage Created.Message
     | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
@@ -159,6 +162,9 @@ view { language, page } =
                 CreatePage subModel ->
                     Html.map CreateMessage (Create.view subModel language)
 
+                WaitPaymentPage subModel ->
+                    Html.map WaitPaymentMessage (WaitPayment.view subModel language)
+
                 CreatedPage subModel ->
                     Html.map CreatedMessage (Created.view subModel language)
 
@@ -188,6 +194,13 @@ update message ({ page, language, flags } as model) =
                     Create.update subMessage subModel flags language
             in
             ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
+
+        ( WaitPaymentMessage subMessage, WaitPaymentPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    WaitPayment.update subMessage subModel flags language
+            in
+            ( { model | page = newPage |> WaitPaymentPage }, Cmd.map WaitPaymentMessage subCmd )
 
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
@@ -250,6 +263,9 @@ getPage route =
     case route of
         CreateRoute _ ->
             CreatePage Create.initModel
+
+        WaitPaymentRoute maybeOrderNo ->
+            WaitPaymentPage (WaitPayment.initModel maybeOrderNo)
 
         CreatedRoute maybeEosAccount maybePublicKey ->
             CreatedPage (Created.initModel maybeEosAccount maybePublicKey)

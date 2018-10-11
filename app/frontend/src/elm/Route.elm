@@ -7,6 +7,7 @@ import UrlParser exposing ((</>), (<?>), Parser, map, oneOf, parsePath, s, strin
 type Route
     = IndexRoute
     | CreateRoute (Maybe String)
+    | WaitPaymentRoute (Maybe String)
     | CreatedRoute (Maybe String) (Maybe String)
     | EventCreationRoute (Maybe String)
     | SearchRoute (Maybe String)
@@ -23,6 +24,7 @@ matchRoute =
     oneOf
         [ map IndexRoute top
         , map CreateRoute (s "account" </> s "create" <?> stringParam "locale")
+        , map WaitPaymentRoute (s "account" </> s "wait_payment" <?> stringParam "order_no")
         , map CreatedRoute (s "account" </> s "created" <?> stringParam "eos_account" <?> stringParam "public_key")
         , map EventCreationRoute (s "account" </> s "event_creation" <?> stringParam "locale")
         , map SearchRoute (s "search" <?> stringParam "query")

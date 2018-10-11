@@ -20,6 +20,10 @@ Rails.application.routes.draw do
     collection do
       post :request_payment
     end
+
+    member do
+      post :create_eos_account
+    end
   end
 
   resources :payment_results, only: [:create]

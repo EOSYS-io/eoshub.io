@@ -77,13 +77,14 @@ class OrdersController < ApplicationController
     raise Exceptions::DefaultError, Exceptions::ORDER_NOT_PAID if order.created?
     raise Exceptions::DefaultError, Exceptions::ORDER_ALREADY_DELIVERED if order.delivered?
 
+    public_key = order.public_key
     eos_account = order.eos_account
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(eos_account)
 
-    response = request_eos_account_creation(eos_account, order.public_key)
+    response = request_eos_account_creation(eos_account, public_key)
     if response.code == 200
       order.delivered!
-      render json: { message: I18n.t('users.eos_account_created') }, status: :ok
+      render json: { eos_account: eos_account, public_key: public_key }, status: :ok
     elsif response.return_code == :couldnt_connect
       render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
     elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
