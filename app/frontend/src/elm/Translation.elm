@@ -73,7 +73,10 @@ type I18n
     | TotalAmount
     | StakedAmount
     | UnstakedAmount
-    | TransactionPossible
+    | TransactionOptimal
+    | TransactionFine
+    | TransactionAttention
+    | TransactionWarning
     | ManageStaking
     | WhatIsStaking
     | Transfer
@@ -389,10 +392,28 @@ getMessages i18n =
             , chinese = "staking代币"
             }
 
-        TransactionPossible ->
-            { korean = "트랜잭션 가능"
-            , english = "Transactions possible"
-            , chinese = "可以进行交易"
+        TransactionOptimal ->
+            { korean = "트랜잭션 최상"
+            , english = "Tx Optimal"
+            , chinese = "交易速度流畅"
+            }
+
+        TransactionFine ->
+            { korean = "트랜잭션 원활"
+            , english = "Tx Fine"
+            , chinese = "交易速度上"
+            }
+
+        TransactionAttention ->
+            { korean = "트랜잭션 주의"
+            , english = "Tx Attention"
+            , chinese = "交易速度中"
+            }
+
+        TransactionWarning ->
+            { korean = "트랜잭션 경고"
+            , english = "Tx Warning"
+            , chinese = "交易速度下"
             }
 
         ManageStaking ->

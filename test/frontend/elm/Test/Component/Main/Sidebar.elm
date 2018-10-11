@@ -1,15 +1,20 @@
 module Test.Component.Main.Sidebar exposing (tests)
 
-import Component.Main.Sidebar exposing (Message(..), State(..), initModel, update)
+import Component.Main.Sidebar exposing (Message(..), State(..), getResourceStatusText, initModel, update)
 import Expect
 import Navigation
 import Port
 import Test exposing (..)
+import Translation exposing (I18n(..), Language(..), translate)
 import Util.WalletDecoder exposing (WalletStatus(..))
 
 
 tests : Test
 tests =
+    let
+        defaultLanguage =
+            Korean
+    in
     describe "Wallet module"
         [ describe "update"
             [ describe "UpdateWalletStatus"
@@ -136,5 +141,30 @@ tests =
                             )
                             (update (AndThen ToggleSidebar (OpenConfigPanel False)) initModel)
                 ]
+            ]
+        , describe "getResourceStatusText"
+            [ test "resourceStatusCode 1" <|
+                \() ->
+                    Expect.equal
+                        (translate defaultLanguage TransactionWarning)
+                        (getResourceStatusText defaultLanguage 1)
+            , test "resourceStatusCode 2" <|
+                \() ->
+                    Expect.equal
+                        (translate defaultLanguage TransactionAttention)
+                        (getResourceStatusText defaultLanguage 2)
+            , test "resourceStatusCode 3" <|
+                \() ->
+                    Expect.equal
+                        (translate defaultLanguage TransactionFine)
+                        (getResourceStatusText defaultLanguage 3)
+            , test "resourceStatusCode 4" <|
+                \() ->
+                    Expect.equal
+                        (translate defaultLanguage TransactionOptimal)
+                        (getResourceStatusText defaultLanguage 4)
+            , test "resourceStatusCode else" <|
+                \() ->
+                    Expect.equal "" (getResourceStatusText defaultLanguage 10)
             ]
         ]
