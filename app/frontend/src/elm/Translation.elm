@@ -265,6 +265,7 @@ type I18n
     | StakePossible
     | DelegatePossible
     | UndelegatePossible
+    | NotFoundDesc
 
 
 translate : Language -> I18n -> String
@@ -1585,4 +1586,10 @@ getMessages i18n =
             { korean = "임대취소 할 계정명을 선택하세요"
             , english = "Select account name to undelegate"
             , chinese = "输入要撤回租借的账户名"
+            }
+
+        NotFoundDesc ->
+            { korean = "페이지를 찾을 수 없습니다."
+            , english = "Not found"
+            , chinese = "未找到"
             }
