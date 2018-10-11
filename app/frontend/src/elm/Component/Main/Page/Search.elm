@@ -37,7 +37,15 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
-import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
+import Data.Action
+    exposing
+        ( Action
+        , Message(..)
+        , actionsDecoder
+        , refineAction
+        , removeDuplicated
+        , viewActionInfo
+        )
 import Data.Table exposing (Row(..))
 import Dict exposing (Dict)
 import Html
@@ -227,8 +235,11 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
         OnFetchActions (Ok actions) ->
             let
-                refinedAction =
-                    List.map (refineAction query) actions
+                uniqueActions =
+                    removeDuplicated actions
+
+                refinedActions =
+                    List.map (refineAction query) uniqueActions
 
                 smallestActionSeq =
                     case List.head actions of
@@ -239,11 +250,11 @@ update message ({ query, pagination, openedActionSeq } as model) =
                             -1
             in
             if smallestActionSeq > 0 then
-                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
 
             else
                 -- NOTE(boseok): There're no more actions to load
-                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
 
         OnFetchActions (Err _) ->
             ( model, Cmd.none )
@@ -324,16 +335,16 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                     ]
                 , ul []
                     [ li []
+                        [ span [] [ text "Unstaked" ]
+                        , strong [ title account.coreLiquidBalance ]
+                            [ text account.coreLiquidBalance ]
+                        ]
+                    , li []
                         [ span [] [ text "Staked" ]
                         , strong [ title stakedAmount ]
                             [ text stakedAmount ]
                         , i [] [ text "more infomation" ]
                         , viewStakedDetail language model
-                        ]
-                    , li []
-                        [ span [] [ text "Unstaked" ]
-                        , strong [ title account.coreLiquidBalance ]
-                            [ text account.coreLiquidBalance ]
                         ]
                     , li []
                         [ span [] [ text "Refunding" ]
@@ -434,7 +445,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                     [ thead []
                         [ tr []
                             [ th [ scope "col" ]
-                                [ text (translate language Number) ]
+                                [ text (translate language TxId) ]
                             , th [ scope "col" ]
                                 [ text (translate language Type) ]
                             , th [ scope "col" ]
@@ -444,7 +455,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                             ]
                         ]
                     , tbody []
-                        (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
+                        (viewActionList selectedActionCategory account.accountName openedActionSeq actions)
                     ]
                 , div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ShowMore ]
@@ -611,17 +622,17 @@ viewAccountSpan value =
         ]
 
 
-viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory accountName openedActionSeq actions =
-    List.map (viewAction language selectedActionCategory accountName openedActionSeq) actions
+viewActionList : SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
+viewActionList selectedActionCategory accountName openedActionSeq actions =
+    List.map (viewAction selectedActionCategory accountName openedActionSeq) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction : SelectedActionCategory -> String -> Int -> Action -> Html Message
+viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
-        [ td []
-            [ text (toString accountActionSeq) ]
+        [ td [ title trxId ]
+            [ text trxId ]
         , td []
             [ text actionTag ]
         , td []

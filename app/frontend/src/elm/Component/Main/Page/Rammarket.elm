@@ -18,6 +18,7 @@ import Data.Action
         , actionsDecoder
         , encodeAction
         , initBuyramParameters
+        , removeDuplicated
         )
 import Data.Table exposing (GlobalFields, RammarketFields, Row, initGlobalFields, initRammarketFields)
 import Html
@@ -239,7 +240,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
     in
     case message of
         OnFetchActions (Ok actions) ->
-            ( { model | actions = actions |> List.reverse }, Cmd.none )
+            ( { model | actions = actions |> removeDuplicated |> List.reverse }, Cmd.none )
 
         OnFetchActions (Err _) ->
             ( model, Cmd.none )
