@@ -13,6 +13,7 @@
 #  order_no                                                           :string           not null
 #  pgcode                                                             :integer          default(NULL), not null
 #  product_name                                                       :string           default("")
+#  public_key                                                         :string           default(""), not null
 #  state                                                              :integer          default("created"), not null
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null
@@ -63,15 +64,20 @@ class Order < ApplicationRecord
 
   enum state: {
     created: 0,
-    paid: 1
+    paid: 1,
+    delivered: 2
   }
 
   aasm column: :state, enum: true do
     state :created, initial: true
-    state :paid
+    state :paid, :delivered
 
     event :paid do
       transitions from: :created, to: :paid
+    end
+
+    event :delivered do
+      transitions from: :paid, to: :delivered
     end
   end
 

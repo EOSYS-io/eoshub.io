@@ -15,8 +15,10 @@ en:
     eos_node_connection_failed: 'Failed to connect EOS node'
     eos_wallet_connection_failed: 'Failed to connect EOS wallet'
   orders:
-    deactivated_product: "You can't order this item for now."
+    deactivated_product: "You can't order this item for now"
     order_not_exist: "The order does not exist"
+    order_not_paid: "The order has not been paid"
+    order_already_delivered: "The account has already been created"
   eos_ram_price_histores:
     unsupported_intvl: 'Unsupported interval.'
   vote_stats:

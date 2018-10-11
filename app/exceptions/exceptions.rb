@@ -6,6 +6,8 @@ module Exceptions
   DUPLICATE_EOS_ACCOUNT = { message: I18n.t('users.eos_account_already_exist'), error_code: 2, status_code: :conflict }.freeze
   DEACTIVATED_PRODUCT = { message: I18n.t('orders.deactivated_product'), error_code: 3, status_code: :bad_request }.freeze
   ORDER_NOT_EXIST = { message: I18n.t('orders.order_not_exist'), error_code: 4, status_code: :bad_request }.freeze
+  ORDER_NOT_PAID = { message: I18n.t('orders.order_not_paid'), error_code: 5, status_code: :bad_request }.freeze
+  ORDER_ALREADY_DELIVERED = { message: I18n.t('orders.order_already_delivered'), error_code: 6, status_code: :bad_request }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects
