@@ -82,55 +82,55 @@ tests =
             , describe "actionHidden"
                 [ test "transfer, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "transfer" actionCategory "transfer")
+                        Expect.equal False (actionHidden "transfer" "transfer")
                 , test "transfer, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "transfer" actionCategory "not transfer")
+                        Expect.equal True (actionHidden "transfer" "not transfer")
                 , test "claimrewards, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "claimrewards" actionCategory "claimrewards")
+                        Expect.equal False (actionHidden "claimrewards" "claimrewards")
                 , test "claimrewards, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "claimrewards" actionCategory "not claimrewards")
+                        Expect.equal True (actionHidden "claimrewards" "not claimrewards")
                 , test "ram, buyram, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" actionCategory "buyram")
+                        Expect.equal False (actionHidden "ram" "buyram")
                 , test "ram, buyrambytes hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" actionCategory "buyrambytes")
+                        Expect.equal False (actionHidden "ram" "buyrambytes")
                 , test "ram, sellram hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "ram" actionCategory "sellram")
+                        Expect.equal False (actionHidden "ram" "sellram")
                 , test "ram, not ram, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "ram" actionCategory "not ram")
+                        Expect.equal True (actionHidden "ram" "not ram")
                 , test "resource, delegatebw, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "resource" actionCategory "delegatebw")
+                        Expect.equal False (actionHidden "resource" "delegatebw")
                 , test "resource, undelegatebw hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "resource" actionCategory "undelegatebw")
+                        Expect.equal False (actionHidden "resource" "undelegatebw")
                 , test "resource, not resource, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "resource" actionCategory "not resource")
+                        Expect.equal True (actionHidden "resource" "not resource")
                 , test "regproxy, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "regproxy" actionCategory "regproxy")
+                        Expect.equal False (actionHidden "regproxy" "regproxy")
                 , test "regproxy, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "regproxy" actionCategory "not regproxy")
+                        Expect.equal True (actionHidden "regproxy" "not regproxy")
                 , test "voteproducer, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "voteproducer" actionCategory "voteproducer")
+                        Expect.equal False (actionHidden "voteproducer" "voteproducer")
                 , test "voteproducer, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "voteproducer" actionCategory "not voteproducer")
+                        Expect.equal True (actionHidden "voteproducer" "not voteproducer")
                 , test "newaccount, hidden False" <|
                     \() ->
-                        Expect.equal False (actionHidden "newaccount" actionCategory "newaccount")
+                        Expect.equal False (actionHidden "newaccount" "newaccount")
                 , test "newaccount, hidden True" <|
                     \() ->
-                        Expect.equal True (actionHidden "newaccount" actionCategory "not newaccount")
+                        Expect.equal True (actionHidden "newaccount" "not newaccount")
                 ]
             ]
         ]

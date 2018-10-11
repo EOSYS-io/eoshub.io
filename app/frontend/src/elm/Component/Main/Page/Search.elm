@@ -619,7 +619,7 @@ viewActionList language selectedActionCategory accountName openedActionSeq actio
 
 viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
 viewAction _ selectedActionCategory accountName openedActionSeq ({ accountActionSeq, blockTime, actionName, actionTag } as action) =
-    tr [ hidden (actionHidden selectedActionCategory actionCategory actionName) ]
+    tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td []
             [ text (toString accountActionSeq) ]
         , td []
@@ -630,8 +630,8 @@ viewAction _ selectedActionCategory accountName openedActionSeq ({ accountAction
         ]
 
 
-actionHidden : SelectedActionCategory -> Dict String (List String) -> String -> Bool
-actionHidden selectedActionCategory actionCategory currentAction =
+actionHidden : SelectedActionCategory -> String -> Bool
+actionHidden selectedActionCategory currentAction =
     let
         maybeSet =
             Dict.get selectedActionCategory actionCategory
