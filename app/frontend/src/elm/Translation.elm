@@ -174,15 +174,12 @@ type I18n
     | ShowMore
     | SearchPublicKey
     | SearchResultPublicKey
-    | StakePossible String String
-    | StakePossibleAmountDesc
-    | OverStakePossibleAmount
     | DelegatebwSucceeded String
     | DelegatebwFailed String
     | UndelegatebwSucceeded String
     | UndelegatebwFailed String
-    | UnstakeInvalidQuantity String
-    | UnstakeOverValidQuantity String
+    | InvalidQuantityInput String
+    | OverValidQuantityInput String
     | UnstakePossible
     | BuyramSucceeded String
     | BuyramFailed String
@@ -233,6 +230,41 @@ type I18n
     | Regproxy
     | Voteproducer
     | NewaccountTx
+    | AvailableCapacity
+    | TotalCapacity String
+    | UsedCapacity String
+    | Permissions
+    | Permission
+    | Threshold
+    | Keys
+    | Stake
+    | Unstake
+    | Delegate
+    | Undelegate
+    | AutoAllocation
+    | StakeAvailableAmount
+    | SetManually
+    | TypeStakeAmount
+    | NeverExceedStakeAmount
+    | AutoStakeAmountDesc String String Bool
+    | ExceedStakeAmount
+    | InvalidInputAmount
+    | RecommendedStakeAmount String String
+    | Cancel
+    | TypeUnstakeAmount
+    | DelegateAvailableAmount
+    | DelegatedList
+    | TypeAccountToDelegate
+    | TypeDelegateAmount
+    | ExceedDelegateAmount
+    | NeverExceedDelegateAmount
+    | DelegatedAmount String
+    | Select
+    | TypeAccount
+    | SelectAccountToUndelegate
+    | StakePossible
+    | DelegatePossible
+    | UndelegatePossible
 
 
 translate : Language -> I18n -> String
@@ -375,7 +407,7 @@ getMessages i18n =
             }
 
         TotalAmount ->
-            { korean = "총 보유 수량"
+            { korean = "총 보유량"
             , english = "Total Amount"
             , chinese = "总数量"
             }
@@ -441,15 +473,15 @@ getMessages i18n =
             }
 
         ManageResource ->
-            { korean = "리소스 관리"
-            , english = "Manage Resource"
-            , chinese = "管理资源"
+            { korean = "CPU / NET"
+            , english = "CPU / NET"
+            , chinese = "CPU/NET"
             }
 
         ManageResourceDesc ->
-            { korean = "CPU, 네트워크 자원관리를 하실 수 있어요"
-            , english = "Manage CPU, Network"
-            , chinese = "在这儿可以管理CPU和网络资源"
+            { korean = "리소스를 관리할 수 있어요 :)"
+            , english = "Manage your resource here :)"
+            , chinese = "可以管理资源：）"
             }
 
         Vote ->
@@ -556,7 +588,7 @@ getMessages i18n =
 
         Confirm ->
             { korean = "확인"
-            , english = "Verify"
+            , english = "Confirm"
             , chinese = "确认"
             }
 
@@ -998,24 +1030,6 @@ getMessages i18n =
             , chinese = "如下为查询到的公匙信息"
             }
 
-        StakePossible cpu net ->
-            { korean = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            , english = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            , chinese = "한 CPU " ++ cpu ++ " / NET " ++ net ++ " 스테이크 됩니다."
-            }
-
-        StakePossibleAmountDesc ->
-            { korean = "보유한 수량만큼 스테이크 할 수 있습니다."
-            , english = ""
-            , chinese = ""
-            }
-
-        OverStakePossibleAmount ->
-            { korean = "스테이크 가능한 수량보다 많습니다."
-            , english = ""
-            , chinese = ""
-            }
-
         DelegatebwSucceeded receiver ->
             { korean = receiver ++ "에게 스테이크 완료!"
             , english = ""
@@ -1040,22 +1054,40 @@ getMessages i18n =
             , chinese = ""
             }
 
-        UnstakeInvalidQuantity resourceType ->
+        InvalidQuantityInput resourceType ->
             { korean = resourceType ++ "의 수량입력이 잘못되었습니다"
-            , english = ""
+            , english = "Invalid " ++ resourceType ++ " amount"
             , chinese = resourceType ++ "数量输入有误"
             }
 
-        UnstakeOverValidQuantity resourceType ->
-            { korean = "언스테이크 가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
-            , english = ""
-            , chinese = ""
+        OverValidQuantityInput resourceType ->
+            { korean = "가능한 " ++ resourceType ++ " 수량을 초과하였습니다."
+            , english = "The " ++ resourceType ++ " input exceeds the available balance."
+            , chinese = "超过了可输入的" ++ resourceType ++ "数量"
+            }
+
+        StakePossible ->
+            { korean = "스테이크 가능합니다 :)"
+            , english = "Ready to stake :)"
+            , chinese = "可以进行Stake :）"
             }
 
         UnstakePossible ->
             { korean = "언스테이크 가능합니다 :)"
-            , english = ""
-            , chinese = "可以进行Unstake：）"
+            , english = "Ready to unstake :)"
+            , chinese = "可以进行Unstake :）"
+            }
+
+        DelegatePossible ->
+            { korean = "임대 가능합니다 :)"
+            , english = "Ready to delegate :)"
+            , chinese = "可以进行租出去 :）"
+            }
+
+        UndelegatePossible ->
+            { korean = "임대취소 가능합니다 :)"
+            , english = "Ready to undelegate :)"
+            , chinese = "可以进行租回来 :）"
             }
 
         BuyramSucceeded str ->
@@ -1107,9 +1139,9 @@ getMessages i18n =
             }
 
         VotePhilosophyDesc ->
-            { korean = "BPGovernance Proxy\nBPGovernance는 블록 프로듀서를 위한 투표를 하기 위해 모든 주체의 동의가 필요한 최초의 다중 서명(Multi-sig) 프록시입니다. 우리는 독립적인 BP로서 이것이 좋은 결정을 하게 하고 부패의 가능성을 줄이기 때문에 이 방식을 택했습니다. 앞으로 우리의 재량에 따라 프록시 관리 멤버를 추가 할 수 있습니다. 각 그룹은 최대한 많은, 다양한 커뮤니티를 포함하기 위해 중국어, 영어 및 한국어를 사용하는 커뮤니티에서 활동합니다. EOS Pacific 은 언어의 장벽이 존재하는 만다린 커뮤니티에 분쟁 해결 교육 및 서비스를 제공하고자 만들어진 ‘EOS 만다린 중재 커뮤니티’인 EMAC의 리더 중 하나입니다. EOS New York은 헌법 문서 초안 작성, 자유 시장 분쟁 해결 체계 제안 및 EOS 툴 개발에 적극적으로 참여해 왔습니다. EOSYS는 커뮤니티 프로젝트인 Worker Proposal 시스템의 리더 중 하나이며 dApp 컨테스트 및 인큐베이션과 같은 이니셔티브를 통해 EOS 개발자에게 기회를 제공합니다.\n\nBPGovernance에 위임함으로써 생태계에 진정으로 기여하는 다양한 능력을 가진 플레이어들에게 투표하고 있다는 것을 확신하실 수 있습니다."
-            , english = "BPGovernance Proxy\nBPGovernance is the first multi-signature proxy which requires unanimous agreement from each managing participant to stake a vote for block producers. We do this because, as three independent parties, this will increase the quality of choices and reduce the likelihood of corruption. In the future, we may add more managing members at our discretion.\n\nEach of these groups has visibility into Mandarin, English, and Korean speaking communities for maximum exposure. EOS Pacific is one of the leaders of EMAC, the EOS Mandarin Arbitration Community, which seeks to provide dispute resolution education and services to the underserved Mandarin communities. EOS New York is actively involved in drafting constitutional documents, providing proposals for a free-market dispute resolution framework, and building EOS tools. EOSYS is one of the leaders of the proposed Worker Proposal system and provides the opportunity to developers through initiatives like paid dApp competitions and incubation.\n\nBy delegating your vote to BPGovernance you are ensuring that you are voting for high-quality contributors to the EOS ecosystem across many disciplines and competencies."
-            , chinese = ""
+            { korean = "EOS 블록체인은 블록 프로듀서들이 EOS 거버넌스 및 커뮤니티 발전을 위해 기여할 때 비로소 가치를 발현할 수 있습니다. BPGovernance는 EOS New York, EOS Pacific, 그리고 EOSYS가 합작하여 만든 최초의 다중 서명 프록시로 regproducer 합의문 준수, EOS 거버넌스 참여 및 커뮤니티 형성 3가지 기준을 주요 척도로 하여 올바른 BP 선정에 기여합니다."
+            , english = "EOS is valuable when Block Producers strive for the development of EOS governance and community overall. BPGovernance, a proxy started by EOS New York, EOS Pacific, and EOSYS, is the first multi-signature proxy to vote for a Block Producer who must demonstrate evident of: Compliance with the regproducer agreement, Contribution to the EOS governance, and Active Involvement in the community."
+            , chinese = "EOS区块链是BP对Governance及社区的发展做出贡献时才能体现其价值。BPGovernance是由EOS NEW YORK，EOS Pacific和EOSYS联合发起的多种签名代理（multi-signature proxy）项目。该项目以遵守regproducer协议，参与EOS Governance以及社区建立为主要标准为选择正确的BP进行代理投票。"
             }
 
         ProxiedEos ->
@@ -1350,4 +1382,207 @@ getMessages i18n =
             { korean = "계정 생성"
             , english = "Newaccount"
             , chinese = "Newaccount"
+            }
+
+        AvailableCapacity ->
+            { korean = "사용 가능 용량"
+            , english = "Available"
+            , chinese = "能够使用"
+            }
+
+        TotalCapacity capacity ->
+            { korean = "총 용량: " ++ capacity
+            , english = "Total: " ++ capacity
+            , chinese = "总量: " ++ capacity
+            }
+
+        UsedCapacity capacity ->
+            { korean = "사용된 용량: " ++ capacity
+            , english = "Used: " ++ capacity
+            , chinese = "已被使用: " ++ capacity
+            }
+
+        Permissions ->
+            { korean = "보유 권한"
+            , english = "Permissions"
+            , chinese = "保有权限"
+            }
+
+        Permission ->
+            { korean = "권한"
+            , english = "Permission"
+            , chinese = "权限"
+            }
+
+        Threshold ->
+            { korean = "임계값"
+            , english = "Threshold"
+            , chinese = "临界值"
+            }
+
+        Keys ->
+            { korean = "키값"
+            , english = "Keys"
+            , chinese = "Key值"
+            }
+
+        Stake ->
+            { korean = "스테이크"
+            , english = "Stake"
+            , chinese = "Stake"
+            }
+
+        Unstake ->
+            { korean = "언스테이크"
+            , english = "Unstake"
+            , chinese = "Unstake"
+            }
+
+        Delegate ->
+            { korean = "임대하기"
+            , english = "Delegate"
+            , chinese = "租出去"
+            }
+
+        Undelegate ->
+            { korean = "임대취소하기"
+            , english = "Undelegate"
+            , chinese = "租回来"
+            }
+
+        AutoAllocation ->
+            { korean = "CPU, NET에 각각 4:1의 비율로 자동 분배됩니다"
+            , english = "Auto-set in 4:1 to CPU, NET"
+            , chinese = "在CPU和NET以4:1的比率进行自动分配"
+            }
+
+        StakeAvailableAmount ->
+            { korean = "스테이크 가능 수량"
+            , english = "Available Balance"
+            , chinese = "可stake数量"
+            }
+
+        SetManually ->
+            { korean = "직접설정"
+            , english = "Edit"
+            , chinese = "亲自设定"
+            }
+
+        TypeStakeAmount ->
+            { korean = "스테이크 할 수량을 입력하세요"
+            , english = "Enter the amount to stake"
+            , chinese = "请输入要stake的数量"
+            }
+
+        NeverExceedStakeAmount ->
+            { korean = "스테이크 가능 수량만큼 입력 가능합니다"
+            , english = "The input cannot exceed the available balance"
+            , chinese = "只能输入可stake的数量范围内"
+            }
+
+        AutoStakeAmountDesc cpu net isManual ->
+            { korean =
+                "CPU "
+                    ++ cpu
+                    ++ " EOS / NET "
+                    ++ net
+                    ++ " EOS 만큼 스테이크 됩니다 "
+                    ++ (if isManual then
+                            ""
+
+                        else
+                            "(자동설정)"
+                       )
+            , english = "The input cannot exceed the available balance"
+            , chinese = "只能输入可stake的数量范围内"
+            }
+
+        ExceedStakeAmount ->
+            { korean = "스테이크 가능 수량을 초과했습니다"
+            , english = "The input exceeds the available balance"
+            , chinese = "超过了可输入数量"
+            }
+
+        InvalidInputAmount ->
+            { korean = "수량 입력이 잘못되었습니다"
+            , english = "Invalid input amount"
+            , chinese = "输入数量有误"
+            }
+
+        RecommendedStakeAmount cpu net ->
+            { korean = "CPU와 NET에 각각 최소 " ++ cpu ++ ", " ++ net ++ " 이상 스테이크 해주세요"
+            , english = "Please stake over " ++ cpu ++ " and " ++ net ++ " for CPU and NET"
+            , chinese = "请各在CPU和NET至少stake" ++ cpu ++ "和" ++ net ++ "以上"
+            }
+
+        Cancel ->
+            { korean = "취소"
+            , english = "Cancel"
+            , chinese = "取消"
+            }
+
+        TypeUnstakeAmount ->
+            { korean = "언스테이크 할 수량을 입력하세요"
+            , english = "Enter amount to unstake"
+            , chinese = "请输入要unstake的数量"
+            }
+
+        DelegateAvailableAmount ->
+            { korean = "임대 가능 수량"
+            , english = "Available Balance"
+            , chinese = "可租数量"
+            }
+
+        NeverExceedDelegateAmount ->
+            { korean = "임대 가능 수량만큼 입력 가능합니다"
+            , english = "The input cannot exceed the available balance"
+            , chinese = "输入数量不能超过可租数量"
+            }
+
+        DelegatedList ->
+            { korean = "임대 받은 계정 리스트"
+            , english = "List of delegated accounts"
+            , chinese = "被租的账户名单"
+            }
+
+        TypeAccountToDelegate ->
+            { korean = "임대 받을 계정명을 입력하세요"
+            , english = "Enter account name to delegate"
+            , chinese = "请输入被租的账户名"
+            }
+
+        TypeDelegateAmount ->
+            { korean = "임대 할 수량을 입력하세요"
+            , english = "Enter amount to delegate"
+            , chinese = "请输入要租的数量"
+            }
+
+        ExceedDelegateAmount ->
+            { korean = "임대 가능 수량을 초과했습니다"
+            , english = "The input exceeds the available balance"
+            , chinese = "超过了可租数量"
+            }
+
+        DelegatedAmount resourceType ->
+            { korean = resourceType ++ " 임대 수량"
+            , english = resourceType ++ " delegated"
+            , chinese = resourceType ++ "的可租数量"
+            }
+
+        Select ->
+            { korean = "선택"
+            , english = "Select"
+            , chinese = "选择"
+            }
+
+        TypeAccount ->
+            { korean = "계정명을 입력하세요"
+            , english = "Enter account name"
+            , chinese = "请输入账户名"
+            }
+
+        SelectAccountToUndelegate ->
+            { korean = "임대취소 할 계정명을 선택하세요"
+            , english = "Select account name to undelegate"
+            , chinese = "输入要撤回租借的账户名"
             }

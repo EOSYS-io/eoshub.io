@@ -28,8 +28,6 @@ import Data.Account
         , AccountPerm
         , KeyPerm
         , Permission
-        , PermissionShortened
-        , Refund
         , RequiredAuth
         , defaultAccount
         , getResource
@@ -91,7 +89,6 @@ import Html.Attributes
         , scope
         , title
         , type_
-        , value
         )
 import Html.Events exposing (on, onClick, targetValue)
 import Http
@@ -291,7 +288,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, delbandTable, actions, selectedActionCategory, openedActionSeq } as model) =
+view language ({ account, actions, selectedActionCategory, openedActionSeq } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -314,6 +311,28 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
 
         ( ramUsed, ramAvailable, ramTotal, ramPercent, ramColorCode ) =
             getResource "ram" account.ramUsage (account.ramQuota - account.ramUsage) account.ramQuota
+
+        resourceDetailDiv topic available total used colorCode percent =
+            div []
+                [ h4 []
+                    [ text topic
+                    ]
+                , p []
+                    [ text (translate language AvailableCapacity)
+                    , br []
+                        []
+                    , text available
+                    ]
+                , p []
+                    [ text (translate language (TotalCapacity total)) ]
+                , p []
+                    [ text (translate language (UsedCapacity used)) ]
+                , div [ class "status" ]
+                    [ span [ class (getResourceColorClass colorCode), attribute "style" ("height:" ++ percent) ]
+                        []
+                    , text percent
+                    ]
+                ]
     in
     main_ [ class "search" ]
         [ h2 []
@@ -357,66 +376,9 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                 [ h3 []
                     [ text (translate language Translation.Resource) ]
                 , div [ class "wrapper" ]
-                    [ div []
-                        [ h4 []
-                            [ text "CPU"
-                            ]
-                        , p []
-                            [ text "Available"
-                            , br []
-                                []
-                            , text cpuAvailable
-                            ]
-                        , p []
-                            [ text ("Total: " ++ cpuTotal) ]
-                        , p []
-                            [ text ("Used: " ++ cpuUsed) ]
-                        , div [ class "status" ]
-                            [ span [ class (getResourceColorClass cpuColorCode), attribute "style" ("height:" ++ cpuPercent) ]
-                                []
-                            , text cpuPercent
-                            ]
-                        ]
-                    , div []
-                        [ h4 []
-                            [ text "NET"
-                            ]
-                        , p []
-                            [ text "Available"
-                            , br []
-                                []
-                            , text netAvailable
-                            ]
-                        , p []
-                            [ text ("Total: " ++ netTotal) ]
-                        , p []
-                            [ text ("Used: " ++ netUsed) ]
-                        , div [ class "status" ]
-                            [ span [ class (getResourceColorClass netColorCode), attribute "style" ("height:" ++ netPercent) ]
-                                []
-                            , text netPercent
-                            ]
-                        ]
-                    , div []
-                        [ h4 []
-                            [ text "RAM"
-                            ]
-                        , p []
-                            [ text "Available"
-                            , br []
-                                []
-                            , text ramAvailable
-                            ]
-                        , p []
-                            [ text ("Total: " ++ ramTotal) ]
-                        , p []
-                            [ text ("Used: " ++ ramUsed) ]
-                        , div [ class "status" ]
-                            [ span [ class (getResourceColorClass ramColorCode), attribute "style" ("height:" ++ ramPercent) ]
-                                []
-                            , text ramPercent
-                            ]
-                        ]
+                    [ resourceDetailDiv "CPU" cpuAvailable cpuTotal cpuUsed cpuColorCode cpuPercent
+                    , resourceDetailDiv "NET" netAvailable netTotal netUsed netColorCode netPercent
+                    , resourceDetailDiv "RAM" ramAvailable ramTotal ramUsed ramColorCode ramPercent
                     ]
                 ]
             , viewPermissionSection language account
@@ -424,21 +386,21 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                 [ h3 []
                     [ text (translate language Transactions) ]
                 , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
-                    [ option [ value "all" ]
+                    [ option [ Html.Attributes.value "all" ]
                         [ text (translate language All) ]
-                    , option [ value "transfer" ]
+                    , option [ Html.Attributes.value "transfer" ]
                         [ text (translate language Transfer) ]
-                    , option [ value "claimrewards" ]
+                    , option [ Html.Attributes.value "claimrewards" ]
                         [ text (translate language Claimrewards) ]
-                    , option [ value "ram" ]
+                    , option [ Html.Attributes.value "ram" ]
                         [ text (translate language Ram) ]
-                    , option [ value "resource" ]
+                    , option [ Html.Attributes.value "resource" ]
                         [ text (translate language Resource) ]
-                    , option [ value "regproxy" ]
+                    , option [ Html.Attributes.value "regproxy" ]
                         [ text (translate language Regproxy) ]
-                    , option [ value "voteproducer" ]
+                    , option [ Html.Attributes.value "voteproducer" ]
                         [ text (translate language Voteproducer) ]
-                    , option [ value "newaccount" ]
+                    , option [ Html.Attributes.value "newaccount" ]
                         [ text (translate language NewaccountTx) ]
                     ]
                 , table []
@@ -467,7 +429,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
 
 
 viewStakedDetail : Language -> Model -> Html Message
-viewStakedDetail language ({ account, delbandTable } as model) =
+viewStakedDetail language { account, delbandTable } =
     let
         { totalResources, selfDelegatedBandwidth } =
             account
@@ -484,13 +446,7 @@ viewStakedDetail language ({ account, delbandTable } as model) =
         stakedToAmount =
             sumStakedToList delbandTable account.accountName
 
-        totalList =
-            [ uElement language SelfStaked selfStakedAmount
-            , uElement language StakedBy stakedByAmount
-            , uElement language StakedTo stakedToAmount
-            ]
-
-        uElement language i18n amount =
+        uElement i18n amount =
             u []
                 [ text
                     (translate language i18n
@@ -499,21 +455,27 @@ viewStakedDetail language ({ account, delbandTable } as model) =
                     )
                 ]
 
+        totalList =
+            [ uElement SelfStaked selfStakedAmount
+            , uElement StakedBy stakedByAmount
+            , uElement StakedTo stakedToAmount
+            ]
+
         delbandList =
             delbandTable
                 |> filterDelbandWithAccountName account.accountName
                 |> List.map
                     (\maybeDelband ->
                         let
-                            ( receiver, sum ) =
+                            ( maybeReceiver, sum ) =
                                 case maybeDelband of
-                                    Delband value ->
-                                        ( value.receiver, assetAdd value.cpuWeight value.netWeight )
+                                    Delband { receiver, cpuWeight, netWeight } ->
+                                        ( receiver, assetAdd cpuWeight netWeight )
 
                                     _ ->
                                         ( "", "0 EOS" )
                         in
-                        s [] [ text (receiver ++ ": " ++ sum) ]
+                        s [] [ text (maybeReceiver ++ ": " ++ sum) ]
                     )
     in
     b []
@@ -529,8 +491,8 @@ sumStakedToList delbandTable accountName =
                 |> List.map
                     (\maybeDelband ->
                         case maybeDelband of
-                            Delband value ->
-                                assetAdd value.cpuWeight value.netWeight
+                            Delband { cpuWeight, netWeight } ->
+                                assetAdd cpuWeight netWeight
 
                             _ ->
                                 "0 EOS"
@@ -544,8 +506,8 @@ filterDelbandWithAccountName accountName delbandTable =
     List.filter
         (\maybeDelband ->
             case maybeDelband of
-                Delband value ->
-                    value.receiver /= accountName
+                Delband { receiver } ->
+                    receiver /= accountName
 
                 _ ->
                     False
@@ -557,16 +519,16 @@ viewPermissionSection : Language -> Account -> Html Message
 viewPermissionSection language account =
     section [ class "permission" ]
         [ h3 []
-            [ text "퍼미션" ]
+            [ text (translate language Permissions) ]
         , table []
             [ thead []
                 [ tr []
                     [ th [ scope "col" ]
-                        [ text "Permission" ]
+                        [ text (translate language Translation.Permission) ]
                     , th [ scope "col" ]
-                        [ text "Threshold" ]
+                        [ text (translate language Threshold) ]
                     , th [ scope "col" ]
-                        [ text "Keys" ]
+                        [ text (translate language Keys) ]
                     ]
                 ]
             , tbody []

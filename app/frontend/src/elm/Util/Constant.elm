@@ -1,4 +1,15 @@
-module Util.Constant exposing (day, eosysProxyAccount, giga, hour, kilo, mega, minute, second, tera)
+module Util.Constant exposing
+    ( day
+    , eosysProxyAccount
+    , giga
+    , hour
+    , kilo
+    , mega
+    , minimumRequiredResources
+    , minute
+    , second
+    , tera
+    )
 
 -- module for collect unit constants
 -- [time]
@@ -55,3 +66,11 @@ tera =
 eosysProxyAccount : String
 eosysProxyAccount =
     "bpgovernance"
+
+
+minimumRequiredResources :
+    { cpu : String
+    , net : String
+    }
+minimumRequiredResources =
+    { cpu = "0.8 EOS", net = "0.2 EOS" }

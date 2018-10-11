@@ -20,7 +20,7 @@ import Data.Account
 import Html exposing (Html, a, div, h2, main_, p, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
-import Translation exposing (I18n(..), Language)
+import Translation exposing (I18n(..), Language, translate)
 
 
 
@@ -160,36 +160,36 @@ view language ({ tab } as model) account =
     div []
         [ main_ [ class "resource_management" ]
             [ h2 []
-                [ text "리소스 관리" ]
+                [ text (translate language ManageResource) ]
             , p []
-                [ text "EOS 네트워크를 활용하기 위한 리소스 관리 페이지입니다." ]
+                [ text (translate language ManageResourceDesc) ]
             , div [ class "tab" ]
-                [ resourceTabA model StakeSelected
-                , resourceTabA model UnstakeSelected
-                , resourceTabA model DelegateSelected
-                , resourceTabA model UndelegateSelected
+                [ resourceTabA language model StakeSelected
+                , resourceTabA language model UnstakeSelected
+                , resourceTabA language model DelegateSelected
+                , resourceTabA language model UndelegateSelected
                 ]
             , tabHtml
             ]
         ]
 
 
-resourceTabA : Model -> SelectedTab -> Html Message
-resourceTabA { selectedTab } selected =
+resourceTabA : Language -> Model -> SelectedTab -> Html Message
+resourceTabA language { selectedTab } selected =
     let
         aText =
             case selected of
                 StakeSelected ->
-                    "스테이크"
+                    translate language Translation.Stake
 
                 UnstakeSelected ->
-                    "언스테이크"
+                    translate language Translation.Unstake
 
                 DelegateSelected ->
-                    "임대해주기"
+                    translate language Translation.Delegate
 
                 UndelegateSelected ->
-                    "임대취소하기"
+                    translate language Translation.Undelegate
 
         resourceTab =
             case selected of

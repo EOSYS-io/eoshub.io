@@ -10,7 +10,7 @@ import Data.Table exposing (Row(..), initDelbandFields)
 import Html exposing (Html, button, div, h2, h3, input, li, p, section, text, ul)
 import Html.Attributes exposing (action, attribute, class, id, name, placeholder, type_)
 import Html.Events exposing (onClick, onInput)
-import Translation exposing (I18n(..), Language)
+import Translation exposing (I18n(..), Language, translate)
 
 
 
@@ -75,27 +75,27 @@ view language { isDelegateListModalOpened, query } list accountName =
         ]
         [ div [ class "wrapper" ]
             [ h2 []
-                [ text "임대해준 계정 리스트" ]
+                [ text (translate language DelegatedList) ]
             , Html.form [ action "" ]
                 [ input
                     [ class "search_token"
                     , id ""
                     , name ""
-                    , placeholder "계정명 검색하기"
+                    , placeholder (translate language TypeAccount)
                     , type_ "text"
                     , onInput AccountInput
                     , Html.Attributes.value query
                     ]
                     []
                 , button [ type_ "button" ]
-                    [ text "검색" ]
+                    [ text (translate language Select) ]
                 ]
             , div [ class "result list", attribute "role" "listbox" ]
                 [ ul []
                     (viewDelbandList language list query accountName)
                 ]
             , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
-                [ text "닫기" ]
+                [ text (translate language Close) ]
             ]
         ]
 
@@ -119,7 +119,7 @@ viewDelbandList language list query accountName =
 
 
 viewDelbandLi : Language -> String -> Row -> Html Message
-viewDelbandLi _ accountName row =
+viewDelbandLi language accountName row =
     let
         delband =
             case row of
@@ -141,7 +141,7 @@ viewDelbandLi _ accountName row =
                 [ type_ "button"
                 , onClick (ClickDelband delband.receiver delband.cpuWeight delband.netWeight)
                 ]
-                [ text "선택" ]
+                [ text (translate language Select) ]
             ]
 
     else

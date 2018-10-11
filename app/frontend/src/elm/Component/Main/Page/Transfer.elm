@@ -148,12 +148,6 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                 [ class "btn_area" ]
                 [ button
                     [ type_ "button"
-                    , class "undo button"
-                    , disabled True
-                    ]
-                    [ text "취소" ]
-                , button
-                    [ type_ "button"
                     , class "ok button"
                     , onClick SubmitAction
                     , disabled (not isFormValid)
@@ -177,13 +171,13 @@ accountWarningSpan accountStatus language =
                     ( "", translate language AccountExample )
 
                 InvalidAccount ->
-                    ( " false", translate language CheckAccountName )
+                    ( " false", translate language AccountIsInvalid )
 
                 ValidAccount ->
-                    ( " true", translate language ValidAccountI18n )
+                    ( " true", translate language AccountIsValid )
 
                 InexistentAccount ->
-                    ( " false", "존재하지 않는 계정입니다." )
+                    ( " false", translate language AccountNotExist )
 
                 AccountToBeVerified ->
                     ( "", "" )
@@ -285,7 +279,7 @@ validateForm ({ accountValidation, quantityValidation, memoValidation } as model
         isFormValid =
             (accountValidation == ValidAccount)
                 && (quantityValidation == ValidQuantity)
-                && (memoValidation == ValidMemo)
+                && (memoValidation /= Validation.MemoTooLong)
     in
     { model
         | isFormValid = isFormValid

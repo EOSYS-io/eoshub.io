@@ -278,19 +278,19 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) ({ coreLiquidBalance } as account) =
+view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isStakeAmountModalOpened } as model) { coreLiquidBalance } =
     div [ class "stake container" ]
         [ p []
-            [ text "스테이크 가능한 토큰 수량"
+            [ text (translate language StakeAvailableAmount)
             , em []
                 [ text coreLiquidBalance ]
             ]
         , section []
             [ div [ class "wallet status" ]
                 [ h3 []
-                    [ text "최소 1 EOS 이상은 스테이크 해놓으시는게 좋습니다. :)" ]
+                    [ text (translate language AutoAllocation) ]
                 , a [ onClick OpenStakeAmountModal ]
-                    [ text "직접설정" ]
+                    [ text (translate language SetManually) ]
                 ]
             , div [ class "input field" ]
                 [ label [ for "eos" ]
@@ -298,7 +298,7 @@ view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isS
                 , input
                     [ attribute "autofocus" ""
                     , class "size large"
-                    , placeholder "수량을 입력하세요"
+                    , placeholder (translate language TypeStakeAmount)
                     , step "0.0001"
                     , type_ "number"
                     , onInput TotalAmountInput
@@ -306,10 +306,10 @@ view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isS
                     ]
                     []
                 , quantityWarningSpan totalQuantityValidation language model
-                , percentageButton percentageOfLiquid Percentage10
-                , percentageButton percentageOfLiquid Percentage50
-                , percentageButton percentageOfLiquid Percentage70
-                , percentageButton percentageOfLiquid Percentage100
+                , percentageButton language percentageOfLiquid Percentage10
+                , percentageButton language percentageOfLiquid Percentage50
+                , percentageButton language percentageOfLiquid Percentage70
+                , percentageButton language percentageOfLiquid Percentage100
                 ]
             , div [ class "btn_area" ]
                 [ button
@@ -325,15 +325,15 @@ view language ({ totalQuantity, percentageOfLiquid, totalQuantityValidation, isS
                     , type_ "button"
                     , onClick SubmitAction
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
-        , Html.map ModalMessage (viewStakeAmountModal language model account isStakeAmountModalOpened)
+        , Html.map ModalMessage (viewStakeAmountModal language model isStakeAmountModalOpened coreLiquidBalance)
         ]
 
 
-viewStakeAmountModal : Language -> Model -> Account -> Bool -> Html StakeAmountMessage
-viewStakeAmountModal _ { distributionRatio, stakeAmountModal } { totalResources } opened =
+viewStakeAmountModal : Language -> Model -> Bool -> String -> Html StakeAmountMessage
+viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
     let
         cpuValidateAttr =
             modalValidateAttr stakeAmountModal.totalQuantityValidation stakeAmountModal.cpuQuantityValidation
@@ -356,25 +356,21 @@ viewStakeAmountModal _ { distributionRatio, stakeAmountModal } { totalResources 
         , attribute "role" "alert"
         ]
         [ div [ class "wrapper" ]
-            [ h2 []
-                [ text "토큰 스테이크 수량 직접 설정" ]
-            , div [ class "token status" ]
+            [ div [ class "token status" ]
                 [ h3 []
-                    [ text "총 스테이크할 토큰"
+                    [ text (translate language StakeAvailableAmount)
                     , strong []
-                        [ text (stakeAmountModal.totalQuantity ++ " EOS") ]
+                        [ text ((coreLiquidBalance |> assetToFloat |> Round.round 4) ++ " EOS") ]
                     ]
                 ]
             , div [ class "form container" ]
                 [ h3 []
                     [ text "CPU" ]
-                , p []
-                    [ text ("Staked : " ++ totalResources.cpuWeight) ]
                 , Html.form [ action "", class "true validate" ]
                     [ input
                         [ class "user"
                         , attribute "data-validate" cpuValidateAttr
-                        , placeholder "스테이크할 수량을 설정하세요"
+                        , placeholder (translate language TypeStakeAmount)
                         , type_ "text"
                         , onInput CpuAmountInput
                         ]
@@ -386,13 +382,11 @@ viewStakeAmountModal _ { distributionRatio, stakeAmountModal } { totalResources 
             , div [ class "form container" ]
                 [ h3 []
                     [ text "NET" ]
-                , p []
-                    [ text ("Staked : " ++ totalResources.netWeight) ]
                 , Html.form [ action "" ]
                     [ input
                         [ class "user"
                         , attribute "data-validate" netValidateAttr
-                        , placeholder "스테이크할 수량을 설정하세요"
+                        , placeholder (translate language TypeStakeAmount)
                         , type_ "text"
                         , onInput NetAmountInput
                         ]
@@ -401,25 +395,24 @@ viewStakeAmountModal _ { distributionRatio, stakeAmountModal } { totalResources 
                         [ text "EOS" ]
                     ]
                 ]
-            , p [ class "validate description" ]
-                [ text (toString distributionRatio.cpu ++ ":" ++ toString distributionRatio.net ++ " 비율로 스테이킹 하는 것이 가장 좋습니다.") ]
+            , p [] []
             , div [ class "btn_area" ]
                 [ button [ class "undo button", type_ "button", onClick CloseModal ]
-                    [ text "취소" ]
+                    [ text (translate language Cancel) ]
                 , button
                     [ class "ok button"
                     , disabled (not stakeAmountModal.isFormValid)
                     , type_ "button"
                     , onClick ClickOk
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
         ]
 
 
-percentageButton : PercentageOfLiquid -> PercentageOfLiquid -> Html Message
-percentageButton modelPercentageOfLiquid thisPercentageOfLiquid =
+percentageButton : Language -> PercentageOfLiquid -> PercentageOfLiquid -> Html Message
+percentageButton language modelPercentageOfLiquid thisPercentageOfLiquid =
     let
         ratio =
             getPercentageOfLiquid thisPercentageOfLiquid
@@ -429,7 +422,7 @@ percentageButton modelPercentageOfLiquid thisPercentageOfLiquid =
                 Round.round 0 (ratio * 100) ++ "%"
 
             else
-                "최대"
+                translate language Max
     in
     button
         [ type_ "button"
@@ -464,34 +457,26 @@ getPercentageOfLiquid percentageOfLiquid =
 quantityWarningSpan : QuantityStatus -> Language -> Model -> Html Message
 quantityWarningSpan quantityStatus language { delegatebw, manuallySet } =
     let
-        -- TODO(boseok): it needs to be translated
-        manualText =
-            if manuallySet then
-                "직접설정"
-
-            else
-                "자동설정"
-
         ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
                     ( " false", translate language InvalidAmount )
 
                 OverValidQuantity ->
-                    ( " false", translate language OverStakePossibleAmount )
+                    ( " false", translate language ExceedStakeAmount )
 
                 ValidQuantity ->
                     ( " true"
-                    , manualText
-                        ++ translate language
-                            (StakePossible
-                                delegatebw.stakeCpuQuantity
-                                delegatebw.stakeNetQuantity
-                            )
+                    , translate language
+                        (AutoStakeAmountDesc
+                            delegatebw.stakeCpuQuantity
+                            delegatebw.stakeNetQuantity
+                            manuallySet
+                        )
                     )
 
                 EmptyQuantity ->
-                    ( "", translate language StakePossibleAmountDesc )
+                    ( "", translate language NeverExceedStakeAmount )
     in
     span [ class ("validate description" ++ classAddedValue) ]
         [ text textValue ]

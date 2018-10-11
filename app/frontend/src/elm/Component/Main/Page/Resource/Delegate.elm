@@ -32,7 +32,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Round
-import Translation exposing (I18n(..), Language)
+import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
         ( assetAdd
@@ -291,13 +291,13 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ delegatebw, delbandTable, accountValidation, totalQuantity, isFormValid, delegateListModal } as model) { accountName, coreLiquidBalance } =
+view language ({ delegatebw, delbandTable, accountValidation, isFormValid, delegateListModal } as model) { accountName, coreLiquidBalance } =
     let
         accountWarning =
             accountWarningSpan accountValidation language
 
         ( validatedText, validatedAttr ) =
-            validateText model
+            validateText language model
 
         modalHtml =
             Html.map DelegateListMessage (DelegateList.view language delegateListModal delbandTable accountName)
@@ -305,19 +305,19 @@ view language ({ delegatebw, delbandTable, accountValidation, totalQuantity, isF
     div [ class "rental cancel container" ]
         [ div [ class "available status" ]
             [ h3 []
-                [ text "임대가능 토큰수량"
+                [ text (translate language DelegateAvailableAmount)
                 , strong []
                     [ text coreLiquidBalance ]
                 ]
             , a [ id "viewRentalListAccount", onClick OpenDelegateListModal ]
-                [ text "임대해준 계정 리스트 보기" ]
+                [ text (translate language DelegatedList) ]
             ]
         , section []
             [ div [ class "input field" ]
                 [ input
                     [ attribute "autofocus" ""
                     , class "size large"
-                    , placeholder "임대해줄 계정의 이름을 입력하세요"
+                    , placeholder (translate language TypeAccountToDelegate)
                     , onInput ReceiverInput
                     , type_ "text"
                     , attribute "maxlength" "12"
@@ -328,15 +328,11 @@ view language ({ delegatebw, delbandTable, accountValidation, totalQuantity, isF
                 ]
             ]
         , section []
-            [ h3 []
-                [ text "임대해 줄 토큰 총량" ]
-            , p []
-                [ text totalQuantity ]
-            , p [ class ("validate description" ++ validatedAttr) ]
+            [ p [ class ("validate description" ++ validatedAttr) ]
                 [ text validatedText ]
             , div [ class "field group" ]
-                [ resourceInputDiv model Cpu
-                , resourceInputDiv model Net
+                [ resourceInputDiv language model Cpu
+                , resourceInputDiv language model Net
                 ]
             , div [ class "btn_area" ]
                 [ button
@@ -345,15 +341,15 @@ view language ({ delegatebw, delbandTable, accountValidation, totalQuantity, isF
                     , type_ "button"
                     , onClick SubmitAction
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
         , modalHtml
         ]
 
 
-percentageButton : ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
-percentageButton resourceType modelPercentageOfResource thisPercentageOfResource =
+percentageButton : Language -> ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
+percentageButton language resourceType modelPercentageOfResource thisPercentageOfResource =
     let
         ratio =
             getPercentageOfResource thisPercentageOfResource
@@ -363,7 +359,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
                 Round.round 0 (ratio * 100) ++ "%"
 
             else
-                "최대"
+                translate language Max
     in
     button
         [ type_ "button"
@@ -386,8 +382,8 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
         [ text buttonText ]
 
 
-resourceInputDiv : Model -> ResourceType -> Html Message
-resourceInputDiv { delegatebw, percentageOfCpu, percentageOfNet, totalQuantityValidation, cpuQuantityValidation, netQuantityValidation } resourceType =
+resourceInputDiv : Language -> Model -> ResourceType -> Html Message
+resourceInputDiv language { delegatebw, percentageOfCpu, percentageOfNet, totalQuantityValidation, cpuQuantityValidation, netQuantityValidation } resourceType =
     let
         cpuValidateAttr =
             modalValidateAttr totalQuantityValidation cpuQuantityValidation
@@ -408,7 +404,7 @@ resourceInputDiv { delegatebw, percentageOfCpu, percentageOfNet, totalQuantityVa
             [ text resourceText ]
         , input
             [ attribute "data-validate" validateAttr
-            , placeholder "0"
+            , placeholder (translate language TypeDelegateAmount)
             , step "0.0001"
             , type_ "number"
             , onInput inputMessage
@@ -417,10 +413,10 @@ resourceInputDiv { delegatebw, percentageOfCpu, percentageOfNet, totalQuantityVa
             []
         , span [ class "unit" ]
             [ text "EOS" ]
-        , percentageButton resourceType percentageOfResource Percentage10
-        , percentageButton resourceType percentageOfResource Percentage50
-        , percentageButton resourceType percentageOfResource Percentage70
-        , percentageButton resourceType percentageOfResource Percentage100
+        , percentageButton language resourceType percentageOfResource Percentage10
+        , percentageButton language resourceType percentageOfResource Percentage50
+        , percentageButton language resourceType percentageOfResource Percentage70
+        , percentageButton language resourceType percentageOfResource Percentage100
         ]
 
 
@@ -495,8 +491,8 @@ validateQuantityFields ({ delegatebw, totalQuantity } as model) eosLiquidAmount 
         }
 
 
-validateText : Model -> ( String, String )
-validateText { cpuQuantityValidation, netQuantityValidation, totalQuantityValidation, accountValidation } =
+validateText : Language -> Model -> ( String, String )
+validateText language { cpuQuantityValidation, netQuantityValidation, totalQuantityValidation, accountValidation } =
     let
         ( isAccountValid, isNotEmptyBoth, isCpuValid, isNetValid, isTotalValid ) =
             validateEach accountValidation cpuQuantityValidation netQuantityValidation totalQuantityValidation
@@ -509,26 +505,26 @@ validateText { cpuQuantityValidation, netQuantityValidation, totalQuantityValida
                 && isTotalValid
     in
     if isFormValid then
-        ( "임대 가능합니다 :)", " true" )
+        ( translate language DelegatePossible, " true" )
 
     else if isNotEmptyBoth then
         if not isCpuValid && not isNetValid then
-            ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU, NET"), " false" )
 
         else if not isCpuValid then
-            ( "CPU의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "CPU"), " false" )
 
         else if not isNetValid then
-            ( "NET의 수량입력이 잘못되었습니다", " false" )
+            ( translate language (InvalidQuantityInput "NET"), " false" )
 
         else if not isTotalValid then
-            ( "임대가능 토큰수량을 초과하였습니다", " false" )
+            ( translate language ExceedDelegateAmount, " false" )
 
         else
-            ( "임대해줄 계정을 입력하세요", " false" )
+            ( translate language TypeAccountToDelegate, " false" )
 
     else
-        ( "임대가능한 토큰 수만큼 임대가 가능합니다", "" )
+        ( translate language NeverExceedDelegateAmount, "" )
 
 
 

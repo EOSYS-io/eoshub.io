@@ -1,6 +1,5 @@
 module Component.Main.Page.Resource.Unstake exposing
     ( Message(..)
-    , MinimumResource
     , Model
     , PercentageOfResource(..)
     , ResourceType(..)
@@ -23,6 +22,7 @@ import Html.Events exposing (onClick, onInput)
 import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
+import Util.Constant exposing (minimumRequiredResources)
 import Util.Formatter
     exposing
         ( assetSubtract
@@ -42,18 +42,11 @@ import Util.Validation
 
 type alias Model =
     { undelegatebw : UndelegatebwParameters
-    , minimumResource : MinimumResource
     , percentageOfCpu : PercentageOfResource
     , percentageOfNet : PercentageOfResource
     , cpuQuantityValidation : QuantityStatus
     , netQuantityValidation : QuantityStatus
     , isFormValid : Bool
-    }
-
-
-type alias MinimumResource =
-    { cpu : String
-    , net : String
     }
 
 
@@ -73,7 +66,6 @@ type ResourceType
 initModel : Model
 initModel =
     { undelegatebw = { from = "", receiver = "", unstakeNetQuantity = "", unstakeCpuQuantity = "" }
-    , minimumResource = { cpu = "0.8 EOS", net = "0.2 EOS" }
     , percentageOfCpu = NoOp
     , percentageOfNet = NoOp
     , cpuQuantityValidation = EmptyQuantity
@@ -95,13 +87,13 @@ type Message
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ undelegatebw, minimumResource } as model) { accountName, selfDelegatedBandwidth } =
+update message ({ undelegatebw } as model) { accountName, selfDelegatedBandwidth } =
     let
         unstakePossibleCpu =
-            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumResource.cpu
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumRequiredResources.cpu
 
         unstakePossibleNet =
-            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumResource.net
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumRequiredResources.net
     in
     case message of
         CpuAmountInput value ->
@@ -188,7 +180,7 @@ update message ({ undelegatebw, minimumResource } as model) { accountName, selfD
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) { selfDelegatedBandwidth } =
+view language ({ cpuQuantityValidation, netQuantityValidation, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) { selfDelegatedBandwidth } =
     let
         ( validatedText, validatedAttr ) =
             validateText language model
@@ -203,14 +195,14 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         [ div [ class "my resource" ]
             [ div []
                 [ h3 []
-                    [ text "SELF CPU 스테이크 양"
+                    [ text "CPU self-staked"
                     , strong []
                         [ text selfDelegatedBandwidth.cpuWeight ]
                     ]
                 ]
             , div []
                 [ h3 []
-                    [ text "SELF NET 스테이크 양"
+                    [ text "NET self-staked"
                     , strong []
                         [ text selfDelegatedBandwidth.netWeight ]
                     ]
@@ -219,7 +211,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
         , section []
             -- NOTE(boseok): new design is needed
             [ h3 []
-                [ text ("CPU는 최소 " ++ minimumResource.cpu ++ ", NET은 최소 " ++ minimumResource.net ++ " 이상 스테이크 하세요.") ]
+                [ text (translate language (RecommendedStakeAmount minimumRequiredResources.cpu minimumRequiredResources.net)) ]
             , p [ class ("validate description" ++ validatedAttr) ]
                 [ text validatedText ]
             , div [ class "field group" ]
@@ -228,7 +220,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         [ text "CPU" ]
                     , input
                         [ attribute "data-validate" cpuValidateAttr
-                        , placeholder "CPU 언스테이크 할 수량 입력"
+                        , placeholder (translate language TypeUnstakeAmount)
                         , step "0.0001"
                         , type_ "number"
                         , onInput CpuAmountInput
@@ -237,17 +229,17 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , percentageButton Cpu percentageOfCpu Percentage10
-                    , percentageButton Cpu percentageOfCpu Percentage50
-                    , percentageButton Cpu percentageOfCpu Percentage70
-                    , percentageButton Cpu percentageOfCpu Percentage100
+                    , percentageButton language Cpu percentageOfCpu Percentage10
+                    , percentageButton language Cpu percentageOfCpu Percentage50
+                    , percentageButton language Cpu percentageOfCpu Percentage70
+                    , percentageButton language Cpu percentageOfCpu Percentage100
                     ]
                 , div [ class "input field" ]
                     [ label [ for "net" ]
                         [ text "NET" ]
                     , input
                         [ attribute "data-validate" netValidateAttr
-                        , placeholder "NET 언스테이크할 수량 입력"
+                        , placeholder (translate language TypeUnstakeAmount)
                         , step "0.0001"
                         , type_ "number"
                         , onInput NetAmountInput
@@ -256,10 +248,10 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                         []
                     , span [ class "unit" ]
                         [ text "EOS" ]
-                    , percentageButton Net percentageOfNet Percentage10
-                    , percentageButton Net percentageOfNet Percentage50
-                    , percentageButton Net percentageOfNet Percentage70
-                    , percentageButton Net percentageOfNet Percentage100
+                    , percentageButton language Net percentageOfNet Percentage10
+                    , percentageButton language Net percentageOfNet Percentage50
+                    , percentageButton language Net percentageOfNet Percentage70
+                    , percentageButton language Net percentageOfNet Percentage100
                     ]
                 ]
             , div [ class "btn_area" ]
@@ -269,14 +261,14 @@ view language ({ cpuQuantityValidation, netQuantityValidation, minimumResource, 
                     , type_ "button"
                     , onClick SubmitAction
                     ]
-                    [ text "확인" ]
+                    [ text (translate language Confirm) ]
                 ]
             ]
         ]
 
 
-percentageButton : ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
-percentageButton resourceType modelPercentageOfResource thisPercentageOfResource =
+percentageButton : Language -> ResourceType -> PercentageOfResource -> PercentageOfResource -> Html Message
+percentageButton language resourceType modelPercentageOfResource thisPercentageOfResource =
     let
         ratio =
             getPercentageOfResource thisPercentageOfResource
@@ -286,7 +278,7 @@ percentageButton resourceType modelPercentageOfResource thisPercentageOfResource
                 Round.round 0 (ratio * 100) ++ "%"
 
             else
-                "최대"
+                translate language Max
     in
     button
         [ type_ "button"
@@ -392,27 +384,27 @@ validateText language { cpuQuantityValidation, netQuantityValidation } =
         if not isCpuValid then
             case cpuQuantityValidation of
                 InvalidQuantity ->
-                    ( translate language (UnstakeInvalidQuantity "CPU"), " false" )
+                    ( translate language (InvalidQuantityInput "CPU"), " false" )
 
                 OverValidQuantity ->
-                    ( translate language (UnstakeOverValidQuantity "CPU"), " false" )
+                    ( translate language (OverValidQuantityInput "CPU"), " false" )
 
                 _ ->
-                    ( "발생 불가 케이스", "" )
+                    ( "This case should not happen!", "" )
 
         else if not isNetValid then
             case netQuantityValidation of
                 InvalidQuantity ->
-                    ( translate language (UnstakeInvalidQuantity "NET"), " false" )
+                    ( translate language (InvalidQuantityInput "NET"), " false" )
 
                 OverValidQuantity ->
-                    ( translate language (UnstakeOverValidQuantity "NET"), " false" )
+                    ( translate language (OverValidQuantityInput "NET"), " false" )
 
                 _ ->
-                    ( "발생 불가 케이스", "" )
+                    ( "This case should not happen!", "" )
 
         else
-            ( "발생 불가 케이스", "" )
+            ( "This case should not happen!", "" )
 
     else
         ( "", "" )
