@@ -82,7 +82,8 @@ section.content {
 	main.ram_market,
 	main.vote,
 	main.resource_management,
-	main.account {
+	main.account,
+	main.error_404 {
 		height:inherit;
 		box-sizing:border-box;
 		padding:42px;
@@ -123,7 +124,8 @@ section.content {
 	main.transfer,
 	main.vote,
 	main.account,
-	main.resource_management {
+	main.resource_management,
+	main.error_404 {
 		width:965px;
 	}
 	// // width
@@ -163,7 +165,8 @@ main.search,
 main.ram_market,
 main.vote,
 main.resource_management ,
-main.account {
+main.account,
+main.error_404 {
 	transition:margin 0.4s;
 }
 
@@ -178,7 +181,8 @@ aside.shrink {
 	+ main.ram_market,
 	+ main.vote,
 	+ main.resource_management ,
-	+ main.account {
+	+ main.account,
+	+ main.error_404 {
 		margin-left:0;
 	}
 
@@ -906,5 +910,42 @@ div.tab {
 			border-top:2px solid $pink;
 			background-color:$xxxx-dark-gray;
 		}
+	}
+}
+
+
+
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------
+
+
+
+// --------------------------------------------------------------------------------
+// error case :: 404
+// --------------------------------------------------------------------------------
+section.content main.error_404 {
+	position:relative;
+	height:calc(100vh - #{$header_height});
+}
+
+section.error.message.wrapper {
+	position:absolute;
+	top:50%;
+	left:50%;
+	transform:translate(-50%,-50%);
+
+	&:before {
+		content:'';
+		background:url('../image/bnr-404@2x.png') center center no-repeat transparent;
+		background-size:contain;
+		display:block;
+		width:381px;
+		height:291px;
+	}
+	h2 {
+		margin-top:8px;
+		text-align:center;
+		font-size:$x-large;
 	}
 }
