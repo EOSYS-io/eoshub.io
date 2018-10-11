@@ -3,6 +3,7 @@ module Component.Main.Page.Search exposing
     , Model
     , Pagination
     , SelectedActionCategory
+    , actionCategory
     , actionHidden
     , filterDelbandWithAccountName
     , getActions
@@ -38,6 +39,7 @@ import Data.Account
         )
 import Data.Action exposing (Action, Message(..), actionsDecoder, refineAction, viewActionInfo)
 import Data.Table exposing (Row(..))
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -147,6 +149,19 @@ initModel accountName =
     , selectedActionCategory = "all"
     , openedActionSeq = -1
     }
+
+
+actionCategory : Dict String (List String)
+actionCategory =
+    Dict.fromList
+        [ ( "transfer", [ "transfer" ] )
+        , ( "claimrewards", [ "claimrewards" ] )
+        , ( "ram", [ "buyram", "buyrambytes", "sellram" ] )
+        , ( "resource", [ "delegatebw", "undelegatebw" ] )
+        , ( "regproxy", [ "regproxy" ] )
+        , ( "voteproducer", [ "voteproducer" ] )
+        , ( "newaccount", [ "newaccount" ] )
+        ]
 
 
 initCmd : String -> Model -> Cmd Message
@@ -402,6 +417,18 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                         [ text (translate language All) ]
                     , option [ value "transfer" ]
                         [ text (translate language Transfer) ]
+                    , option [ value "claimrewards" ]
+                        [ text (translate language Claimrewards) ]
+                    , option [ value "ram" ]
+                        [ text (translate language Ram) ]
+                    , option [ value "resource" ]
+                        [ text (translate language Resource) ]
+                    , option [ value "regproxy" ]
+                        [ text (translate language Regproxy) ]
+                    , option [ value "voteproducer" ]
+                        [ text (translate language Voteproducer) ]
+                    , option [ value "newaccount" ]
+                        [ text (translate language NewaccountTx) ]
                     ]
                 , table []
                     [ thead []
@@ -605,12 +632,17 @@ viewAction _ selectedActionCategory accountName openedActionSeq ({ accountAction
 
 actionHidden : SelectedActionCategory -> String -> Bool
 actionHidden selectedActionCategory currentAction =
+    let
+        maybeSet =
+            Dict.get selectedActionCategory actionCategory
+                |> Maybe.withDefault []
+    in
     case selectedActionCategory of
         "all" ->
             False
 
         _ ->
-            if currentAction == selectedActionCategory then
+            if List.member currentAction maybeSet then
                 False
 
             else
