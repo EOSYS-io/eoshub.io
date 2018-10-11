@@ -455,7 +455,7 @@ view language ({ account, delbandTable, actions, selectedActionCategory, openedA
                             ]
                         ]
                     , tbody []
-                        (viewActionList language selectedActionCategory account.accountName openedActionSeq actions)
+                        (viewActionList selectedActionCategory account.accountName openedActionSeq actions)
                     ]
                 , div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ShowMore ]
@@ -622,14 +622,14 @@ viewAccountSpan value =
         ]
 
 
-viewActionList : Language -> SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
-viewActionList language selectedActionCategory accountName openedActionSeq actions =
-    List.map (viewAction language selectedActionCategory accountName openedActionSeq) actions
+viewActionList : SelectedActionCategory -> String -> Int -> List Action -> List (Html Message)
+viewActionList selectedActionCategory accountName openedActionSeq actions =
+    List.map (viewAction selectedActionCategory accountName openedActionSeq) actions
         |> List.reverse
 
 
-viewAction : Language -> SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction _ selectedActionCategory accountName openedActionSeq ({ trxId, accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction : SelectedActionCategory -> String -> Int -> Action -> Html Message
+viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountActionSeq, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td [ title trxId ]
             [ text trxId ]
