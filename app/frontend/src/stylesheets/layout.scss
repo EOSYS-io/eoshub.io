@@ -931,7 +931,7 @@ section.content main.error_404 {
 
 section.error.message.wrapper {
 	position:absolute;
-	top:50%;
+	top:calc(50% - 6vh);
 	left:50%;
 	transform:translate(-50%,-50%);
 
@@ -941,10 +941,10 @@ section.error.message.wrapper {
 		background-size:contain;
 		display:block;
 		width:381px;
-		height:291px;
+		height:251px;
 	}
 	h2 {
-		margin-top:8px;
+		margin-top:20px;
 		text-align:center;
 		font-size:$x-large;
 	}
