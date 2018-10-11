@@ -823,6 +823,9 @@ removeDuplicated : List Action -> List Action
 removeDuplicated actionList =
     let
         getActionIdentifier action =
-            toString (.trxId action) ++ toString (.data action)
+            toString action.trxId
+                ++ toString action.contractAccount
+                ++ toString action.actionName
+                ++ toString action.data
     in
     List.uniqueBy getActionIdentifier actionList

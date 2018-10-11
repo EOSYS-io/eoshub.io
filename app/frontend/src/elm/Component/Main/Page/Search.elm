@@ -238,7 +238,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 uniqueActions =
                     removeDuplicated actions
 
-                refinedAction =
+                refinedActions =
                     List.map (refineAction query) uniqueActions
 
                 smallestActionSeq =
@@ -250,11 +250,11 @@ update message ({ query, pagination, openedActionSeq } as model) =
                             -1
             in
             if smallestActionSeq > 0 then
-                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
 
             else
                 -- NOTE(boseok): There're no more actions to load
-                ( { model | actions = refinedAction ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
 
         OnFetchActions (Err _) ->
             ( model, Cmd.none )
