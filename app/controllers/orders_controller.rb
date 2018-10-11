@@ -1,6 +1,10 @@
 class OrdersController < ApplicationController
   include EosAccount
 
+  skip_before_action :verify_authenticity_token, if: -> { 
+    controller_name == 'orders' && ['request_payment','create','create_eos_account'].include?(action_name)
+  }
+
   def request_payment
     request_params = request_payment_params
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(request_params[:eos_account])
@@ -8,16 +12,19 @@ class OrdersController < ApplicationController
     product = Product.find_by(id: request_params[:product_id])
     raise Exceptions::DefaultError, Exceptions::DEACTIVATED_PRODUCT unless product.active?
     
+    order_no = Order.generate_order_no
     payment_params = {
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
       user_id: request_params[:eos_account],
       pgcode: request_params[:pgcode],
-      order_no: Order.generate_order_no,
+      order_no: order_no,
       amount: product.price,
       product_name: product.name,
       custom_parameter: request_params[:public_key],
-      return_url: orders_path,
-      callback_url: payment_results_path
+      return_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/orders',
+      callback_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/payment_results'
+      # return_url: orders_url,
+      # callback_url: payment_results_url
     }
 
     response = Typhoeus::Request.new(
@@ -31,7 +38,9 @@ class OrdersController < ApplicationController
       timeout: 3
     ).run
 
-    result = JSON.parse(response.body)
+    raise Exceptions::DefaultError, Exceptions::payment_server_not_respond if response.return_code == :operation_timedout
+
+    result = JSON.parse(response.body).merge(order_no: order_no)
     render json: result, status: response.code
   end
 

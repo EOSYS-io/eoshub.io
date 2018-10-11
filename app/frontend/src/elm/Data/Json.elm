@@ -3,14 +3,19 @@
 
 module Data.Json exposing
     ( Producer
+    , Product
     , RailsResponse
+    , RequestPaymentResponse
     , VoteStat
     , decodeRailsResponseBodyMsg
     , initProducer
+    , initProduct
     , initVoteStat
     , producerDecoder
     , producersDecoder
+    , productDecoder
     , railsResponseDecoder
+    , requestPaymentResposeDecoder
     , voteStatDecoder
     )
 
@@ -124,3 +129,44 @@ railsResponseDecoder : Decoder RailsResponse
 railsResponseDecoder =
     decode RailsResponse
         |> required "message" Decode.string
+
+
+type alias RequestPaymentResponse =
+    { token : Int
+    , onlineUrl : String
+    , mobileUrl : String
+    , orderNo : String
+    }
+
+
+requestPaymentResposeDecoder : Decoder RequestPaymentResponse
+requestPaymentResposeDecoder =
+    decode RequestPaymentResponse
+        |> required "token" Decode.int
+        |> required "online_url" Decode.string
+        |> required "mobile_url" Decode.string
+        |> required "order_no" Decode.string
+
+
+type alias Product =
+    { id : Int
+    , name : String
+    , price : Int
+    }
+
+
+initProduct : Product
+initProduct =
+    { id = 0
+    , name = ""
+    , price = 0
+    }
+
+
+productDecoder : Decoder Product
+productDecoder =
+    decode Product
+        |> required "id" Decode.int
+        |> required "name" Decode.string
+        |> required "price" Decode.int
+

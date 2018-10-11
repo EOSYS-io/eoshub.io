@@ -19,6 +19,7 @@ ko:
     order_not_exist: "해당 주문이 존재하지 않습니다."
     order_not_paid: "주문이 결제되지 않았습니다."
     order_already_delivered: "계정이 이미 생성되었습니다."
+    payment_server_not_respond: "결제 서버가 응답하지않습니다. 잠시 후 다시 시도하시거나 관리자에게 연락해주세요."
   eos_ram_price_histores:
     unsupported_intvl: '지원하지 않는 시간 간격입니다.'
   vote_stats:

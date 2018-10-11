@@ -18,4 +18,8 @@ class Product < ApplicationRecord
   validates :name, presence: true
   validates :price, presence: true
   validates :active, inclusion: { in: [true, false] }
+
+  def as_json(*args)
+    { id: id, name: name, price: price }
+  end
 end
