@@ -20,7 +20,7 @@ class OrdersController < ApplicationController
     }
 
     response = Typhoeus::Request.new(
-      Rails.configuration.urls['payletter_host'] + Rails.configuration.urls['payletter_pay_api_url'],
+      Rails.application.credentials.dig(Rails.env.to_sym, :payletter_host) + Rails.configuration.urls['payletter_pay_api_url'],
       method: :post,
       headers: {
         'Content-Type'=> "application/json",
