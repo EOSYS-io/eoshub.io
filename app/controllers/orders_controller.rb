@@ -21,10 +21,11 @@ class OrdersController < ApplicationController
       amount: product.price,
       product_name: product.name,
       custom_parameter: request_params[:public_key],
-      return_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/orders',
-      callback_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/payment_results'
-      # return_url: orders_url,
-      # callback_url: payment_results_url
+      # for local test, pg company do not accept localhost url
+      # return_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/orders',
+      # callback_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/payment_results'
+      return_url: orders_url,
+      callback_url: payment_results_url
     }
 
     response = Typhoeus::Request.new(
