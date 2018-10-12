@@ -69,7 +69,7 @@ update message model =
             ( { model | accounts = data }, Cmd.none )
 
         OnFetchKeyAccounts (Err _) ->
-            ( model, Cmd.none )
+            ( model, Navigation.newUrl "/notfound" )
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )

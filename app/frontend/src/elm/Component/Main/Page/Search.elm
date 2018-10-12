@@ -94,6 +94,7 @@ import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Navigation
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
@@ -222,7 +223,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
             ( { model | account = data }, Cmd.none )
 
         OnFetchAccount (Err _) ->
-            ( model, Cmd.none )
+            ( model, Navigation.newUrl "/notfound" )
 
         OnFetchTableRows (Ok rows) ->
             ( { model | delbandTable = rows }, Cmd.none )
