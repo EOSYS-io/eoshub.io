@@ -39,6 +39,7 @@ import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
         ( assetToFloat
+        , numberWithinDigitLimit
         , removeSymbolIfExists
         )
 import Util.HttpRequest exposing (getTableRows)
@@ -134,30 +135,38 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
             ( model, Cmd.none )
 
         CpuAmountInput value ->
-            let
-                newModel =
-                    { model
-                        | undelegatebw =
-                            { undelegatebw
-                                | unstakeCpuQuantity = value
-                            }
-                        , percentageOfCpu = NoOp
-                    }
-            in
-            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
+            if numberWithinDigitLimit 4 value then
+                let
+                    newModel =
+                        { model
+                            | undelegatebw =
+                                { undelegatebw
+                                    | unstakeCpuQuantity = value
+                                }
+                            , percentageOfCpu = NoOp
+                        }
+                in
+                ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
         NetAmountInput value ->
-            let
-                newModel =
-                    { model
-                        | undelegatebw =
-                            { undelegatebw
-                                | unstakeNetQuantity = value
-                            }
-                        , percentageOfNet = NoOp
-                    }
-            in
-            ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
+            if numberWithinDigitLimit 4 value then
+                let
+                    newModel =
+                        { model
+                            | undelegatebw =
+                                { undelegatebw
+                                    | unstakeNetQuantity = value
+                                }
+                            , percentageOfNet = NoOp
+                        }
+                in
+                ( validate newModel unstakePossibleCpu unstakePossibleNet, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
         ClickCpuPercentage percentageOfResource ->
             let

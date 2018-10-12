@@ -41,6 +41,7 @@ import Util.Formatter
         ( assetAdd
         , assetSubtract
         , assetToFloat
+        , numberWithinDigitLimit
         , removeSymbolIfExists
         )
 import Util.Validation
@@ -148,22 +149,26 @@ update : Message -> Model -> Account -> ( Model, Cmd Message )
 update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmountModalOpened } as model) { coreLiquidBalance, accountName } =
     case message of
         TotalAmountInput value ->
-            let
-                ( cpuQuantity, netQuantity ) =
-                    distributeCpuNet value distributionRatio.cpu distributionRatio.net
+            if numberWithinDigitLimit 4 value then
+                let
+                    ( cpuQuantity, netQuantity ) =
+                        distributeCpuNet value distributionRatio.cpu distributionRatio.net
 
-                newModel =
-                    { model
-                        | totalQuantity = value
-                        , delegatebw =
-                            { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
-                        , percentageOfLiquid = NoOp
-                        , manuallySet = False
-                    }
-            in
-            ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened
-            , Cmd.none
-            )
+                    newModel =
+                        { model
+                            | totalQuantity = value
+                            , delegatebw =
+                                { delegatebw | stakeCpuQuantity = cpuQuantity, stakeNetQuantity = netQuantity }
+                            , percentageOfLiquid = NoOp
+                            , manuallySet = False
+                        }
+                in
+                ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
 
         StakePercentage percentageOfLiquid ->
             let
@@ -207,40 +212,48 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
         ModalMessage stakeAmountMessage ->
             case stakeAmountMessage of
                 CpuAmountInput value ->
-                    let
-                        newTotalQuantity =
-                            assetAdd value stakeAmountModal.netQuantity
-                                |> assetToFloat
-                                |> toString
+                    if numberWithinDigitLimit 4 value then
+                        let
+                            newTotalQuantity =
+                                assetAdd value stakeAmountModal.netQuantity
+                                    |> assetToFloat
+                                    |> toString
 
-                        newModel =
-                            { model
-                                | stakeAmountModal =
-                                    { stakeAmountModal
-                                        | totalQuantity = newTotalQuantity
-                                        , cpuQuantity = value
-                                    }
-                            }
-                    in
-                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                            newModel =
+                                { model
+                                    | stakeAmountModal =
+                                        { stakeAmountModal
+                                            | totalQuantity = newTotalQuantity
+                                            , cpuQuantity = value
+                                        }
+                                }
+                        in
+                        ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+
+                    else
+                        ( model, Cmd.none )
 
                 NetAmountInput value ->
-                    let
-                        newTotalQuantity =
-                            assetAdd stakeAmountModal.cpuQuantity value
-                                |> assetToFloat
-                                |> toString
+                    if numberWithinDigitLimit 4 value then
+                        let
+                            newTotalQuantity =
+                                assetAdd stakeAmountModal.cpuQuantity value
+                                    |> assetToFloat
+                                    |> toString
 
-                        newModel =
-                            { model
-                                | stakeAmountModal =
-                                    { stakeAmountModal
-                                        | totalQuantity = newTotalQuantity
-                                        , netQuantity = value
-                                    }
-                            }
-                    in
-                    ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+                            newModel =
+                                { model
+                                    | stakeAmountModal =
+                                        { stakeAmountModal
+                                            | totalQuantity = newTotalQuantity
+                                            , netQuantity = value
+                                        }
+                                }
+                        in
+                        ( validate newModel (assetToFloat coreLiquidBalance) isStakeAmountModalOpened, Cmd.none )
+
+                    else
+                        ( model, Cmd.none )
 
                 ClickOk ->
                     ( { model
@@ -373,6 +386,7 @@ viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
                         , placeholder (translate language TypeStakeAmount)
                         , type_ "text"
                         , onInput CpuAmountInput
+                        , Html.Attributes.value stakeAmountModal.cpuQuantity
                         ]
                         []
                     , span []
@@ -389,6 +403,7 @@ viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
                         , placeholder (translate language TypeStakeAmount)
                         , type_ "text"
                         , onInput NetAmountInput
+                        , Html.Attributes.value stakeAmountModal.netQuantity
                         ]
                         []
                     , span []

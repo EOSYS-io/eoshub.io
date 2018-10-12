@@ -37,6 +37,7 @@ import Util.Formatter
     exposing
         ( assetAdd
         , assetToFloat
+        , numberWithinDigitLimit
         )
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Validation as Validation
@@ -145,38 +146,46 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
             validateReceiverField model Validation.Fail
 
         CpuAmountInput value ->
-            let
-                total =
-                    assetAdd value delegatebw.stakeNetQuantity
+            if numberWithinDigitLimit 4 value then
+                let
+                    total =
+                        assetAdd value delegatebw.stakeNetQuantity
 
-                newModel =
-                    { model
-                        | delegatebw =
-                            { delegatebw
-                                | stakeCpuQuantity = value
-                            }
-                        , percentageOfCpu = NoOp
-                        , totalQuantity = total
-                    }
-            in
-            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
+                    newModel =
+                        { model
+                            | delegatebw =
+                                { delegatebw
+                                    | stakeCpuQuantity = value
+                                }
+                            , percentageOfCpu = NoOp
+                            , totalQuantity = total
+                        }
+                in
+                ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
         NetAmountInput value ->
-            let
-                total =
-                    assetAdd delegatebw.stakeCpuQuantity value
+            if numberWithinDigitLimit 4 value then
+                let
+                    total =
+                        assetAdd delegatebw.stakeCpuQuantity value
 
-                newModel =
-                    { model
-                        | delegatebw =
-                            { delegatebw
-                                | stakeNetQuantity = value
-                            }
-                        , percentageOfNet = NoOp
-                        , totalQuantity = total
-                    }
-            in
-            ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
+                    newModel =
+                        { model
+                            | delegatebw =
+                                { delegatebw
+                                    | stakeNetQuantity = value
+                                }
+                            , percentageOfNet = NoOp
+                            , totalQuantity = total
+                        }
+                in
+                ( validateQuantityFields newModel eosLiquidAmount, Cmd.none )
+
+            else
+                ( model, Cmd.none )
 
         ReceiverInput value ->
             let
