@@ -38,7 +38,7 @@ class OrdersController < ApplicationController
       timeout: 3
     ).run
 
-    raise Exceptions::DefaultError, Exceptions::payment_server_not_respond if response.return_code == :operation_timedout
+    raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
 
     result = JSON.parse(response.body).merge(order_no: order_no)
     render json: result, status: response.code
