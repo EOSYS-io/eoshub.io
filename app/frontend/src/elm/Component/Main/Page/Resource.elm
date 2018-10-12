@@ -157,20 +157,18 @@ view language ({ tab } as model) account =
                 Undelegate undelegateModel ->
                     Html.map UndelegateMessage (UndelegateTab.view language undelegateModel account)
     in
-    div []
-        [ main_ [ class "resource_management" ]
-            [ h2 []
-                [ text "CPU / NET" ]
-            , p []
-                [ text (translate language ManageResourceDesc) ]
-            , div [ class "tab" ]
-                [ resourceTabA language model StakeSelected
-                , resourceTabA language model UnstakeSelected
-                , resourceTabA language model DelegateSelected
-                , resourceTabA language model UndelegateSelected
-                ]
-            , tabHtml
+    main_ [ class "resource_management" ]
+        [ h2 []
+            [ text "CPU / NET" ]
+        , p []
+            [ text (translate language ManageResourceDesc) ]
+        , div [ class "tab" ]
+            [ resourceTabA language model StakeSelected
+            , resourceTabA language model UnstakeSelected
+            , resourceTabA language model DelegateSelected
+            , resourceTabA language model UndelegateSelected
             ]
+        , tabHtml
         ]
 
 
