@@ -54,6 +54,7 @@ import Html.Attributes
         , id
         , placeholder
         , rel
+        , target
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -385,9 +386,14 @@ view { page, header, notification, sidebar, selectedNav } =
         footerView =
             footer []
                 [ div [ class "sns area" ]
-                    [ a [ href "#", class "sns medium button" ] [ text "Go to Medium" ]
-                    , a [ href "#", class "sns twitter button" ] [ text "Go to Twitter" ]
-                    , a [ href "#", class "sns telegram button" ] [ text "Go to Telegram" ]
+                    [ a
+                        [ href "https://medium.com/eosys", class "sns medium button", target "_blank" ]
+                        [ text "Go to Medium" ]
+                    , a
+                        [ href "https://twitter.com/EOSYS_IO", class "sns twitter button", target "_blank" ]
+                        [ text "Go to Twitter" ]
+                    , a [ href (translate language GoToTelegramLink), class "sns telegram button" ]
+                        [ text "Go to Telegram" ]
                     ]
                 ]
     in
