@@ -33,25 +33,6 @@ module Data.Action exposing
     , voteproducerDecoder
     )
 
-import Html
-    exposing
-        ( Html
-        , a
-        , button
-        , em
-        , span
-        , strong
-        , td
-        , text
-        )
-import Html.Attributes
-    exposing
-        ( attribute
-        , class
-        , title
-        , type_
-        )
-import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
