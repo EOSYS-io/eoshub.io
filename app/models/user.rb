@@ -61,7 +61,12 @@ class User < ApplicationRecord
     end
 
     def qualify_for_event(ip_address)
-      User.eos_account_created.where(ip_address: ip_address).count < 3
+      max = if Rails.env.alpha?
+        9999999
+      else
+        3
+      end
+      User.eos_account_created.where(ip_address: ip_address).count < max
     end
   end
 
