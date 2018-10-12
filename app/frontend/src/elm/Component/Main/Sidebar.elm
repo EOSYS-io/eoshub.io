@@ -28,7 +28,7 @@ import Date
 import Date.Extra as Date exposing (Interval(..))
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
 import Html.Attributes exposing (attribute, class, type_)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Http
 import Navigation
 import Port
@@ -278,10 +278,15 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             [ type_ "button"
             , class "icon gear button"
             , attribute "wai-aria" "hidden"
-            , onClick (OpenConfigPanel (not configPanelOpen))
+            , onMouseEnter (OpenConfigPanel True)
+            , onMouseLeave (OpenConfigPanel False)
             ]
             [ text "option" ]
-        , div [ class "menu_list" ]
+        , div
+            [ class "menu_list"
+            , onMouseEnter (OpenConfigPanel True)
+            , onMouseLeave (OpenConfigPanel False)
+            ]
             [ a
                 [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
                 ]
