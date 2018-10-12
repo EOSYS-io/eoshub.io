@@ -8,6 +8,7 @@ module Util.Formatter exposing
     , formatWithUsLocale
     , getNow
     , larimerToEos
+    , numberWithinDigitLimit
     , percentageConverter
     , removeSymbolIfExists
     , resourceUnitConverter
@@ -18,7 +19,7 @@ module Util.Formatter exposing
 import Date.Extra as Date
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Regex exposing (regex, replace)
+import Regex exposing (contains, regex, replace)
 import Round
 import Task
 import Time exposing (Time)
@@ -209,3 +210,16 @@ formatWithUsLocale : Int -> Float -> String
 formatWithUsLocale decimals value =
     value
         |> format { usLocale | decimals = decimals }
+
+
+numberWithinDigitLimit : Int -> String -> Bool
+numberWithinDigitLimit digitLimit value =
+    if contains (regex "^\\d+\\.\\d+$") value then
+        let
+            digitLength =
+                String.split "." value |> List.drop 1 |> List.head |> Maybe.map String.length |> Maybe.withDefault 0
+        in
+        digitLength <= digitLimit
+
+    else
+        True
