@@ -9,6 +9,7 @@ module Data.Action exposing
     , Message(..)
     , NewaccountParameters
     , OpenedActionSeq
+    , QueryType(..)
     , RegproxyParameters
     , SellramParameters
     , TransferParameters

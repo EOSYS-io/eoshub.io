@@ -39,7 +39,9 @@ import Data.Action
     exposing
         ( Action
         , Message(..)
+        , QueryType(..)
         , actionsDecoder
+        , addSearchLink
         , refineAction
         , removeDuplicated
         , viewActionInfo
@@ -570,7 +572,9 @@ viewKeyAccountPermList requiredAuth =
 viewKeyPermSpan : KeyPerm -> Html Message
 viewKeyPermSpan value =
     span []
-        [ text ("+" ++ (value.weight |> toString) ++ " " ++ value.key)
+        [ text
+            ("+" ++ (value.weight |> toString) ++ " ")
+        , Html.map ActionMessage (addSearchLink Data.Action.PublicKeyQuery value.key (text value.key))
         , br [] []
         ]
 
