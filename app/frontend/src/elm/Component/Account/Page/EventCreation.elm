@@ -365,6 +365,7 @@ accountInputViews { accountName, accountValidation } language =
         [ class "account_name"
         , placeholder (translate language AccountCreationNamePlaceholder)
         , type_ "text"
+        , attribute "maxlength" "12"
         , onInput ValidateAccountNameInput
         ]
         []
