@@ -348,16 +348,19 @@ update msg ({ accountName, keys, notification } as model) flags language =
 accountInputViews : Model -> Language -> List (Html Message)
 accountInputViews { accountName, accountValidation } language =
     let
-        accountValidationMsg =
+        ( accountValidationMsg, visibility, classAttr ) =
             case accountValidation of
                 ValidAccount ->
-                    AccountCreationNameAlreadyExist
+                    ( AccountCreationNameAlreadyExist, "visible", "false validate" )
 
                 InexistentAccount ->
-                    AccountCreationNameValid
+                    ( AccountCreationNameValid, "visible", "true validate" )
+
+                EmptyAccount ->
+                    ( EmptyMessage, "hidden", "false validate" )
 
                 _ ->
-                    AccountCreationNameInvalid
+                    ( AccountCreationNameInvalid, "visible", "false validate" )
     in
     [ h3 []
         [ textViewI18n language AccountCreationInput ]
@@ -365,26 +368,13 @@ accountInputViews { accountName, accountValidation } language =
         [ class "account_name"
         , placeholder (translate language AccountCreationNamePlaceholder)
         , type_ "text"
+        , attribute "maxlength" "12"
         , onInput ValidateAccountNameInput
         ]
         []
     , span
-        [ style
-            [ ( "visibility"
-              , if accountValidation == EmptyAccount then
-                    "hidden"
-
-                else
-                    "visible"
-              )
-            ]
-        , class
-            (if accountValidation == InexistentAccount then
-                "true validate"
-
-             else
-                "false validate"
-            )
+        [ style [ ( "visibility", visibility ) ]
+        , class classAttr
         ]
         [ textViewI18n language accountValidationMsg ]
     ]
