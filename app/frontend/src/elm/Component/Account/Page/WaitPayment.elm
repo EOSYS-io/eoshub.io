@@ -68,12 +68,7 @@ initModel : Maybe String -> Model
 initModel maybeOrderNo =
     let
         orderNo =
-            case maybeOrderNo of
-                Just string ->
-                    string
-
-                Nothing ->
-                    ""
+            Maybe.withDefault "" maybeOrderNo
     in
     { orderNo = orderNo
     , notification = Notification.initModel
