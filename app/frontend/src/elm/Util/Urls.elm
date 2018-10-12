@@ -1,9 +1,12 @@
 module Util.Urls exposing
     ( confirmEmailUrl
+    , createEosAccountByOrderUrl
     , createEosAccountUrl
+    , eosAccountProductUrl
     , getProducersUrl
     , getRecentVoteStatUrl
     , mainnetRpcUrl
+    , requestPaymentUrl
     , usersApiUrl
     )
 
@@ -41,6 +44,21 @@ confirmEmailUrl flags confirmToken locale =
 createEosAccountUrl : Flags -> String -> String -> String
 createEosAccountUrl flags confirmToken locale =
     eoshubHost flags ++ "/users/" ++ confirmToken ++ "/create_eos_account?locale=" ++ locale
+
+
+eosAccountProductUrl : Flags -> String -> String
+eosAccountProductUrl flags locale =
+    eoshubHost flags ++ "/products/eos_account?locale=" ++ locale
+
+
+requestPaymentUrl : Flags -> String -> String
+requestPaymentUrl flags locale =
+    eoshubHost flags ++ "/orders/request_payment?locale=" ++ locale
+
+
+createEosAccountByOrderUrl : Flags -> String -> String -> String
+createEosAccountByOrderUrl flags orderId locale =
+    eoshubHost flags ++ "/orders/" ++ orderId ++ "/create_eos_account?locale=" ++ locale
 
 
 getProducersUrl : Flags -> String

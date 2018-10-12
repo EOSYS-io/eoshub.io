@@ -1,7 +1,9 @@
 module Component.Account.AccountComponent exposing (Message(..), Model, Page(..), getPage, initCmd, initModel, subscriptions, toLanguage, update, view)
 
+import Component.Account.Page.Create as Create
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
+import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
@@ -17,7 +19,9 @@ import Util.Flags exposing (Flags)
 
 
 type Page
-    = CreatedPage Created.Model
+    = CreatePage Create.Model
+    | WaitPaymentPage WaitPayment.Model
+    | CreatedPage Created.Model
     | EventCreationPage EventCreation.Model
     | NotFoundPage
 
@@ -55,6 +59,12 @@ initModel location flags =
             , flags = flags
             }
 
+        CreateRoute maybeLocale ->
+            { page = page
+            , language = toLanguage maybeLocale
+            , flags = flags
+            }
+
         _ ->
             { page = page
             , language = Translation.Korean
@@ -67,7 +77,9 @@ initModel location flags =
 
 
 type Message
-    = CreatedMessage Created.Message
+    = CreateMessage Create.Message
+    | WaitPaymentMessage WaitPayment.Message
+    | CreatedMessage Created.Message
     | EventCreationMessage EventCreation.Message
     | OnLocationChange Location
     | ChangeUrl String
@@ -77,10 +89,20 @@ type Message
 initCmd : Model -> Cmd Message
 initCmd { page, flags, language } =
     case page of
+        CreatePage subModel ->
+            let
+                subCmd =
+                    Create.initCmd subModel flags language
+
+                cmd =
+                    Cmd.map CreateMessage subCmd
+            in
+            cmd
+
         EventCreationPage subModel ->
             let
-                ( _, subCmd ) =
-                    EventCreation.update EventCreation.GenerateKeys subModel flags language
+                subCmd =
+                    EventCreation.initCmd
 
                 cmd =
                     Cmd.map EventCreationMessage subCmd
@@ -137,6 +159,12 @@ view { language, page } =
 
         newContentHtml =
             case page of
+                CreatePage subModel ->
+                    Html.map CreateMessage (Create.view subModel language)
+
+                WaitPaymentPage subModel ->
+                    Html.map WaitPaymentMessage (WaitPayment.view subModel language)
+
                 CreatedPage subModel ->
                     Html.map CreatedMessage (Created.view subModel language)
 
@@ -160,6 +188,20 @@ view { language, page } =
 update : Message -> Model -> ( Model, Cmd Message )
 update message ({ page, language, flags } as model) =
     case ( message, page ) of
+        ( CreateMessage subMessage, CreatePage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    Create.update subMessage subModel flags language
+            in
+            ( { model | page = newPage |> CreatePage }, Cmd.map CreateMessage subCmd )
+
+        ( WaitPaymentMessage subMessage, WaitPaymentPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    WaitPayment.update subMessage subModel flags language
+            in
+            ( { model | page = newPage |> WaitPaymentPage }, Cmd.map WaitPaymentMessage subCmd )
+
         ( CreatedMessage subMessage, CreatedPage subModel ) ->
             let
                 ( newPage, subCmd ) =
@@ -207,7 +249,8 @@ update message ({ page, language, flags } as model) =
 subscriptions : Model -> Sub Message
 subscriptions _ =
     Sub.batch
-        [ Sub.map EventCreationMessage EventCreation.subscriptions
+        [ Sub.map CreateMessage Create.subscriptions
+        , Sub.map EventCreationMessage EventCreation.subscriptions
         ]
 
 
@@ -218,6 +261,12 @@ subscriptions _ =
 getPage : Route -> Page
 getPage route =
     case route of
+        CreateRoute _ ->
+            CreatePage Create.initModel
+
+        WaitPaymentRoute maybeOrderNo ->
+            WaitPaymentPage (WaitPayment.initModel maybeOrderNo)
+
         CreatedRoute maybeEosAccount maybePublicKey ->
             CreatedPage (Created.initModel maybeEosAccount maybePublicKey)
 

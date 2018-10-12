@@ -6,6 +6,7 @@ port module Port exposing
     , generateKeys
     , invalidateAccount
     , loadChart
+    , openWindow
     , pushAction
     , receiveKeys
     , receivePushActionResponse
@@ -71,3 +72,10 @@ port copy : () -> Cmd message
 
 
 port loadChart : () -> Cmd message
+
+
+
+-- Open window
+
+
+port openWindow : JE.Value -> Cmd message

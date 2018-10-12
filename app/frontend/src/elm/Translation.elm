@@ -152,6 +152,12 @@ type I18n
     | AccountCreationNameCondition
     | AccountCreationInput
     | AccountCreationNamePlaceholder
+    | AccountCreationPayment
+    | PaymentVirtualAccount
+    | PaymentTotalAmount
+    | AccountCreationWaitPaymentMsg1
+    | AccountCreationWaitPaymentMsg2
+    | PaymentComplete
     | AccountCreationCongratulation
     | AccountCreationWelcome
     | AccountCreationYouCanSignIn
@@ -885,6 +891,42 @@ getMessages i18n =
             { korean = "ex) eoshuby12345"
             , english = "ex) eoshuby12345"
             , chinese = "ex) eoshuby12345"
+            }
+
+        AccountCreationPayment ->
+            { korean = "결제정보"
+            , english = "Billing Information"
+            , chinese = "帐单信息"
+            }
+
+        PaymentVirtualAccount ->
+            { korean = "가상계좌"
+            , english = "Virtual Account"
+            , chinese = "虚拟账户"
+            }
+
+        PaymentTotalAmount ->
+            { korean = "총 결제금액"
+            , english = "Total"
+            , chinese = "付款总额"
+            }
+
+        AccountCreationWaitPaymentMsg1 ->
+            { korean = "입금 후 결제완료 버튼을 눌러주세요."
+            , english = "Click the payment completion button after deposit."
+            , chinese = "付款后请点击付款完成按钮。"
+            }
+
+        AccountCreationWaitPaymentMsg2 ->
+            { korean = "입금을 하셨는지 다시 한번 확인하고 결제완료를 눌러주세요."
+            , english = "Check again that you have made the deposit and click Finish Payment."
+            , chinese = "请再次检查您是否已支付押金，然后单击“完成付款”。"
+            }
+
+        PaymentComplete ->
+            { korean = "결제완료"
+            , english = "Payment Complete"
+            , chinese = "付款已完成"
             }
 
         AccountCreationAgreeEosConstitution ->

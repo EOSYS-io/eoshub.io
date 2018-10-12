@@ -123,6 +123,11 @@ app.ports.loadChart.subscribe(async () => {
   });
 });
 
+app.ports.openWindow.subscribe(async ({ url, width, height }) => {
+  const specs = `top=${(window.screen.height - height) * 0.5},left=${(window.screen.width - width) * 0.5},width=${width},height=${height}`;
+  window.open(url, '_blank', specs);
+});
+
 document.addEventListener('scatterLoaded', () => {
   const { scatter } = window;
 

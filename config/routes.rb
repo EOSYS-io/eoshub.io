@@ -16,13 +16,23 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :orders, only: [:create] do
+  resources :orders, only: [:create, :show] do
     collection do
-      post 'request_payment'
+      post :request_payment
+    end
+
+    member do
+      post :create_eos_account
     end
   end
 
   resources :payment_results, only: [:create]
+
+  resources :products, only: [] do
+    collection do
+      get 'eos_account'
+    end
+  end
 
   namespace :eos_ram_price_histories do
     get 'data'

@@ -1,0 +1,25 @@
+<section id="popup" class="virtual_account_check modal popup viewing" aria-live="true" role="alert">
+	<div class="wrapper">
+		<h2>가상계좌입금</h2>
+		<p>생성된 가상계좌로<br />
+			총 결제금액인 <strong><%= @order.amount %></strong>원을 입금해주세요!</p>
+
+		<dl>
+			<dt>은행</dt>
+			<dd><%= @order.bank_name %></dd>
+
+			<dt>가상계좌명</dt>
+			<dd><%= @order.account_no %></dd>
+
+			<dt>결제자명</dt>
+			<dd><%= @order.account_name %></dd>
+
+			<dt>입금만료일</dt>
+			<dd><%= @order.expire_date %></dd>
+		</dl>
+		<div class="btn_area">
+			<button type="button" class="ok button" onclick="window.close()">확인</button>
+		</div>
+		<button id="closePopup" type="button" class="close button" onclick="window.close()">닫기</button>
+	</div>
+</section>

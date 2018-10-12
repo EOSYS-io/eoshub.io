@@ -5,6 +5,10 @@ module Exceptions
   MISSING_PARAMETER = { message: I18n.t('errors.parameter_missing'), error_code: 1, status_code: :bad_request }.freeze
   DUPLICATE_EOS_ACCOUNT = { message: I18n.t('users.eos_account_already_exist'), error_code: 2, status_code: :conflict }.freeze
   DEACTIVATED_PRODUCT = { message: I18n.t('orders.deactivated_product'), error_code: 3, status_code: :bad_request }.freeze
+  ORDER_NOT_EXIST = { message: I18n.t('orders.order_not_exist'), error_code: 4, status_code: :bad_request }.freeze
+  ORDER_NOT_PAID = { message: I18n.t('orders.order_not_paid'), error_code: 5, status_code: :bad_request }.freeze
+  ORDER_ALREADY_DELIVERED = { message: I18n.t('orders.order_already_delivered'), error_code: 6, status_code: :bad_request }.freeze
+  PAYMENT_SERVER_NOT_RESPOND = { message: I18n.t('orders.payment_server_not_respond'), error_code: 7, status_code: :internal_server_error }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects

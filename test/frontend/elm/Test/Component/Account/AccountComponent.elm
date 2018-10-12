@@ -1,6 +1,7 @@
 module Test.Component.Account.AccountComponent exposing (location, tests)
 
 import Component.Account.AccountComponent exposing (..)
+import Component.Account.Page.Create as Create
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Expect
@@ -60,11 +61,11 @@ tests =
                         eventCreationModel =
                             EventCreation.initModel
 
-                        ( newEventCreationModel, subCmd ) =
-                            EventCreation.update EventCreation.GenerateKeys eventCreationModel flags language
+                        subCmd =
+                            EventCreation.initCmd
 
                         expectedPage =
-                            EventCreationPage newEventCreationModel
+                            EventCreationPage eventCreationModel
 
                         expectedCmd =
                             Cmd.map EventCreationMessage subCmd

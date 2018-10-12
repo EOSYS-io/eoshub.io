@@ -1,22 +1,30 @@
 class OrdersController < ApplicationController
   include EosAccount
 
-  def request_payment
-    raise Exceptions::DefaultError, Exceptions::MISSING_PARAMETER if params.blank?
-    raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:eos_account])
+  skip_before_action :verify_authenticity_token, if: -> { 
+    controller_name == 'orders' && ['request_payment','create','create_eos_account'].include?(action_name)
+  }
 
-    product = Product.find_by(id: params[:product_id])
+  def request_payment
+    request_params = request_payment_params
+    raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(request_params[:eos_account])
+
+    product = Product.find_by(id: request_params[:product_id])
     raise Exceptions::DefaultError, Exceptions::DEACTIVATED_PRODUCT unless product.active?
     
+    order_no = Order.generate_order_no
     payment_params = {
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
-      user_id: params[:eos_account],
-      pgcode: params[:pgcode],
-      order_no: Order.generate_order_no,
+      user_id: request_params[:eos_account],
+      pgcode: request_params[:pgcode],
+      order_no: order_no,
       amount: product.price,
       product_name: product.name,
-      return_url: orders_path,
-      callback_url: payment_results_path
+      custom_parameter: request_params[:public_key],
+      return_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/orders',
+      callback_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/payment_results'
+      # return_url: orders_url,
+      # callback_url: payment_results_url
     }
 
     response = Typhoeus::Request.new(
@@ -30,7 +38,9 @@ class OrdersController < ApplicationController
       timeout: 3
     ).run
 
-    result = JSON.parse(response.body)
+    raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
+
+    result = JSON.parse(response.body).merge(order_no: order_no)
     render json: result, status: response.code
   end
 
@@ -38,18 +48,49 @@ class OrdersController < ApplicationController
     @order_params = create_params
 
     if @order_params&.dig(:cid).present?
-      Order.create!(
+      order = Order.create!(
         eos_account: @order_params[:user_id],
         order_no: @order_params[:order_no],
         pgcode: @order_params[:pgcode],
         amount: @order_params[:amount],
         product_name: @order_params[:product_name],
+        public_key: @order_params[:custom_parameter],
         account_name: @order_params[:account_name],
         account_no: @order_params[:account_no],
         bank_code: @order_params[:bank_code],
         bank_name: @order_params[:bank_name],
         expire_date: Date.parse(@order_params[:expire_date])
       )
+
+      redirect_to action: 'show', id: order.order_no
+    end
+  end
+
+  def show
+    @order = Order.find_by(order_no: params[:id])
+    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
+  end
+
+  def create_eos_account
+    order = Order.find_by(order_no: params[:id])
+    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if order.blank?
+    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_PAID if order.created?
+    raise Exceptions::DefaultError, Exceptions::ORDER_ALREADY_DELIVERED if order.delivered?
+
+    public_key = order.public_key
+    eos_account = order.eos_account
+    raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(eos_account)
+
+    response = request_eos_account_creation(eos_account, public_key)
+    if response.code == 200
+      order.delivered!
+      render json: { eos_account: eos_account, public_key: public_key }, status: :ok
+    elsif response.return_code == :couldnt_connect
+      render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
+    elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
+      render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
+    else
+      render json: response.body, status: response.code
     end
   end
 
@@ -57,5 +98,10 @@ class OrdersController < ApplicationController
 
   def create_params
     params.permit(Order.permit_attributes_on_create)
+  end
+
+  def request_payment_params
+    product_id, pgcode, eos_account, public_key = params.require([:product_id, :pgcode, :eos_account, :public_key])
+    { product_id: product_id, pgcode: pgcode, eos_account: eos_account, public_key: public_key }
   end
 end

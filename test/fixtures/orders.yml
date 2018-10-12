@@ -13,6 +13,7 @@
 #  order_no                                                           :string           not null
 #  pgcode                                                             :integer          default(NULL), not null
 #  product_name                                                       :string           default("")
+#  public_key                                                         :string           default(""), not null
 #  state                                                              :integer          default("created"), not null
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null

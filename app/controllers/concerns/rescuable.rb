@@ -11,7 +11,7 @@ module Rescuable
   end
 
   def parameter_missing(exception)
-    render_default_error(Exceptions::DefaultError.new(cause: exception, message: (exception.nil? ? I18n.t('errors.parameter_missing') : exception), status_code: :bad_request))
+    render_default_error(Exceptions::DefaultError.new(cause: exception, message: (exception.nil? ? I18n.t('errors.parameter_missing') : exception.message), status_code: :bad_request))
   end
 
   def unexpected_error(exception)

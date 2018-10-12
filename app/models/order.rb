@@ -13,6 +13,7 @@
 #  order_no                                                           :string           not null
 #  pgcode                                                             :integer          default(NULL), not null
 #  product_name                                                       :string           default("")
+#  public_key                                                         :string           default(""), not null
 #  state                                                              :integer          default("created"), not null
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null
@@ -63,21 +64,26 @@ class Order < ApplicationRecord
 
   enum state: {
     created: 0,
-    paid: 1
+    paid: 1,
+    delivered: 2
   }
 
   aasm column: :state, enum: true do
     state :created, initial: true
-    state :paid
+    state :paid, :delivered
 
     event :paid do
       transitions from: :created, to: :paid
+    end
+
+    event :delivered do
+      transitions from: :paid, to: :delivered
     end
   end
 
   class << self
     def permit_attributes_on_create
-      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date]
+      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date, :cid]
     end
 
     def generate_order_no
