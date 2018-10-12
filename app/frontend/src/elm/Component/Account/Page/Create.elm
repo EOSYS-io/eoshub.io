@@ -115,7 +115,6 @@ type alias Model =
     , accountRequestSuccess : Bool
     , keys : KeyPair
     , product : Product
-    , pgcode : String
     , agreeEosConstitution : Bool
     , notification : Notification.Model
     }
@@ -128,7 +127,6 @@ initModel =
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "" }
     , product = initProduct
-    , pgcode = "virtualaccount"
     , agreeEosConstitution = False
     , notification = Notification.initModel
     }
@@ -438,12 +436,12 @@ view ({ agreeEosConstitution, notification } as model) language =
 
 
 requestPaymentBodyParams : Model -> Http.Body
-requestPaymentBodyParams { accountName, keys, product, pgcode } =
+requestPaymentBodyParams { accountName, keys, product } =
     Encode.object
         [ ( "eos_account", Encode.string accountName )
         , ( "public_key", Encode.string keys.publicKey )
         , ( "product_id", Encode.int product.id )
-        , ( "pgcode", Encode.string pgcode )
+        , ( "pgcode", Encode.string "virtualaccount" )
         ]
         |> Http.jsonBody
 
