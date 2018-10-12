@@ -1,7 +1,7 @@
 module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
-import Html exposing (Html, a, br, div, h2, h3, main_, p, section, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, text)
+import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
 
@@ -30,10 +30,6 @@ view language =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , p
-                        []
-                        [ a [] [ text (translate language HowToUseEosHub) ]
-                        ]
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -53,7 +49,7 @@ view language =
                     [ onClick (ChangeUrl "/resource")
                     , class "card resource"
                     ]
-                    [ h3 [] [ text (translate language ManageResource) ]
+                    [ h3 [] [ text "CPU / NET" ]
                     , p [] [ text (translate language ManageResourceDesc) ]
                     ]
                 , a
@@ -65,4 +61,29 @@ view language =
                     ]
                 ]
             ]
+        , section [ class "promotion", attribute "data-display" "1", attribute "data-max" "3" ]
+            [ h3 []
+                [ text "AD" ]
+            , div [ class "rolling banner" ]
+                [ a [ class "dapp", href "https://medium.com/eosys/%EC%A0%9C1%ED%9A%8C-dapp-contest-3d0a9d1338a8", target "_blank" ]
+                    [ text "Dapp contest" ]
+                , a [ class "fuze", href "http://fuze.live", target "_blank" ]
+                    [ text "Two World meet, FUZE" ]
+                , a [ class "nova", href "http://eosnova.io/", target "_blank" ]
+                    [ text "Yout first EOS wallet,NOVA Wallet" ]
+                ]
+            , div [ class "banner handler" ]
+                [ button [ class "rotate banner circle button", type_ "button" ]
+                    [ text "Dapp contest banner" ]
+                , button [ class "rotate banner circle button", type_ "button" ]
+                    [ text "Fuze banner" ]
+                , button [ class "rotate banner circle button", type_ "button" ]
+                    [ text "Nova wallet" ]
+                ]
+            ]
+
+        -- TODO(boseok): Change js code to Elm
+        , node "script"
+            []
+            [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}console.log(e,n);for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
         ]

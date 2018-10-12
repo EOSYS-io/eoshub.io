@@ -58,7 +58,6 @@ type I18n
     | OpenCloseSidebar
     | Hello
     | WelcomeEosHub
-    | HowToUseEosHub
     | IfYouHaveEos
     | IfYouAreNew
     | AttachableWallet1
@@ -81,7 +80,6 @@ type I18n
     | WhatIsStaking
     | Transfer
     | TransferHereDesc
-    | ManageResource
     | ManageResourceDesc
     | Vote
     | SimplifiedVote
@@ -320,7 +318,7 @@ getMessages i18n =
         NewAccount ->
             { korean = "신규계정 만들기"
             , english = "Create New"
-            , chinese = "创建账户"
+            , chinese = "创建新的账户"
             }
 
         OpenCloseSidebar ->
@@ -337,18 +335,12 @@ getMessages i18n =
 
         WelcomeEosHub ->
             { korean = "이오스 허브입니다"
-            , english = "Welcome to EOS Hub"
-            , chinese = "欢迎使用eoshub"
-            }
-
-        HowToUseEosHub ->
-            { korean = "이오스허브 사용법 보기"
-            , english = "How to use eoshub"
-            , chinese = "查看eoshub使用说明"
+            , english = "Welcome to EOS Hub!"
+            , chinese = "哈罗！我是eoshub"
             }
 
         IfYouHaveEos ->
-            { korean = "이오스 계정이 있으시면 로그인을,"
+            { korean = "EOS 계정이 있으면 로그인을,"
             , english = "If you have an EOS account, sign in"
             , chinese = "如果您有EOS账户请进行账户联动,"
             }
@@ -474,21 +466,15 @@ getMessages i18n =
             }
 
         TransferHereDesc ->
-            { korean = "여기서 토큰을 보내실 수 있어요"
+            { korean = "여기서 토큰을 보낼 수 있어요"
             , english = "Send tokens here"
             , chinese = "去传送代币"
             }
 
-        ManageResource ->
-            { korean = "CPU / NET"
-            , english = "CPU / NET"
-            , chinese = "CPU/NET"
-            }
-
         ManageResourceDesc ->
-            { korean = "리소스를 관리할 수 있어요 :)"
-            , english = "Manage your resource here :)"
-            , chinese = "可以管理资源：）"
+            { korean = "리소스를 관리할 수 있어요"
+            , english = "Manage your resource"
+            , chinese = "可以管理资源"
             }
 
         Vote ->
@@ -504,21 +490,21 @@ getMessages i18n =
             }
 
         VoteDesc ->
-            { korean = "EOS로 투표할 수 있어요 :)"
-            , english = "Vote with your EOS :)"
+            { korean = "EOS로 투표할 수 있어요"
+            , english = "Vote with your EOS"
             , chinese = "EOS币持有者可以进行投票"
             }
 
         RamMarket ->
-            { korean = "램마켓"
-            , english = "Ram Market"
+            { korean = "RAM Market"
+            , english = "RAM Market"
             , chinese = "RAM市场"
             }
 
         RamMarketDesc ->
-            { korean = "램을 사고 팔 수 있어요 :)"
-            , english = "Buy or sell RAM here :)"
-            , chinese = "买卖RAM :)"
+            { korean = "램을 사고 팔 수 있어요"
+            , english = "Buy or Sell RAM here"
+            , chinese = "可以买卖RAM"
             }
 
         Application ->
@@ -972,9 +958,9 @@ getMessages i18n =
             }
 
         SearchDescribe ->
-            { korean = "계정명, 공개 키 검색하기"
-            , english = "Search account name or public key"
-            , chinese = "查询账户名，公匙"
+            { korean = "계정 / 퍼블릭 키"
+            , english = "Account / Public Key"
+            , chinese = "账户名，公匙"
             }
 
         SearchAccount ->

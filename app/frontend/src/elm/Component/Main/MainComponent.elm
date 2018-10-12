@@ -363,9 +363,9 @@ view { page, header, notification, sidebar, selectedNav } =
                             , class ("resource" ++ getNavClass selectedNav ResourceNav)
                             , onClick (ChangeUrl "/resource")
                             ]
-                            [ text (translate language Translation.ManageResource) ]
+                            [ text "CPU / NET" ]
                         , span [ class "tooltip", attribute "aria-hidden" "true" ]
-                            [ text (translate language Translation.ManageResource) ]
+                            [ text "CPU / NET" ]
                         ]
                     , li
                         []
