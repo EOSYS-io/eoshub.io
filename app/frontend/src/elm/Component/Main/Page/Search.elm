@@ -35,20 +35,19 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
-import Data.Action
+import Data.Action as Action
     exposing
         ( Action
-        , Message(..)
         , actionsDecoder
         , refineAction
         , removeDuplicated
-        , viewActionInfo
         )
 import Data.Table exposing (Row(..))
 import Dict exposing (Dict)
 import Html
     exposing
         ( Html
+        , a
         , b
         , br
         , button
@@ -56,6 +55,7 @@ import Html
         , div
         , dl
         , dt
+        , em
         , h2
         , h3
         , h4
@@ -132,6 +132,21 @@ type alias Pagination =
 
 type alias SelectedActionCategory =
     String
+
+
+
+-- type Message
+--     = ShowMemo OpenedActionSeq
+--     | ChangeUrl String
+
+
+type alias OpenedActionSeq =
+    Int
+
+
+type QueryType
+    = AccountQuery
+    | PublicKeyQuery
 
 
 
@@ -213,7 +228,8 @@ type Message
     | OnFetchActions (Result Http.Error (List Action))
     | SelectActionCategory SelectedActionCategory
     | ShowMore
-    | ActionMessage Data.Action.Message
+    | ShowMemo OpenedActionSeq
+    | ChangeUrl String
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -272,7 +288,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 -- TODO(boseok): alert it is the end of records
                 ( model, Cmd.none )
 
-        ActionMessage (ShowMemo clickedActionSeq) ->
+        ShowMemo clickedActionSeq ->
             let
                 newOpenedActionSeq =
                     if openedActionSeq == clickedActionSeq then
@@ -282,6 +298,9 @@ update message ({ query, pagination, openedActionSeq } as model) =
                         clickedActionSeq
             in
             ( { model | openedActionSeq = newOpenedActionSeq }, Cmd.none )
+
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
 
 
 
@@ -565,7 +584,9 @@ viewKeyAccountPermList requiredAuth =
 viewKeyPermSpan : KeyPerm -> Html Message
 viewKeyPermSpan value =
     span []
-        [ text ("+" ++ (value.weight |> toString) ++ " " ++ value.key)
+        [ text
+            ("+" ++ (value.weight |> toString) ++ " ")
+        , addSearchLink PublicKeyQuery value.key (text value.key)
         , br [] []
         ]
 
@@ -600,8 +621,207 @@ viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountA
             [ text actionTag ]
         , td []
             [ text (timeFormatter blockTime) ]
-        , Html.map ActionMessage (viewActionInfo accountName action openedActionSeq)
+        , viewActionInfo action openedActionSeq
         ]
+
+
+viewActionInfo : Action -> Int -> Html Message
+viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedActionSeq =
+    case data of
+        -- controlled actions
+        Ok actionParameters ->
+            case ( contractAccount, actionName ) of
+                ( "eosio.token", "transfer" ) ->
+                    case actionParameters of
+                        Action.Transfer params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                , text " -> "
+                                , addSearchLink AccountQuery params.to (em [] [ text params.to ])
+                                , text (" " ++ params.quantity)
+                                , span
+                                    [ class
+                                        ("memo popup"
+                                            ++ (if accountActionSeq == openedActionSeq then
+                                                    " viewing"
+
+                                                else
+                                                    ""
+                                               )
+                                        )
+                                    , title "클릭하시면 메모를 보실 수 있습니다."
+                                    ]
+                                    [ span []
+                                        [ strong [ attribute "role" "title" ]
+                                            [ text "메모" ]
+                                        , span [ class "description" ]
+                                            [ text params.memo ]
+                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo accountActionSeq) ]
+                                            [ text "열기/닫기" ]
+                                        ]
+                                    ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "sellram" ) ->
+                    case actionParameters of
+                        Action.Sellram params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.account (em [] [ text params.account ])
+                                , text (" sold " ++ toString params.bytes ++ " bytes RAM")
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "buyram" ) ->
+                    case actionParameters of
+                        Action.Buyram params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.payer (em [] [ text params.payer ])
+                                , text (" bought " ++ params.quant ++ " RAM for ")
+                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "buyrambytes" ) ->
+                    case actionParameters of
+                        Action.Buyrambytes params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.payer (em [] [ text params.payer ])
+                                , text (" bought " ++ toString params.bytes ++ "bytes RAM for ")
+                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "delegatebw" ) ->
+                    case actionParameters of
+                        Action.Delegatebw params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                , text " delegated to the account "
+                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                , text
+                                    (" "
+                                        ++ params.stakeNetQuantity
+                                        ++ " for NET, and "
+                                        ++ params.stakeCpuQuantity
+                                        ++ " for CPU "
+                                        ++ (if params.transfer == 1 then
+                                                "(transfer)"
+
+                                            else
+                                                ""
+                                           )
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "undelegatebw" ) ->
+                    case actionParameters of
+                        Action.Undelegatebw params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                , text " undelegated from the account "
+                                , addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                , text
+                                    (" "
+                                        ++ params.unstakeNetQuantity
+                                        ++ " for NET, and "
+                                        ++ params.unstakeCpuQuantity
+                                        ++ " for CPU"
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "regproxy" ) ->
+                    case actionParameters of
+                        Action.Regproxy params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.proxy (em [] [ text params.proxy ])
+                                , text
+                                    (if params.isproxy == 1 then
+                                        " registered as voting proxy"
+
+                                     else
+                                        " unregistered as voting proxy"
+                                    )
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "voteproducer" ) ->
+                    case actionParameters of
+                        Action.Voteproducer params ->
+                            td [ class "info" ]
+                                [ addSearchLink AccountQuery params.voter (em [] [ text params.voter ])
+                                , if String.length params.proxy == 0 then
+                                    span []
+                                        ([ text " voted for block producers " ]
+                                            ++ List.map addSearchLinkToBP params.producers
+                                        )
+
+                                  else
+                                    span []
+                                        [ text " voted through "
+                                        , addSearchLink AccountQuery params.proxy (text params.proxy)
+                                        ]
+                                ]
+
+                        _ ->
+                            td [] []
+
+                ( "eosio", "newaccount" ) ->
+                    case actionParameters of
+                        Action.Newaccount params ->
+                            td [ class "info" ]
+                                [ text "New account "
+                                , addSearchLink AccountQuery params.name (em [] [ text params.name ])
+                                , text " was created by "
+                                , addSearchLink AccountQuery params.creator (em [] [ text params.creator ])
+                                ]
+
+                        _ ->
+                            td [ class "info" ] []
+
+                _ ->
+                    td [ class "info" ]
+                        [ text (toString actionParameters) ]
+
+        -- undefined actions in eoshub
+        Err str ->
+            td [ class "info" ]
+                [ text (toString str) ]
+
+
+addSearchLinkToBP : String -> Html Message
+addSearchLinkToBP bp =
+    addSearchLink AccountQuery bp (span [] [ em [] [ text bp ], text ", " ])
+
+
+addSearchLink : QueryType -> String -> Html Message -> Html Message
+addSearchLink queryType query contentHtml =
+    let
+        url =
+            case queryType of
+                AccountQuery ->
+                    "/search?query=" ++ query
+
+                PublicKeyQuery ->
+                    "/searchkey?query=" ++ query
+    in
+    a [ onClick (ChangeUrl url) ] [ contentHtml ]
 
 
 actionHidden : SelectedActionCategory -> String -> Bool

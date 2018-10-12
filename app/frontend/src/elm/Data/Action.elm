@@ -5,10 +5,7 @@ module Data.Action exposing
     , BuyrambytesParameters
     , ClaimrewardsParameters
     , DelegatebwParameters
-    , LetOpen
-    , Message(..)
     , NewaccountParameters
-    , OpenedActionSeq
     , RegproxyParameters
     , SellramParameters
     , TransferParameters
@@ -32,28 +29,9 @@ module Data.Action exposing
     , transferDecoder
     , transferParametersToValue
     , undelegatebwDecoder
-    , viewActionInfo
     , voteproducerDecoder
     )
 
-import Html
-    exposing
-        ( Html
-        , button
-        , em
-        , span
-        , strong
-        , td
-        , text
-        )
-import Html.Attributes
-    exposing
-        ( attribute
-        , class
-        , title
-        , type_
-        )
-import Html.Events exposing (onClick)
 import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
@@ -188,16 +166,8 @@ type alias NewaccountParameters =
 -- UPDATE
 
 
-type Message
-    = ShowMemo OpenedActionSeq
-
-
 type alias OpenedActionSeq =
     Int
-
-
-type alias LetOpen =
-    Bool
 
 
 actionsDecoder : Decoder (List Action)
@@ -447,7 +417,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
                                         "Vote"
 
                                     else
-                                        "Vote though proxy"
+                                        "Proxy vote"
                             in
                             { model | actionTag = actionTag }
 
@@ -472,214 +442,6 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
         -- undefined actions in eoshub
         Err _ ->
             { model | actionTag = contractAccount ++ ":" ++ actionName }
-
-
-
--- VIEW
-
-
-viewActionInfo : String -> Action -> Int -> Html Message
-viewActionInfo _ { accountActionSeq, contractAccount, actionName, data } openedActionSeq =
-    case data of
-        -- controlled actions
-        Ok actionParameters ->
-            case ( contractAccount, actionName ) of
-                ( "eosio.token", "transfer" ) ->
-                    case actionParameters of
-                        Transfer params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.from ]
-                                , text " -> "
-                                , em []
-                                    [ text params.to ]
-                                , text (" " ++ params.quantity)
-                                , span
-                                    [ class
-                                        ("memo popup"
-                                            ++ (if accountActionSeq == openedActionSeq then
-                                                    " viewing"
-
-                                                else
-                                                    ""
-                                               )
-                                        )
-                                    , title "클릭하시면 메모를 보실 수 있습니다."
-                                    ]
-                                    [ span []
-                                        [ strong [ attribute "role" "title" ]
-                                            [ text "메모" ]
-                                        , span [ class "description" ]
-                                            [ text params.memo ]
-                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo accountActionSeq) ]
-                                            [ text "열기/닫기" ]
-                                        ]
-                                    ]
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "sellram" ) ->
-                    case actionParameters of
-                        Sellram params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.account ]
-                                , text (" sold " ++ toString params.bytes ++ " bytes RAM")
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "buyram" ) ->
-                    case actionParameters of
-                        Buyram params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.payer ]
-                                , text (" bought " ++ params.quant ++ " RAM for ")
-                                , em []
-                                    [ text params.receiver ]
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "buyrambytes" ) ->
-                    case actionParameters of
-                        Buyrambytes params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.payer ]
-                                , text (" bought " ++ toString params.bytes ++ "bytes RAM for ")
-                                , em []
-                                    [ text params.receiver ]
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "delegatebw" ) ->
-                    case actionParameters of
-                        Delegatebw params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.from ]
-                                , text " delegated to the account "
-                                , em []
-                                    [ text params.receiver ]
-                                , text
-                                    (" "
-                                        ++ params.stakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.stakeCpuQuantity
-                                        ++ " for CPU "
-                                        ++ (if params.transfer == 1 then
-                                                "(transfer)"
-
-                                            else
-                                                ""
-                                           )
-                                    )
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "undelegatebw" ) ->
-                    case actionParameters of
-                        Undelegatebw params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.receiver ]
-                                , text " undelegated from the account "
-                                , em []
-                                    [ text params.from ]
-                                , text
-                                    (" "
-                                        ++ params.unstakeNetQuantity
-                                        ++ " for NET, and "
-                                        ++ params.unstakeCpuQuantity
-                                        ++ " for CPU"
-                                    )
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "regproxy" ) ->
-                    case actionParameters of
-                        Regproxy params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.proxy ]
-                                , text
-                                    (if params.isproxy == 1 then
-                                        " registered as voting proxy"
-
-                                     else
-                                        " unregistered as voting proxy"
-                                    )
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "voteproducer" ) ->
-                    case actionParameters of
-                        Voteproducer params ->
-                            td [ class "info" ]
-                                [ em []
-                                    [ text params.voter ]
-                                , text
-                                    (if String.length params.proxy == 0 then
-                                        " voted for block producers " ++ toString params.producers
-
-                                     else
-                                        " voted through "
-                                    )
-                                , em []
-                                    [ text
-                                        (if String.length params.proxy == 0 then
-                                            ""
-
-                                         else
-                                            params.proxy
-                                        )
-                                    ]
-                                ]
-
-                        _ ->
-                            td [] []
-
-                ( "eosio", "newaccount" ) ->
-                    case actionParameters of
-                        Newaccount params ->
-                            td [ class "info" ]
-                                [ text "New account "
-                                , em []
-                                    [ text params.name ]
-                                , text " was created by "
-                                , em []
-                                    [ text params.creator ]
-                                ]
-
-                        _ ->
-                            td [ class "info" ] []
-
-                _ ->
-                    td [ class "info" ]
-                        [ text (toString actionParameters) ]
-
-        -- undefined actions in eoshub
-        Err str ->
-            td [ class "info" ]
-                [ text (toString str) ]
-
-
-
--- for the not defined cases
 
 
 errorDecoder : Decoder String
