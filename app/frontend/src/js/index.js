@@ -44,6 +44,8 @@ const app = Elm.Main.embed(target, {
   node_env: process.env.NODE_ENV,
 });
 
+console.info(`node_env: ${process.env.NODE_ENV}`);
+
 app.ports.checkWalletStatus.subscribe(async () => {
   // the delay is required to wait for loading scatter or changing component subscription
   window.setTimeout(
