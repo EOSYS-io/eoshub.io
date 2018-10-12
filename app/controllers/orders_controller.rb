@@ -22,8 +22,8 @@ class OrdersController < ApplicationController
       product_name: product.name,
       custom_parameter: request_params[:public_key],
       # for local test, pg company do not accept localhost url
-      # return_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/orders',
-      # callback_url: 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com/payment_results'
+      # return_url: 'http://alpha.eoshub.io/orders',
+      # callback_url: 'http://alpha.eoshub.io/payment_results'
       return_url: orders_url,
       callback_url: payment_results_url
     }

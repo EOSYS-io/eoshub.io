@@ -22,10 +22,10 @@ eoshubHost flags =
         "http://localhost:3000"
 
     else if flags.node_env == "alpha" then
-        "http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com"
+        "http://alpha.eoshub.io"
 
     else if flags.node_env == "production" then
-        ""
+        "https://eoshub.io"
 
     else
         "http://localhost:3000"
