@@ -16,6 +16,10 @@ class OrdersControllerTest < ActionController::TestCase
       def body
         @mock_body
       end
+
+      def return_code
+        :ok
+      end
     end
 
     product = products(:one)
