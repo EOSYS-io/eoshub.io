@@ -531,6 +531,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                         , placeholder "ex) eosio"
                         , type_ "text"
                         , onInput <| SetBuyFormField ProxyAccount
+                        , attribute "maxlength" "12"
                         ]
                         []
                     ]

@@ -18,7 +18,7 @@ module Component.Main.Page.Transfer exposing
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
 import Html exposing (Html, button, div, em, h2, input, li, main_, p, span, text, ul)
-import Html.Attributes exposing (autofocus, class, disabled, placeholder, step, type_)
+import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
@@ -117,6 +117,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                             , autofocus True
                             , onInput <| SetTransferMessageField To
                             , Html.Attributes.value to
+                            , attribute "maxlength" "12"
                             ]
                             []
                         , accountWarning
