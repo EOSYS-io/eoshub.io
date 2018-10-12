@@ -10,7 +10,7 @@ tests : Test
 tests =
     let
         flags =
-            { node_env = "test" }
+            { rails_env = "test" }
     in
     describe "Page.SearchKey module"
         [ describe "keyAccountsDecoder"

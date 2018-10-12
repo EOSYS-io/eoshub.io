@@ -39,7 +39,7 @@ tests =
             }
 
         flags =
-            { node_env = "test" }
+            { rails_env = "test" }
     in
     describe "Page module"
         [ describe "getPage"

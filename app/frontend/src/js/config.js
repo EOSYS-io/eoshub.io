@@ -19,10 +19,10 @@ const chartConfig = {
 };
 
 function getEoshubHost() {
-  if (process.env.NODE_ENV === 'alpha') {
+  if (process.env.RAILS_ENV === 'alpha') {
     return 'http://alpha.eoshub.io';
   }
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.RAILS_ENV === 'production') {
     return 'https://eoshub.io';
   }
   return 'http://localhost:3000';

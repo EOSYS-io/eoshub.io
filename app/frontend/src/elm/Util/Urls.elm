@@ -15,16 +15,16 @@ import Util.Flags exposing (Flags)
 
 eoshubHost : Flags -> String
 eoshubHost flags =
-    if flags.node_env == "development" then
+    if flags.rails_env == "development" then
         "http://localhost:3000"
 
-    else if flags.node_env == "test" then
+    else if flags.rails_env == "test" then
         "http://localhost:3000"
 
-    else if flags.node_env == "alpha" then
+    else if flags.rails_env == "alpha" then
         "http://alpha.eoshub.io"
 
-    else if flags.node_env == "production" then
+    else if flags.rails_env == "production" then
         "https://eoshub.io"
 
     else

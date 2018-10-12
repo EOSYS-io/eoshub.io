@@ -31,7 +31,7 @@ tests : Test
 tests =
     let
         flags =
-            { node_env = "test" }
+            { rails_env = "test" }
 
         language =
             Translation.Korean
@@ -73,7 +73,7 @@ tests =
                         model =
                             { page = expectedPage
                             , language = Translation.Korean
-                            , flags = { node_env = "test" }
+                            , flags = { rails_env = "test" }
                             }
                     in
                     Expect.equal expectedCmd (initCmd model)

@@ -41,7 +41,7 @@ function createPushActionReponse(code, action, type, msg) {
 const target = document.getElementById('elm-target');
 
 const app = Elm.Main.embed(target, {
-  node_env: process.env.NODE_ENV,
+  rails_env: process.env.RAILS_ENV,
 });
 
 console.info(`node_env: ${process.env.NODE_ENV}`);
