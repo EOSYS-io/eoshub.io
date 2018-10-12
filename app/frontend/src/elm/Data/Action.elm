@@ -5,7 +5,6 @@ module Data.Action exposing
     , BuyrambytesParameters
     , ClaimrewardsParameters
     , DelegatebwParameters
-    , Message(..)
     , NewaccountParameters
     , RegproxyParameters
     , SellramParameters
@@ -167,18 +166,8 @@ type alias NewaccountParameters =
 -- UPDATE
 
 
-type Message
-    = ShowMemo OpenedActionSeq
-    | ChangeUrl String
-
-
 type alias OpenedActionSeq =
     Int
-
-
-type QueryType
-    = AccountQuery
-    | PublicKeyQuery
 
 
 actionsDecoder : Decoder (List Action)

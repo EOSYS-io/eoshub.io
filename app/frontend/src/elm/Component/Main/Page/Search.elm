@@ -38,7 +38,6 @@ import Data.Account
 import Data.Action as Action
     exposing
         ( Action
-        , Message(..)
         , actionsDecoder
         , refineAction
         , removeDuplicated
