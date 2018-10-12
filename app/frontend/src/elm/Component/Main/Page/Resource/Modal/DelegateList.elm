@@ -85,6 +85,7 @@ view language { isDelegateListModalOpened, query } list accountName =
                     , type_ "text"
                     , onInput AccountInput
                     , Html.Attributes.value query
+                    , attribute "maxlength" "12"
                     ]
                     []
                 , button [ type_ "button" ]

@@ -303,6 +303,7 @@ accountInputViews { accountName, accountValidation } language =
         , type_ "text"
         , attribute "maxlength" "12"
         , onInput ValidateAccountNameInput
+        , attribute "maxlength" "12"
         ]
         []
     , span
