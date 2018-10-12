@@ -3,6 +3,7 @@ FROM eosys/rails
 ENV TZ Asia/Seoul
 ENV RACK_ENV production
 ENV RAILS_ENV production
+ENV NODE_ENV production
 ENV RAILS_LOG_TO_STDOUT true
 ENV WEB_CONCURRENCY 2
 ENV RAILS_MAX_THREADS 10
