@@ -329,6 +329,7 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
     , button
         [ type_ "button"
         , class "resource management"
+        , onClick (ChangeUrl "/resource")
         ]
         [ text (translate language ManageStaking) ]
     ]
