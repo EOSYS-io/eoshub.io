@@ -27,7 +27,7 @@ import Data.Account
 import Date
 import Date.Extra as Date exposing (Interval(..))
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
-import Html.Attributes exposing (attribute, class, type_)
+import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Http
 import Navigation
@@ -223,7 +223,7 @@ pairWalletView language =
         --         [ text (translate language Attach) ]
         --     ]
         ]
-    , a [ class "go link wallet_sync" ] [ text (translate language HowToAttach) ]
+    , a [ href (translate language HowToAttachLink), class "go link wallet_sync", target "_blank" ] [ text (translate language HowToAttach) ]
     ]
 
 

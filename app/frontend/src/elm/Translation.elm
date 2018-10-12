@@ -65,6 +65,7 @@ type I18n
     | FurtherUpdate1
     | FurtherUpdate2
     | HowToAttach
+    | HowToAttachLink
     | Attach
     | ChangeWallet
     | MyAccount
@@ -86,6 +87,7 @@ type I18n
     | VoteDesc
     | RamMarket
     | RamMarketDesc
+    | GoToTelegramLink
     | Application
     | ApplicationDesc
     | ProxyVote
@@ -381,6 +383,12 @@ getMessages i18n =
             , chinese = "了解钱包联动"
             }
 
+        HowToAttachLink ->
+            { korean = "https://medium.com/eosys/%EC%8A%A4%EC%BC%80%ED%84%B0-%EC%84%A4%EC%B9%98-%EB%B0%8F-%EC%97%B0%EB%8F%99-aaaf6a98b1b7"
+            , english = "https://medium.com/eosys/scatter-installation-attachment-4795b7a0202"
+            , chinese = "https://medium.com/eosys/scatter-%E5%AE%89%E8%A3%85-%E7%BB%91%E5%AE%9A-171788b91c13"
+            }
+
         Attach ->
             { korean = "연동하기"
             , english = "Attach"
@@ -448,9 +456,9 @@ getMessages i18n =
             }
 
         ManageStaking ->
-            { korean = "보관 토큰 관리하기"
-            , english = "Manage staking"
-            , chinese = "管理staking代币"
+            { korean = "CPU / NET 관리"
+            , english = "Manage CPU / NET"
+            , chinese = "CPU / NET管理"
             }
 
         WhatIsStaking ->
@@ -505,6 +513,12 @@ getMessages i18n =
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
             , chinese = "可以买卖RAM"
+            }
+
+        GoToTelegramLink ->
+            { korean = "https://t.me/EOSYSIOKR"
+            , english = "https://t.me/EOSYSIO"
+            , chinese = "https://t.me/EOSYSIO"
             }
 
         Application ->
@@ -989,8 +1003,8 @@ getMessages i18n =
 
         StakedTo ->
             { korean = "스테이크 해준 양"
-            , english = "Self Staked"
-            , chinese = "Self Staked"
+            , english = "Self to others"
+            , chinese = "Self to others"
             }
 
         StakedBy ->
