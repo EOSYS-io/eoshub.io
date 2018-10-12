@@ -273,20 +273,18 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
         [ text wallet.account
         , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
         ]
-    , div [ configPanelClass ]
+    , div
+        [ configPanelClass
+        , onMouseEnter (OpenConfigPanel True)
+        , onMouseLeave (OpenConfigPanel False)
+        ]
         [ button
             [ type_ "button"
             , class "icon gear button"
             , attribute "wai-aria" "hidden"
-            , onMouseEnter (OpenConfigPanel True)
-            , onMouseLeave (OpenConfigPanel False)
             ]
             [ text "option" ]
-        , div
-            [ class "menu_list"
-            , onMouseEnter (OpenConfigPanel True)
-            , onMouseLeave (OpenConfigPanel False)
-            ]
+        , div [ class "menu_list" ]
             [ a
                 [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
                 ]
