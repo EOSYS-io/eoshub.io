@@ -232,51 +232,30 @@ update msg ({ accountName, keys, notification } as model) flags language =
             )
 
         NewEosAccount (Err error) ->
-            case error of
-                Http.BadStatus response ->
-                    ( { model
-                        | accountRequestSuccess = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                    , detail = EmptyMessage
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+            let
+                errorContent =
+                    case error of
+                        Http.BadStatus response ->
+                            Notification.Error
+                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
+                                , detail = EmptyMessage
+                                }
 
-                Http.BadPayload debugMsg response ->
-                    ( { model
-                        | accountRequestSuccess = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = AccountCreationFailure
-                                    , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+                        Http.BadPayload debugMsg response ->
+                            Notification.Error
+                                { message = AccountCreationFailure
+                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
+                                }
 
-                _ ->
-                    ( { model
-                        | accountRequestSuccess = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = AccountCreationFailure
-                                    , detail = DebugMessage (toString error)
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+                        _ ->
+                            Notification.Error
+                                { message = AccountCreationFailure
+                                , detail = DebugMessage (toString error)
+                                }
+            in
+            ( { model | accountRequestSuccess = False, notification = { content = errorContent, open = True } }
+            , Cmd.none
+            )
 
         ValidateEmail email ->
             let
@@ -302,51 +281,30 @@ update msg ({ accountName, keys, notification } as model) flags language =
             )
 
         SendCodeResponse (Err error) ->
-            case error of
-                Http.BadStatus response ->
-                    ( { model
-                        | emailRequested = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                    , detail = EmptyMessage
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+            let
+                errorContent =
+                    case error of
+                        Http.BadStatus response ->
+                            Notification.Error
+                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
+                                , detail = EmptyMessage
+                                }
 
-                Http.BadPayload debugMsg response ->
-                    ( { model
-                        | emailRequested = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                    , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+                        Http.BadPayload debugMsg response ->
+                            Notification.Error
+                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
+                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
+                                }
 
-                _ ->
-                    ( { model
-                        | emailRequested = False
-                        , notification =
-                            { content =
-                                Notification.Error
-                                    { message = UnknownError
-                                    , detail = DebugMessage (toString error)
-                                    }
-                            , open = True
-                            }
-                      }
-                    , Cmd.none
-                    )
+                        _ ->
+                            Notification.Error
+                                { message = UnknownError
+                                , detail = DebugMessage (toString error)
+                                }
+            in
+            ( { model | emailRequested = False, notification = { content = errorContent, open = True } }
+            , Cmd.none
+            )
 
         ValidateConfirmToken confirmToken ->
             ( { model | confirmToken = confirmToken, confirmTokenValid = checkConfirmToken confirmToken }, Cmd.none )
@@ -355,22 +313,18 @@ update msg ({ accountName, keys, notification } as model) flags language =
             ( { model | emailConfirmationRequested = False }, confirmEmailRequest model flags language )
 
         EmailConfirmationResponse response ->
-            case response of
-                Ok res ->
-                    ( { model
-                        | emailConfirmationRequested = True
-                        , emailConfirmed = True
-                      }
-                    , Cmd.none
-                    )
+            let
+                emailConfirmed =
+                    case response of
+                        Ok res ->
+                            True
 
-                Err error ->
-                    ( { model
-                        | emailConfirmationRequested = True
-                        , emailConfirmed = False
-                      }
-                    , Cmd.none
-                    )
+                        Err error ->
+                            False
+            in
+            ( { model | emailConfirmationRequested = True, emailConfirmed = emailConfirmed }
+            , Cmd.none
+            )
 
         ToggleAgreeEosConstitution ->
             ( { model | agreeEosConstitution = not model.agreeEosConstitution }, Cmd.none )
