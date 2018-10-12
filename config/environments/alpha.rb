@@ -80,7 +80,7 @@ Rails.application.configure do
     enable_starttls_auto: true
   }
 
-  config.action_mailer.default_url_options = { host: 'ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com', port: 80 }
+  config.action_mailer.default_url_options = { host: 'alpha.eoshub.io', port: 80 }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

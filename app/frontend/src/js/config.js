@@ -20,10 +20,10 @@ const chartConfig = {
 
 function getEoshubHost() {
   if (process.env.NODE_ENV === 'alpha') {
-    return 'http://ecs-first-run-alb-1125793223.ap-northeast-2.elb.amazonaws.com';
+    return 'http://alpha.eoshub.io';
   }
   if (process.env.NODE_ENV === 'production') {
-    return '';
+    return 'https://eoshub.io';
   }
   return 'http://localhost:3000';
 }
