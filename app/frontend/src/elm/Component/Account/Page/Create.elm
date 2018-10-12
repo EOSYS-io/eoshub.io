@@ -78,9 +78,12 @@ import Translation
             , AccountCreationNameInvalid
             , AccountCreationNamePlaceholder
             , AccountCreationNameValid
+            , AccountCreationPayment
             , CopyAll
             , DebugMessage
             , EmptyMessage
+            , PaymentTotalAmount
+            , PaymentVirtualAccount
             , PrivateKey
             , PublicKey
             )
@@ -394,7 +397,7 @@ paymentView : Model -> Language -> Html Message
 paymentView { product } language =
     div [ class "container" ]
         [ h3 []
-            [ text "결제정보" ]
+            [ textViewI18n language AccountCreationPayment ]
         , dl [ class "invoice" ]
             [ dt []
                 [ text "CPU" ]
@@ -411,12 +414,12 @@ paymentView { product } language =
             ]
         , div [ class "select_payment_type area" ]
             [ button [ class "choice ing button", type_ "button" ]
-                [ text "가상계좌" ]
+                [ textViewI18n language PaymentVirtualAccount ]
             , p [ class "amount" ]
-                [ text "총 결제금액 "
+                [ textViewI18n language PaymentTotalAmount
                 , strong []
                     [ text (toString product.price) ]
-                , text "원"
+                , text "₩"
                 ]
             ]
         ]

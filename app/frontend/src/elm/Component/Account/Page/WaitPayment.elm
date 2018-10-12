@@ -38,8 +38,11 @@ import Translation
     exposing
         ( I18n
             ( AccountCreationFailure
+            , AccountCreationWaitPaymentMsg1
+            , AccountCreationWaitPaymentMsg2
             , DebugMessage
             , EmptyMessage
+            , PaymentComplete
             )
         , Language
         , toLocale
@@ -164,12 +167,12 @@ view { notification } language =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "validate-email-ok" ]
             [ h2 []
-                [ text "입금 후 결제완료 버튼을 눌러주세요." ]
+                [ textViewI18n language AccountCreationWaitPaymentMsg1 ]
             , p []
-                [ text "입금을 하셨는지 다시 한번 확인하고 결제완료를 눌러주세요." ]
+                [ textViewI18n language AccountCreationWaitPaymentMsg2 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", type_ "button", onClick CreateEosAccount ]
-                    [ text "결제완료" ]
+                    [ textViewI18n language PaymentComplete ]
                 ]
             , Html.map NotificationMessage (Notification.view notification language)
             ]
