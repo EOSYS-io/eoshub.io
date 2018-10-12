@@ -28,7 +28,7 @@ import Date
 import Date.Extra as Date exposing (Interval(..))
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
 import Html.Attributes exposing (attribute, class, type_)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
 import Http
 import Navigation
 import Port
@@ -273,12 +273,15 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
         [ text wallet.account
         , span [ class "description" ] [ text ("@" ++ wallet.authority) ]
         ]
-    , div [ configPanelClass ]
+    , div
+        [ configPanelClass
+        , onMouseEnter (OpenConfigPanel True)
+        , onMouseLeave (OpenConfigPanel False)
+        ]
         [ button
             [ type_ "button"
             , class "icon gear button"
             , attribute "wai-aria" "hidden"
-            , onClick (OpenConfigPanel (not configPanelOpen))
             ]
             [ text "option" ]
         , div [ class "menu_list" ]
@@ -326,6 +329,7 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
     , button
         [ type_ "button"
         , class "resource management"
+        , onClick (ChangeUrl "/resource")
         ]
         [ text (translate language ManageStaking) ]
     ]
