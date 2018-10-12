@@ -180,7 +180,7 @@ signInView language =
             [ text (translate language Login) ]
         , a
             [ class "join button"
-            , onClick (ChangeUrl ("/account/create?locale=" ++ toLocale language))
+            , onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language))
             ]
             [ text (translate language NewAccount) ]
         ]
