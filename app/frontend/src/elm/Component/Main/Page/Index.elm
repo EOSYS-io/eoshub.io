@@ -30,10 +30,6 @@ view language =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , p
-                        []
-                        [ a [] [ text (translate language HowToUseEosHub) ]
-                        ]
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -53,7 +49,7 @@ view language =
                     [ onClick (ChangeUrl "/resource")
                     , class "card resource"
                     ]
-                    [ h3 [] [ text (translate language ManageResource) ]
+                    [ h3 [] [ text "CPU / NET" ]
                     , p [] [ text (translate language ManageResourceDesc) ]
                     ]
                 , a

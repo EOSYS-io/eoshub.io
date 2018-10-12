@@ -396,7 +396,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq } as 
                     , option [ Html.Attributes.value "ram" ]
                         [ text (translate language Ram) ]
                     , option [ Html.Attributes.value "resource" ]
-                        [ text (translate language Resource) ]
+                        [ text "CPU / NET" ]
                     , option [ Html.Attributes.value "regproxy" ]
                         [ text (translate language Regproxy) ]
                     , option [ Html.Attributes.value "voteproducer" ]

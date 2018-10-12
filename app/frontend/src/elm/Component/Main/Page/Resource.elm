@@ -160,7 +160,7 @@ view language ({ tab } as model) account =
     div []
         [ main_ [ class "resource_management" ]
             [ h2 []
-                [ text (translate language ManageResource) ]
+                [ text "CPU / NET" ]
             , p []
                 [ text (translate language ManageResourceDesc) ]
             , div [ class "tab" ]
