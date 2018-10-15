@@ -16,6 +16,10 @@
 // set layout, wrapper element style
 @import 'layout.scss';
 
+// modal popup
+@import 'common.popup.scss';
+@import 'common.notification.scss';
+
 
 // specific
 @import 'header.scss';
