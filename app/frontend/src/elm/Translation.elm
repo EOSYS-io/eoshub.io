@@ -1522,8 +1522,30 @@ getMessages i18n =
                         else
                             "(자동설정)"
                        )
-            , english = "The input cannot exceed the available balance"
-            , chinese = "只能输入可stake的数量范围内"
+            , english =
+                "Stake "
+                    ++ cpu
+                    ++ " EOS to CPU / "
+                    ++ net
+                    ++ " EOS to NET"
+                    ++ (if isManual then
+                            ""
+
+                        else
+                            " (Auto-set)"
+                       )
+            , chinese =
+                "进行CPU "
+                    ++ cpu
+                    ++ "EOS / NET "
+                    ++ net
+                    ++ "EOS stake"
+                    ++ (if isManual then
+                            ""
+
+                        else
+                            " （自动设定）"
+                       )
             }
 
         ExceedStakeAmount ->
