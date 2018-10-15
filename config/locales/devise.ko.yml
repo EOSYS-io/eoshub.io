@@ -40,7 +40,7 @@ ko:
     failure:
       already_authenticated: "이미 로그인되어 있습니다."
       inactive: "계정이 아직 활성화되지 않았습니다."
-      invalid: 
+      invalid: "올바르지 않은 %{authentication_keys} 또는 비밀번호"
       last_attempt: "이번 로그인 시도를 실패하면 계정이 잠깁니다."
       locked: "계정이 잠겨있습니다."
       not_found_in_database: "올바르지 않은 %{authentication_keys} 또는 비밀번호"
