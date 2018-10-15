@@ -7,7 +7,8 @@ ActiveAdmin.register User do
     id_column
     column :email
     state_column :state
-    column :created_at
+    column :eos_account
+    column :ip_address
     column :updated_at
     actions
   end
@@ -17,6 +18,8 @@ ActiveAdmin.register User do
       row :email
       state_row :state
       row :confirm_token
+      row :eos_account
+      row :ip_address
       row :created_at
       row :updated_at
     end
