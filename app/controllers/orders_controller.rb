@@ -22,7 +22,7 @@ class OrdersController < ApplicationController
 
     payment_params = {
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
-      service_name: 'eoshub.io'
+      service_name: 'eoshub.io',
       user_id: order.eos_account,
       user_name: order.eos_account,
       pgcode: order.pgcode,
