@@ -11,16 +11,16 @@ tests =
         [ describe "time"
             [ test "second" <|
                 \() ->
-                    Expect.equal 1000 second
+                    Expect.equal 1000000 second
             , test "minute" <|
                 \() ->
-                    Expect.equal 60000 minute
+                    Expect.equal 60000000 minute
             , test "hour" <|
                 \() ->
-                    Expect.equal 3600000 hour
+                    Expect.equal 3600000000 hour
             , test "day" <|
                 \() ->
-                    Expect.equal 86400000 day
+                    Expect.equal 86400000000 day
             ]
         , describe "digital prefix"
             [ test "kilo" <|

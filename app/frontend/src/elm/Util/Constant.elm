@@ -7,34 +7,40 @@ module Util.Constant exposing
     , mega
     , minimumRequiredResources
     , minute
+    , millisec
     , second
     , tera
     )
 
 -- module for collect unit constants
 -- [time]
--- default   : millisec
--- constants : sec, min, hour, day
+-- default   : micro sec
+-- constants : ms, sec, min, hour, day
+
+
+millisec : Int
+millisec =
+    1000
 
 
 second : Int
 second =
-    1000
+    1000 * millisec
 
 
 minute : Int
 minute =
-    60 * 1000
+    60 * second
 
 
 hour : Int
 hour =
-    60 * 60 * 1000
+    60 * minute
 
 
 day : Int
 day =
-    24 * 60 * 60 * 1000
+    24 * hour
 
 
 
