@@ -58,7 +58,7 @@ class OrdersController < ApplicationController
     @order_params = create_params
     order = Order.find_by(order_no: @order_params[:order_no])
 
-    if @order_params&.dig(:cid).present?
+    if @order_params&.dig(:cid).present? || @order_params&.dig(:issue_tid).present?
       order.update!(
         account_name: @order_params[:account_name],
         account_no: @order_params[:account_no],
