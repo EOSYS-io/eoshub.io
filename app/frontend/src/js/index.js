@@ -95,6 +95,21 @@ app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
       app.ports.receivePushActionResponse.send(
         createPushActionReponse(code, action, type, message),
       );
+      return;
+    }
+
+    try {
+      // Handle blockchain errors.
+      const errObject = JSON.parse(err);
+      console.log(errObject);
+      if (errObject.code === 500 && errObject.error) {
+        const { name, code, what } = errObject.error;
+        app.ports.receivePushActionResponse.send(
+          createPushActionReponse(code, action, name, what),
+        );
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
 });
