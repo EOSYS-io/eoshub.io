@@ -70,4 +70,17 @@ tests =
             , test "remove characters more than string size" <|
                 \() -> Expect.equal "" (deleteFromBack 4 "abc")
             ]
+        , describe "numberWithinDigitLimit"
+            (let
+                digitLimit =
+                    4
+             in
+             [ test "integer" <|
+                \() -> Expect.equal True (numberWithinDigitLimit digitLimit "4")
+             , test "digits not exceeding the limit" <|
+                \() -> Expect.equal True (numberWithinDigitLimit digitLimit "400.0123")
+             , test "digits exceeding the limit" <|
+                \() -> Expect.equal False (numberWithinDigitLimit digitLimit "400.01243")
+             ]
+            )
         ]

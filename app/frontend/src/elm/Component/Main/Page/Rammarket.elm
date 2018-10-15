@@ -64,7 +64,7 @@ import Round
 import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
-import Util.Formatter exposing (assetToFloat, deleteFromBack, timeFormatter)
+import Util.Formatter exposing (assetToFloat, deleteFromBack, numberWithinDigitLimit, timeFormatter)
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
 import Util.Validation as Validation
     exposing
@@ -853,11 +853,15 @@ setBuyFormField : BuyFormField -> BuyModel -> Float -> String -> VerificationReq
 setBuyFormField field ({ params } as buyModel) availableQuantity val requestStatus =
     case field of
         BuyQuantity ->
-            ( validateQuantityField
-                { buyModel | params = { params | quant = val } }
-                availableQuantity
-            , Cmd.none
-            )
+            if numberWithinDigitLimit 4 val then
+                ( validateQuantityField
+                    { buyModel | params = { params | quant = val } }
+                    availableQuantity
+                , Cmd.none
+                )
+
+            else
+                ( buyModel, Cmd.none )
 
         ProxyAccount ->
             validateReceiverField
@@ -867,9 +871,13 @@ setBuyFormField field ({ params } as buyModel) availableQuantity val requestStat
 
 setSellFormField : SellModel -> Int -> String -> SellModel
 setSellFormField ({ params } as sellModel) availableRam val =
-    validateSell
-        { sellModel | params = { params | kiloBytes = val } }
-        availableRam
+    if numberWithinDigitLimit 3 val then
+        validateSell
+            { sellModel | params = { params | kiloBytes = val } }
+            availableRam
+
+    else
+        sellModel
 
 
 validateBuyForm : BuyModel -> BuyModel

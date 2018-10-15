@@ -23,6 +23,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
+import Util.Formatter exposing (numberWithinDigitLimit)
 import Util.HttpRequest exposing (getAccount)
 import Util.Validation as Validation
     exposing
@@ -264,9 +265,13 @@ setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
             validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
-            ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
-            , Cmd.none
-            )
+            if numberWithinDigitLimit 4 value then
+                ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+                , Cmd.none
+                )
+
+            else
+                ( model, Cmd.none )
 
         Memo ->
             ( validateMemoField { model | transfer = { transfer | memo = value } }
