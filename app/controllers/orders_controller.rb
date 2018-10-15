@@ -12,15 +12,24 @@ class OrdersController < ApplicationController
     product = Product.find_by(id: request_params[:product_id])
     raise Exceptions::DefaultError, Exceptions::DEACTIVATED_PRODUCT unless product.active?
     
-    order_no = Order.generate_order_no
-    payment_params = {
-      client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
-      user_id: request_params[:eos_account],
+    order = Order.create!(
+      eos_account: request_params[:eos_account],
       pgcode: request_params[:pgcode],
-      order_no: order_no,
       amount: product.price,
       product_name: product.name,
-      custom_parameter: request_params[:public_key],
+      public_key: request_params[:public_key]
+    )
+
+    payment_params = {
+      client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
+      service_name: 'eoshub.io',
+      user_id: order.eos_account,
+      user_name: order.eos_account,
+      pgcode: order.pgcode,
+      order_no: order.order_no,
+      amount: product.price,
+      product_name: product.name,
+      custom_parameter: order.public_key,
       # for local test, pg company do not accept localhost url
       # return_url: 'http://alpha.eoshub.io/orders',
       # callback_url: 'http://alpha.eoshub.io/payment_results'
@@ -41,21 +50,16 @@ class OrdersController < ApplicationController
 
     raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
 
-    result = JSON.parse(response.body).merge(order_no: order_no)
+    result = JSON.parse(response.body).merge(order_no: order.order_no)
     render json: result, status: response.code
   end
 
   def create
     @order_params = create_params
+    order = Order.find_by(order_no: @order_params[:order_no])
 
     if @order_params&.dig(:cid).present?
-      order = Order.create!(
-        eos_account: @order_params[:user_id],
-        order_no: @order_params[:order_no],
-        pgcode: @order_params[:pgcode],
-        amount: @order_params[:amount],
-        product_name: @order_params[:product_name],
-        public_key: @order_params[:custom_parameter],
+      order.update!(
         account_name: @order_params[:account_name],
         account_no: @order_params[:account_no],
         bank_code: @order_params[:bank_code],
@@ -64,11 +68,23 @@ class OrdersController < ApplicationController
       )
 
       redirect_to action: 'show', id: order.order_no
+    else
+      order.update!(
+        return_code: @order_params[:code],
+        return_message: @order_params[:message]
+      )
+
+      redirect_to action: 'show_error', id: order.order_no
     end
   end
 
   def show
     @order = Order.find_by(order_no: params[:id])
+    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
+  end
+
+  def show_error
+    order = Order.find_by(order_no: params[:id])
     raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
   end
 

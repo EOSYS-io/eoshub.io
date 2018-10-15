@@ -1,0 +1,18 @@
+<section id="popup" class="virtual_account_check modal popup viewing" aria-live="true" role="alert">
+	<div class="wrapper">
+		<h2>가상계좌입금</h2>
+		<p>가상계좌 발급에 실패했습니다.</p>
+
+		<dl>
+			<dt>Code</dt>
+			<dd><%= @order.return_code %></dd>
+
+			<dt>Message</dt>
+			<dd><%= @order.return_message %></dd>
+		</dl>
+		<div class="btn_area">
+			<button type="button" class="ok button" onclick="window.close()">확인</button>
+		</div>
+		<button id="closePopup" type="button" class="close button" onclick="window.close()">닫기</button>
+	</div>
+</section>

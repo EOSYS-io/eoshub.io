@@ -14,6 +14,8 @@
 #  pgcode                                                             :integer          default(NULL), not null
 #  product_name                                                       :string           default("")
 #  public_key                                                         :string           default(""), not null
+#  return_code                                                        :string           default("")
+#  return_message                                                     :string           default("")
 #  state                                                              :integer          default("created"), not null
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null

@@ -29,7 +29,7 @@ class OrdersControllerTest < ActionController::TestCase
       Typhoeus::Request.stub_any_instance :run, MockResponse.new(mock_body) do
         post :request_payment, body: { 
             pgcode: 'virtualaccount',
-            eos_account: 'testtesttest',
+            eos_account: 'testtesttes1',
             product_id: product.id,
             public_key: 'EOS8MZzGSfAChnmBboTDtrm1n7axdutX8QMr855HyEKLwX3BuQ68A'
           }.to_json, as: :json

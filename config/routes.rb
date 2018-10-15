@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
     member do
       post :create_eos_account
+      get :show_error
     end
   end
 

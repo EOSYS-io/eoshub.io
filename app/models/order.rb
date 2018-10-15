@@ -14,6 +14,8 @@
 #  pgcode                                                             :integer          default(NULL), not null
 #  product_name                                                       :string           default("")
 #  public_key                                                         :string           default(""), not null
+#  return_code                                                        :string           default("")
+#  return_message                                                     :string           default("")
 #  state                                                              :integer          default("created"), not null
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null
@@ -33,6 +35,7 @@ class Order < ApplicationRecord
   has_many :payment_results
 
   validates :eos_account, uniqueness: true
+  before_create :generate_order_no
 
   # using only virtual_account
   enum pgcode: {
@@ -85,16 +88,14 @@ class Order < ApplicationRecord
     def permit_attributes_on_create
       [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date, :cid]
     end
+  end
 
-    def generate_order_no
-      order_no = nil
+  private
 
-      loop do
-        order_no = (0..9).to_a.shuffle[0, 8].join
-        break unless self.where(order_no: order_no).exists?
-      end
-
-      order_no
+  def generate_order_no
+    loop do
+      self.order_no = (0..9).to_a.shuffle[0, 8].join
+      break unless Order.where(order_no: order_no).exists?
     end
   end
 end
