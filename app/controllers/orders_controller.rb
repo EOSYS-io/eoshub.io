@@ -84,7 +84,7 @@ class OrdersController < ApplicationController
   end
 
   def show_error
-    order = Order.find_by(order_no: params[:id])
+    @order = Order.find_by(order_no: params[:id])
     raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
   end
 
