@@ -111,7 +111,6 @@ type I18n
     | AccountExample
     | ValidAccountI18n
     | TransferAmount
-    | InvalidAmount
     | OverTransferableAmount
     | Transferable
     | TransferableAmountDesc
@@ -657,12 +656,6 @@ getMessages i18n =
             { korean = "전송하실 수량을 입력하세요"
             , english = "Type in the amount to send"
             , chinese = "请输入要传送的数量"
-            }
-
-        InvalidAmount ->
-            { korean = "유효하지 않은 수량입니다."
-            , english = "Invalid amount!"
-            , chinese = "金额无效"
             }
 
         OverTransferableAmount ->
