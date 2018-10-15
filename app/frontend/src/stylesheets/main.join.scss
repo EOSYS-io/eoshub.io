@@ -357,11 +357,12 @@ main.join {
 
 main.join {
 	article[data-step="done"] {
+		padding:0;
 		position:absolute;
 		top:50%;
 		left:50%;
 		transform:translate(-50%,-50%);
-		background:url('../image/bi-hubby.svg#pink') right calc(50% - 67px) no-repeat;
+		background:url('../image/bi-hubby.svg#pink') right top no-repeat;
 		background-size:61px 67px;
 
 		.button {
