@@ -194,7 +194,7 @@ quantityWarningSpan quantityStatus language =
         ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
-                    ( " false", translate language InvalidAmount )
+                    ( " false", translate language InvalidInputAmount )
 
                 OverValidQuantity ->
                     ( " false", translate language OverTransferableAmount )

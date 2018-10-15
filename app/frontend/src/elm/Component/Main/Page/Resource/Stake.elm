@@ -475,7 +475,7 @@ quantityWarningSpan quantityStatus language { delegatebw, manuallySet } =
         ( classAddedValue, textValue ) =
             case quantityStatus of
                 InvalidQuantity ->
-                    ( " false", translate language InvalidAmount )
+                    ( " false", translate language InvalidInputAmount )
 
                 OverValidQuantity ->
                     ( " false", translate language ExceedStakeAmount )
