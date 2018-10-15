@@ -343,11 +343,11 @@ tests =
                             1024 * 1024 * 1024 * 1024
                     in
                     Expect.equal expected (getResource resourceType used available max)
-            , test "cpu,  max < 1 s, percentage = 0%" <|
+            , test "cpu,  max < 1 ms, percentage = 0%" <|
                 \() ->
                     let
                         expected =
-                            ( "430 ms", "0 ms", "430 ms", "0.00%", 1 )
+                            ( "430 us", "0 us", "430 us", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -362,11 +362,11 @@ tests =
                             430
                     in
                     Expect.equal expected (getResource resourceType used available max)
-            , test "cpu, 1 s <= max < 1 min, percentage = 0%" <|
+            , test "cpu, 1 ms <= max < 1 sec, percentage = 0%" <|
                 \() ->
                     let
                         expected =
-                            ( "4.30 s", "0 ms", "4.30 s", "0.00%", 1 )
+                            ( "4.30 ms", "0 us", "4.30 ms", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
@@ -379,63 +379,82 @@ tests =
 
                         max =
                             4300
+                    in
+                    Expect.equal expected (getResource resourceType used available max)
+            , test "cpu, 1 sec <= max < 1 min, percentage = 0%" <|
+                \() ->
+                    let
+                        expected =
+                            ( "4.30 s", "0 us", "4.30 s", "0.00%", 1 )
+
+                        resourceType =
+                            "cpu"
+
+                        used =
+                            4300000
+
+                        available =
+                            0
+
+                        max =
+                            4300000
                     in
                     Expect.equal expected (getResource resourceType used available max)
             , test "cpu, 1 min <= max < 1 hour, percentage = 0%" <|
                 \() ->
                     let
                         expected =
-                            ( "7.17 min", "0 ms", "7.17 min", "0.00%", 1 )
+                            ( "7.17 min", "0 us", "7.17 min", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
 
                         used =
-                            430000
+                            430000000
 
                         available =
                             0
 
                         max =
-                            430000
+                            430000000
                     in
                     Expect.equal expected (getResource resourceType used available max)
             , test "cpu, 1 hour <= max < 1 day, percentage = 0%" <|
                 \() ->
                     let
                         expected =
-                            ( "1.19 hour", "0 ms", "1.19 hour", "0.00%", 1 )
+                            ( "1.19 hour", "0 us", "1.19 hour", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
 
                         used =
-                            4300000
+                            4300000000
 
                         available =
                             0
 
                         max =
-                            4300000
+                            4300000000
                     in
                     Expect.equal expected (getResource resourceType used available max)
             , test "cpu, max >= 1 day, percentage = 0%" <|
                 \() ->
                     let
                         expected =
-                            ( "4.98 day", "0 ms", "4.98 day", "0.00%", 1 )
+                            ( "4.98 day", "0 us", "4.98 day", "0.00%", 1 )
 
                         resourceType =
                             "cpu"
 
                         used =
-                            430000000
+                            430000000000
 
                         available =
                             0
 
                         max =
-                            430000000
+                            430000000000
                     in
                     Expect.equal expected (getResource resourceType used available max)
             , test "ram max < 1024, percentage = 0%" <|
