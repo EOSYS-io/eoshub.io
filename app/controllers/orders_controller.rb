@@ -23,6 +23,7 @@ class OrdersController < ApplicationController
     payment_params = {
       client_id: Rails.application.credentials.dig(Rails.env.to_sym, :payletter_client_id),
       user_id: order.eos_account,
+      user_name: order.eos_account,
       pgcode: order.pgcode,
       order_no: order.order_no,
       amount: product.price,
