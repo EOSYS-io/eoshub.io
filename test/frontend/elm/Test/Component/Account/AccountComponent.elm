@@ -50,7 +50,7 @@ tests =
                     Expect.equal (CreatedPage <| Created.initModel eosAccount publicKey) (getPage <| Route.CreatedRoute eosAccount publicKey)
             , test "EventCreationRoute" <|
                 \() ->
-                    Expect.equal (EventCreationPage EventCreation.initModel) (getPage <| Route.EventCreationRoute <| Just "ko")
+                    Expect.equal NotFoundPage (getPage <| Route.EventCreationRoute <| Just "ko")
             , test "NotFoundRoute" <|
                 \() -> Expect.equal NotFoundPage (getPage Route.NotFoundRoute)
             ]
