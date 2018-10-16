@@ -271,7 +271,7 @@ getPage route =
             CreatedPage (Created.initModel maybeEosAccount maybePublicKey)
 
         EventCreationRoute _ ->
-            EventCreationPage EventCreation.initModel
+            NotFoundPage
 
         _ ->
             NotFoundPage
