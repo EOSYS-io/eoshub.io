@@ -331,13 +331,13 @@ getMessages i18n =
         Hello ->
             { korean = "안녕하세요"
             , english = "Hello"
-            , chinese = ""
+            , chinese = "哈罗！我是eoshub"
             }
 
         WelcomeEosHub ->
             { korean = "이오스 허브입니다"
             , english = "Welcome to EOS Hub!"
-            , chinese = "哈罗！我是eoshub"
+            , chinese = ""
             }
 
         IfYouHaveEos ->

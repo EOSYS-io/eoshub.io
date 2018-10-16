@@ -163,7 +163,7 @@ view ({ state, fold } as model) language =
 signInView : Language -> List (Html Message)
 signInView language =
     [ h2 []
-        [ text (translate language Hello ++ ",")
+        [ text (translate language Hello)
         , br [] []
         , text (translate language WelcomeEosHub)
         ]
