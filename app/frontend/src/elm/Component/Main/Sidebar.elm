@@ -194,7 +194,7 @@ pairWalletView language =
         , class "back button"
         , onClick (UpdateState SignIn)
         ]
-        [ text "뒤로가기" ]
+        [ text (translate Language GoBack) ]
     , h2 []
         [ text (translate language AttachableWallet1)
         , br [] []
