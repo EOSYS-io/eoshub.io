@@ -194,7 +194,7 @@ pairWalletView language =
         , class "back button"
         , onClick (UpdateState SignIn)
         ]
-        [ text (translate Language GoBack) ]
+        [ text (translate language GoBack) ]
     , h2 []
         [ text (translate language AttachableWallet1)
         , br [] []
