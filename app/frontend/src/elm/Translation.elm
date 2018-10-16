@@ -270,6 +270,7 @@ type I18n
     | DelegatePossible
     | UndelegatePossible
     | NotFoundDesc
+    | GoBack
 
 
 translate : Language -> I18n -> String
@@ -330,7 +331,7 @@ getMessages i18n =
         Hello ->
             { korean = "안녕하세요"
             , english = "Hello"
-            , chinese = "哈罗!"
+            , chinese = ""
             }
 
         WelcomeEosHub ->
@@ -342,43 +343,43 @@ getMessages i18n =
         IfYouHaveEos ->
             { korean = "EOS 계정이 있으면 로그인을,"
             , english = "If you have an EOS account, sign in"
-            , chinese = "如果您有EOS账户请进行账户联动,"
+            , chinese = "如果有EOS账户请登入,"
             }
 
         IfYouAreNew ->
             { korean = "이오스가 처음이라면 신규계정을 생성해주세요!"
             , english = "If you are a newbie, create a new account!"
-            , chinese = "如果没有EOS账户请先进行注册!"
+            , chinese = "如果没有EOS账户请注册!"
             }
 
         AttachableWallet1 ->
             { korean = "이오스 허브와 연동이"
             , english = "Attachable wallets"
-            , chinese = "能够联动的钱包"
+            , chinese = "以下是与eoshub"
             }
 
         AttachableWallet2 ->
             { korean = "가능한 EOS 지갑입니다"
             , english = "for EOS Hub"
-            , chinese = ""
+            , chinese = "能够绑定的钱包"
             }
 
         FurtherUpdate1 ->
             { korean = "추후 업데이트를 통해 연동가능한"
             , english = "Wait for further updates to include"
-            , chinese = "通过更新逐渐增加"
+            , chinese = "通过更新会逐渐增加能"
             }
 
         FurtherUpdate2 ->
             { korean = "지갑수를 늘려갈 예정이오니 조금만 기다려주세요!"
             , english = "more wallets!"
-            , chinese = "能够联动的钱包数量"
+            , chinese = "够绑定的钱包数量"
             }
 
         HowToAttach ->
             { korean = "지갑연동방법 알아보기"
             , english = "How to attach"
-            , chinese = "了解钱包联动"
+            , chinese = "了解钱包绑定"
             }
 
         HowToAttachLink ->
@@ -390,7 +391,7 @@ getMessages i18n =
         Attach ->
             { korean = "연동하기"
             , english = "Attach"
-            , chinese = "联动"
+            , chinese = "绑定"
             }
 
         ChangeWallet ->
@@ -474,13 +475,13 @@ getMessages i18n =
         TransferHereDesc ->
             { korean = "여기서 토큰을 보낼 수 있어요"
             , english = "Send tokens here"
-            , chinese = "去传送代币"
+            , chinese = "传送代币"
             }
 
         ManageResourceDesc ->
             { korean = "리소스를 관리할 수 있어요"
             , english = "Manage your resource"
-            , chinese = "可以管理资源"
+            , chinese = "可以自由地管理资源"
             }
 
         Vote ->
@@ -510,7 +511,7 @@ getMessages i18n =
         RamMarketDesc ->
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
-            , chinese = "可以买卖RAM"
+            , chinese = "在这里可以自由地买卖RAM :)"
             }
 
         GoToTelegramLink ->
@@ -618,7 +619,7 @@ getMessages i18n =
         TransferDesc ->
             { korean = "원하시는 수량만큼 토큰을 전송하세요 :)"
             , english = "Transfer Tokens"
-            , chinese = "去传送代币"
+            , chinese = "传送代币"
             }
 
         TransferableAmount ->
@@ -636,13 +637,13 @@ getMessages i18n =
         ReceiverAccountName ->
             { korean = "전송하실 계정의 이름을 입력하세요."
             , english = "Receiver's Account Name"
-            , chinese = "请输入被传送的账户名"
+            , chinese = "请输入要传送的账户名"
             }
 
         AccountExample ->
             { korean = "계정이름 예시: eoshubby"
             , english = "Example: eoshubby"
-            , chinese = "例子: eoshubby"
+            , chinese = "比如: eoshubby"
             }
 
         TransferAmount ->
@@ -666,7 +667,7 @@ getMessages i18n =
         TransferableAmountDesc ->
             { korean = "최대 전송가능한 수량만큼 입력 가능합니다."
             , english = "Type in up to the transferable amount"
-            , chinese = "只能输入可传送的数量范围内"
+            , chinese = "传送数量不可超过可传送数量"
             }
 
         Memo ->
@@ -684,7 +685,7 @@ getMessages i18n =
         MemoNotMandatory ->
             { korean = "필수는 아니에요 :)"
             , english = "Optional :)"
-            , chinese = "选填"
+            , chinese = "不是必填 :)"
             }
 
         ConfirmEmailSent ->
@@ -762,7 +763,7 @@ getMessages i18n =
         AccountCreationAlreadyHaveAccount ->
             { korean = "이미 EOS 계정이 있나요?"
             , english = "Already have an EOS account?"
-            , chinese = "是否已经持有EOS账户？"
+            , chinese = "是否已经有EOS账户？"
             }
 
         AccountCreationLoginLink ->
@@ -810,7 +811,7 @@ getMessages i18n =
         AccountCreationKeypairCaution ->
             { korean = "* 계정의 소유권을 증명하는 정보이니 꼭 복사하여 안전하게 보관하세요!"
             , english = "* Ensure safe storage of your keypair, as it proves the account ownership."
-            , chinese = "* 唯一能够证明账户的所属权的信息，一定要把它复制并保管在安全的地方！"
+            , chinese = "* 这是唯一能够证明账户所属权的信息！一定要把它复制并保存在安全的地方"
             }
 
         AccountCreationKeypairCopiedToClipboard ->
@@ -864,13 +865,13 @@ getMessages i18n =
         AccountCreationNameCondition ->
             { korean = "영어 소문자와 숫자(1~5)의 조합으로 12글자만 가능합니다."
             , english = "Only 12 characters - lowercase letters and numbers (1~5) - are possible"
-            , chinese = "由小写英文字母和数字1～5组成的12位字符"
+            , chinese = "账户名是由小写英文字母和数字1~5组成的12为字符"
             }
 
         AccountCreationInput ->
             { korean = "계정명 입력"
             , english = "Enter account name"
-            , chinese = "输入账户名"
+            , chinese = "请输入账户名"
             }
 
         AccountCreationNamePlaceholder ->
@@ -918,7 +919,7 @@ getMessages i18n =
         AccountCreationAgreeEosConstitution ->
             { korean = "EOS 헌법에 동의합니다."
             , english = "I agree to the EOS Constitution."
-            , chinese = "同意EOS宪法上的内容"
+            , chinese = "已同意EOS宪法"
             }
 
         AccountCreationButton ->
@@ -1110,13 +1111,13 @@ getMessages i18n =
         DelegatePossible ->
             { korean = "임대 가능합니다 :)"
             , english = "Ready to delegate :)"
-            , chinese = "可以进行租出去 :）"
+            , chinese = "可以进行资源租借 :）"
             }
 
         UndelegatePossible ->
             { korean = "임대취소 가능합니다 :)"
             , english = "Ready to undelegate :)"
-            , chinese = "可以进行租回来 :）"
+            , chinese = "可以取消资源租借 :）"
             }
 
         BuyramSucceeded receiver ->
@@ -1284,7 +1285,7 @@ getMessages i18n =
         EnterReceiverAccountName ->
             { korean = "RAM 구매 받을 계정명을 입력해주세요"
             , english = "Enter account name"
-            , chinese = "请输入被购买RAM的账户"
+            , chinese = "请输入账户名"
             }
 
         AccountNotExist ->
@@ -1470,25 +1471,25 @@ getMessages i18n =
         Delegate ->
             { korean = "임대하기"
             , english = "Delegate"
-            , chinese = "租出去"
+            , chinese = "资源租借"
             }
 
         Undelegate ->
             { korean = "임대취소하기"
             , english = "Undelegate"
-            , chinese = "租回来"
+            , chinese = "取消资源租借"
             }
 
         AutoAllocation ->
             { korean = "CPU, NET에 각각 4:1의 비율로 자동 분배됩니다"
             , english = "Auto-set in 4:1 to CPU, NET"
-            , chinese = "在CPU和NET以4:1的比率进行自动分配"
+            , chinese = "CPU和NET以4:1的比率进行自动分配"
             }
 
         StakeAvailableAmount ->
             { korean = "스테이크 가능 수량"
             , english = "Available Balance"
-            , chinese = "可stake数量"
+            , chinese = "可以stake的EOS数量"
             }
 
         SetManually ->
@@ -1506,7 +1507,7 @@ getMessages i18n =
         NeverExceedStakeAmount ->
             { korean = "스테이크 가능 수량만큼 입력 가능합니다"
             , english = "The input cannot exceed the available balance"
-            , chinese = "只能输入可stake的数量范围内"
+            , chinese = "不可超过可stake数量"
             }
 
         AutoStakeAmountDesc cpu net isManual ->
@@ -1563,7 +1564,7 @@ getMessages i18n =
         RecommendedStakeAmount cpu net ->
             { korean = "CPU와 NET에 각각 최소 " ++ cpu ++ ", " ++ net ++ " 이상 스테이크 해주세요"
             , english = "Please stake over " ++ cpu ++ " and " ++ net ++ " for CPU and NET"
-            , chinese = "请各在CPU和NET至少stake" ++ cpu ++ "和" ++ net ++ "以上"
+            , chinese = "CPU和NET至少要stake" ++ cpu ++ "和" ++ net
             }
 
         Cancel ->
@@ -1581,43 +1582,43 @@ getMessages i18n =
         DelegateAvailableAmount ->
             { korean = "임대 가능 수량"
             , english = "Available Balance"
-            , chinese = "可租数量"
+            , chinese = "可租借数量"
             }
 
         NeverExceedDelegateAmount ->
             { korean = "임대 가능 수량만큼 입력 가능합니다"
             , english = "The input cannot exceed the available balance"
-            , chinese = "输入数量不能超过可租数量"
+            , chinese = "不可超过可租借数量"
             }
 
         DelegatedList ->
             { korean = "임대 받은 계정 리스트"
             , english = "List of delegated accounts"
-            , chinese = "被租的账户名单"
+            , chinese = "资源租借名单"
             }
 
         TypeAccountToDelegate ->
             { korean = "임대 받을 계정명을 입력하세요"
             , english = "Enter account name to delegate"
-            , chinese = "请输入被租的账户名"
+            , chinese = "请输入接受资源租借的账户名"
             }
 
         TypeDelegateAmount ->
             { korean = "임대 할 수량을 입력하세요"
             , english = "Enter amount to delegate"
-            , chinese = "请输入要租的数量"
+            , chinese = "请输入要租借的数量"
             }
 
         ExceedDelegateAmount ->
             { korean = "임대 가능 수량을 초과했습니다"
             , english = "The input exceeds the available balance"
-            , chinese = "超过了可租数量"
+            , chinese = "超过了可租借数量"
             }
 
         DelegatedAmount resourceType ->
             { korean = resourceType ++ " 임대 수량"
             , english = resourceType ++ " delegated"
-            , chinese = resourceType ++ "的可租数量"
+            , chinese = resourceType ++ "的租借数量"
             }
 
         Select ->
@@ -1635,11 +1636,17 @@ getMessages i18n =
         SelectAccountToUndelegate ->
             { korean = "임대취소 할 계정명을 선택하세요"
             , english = "Select account name to undelegate"
-            , chinese = "输入要撤回租借的账户名"
+            , chinese = "请输入要取消资源租借的账户名"
             }
 
         NotFoundDesc ->
             { korean = "페이지를 찾을 수 없습니다."
             , english = "Not found"
             , chinese = "未找到"
+            }
+
+        GoBack ->
+            { korean = "뒤로가기"
+            , english = "Back"
+            , chinese = "后退"
             }
