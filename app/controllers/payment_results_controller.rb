@@ -3,7 +3,7 @@ class PaymentResultsController < ApiController
     @payment_result_params = create_params
 
     order = Order.find_by(order_no: params[:order_no])
-    if @payment_result_params&.dig(:cid).present?
+    if params.dig(:cid).present? || params.dig(:issue_tid).present?
       order.paid!
 
       PaymentResult.create!(

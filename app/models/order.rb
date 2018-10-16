@@ -34,7 +34,6 @@ class Order < ApplicationRecord
   belongs_to :user, optional: true
   has_many :payment_results
 
-  validates :eos_account, uniqueness: true
   before_create :generate_order_no
 
   # using only virtual_account
