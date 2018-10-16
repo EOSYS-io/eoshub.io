@@ -109,7 +109,6 @@ type I18n
     | CheckAccountName
     | ReceiverAccountName
     | AccountExample
-    | ValidAccountI18n
     | TransferAmount
     | OverTransferableAmount
     | Transferable
@@ -646,12 +645,6 @@ getMessages i18n =
             , chinese = "例子: eoshubby"
             }
 
-        ValidAccountI18n ->
-            { korean = "올바른 계정입니다."
-            , english = "Valid Account"
-            , chinese = ""
-            }
-
         TransferAmount ->
             { korean = "전송하실 수량을 입력하세요"
             , english = "Type in the amount to send"
@@ -1067,27 +1060,27 @@ getMessages i18n =
             }
 
         DelegatebwSucceeded receiver ->
-            { korean = receiver ++ "에게 스테이크 완료!"
-            , english = ""
-            , chinese = ""
+            { korean = receiver ++ "에게 임대 완료!"
+            , english = "Delegatebw to " ++ receiver ++ " successful!"
+            , chinese = "向" ++ receiver ++ "租借成功！"
             }
 
         DelegatebwFailed code ->
-            { korean = code ++ " 코드오류로 스테이크 실패"
+            { korean = code ++ " 코드오류로 임대 실패"
             , english = "Failed with error code " ++ code
-            , chinese = ""
+            , chinese = code ++ "编码有误，租借失败"
             }
 
         UndelegatebwSucceeded receiver ->
-            { korean = receiver ++ "으로 언스테이크 완료!"
-            , english = ""
-            , chinese = ""
+            { korean = receiver ++ " 임대취소 완료!"
+            , english = "Undelegate to " ++ receiver ++ " successful!"
+            , chinese = receiver ++ "取消租借成功！"
             }
 
         UndelegatebwFailed code ->
-            { korean = code ++ " 코드오류로 언스테이크 실패"
+            { korean = code ++ " 코드오류로 임대취소 실패"
             , english = "Failed with error code " ++ code
-            , chinese = ""
+            , chinese = code ++ "编码有误，取消租借失败"
             }
 
         InvalidQuantityInput resourceType ->
@@ -1126,40 +1119,40 @@ getMessages i18n =
             , chinese = "可以进行租回来 :）"
             }
 
-        BuyramSucceeded str ->
-            { korean = str ++ " 에게 구매 완료."
-            , english = ""
-            , chinese = ""
+        BuyramSucceeded receiver ->
+            { korean = receiver ++ " 에게 구매 완료."
+            , english = "Bought RAM to " ++ receiver
+            , chinese = "向" ++ receiver ++ "购买成功"
             }
 
         BuyramFailed code ->
             { korean = code ++ " 코드오류로 램 구매 실패"
-            , english = ""
-            , chinese = ""
+            , english = "Failed to buy RAM due to " ++ code
+            , chinese = code ++ "编码有误，RAM购买失败"
             }
 
         SellramSucceeded _ ->
             { korean = "판매 완료!"
-            , english = ""
-            , chinese = ""
+            , english = "Successfully sold RAM!"
+            , chinese = "销售成功！"
             }
 
         SellramFailed code ->
             { korean = code ++ " 코드오류로 램 판매 실패"
-            , english = ""
-            , chinese = ""
+            , english = "Failed to sell RAM due to " ++ code
+            , chinese = code ++ "编码有误，RAM销售失败"
             }
 
         VoteSucceeded _ ->
             { korean = "투표 성공"
-            , english = ""
-            , chinese = ""
+            , english = "Vote Complete"
+            , chinese = "投票成功"
             }
 
         VoteFailed code ->
             { korean = code ++ " 코드오류로 투표 실패"
-            , english = ""
-            , chinese = ""
+            , english = "Failed to vote due to " ++ code
+            , chinese = code ++ "编码有误，投票失败"
             }
 
         DoProxyVote ->
