@@ -2,7 +2,7 @@ module Test.Translation exposing (tests)
 
 import Expect
 import Test exposing (..)
-import Translation exposing (I18n(Hello), Language(Chinese, English, Korean), getMessages, translate)
+import Translation exposing (I18n(Login), Language(Chinese, English, Korean), getMessages, translate)
 
 
 tests : Test
@@ -12,18 +12,18 @@ tests =
             [ test "Success" <|
                 \() ->
                     Expect.equal
-                        { korean = "안녕하세요"
-                        , english = "Hello"
-                        , chinese = "哈罗!"
+                        { korean = "로그인"
+                        , english = "Sign In"
+                        , chinese = "登入"
                         }
-                        (getMessages Hello)
+                        (getMessages Login)
             ]
         , describe "translate"
             [ test "korean" <|
-                \() -> Expect.equal "안녕하세요" (translate Korean Hello)
+                \() -> Expect.equal "로그인" (translate Korean Login)
             , test "english" <|
-                \() -> Expect.equal "Hello" (translate English Hello)
+                \() -> Expect.equal "Sign In" (translate English Login)
             , test "chinese" <|
-                \() -> Expect.equal "哈罗!" (translate Chinese Hello)
+                \() -> Expect.equal "登入" (translate Chinese Login)
             ]
         ]

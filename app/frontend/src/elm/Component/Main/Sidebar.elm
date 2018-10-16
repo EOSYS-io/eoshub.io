@@ -163,7 +163,7 @@ view ({ state, fold } as model) language =
 signInView : Language -> List (Html Message)
 signInView language =
     [ h2 []
-        [ text (translate language Hello ++ ",")
+        [ text (translate language Hello)
         , br [] []
         , text (translate language WelcomeEosHub)
         ]
@@ -194,7 +194,7 @@ pairWalletView language =
         , class "back button"
         , onClick (UpdateState SignIn)
         ]
-        [ text "뒤로가기" ]
+        [ text (translate language GoBack) ]
     , h2 []
         [ text (translate language AttachableWallet1)
         , br [] []
