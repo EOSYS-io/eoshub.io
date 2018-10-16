@@ -315,8 +315,8 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             [ span [ class "title" ] [ text "staked" ]
             , span [ class "amount" ] [ text (deleteFromBack 4 stakedAmount) ]
 
-            -- TODO(boseok): Translation i18n should be decided.
-            , span [ class ("status " ++ colorClass) ] [ text (getResourceStatusText language resourceStatusCode) ]
+            -- NOTE(boseok): Remove resource status temporarily
+            -- , span [ class ("status " ++ colorClass) ] [ text (getResourceStatusText language resourceStatusCode) ]
 
             -- span [ class "status unavailable" ] [ text "" ]
             ]
