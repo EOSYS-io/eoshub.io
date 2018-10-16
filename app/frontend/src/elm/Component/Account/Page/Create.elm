@@ -354,7 +354,7 @@ paymentView { product } language =
             , dt []
                 [ text "NET" ]
             , dd []
-                [ text "0.01 EOS" ]
+                [ text "0.1 EOS" ]
             , dt []
                 [ text "RAM" ]
             , dd []
