@@ -63,10 +63,11 @@ jobs:
         - sudo chmod +x /usr/bin/ecs-deploy
       script:
         - if [ "$TRAVIS_BRANCH" == "alpha" ]; then
-            export DEPLOYMENT_ENV=alpha DOCKER_TAG=$TRAVIS_COMMIT;
+            export DEPLOYMENT_ENV=alpha;
           elif [ "$TRAVIS_BRANCH" == "master" ]; then
-            export DEPLOYMENT_ENV=production DOCKER_TAG=$TRAVIS_TAG;
+            export DEPLOYMENT_ENV=production;
           fi
+        - export DOCKER_TAG=$TRAVIS_COMMIT
         # Dockerhub login
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
         # Rails app build
