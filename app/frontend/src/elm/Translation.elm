@@ -343,8 +343,8 @@ getMessages i18n =
             }
 
         IfYouHaveEos ->
-            { korean = "EOS 계정이 있으면 로그인을"
-            , english = "If you have an EOS account, sign in."
+            { korean = "EOS 계정이 있으면 로그인을 "
+            , english = "If you have an EOS account, sign in. "
             , chinese = "如果有EOS账户请登入"
             }
 
@@ -355,8 +355,8 @@ getMessages i18n =
             }
 
         AttachableWallet1 ->
-            { korean = "다음은 이오스허브와"
-            , english = "Sign in to eoshub"
+            { korean = "다음은 이오스허브와 "
+            , english = "Sign in to eoshub "
             , chinese = "以下是与eoshub"
             }
 
@@ -367,8 +367,8 @@ getMessages i18n =
             }
 
         FurtherUpdate1 ->
-            { korean = "추후 업데이트를 통해 더 많은"
-            , english = "More wallet sign-in"
+            { korean = "추후 업데이트를 통해 더 많은 "
+            , english = "More wallet sign-in "
             , chinese = "通过更新会增加"
             }
 
@@ -419,7 +419,6 @@ getMessages i18n =
             , english = "Total"
             , chinese = "总数量"
             }
-
 
         TransactionOptimal ->
             { korean = "트랜잭션 최상"
