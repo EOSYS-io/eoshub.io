@@ -24,8 +24,6 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
-import Date
-import Date.Extra as Date exposing (Interval(..))
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
 import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
@@ -316,11 +314,6 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             -- , span [ class ("status " ++ colorClass) ] [ text (getResourceStatusText language resourceStatusCode) ]
             -- span [ class "status unavailable" ] [ text "" ]
             ]
-        , li []
-            [ span [ class "title" ] [ text "refunding" ]
-            , span [ class "amount" ] [ text (deleteFromBack 4 unstakingAmount) ]
-            , span [ class "remaining time" ] [ text (getLeftTime refundRequest.requestTime now) ]
-            ]
         ]
     , button
         [ type_ "button"
@@ -408,33 +401,6 @@ update message ({ fold, wallet } as model) =
 
         OnTime now ->
             ( { model | now = now }, Cmd.none )
-
-
-getLeftTime : String -> Time -> String
-getLeftTime requestTime now =
-    case Date.fromIsoString (requestTime ++ "+00:00") of
-        Ok time ->
-            let
-                expectedDate =
-                    Date.add Hour 72 time
-
-                nowDate =
-                    Date.fromTime now
-
-                leftHours =
-                    Date.diff Hour nowDate expectedDate
-
-                leftMinutes =
-                    Date.diff Minute nowDate expectedDate
-            in
-            if leftHours < 1 then
-                (leftMinutes |> toString) ++ " minutes"
-
-            else
-                (leftHours |> toString) ++ " hours"
-
-        Err _ ->
-            ""
 
 
 getResourceStatusText : Language -> Int -> String
