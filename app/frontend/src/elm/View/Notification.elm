@@ -22,6 +22,7 @@ import Translation exposing (I18n(Close), Language, translate)
 
 type Message
     = CloseNotification
+    | MoveToAccountPage
 
 
 
@@ -120,7 +121,7 @@ messageBoxMainText mainText =
 
 messageBoxDetailText : String -> Html Message
 messageBoxDetailText detailText =
-    a [] [ text detailText ]
+    a [ onClick MoveToAccountPage ] [ text detailText ]
 
 
 messageBoxButton : Language -> Html Message
