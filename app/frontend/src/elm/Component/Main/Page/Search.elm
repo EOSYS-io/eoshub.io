@@ -404,7 +404,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq } as 
             , viewPermissionSection language account
             , section [ class "transaction history" ]
                 [ h3 []
-                    [ text (translate language Transactions) ]
+                    [ text (translate language Actions) ]
                 , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
                     [ option [ Html.Attributes.value "all" ]
                         [ text (translate language All) ]

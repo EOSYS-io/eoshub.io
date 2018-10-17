@@ -71,8 +71,6 @@ type I18n
     | MyAccount
     | SignOut
     | TotalAmount
-    | StakedAmount
-    | UnstakedAmount
     | TransactionOptimal
     | TransactionFine
     | TransactionAttention
@@ -169,7 +167,7 @@ type I18n
     | StakedTo
     | StakedBy
     | Resource
-    | Transactions
+    | Actions
     | TxId
     | Type
     | Time
@@ -417,21 +415,10 @@ getMessages i18n =
 
         TotalAmount ->
             { korean = "총 보유량"
-            , english = "Total Amount"
+            , english = "Total"
             , chinese = "总数量"
             }
 
-        UnstakedAmount ->
-            { korean = "보관 취소 토큰"
-            , english = "Unstaked Amount"
-            , chinese = "unstaking代币"
-            }
-
-        StakedAmount ->
-            { korean = "보관한 토큰"
-            , english = "Staked Amount"
-            , chinese = "staking代币"
-            }
 
         TransactionOptimal ->
             { korean = "트랜잭션 최상"
@@ -656,8 +643,8 @@ getMessages i18n =
             }
 
         TransferAmount ->
-            { korean = "전송하실 수량을 입력하세요"
-            , english = "Type in the amount to send"
+            { korean = "전송 할 수량을 입력하세요"
+            , english = "Enter amount to send"
             , chinese = "请输入要传送的数量"
             }
 
@@ -975,19 +962,19 @@ getMessages i18n =
 
         SearchAccount ->
             { korean = "계정 검색"
-            , english = "Search account "
+            , english = "Search Result "
             , chinese = "查询账户"
             }
 
         SearchResultAccount ->
             { korean = "검색하신 계정에 대한 정보입니다 :)"
-            , english = "Search result"
-            , chinese = "如下为查询到的账户信息"
+            , english = "Below is the search result of the account :)"
+            , chinese = "查询到的账户信息"
             }
 
         Account ->
-            { korean = "계정 이름"
-            , english = "Account"
+            { korean = "계정명"
+            , english = "Account Name"
             , chinese = "账户名"
             }
 
@@ -1015,16 +1002,16 @@ getMessages i18n =
             , chinese = "资源"
             }
 
-        Transactions ->
-            { korean = "트랜잭션"
-            , english = "Transactions"
-            , chinese = "交易"
+        Actions ->
+            { korean = "액션 조회"
+            , english = "Actions"
+            , chinese = "查询"
             }
 
         TxId ->
-            { korean = "트랜잭션 id"
-            , english = "Tx id"
-            , chinese = "Tx id"
+            { korean = "Tx ID"
+            , english = "Tx ID"
+            , chinese = "Tx ID"
             }
 
         Type ->
