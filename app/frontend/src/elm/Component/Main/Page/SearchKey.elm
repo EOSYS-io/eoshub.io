@@ -81,6 +81,11 @@ update message model =
 
 view : Language -> Model -> Html Message
 view language { accounts, publickey } =
+    let
+        count =
+            List.length accounts
+                |> toString
+    in
     main_ [ class "search public_key" ]
         [ h2 []
             [ text (translate language SearchPublicKey) ]
@@ -93,6 +98,7 @@ view language { accounts, publickey } =
                 , dd []
                     [ text publickey ]
                 ]
+            , p [ class "description" ] [ text (translate language (LinkedCount count)) ]
             , div [ class "keybox" ]
                 (viewAccountCardList language accounts)
             ]
@@ -106,11 +112,9 @@ viewAccountCardList language accounts =
 
 viewAccountCard : Language -> Int -> String -> Html Message
 viewAccountCard language index account =
-    div []
-        [ span [] [ text <| translate language Translation.Account ++ " " ++ toString (index + 1) ]
+    div [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
+        [ span [] [ text <| translate language Translation.Account ]
         , strong
             [ title account ]
             [ text account ]
-        , button [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
-            [ text "자세한 검색 보기" ]
         ]

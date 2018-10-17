@@ -176,6 +176,7 @@ type I18n
     | All
     | ShowMore
     | SearchPublicKey
+    | LinkedCount String
     | SearchResultPublicKey
     | DelegatebwSucceeded String
     | DelegatebwFailed String
@@ -1054,6 +1055,12 @@ getMessages i18n =
             { korean = "퍼블릭 키 검색"
             , english = "Search Public Key"
             , chinese = "查询公匙"
+            }
+
+        LinkedCount count ->
+            { korean = "위 퍼블릭 키와 연동된 계정이 " ++ count ++ "개 있습니다."
+            , english = count ++ " account linked to the public key."
+            , chinese = "有" ++ count ++ "个绑定账户存在"
             }
 
         SearchResultPublicKey ->
