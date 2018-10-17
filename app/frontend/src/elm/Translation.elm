@@ -1667,7 +1667,7 @@ getMessages i18n =
             }
 
         EosConstitutionLink ->
-            { korean = "헌법 보기"
+            { korean = "헌법 전문 보기"
             , english = "View the Constitution"
             , chinese = "查看宪法"
             }
