@@ -132,6 +132,9 @@ update msg ({ notification } as model) flags language =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        _ ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW

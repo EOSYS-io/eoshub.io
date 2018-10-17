@@ -340,6 +340,9 @@ update msg ({ accountName, keys, notification } as model) flags language =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        _ ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW
