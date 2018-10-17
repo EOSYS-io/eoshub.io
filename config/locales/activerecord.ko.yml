@@ -2,6 +2,9 @@ ko:
   activerecord:
     models:
       admin_user: '내부어드민 관리자'
+      product: '상품 관리'
+      order: '주문 내역'
+      payment_result: '결제 내역'
       comment: '댓글'
 
     attributes:
@@ -18,6 +21,25 @@ ko:
         current_sign_in_at: '최근 로그인'
         last_sign_in_at: '마지막 로그인'
         sign_in_count: '로그인 횟수'
+      product:
+        <<: *commons
+        name: '상품명'
+        price: '가격'
+        active: '활성화'
+      order:
+        <<: *commons
+        pgcode: '결제 방식'
+        product_name: '상품명'
+        account_name: '가상계좌 입금자명'
+        account_no: '가상계좌 번호'
+        bank_code: '가상계좌 은행 코드'
+        bank_name: '가상계좌 은행명'
+        expire_date: '가상계좌 입금 기한'
+        return_code: '결제요청 응답 코드'
+        return_message: '결제요청 응답 메세지'
+      payment_result:
+        <<: *commons
+
 
     #http://guides.rubyonrails.org/i18n.html
     errors:
