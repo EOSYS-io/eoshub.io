@@ -345,7 +345,7 @@ getMessages i18n =
         IfYouHaveEos ->
             { korean = "EOS 계정이 있으면 로그인을 "
             , english = "If you have an EOS account, sign in. "
-            , chinese = "如果有EOS账户请登入"
+            , chinese = "如果有EOS账户请登入。"
             }
 
         IfYouAreNew ->
