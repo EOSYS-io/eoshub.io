@@ -338,7 +338,7 @@ getMessages i18n =
             }
 
         WelcomeEosHub ->
-            { korean = "이오스 허브입니다"
+            { korean = "이오스허브입니다"
             , english = "Welcome to EOS Hub!"
             , chinese = ""
             }
