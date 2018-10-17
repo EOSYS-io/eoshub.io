@@ -49,9 +49,11 @@ import Html.Attributes
         , checked
         , class
         , for
+        , href
         , id
         , placeholder
         , style
+        , target
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -82,6 +84,7 @@ import Translation
             , CopyAll
             , DebugMessage
             , EmptyMessage
+            , EosConstitutionLink
             , PaymentTotalAmount
             , PaymentVirtualAccount
             , PrivateKey
@@ -388,6 +391,8 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
             []
         , label [ for "agreeContract" ]
             [ textViewI18n language AccountCreationAgreeEosConstitution ]
+        , a [ href "https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md", target "_blank" ]
+            [ textViewI18n language EosConstitutionLink ]
         ]
 
 

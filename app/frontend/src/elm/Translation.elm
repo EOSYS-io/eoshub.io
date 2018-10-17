@@ -273,6 +273,7 @@ type I18n
     | Send
     | DoBuy
     | DoSell
+    | EosConstitutionLink
 
 
 translate : Language -> I18n -> String
@@ -419,7 +420,6 @@ getMessages i18n =
             , english = "Total"
             , chinese = "总数量"
             }
-
 
         TransactionOptimal ->
             { korean = "트랜잭션 최상"
@@ -1664,4 +1664,10 @@ getMessages i18n =
             { korean = "뒤로가기"
             , english = "Back"
             , chinese = "后退"
+            }
+
+        EosConstitutionLink ->
+            { korean = "헌법 보기"
+            , english = "View the Constitution"
+            , chinese = "查看宪法"
             }
