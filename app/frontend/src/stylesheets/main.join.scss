@@ -27,6 +27,7 @@ main.join {
 		width: 100%;
 		box-sizing: border-box;
 		font-size:$small;
+		color:$white;
 
 		background-color:$xx-dark-gray;
 
@@ -275,6 +276,20 @@ main.join {
 		button.button  {
 			flex:1;
 			max-width:136px;
+		}
+
+		// 헌법 전문 보기
+		a {
+			font-size:$x-small;
+			display:block;
+			margin-left:1.6rem;
+			margin-top:0.4em;
+			text-decoration:underline;
+			transition:color 0.4s;
+
+			&:hover {
+				color:$white;
+			}
 		}
 
 	}

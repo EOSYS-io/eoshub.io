@@ -53,7 +53,7 @@ main.search {
 			}
 
 			dt.id {
-				background:url('../image/icon-id-default.svg') left center no-repeat;
+				background:url('../image/icon-id-default.svg#medium-gray') left center no-repeat;
 				background-size:20px;
 				padding-left:28px;
 			}
@@ -82,6 +82,12 @@ main.search {
 
 			span {
 				font-size:$small;
+				&.remaining.time {
+					display:block;
+					position:absolute;
+					top:16px;
+					right:24px;
+				}
 			}
 
 			strong {
@@ -345,6 +351,14 @@ main.search {
 					text-align:center;
 				}
 			}
+
+			td a {
+				transition:color 0.4s;
+				text-decoration:underline;
+				&:hover {
+					color:$white;
+				}
+			}
 		}
 
 	}
@@ -473,18 +487,33 @@ main.search.public_key {
 		margin-top:40px;
 	}
 	.summary {
+		display:block;
+		padding:48px;
+
+		dt {
+			font-size:$small;
+			background:url('../image/icon-key.svg') left top no-repeat transparent;
+			background-size:20px auto;
+			padding-left:28px;
+		}
+
 		dd {
-			margin-top:8px;
+			margin-top:12px;
 			color:$white;
-			font-size:$large;
+			font-size:$x-large;
 			font-weight:300;
 		}
 	}
-	div.keybox {
+
+	p.description {
+		margin:32px 0 0 0;
 		border-top:1px solid $dark-gray;
+		padding:24px 32px;
+		font-size:$small;
+	}
+
+	div.keybox {
 		padding:0 32px;
-		padding-top:40px;
-		margin-top:40px;
 		display:grid;
 		grid-template-columns:repeat(4,1fr);
 		column-gap:8px;
@@ -493,15 +522,17 @@ main.search.public_key {
 		> div {
 			background-color:$xxx-dark-gray;
 			font-size:$small;
-			padding:24px 32px;
+			padding:21px 32px;
 
 			&:first-child {
 				margin-left:0;
 			}
 
 			strong {
+				margin-top:4px;
 				color:$white;
 				display:block;
+				font-weight:$regular;
 			}
 
 			position:relative;

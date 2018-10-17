@@ -1,14 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
     <!-- Generator: sketchtool 51 (57462) - http://www.bohemiancoding.com/sketch -->
-    <title>964FAEC4-BDD7-41A4-9159-28DEB5DB0F73</title>
-    <desc>Created with sketchtool.</desc>
-    <defs></defs>
-    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-        <g id="icon_ID-default" stroke="#D8D8D8" stroke-width="1.3">
-            <g id="user" transform="translate(2.000000, 1.000000)">
-                <path d="M16,18 L16,16 C16,13.790861 14.209139,12 12,12 L4,12 C1.790861,12 0,13.790861 0,16 L0,18" id="Shape"></path>
-                <circle id="Oval" cx="8" cy="4" r="4"></circle>
+    <title>icon :: pictogram human</title>
+    <defs>
+        <style>
+        g { display: none }
+        g:first-child,
+        g:target { display: inline }
+        </style>
+    </defs>
+    <g id="medium-gray" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke="#999999" stroke-width="1.3">
+            <g transform="translate(2.000000, 1.000000)">
+                <path d="M16,18 L16,16 C16,13.790861 14.209139,12 12,12 L4,12 C1.790861,12 0,13.790861 0,16 L0,18"></path>
+                <circle cx="8" cy="4" r="4"></circle>
+            </g>
+        </g>
+    </g>
+    <g id="lignt-gray" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+        <g stroke="#D8D8D8" stroke-width="1.3">
+            <g transform="translate(2.000000, 1.000000)">
+                <path d="M16,18 L16,16 C16,13.790861 14.209139,12 12,12 L4,12 C1.790861,12 0,13.790861 0,16 L0,18"></path>
+                <circle cx="8" cy="4" r="4"></circle>
             </g>
         </g>
     </g>
