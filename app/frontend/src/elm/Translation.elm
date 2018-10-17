@@ -85,6 +85,7 @@ type I18n
     | VoteDesc
     | RamMarket
     | RamMarketDesc
+    | DappContestLink
     | GoToTelegramLink
     | Application
     | ApplicationDesc
@@ -508,6 +509,12 @@ getMessages i18n =
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
             , chinese = "在这里可以自由地买卖RAM"
+            }
+
+        DappContestLink ->
+            { korean = "https://medium.com/eosys/%EC%A0%9C1%ED%9A%8C-dapp-contest-3d0a9d1338a8"
+            , english = "https://medium.com/eosys/the-1st-dapp-contest-d2b714a90adc"
+            , chinese = "https://medium.com/eosys/dapp-studio%E6%9D%AF%E9%A6%96%E5%B1%8A-dapp%E5%BC%80%E5%8F%91%E7%AB%9E%E9%80%89-2396e714e10a"
             }
 
         GoToTelegramLink ->
