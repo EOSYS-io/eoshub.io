@@ -11,7 +11,7 @@ class PaymentResultsController < ApiController
         cid: @payment_result_params[:cid],
         tid: @payment_result_params[:tid],
         pay_info: @payment_result_params[:pay_info],
-        transaction_date: DateTime.parse(@payment_result_params[:transaction_date]),
+        transaction_date: DateTime.parse(@payment_result_params[:transaction_date]) - 9.hours,
         code: @payment_result_params[:code],
         message: @payment_result_params[:message],
       )
