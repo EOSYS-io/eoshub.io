@@ -1,6 +1,6 @@
 ActiveAdmin.register PaymentResult do
   menu priority: 5
-  actions :all, except: [:new, :create, :destroy, :update]
+  actions :all, except: [:new, :create, :destroy, :update, :edit]
 
   index do
     selectable_column
