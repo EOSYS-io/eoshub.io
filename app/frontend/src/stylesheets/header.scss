@@ -16,7 +16,7 @@ header {
 		background-size:contain;
 
 		a {
-			display:inline-block;
+			display:block;
 			width:inherit;
 			height:inherit;
 			@include ir();

@@ -43,6 +43,8 @@ import Data.Action as Action
         , removeDuplicated
         )
 import Data.Table exposing (Row(..))
+import Date
+import Date.Extra as Date exposing (Interval(..))
 import Dict exposing (Dict)
 import Html
     exposing
@@ -95,12 +97,14 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Navigation
+import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
         ( assetAdd
         , assetSubtract
         , floatToAsset
+        , getNow
         , larimerToEos
         , timeFormatter
         )
@@ -119,6 +123,7 @@ type alias Model =
     , pagination : Pagination
     , selectedActionCategory : SelectedActionCategory
     , openedActionSeq : Int
+    , now : Time
     }
 
 
@@ -132,12 +137,6 @@ type alias Pagination =
 
 type alias SelectedActionCategory =
     String
-
-
-
--- type Message
---     = ShowMemo OpenedActionSeq
---     | ChangeUrl String
 
 
 type alias OpenedActionSeq =
@@ -169,6 +168,7 @@ initModel accountName =
         }
     , selectedActionCategory = "all"
     , openedActionSeq = -1
+    , now = 0
     }
 
 
@@ -200,7 +200,12 @@ initCmd query { pagination } =
             getTableRows "eosio" query "delband"
                 |> Http.send OnFetchTableRows
     in
-    Cmd.batch [ accountCmd, actionsCmd, delbandCmd ]
+    Cmd.batch
+        [ accountCmd
+        , actionsCmd
+        , delbandCmd
+        , getNow OnTime
+        ]
 
 
 getActions : String -> Int -> Int -> Cmd Message
@@ -230,6 +235,7 @@ type Message
     | ShowMore
     | ShowMemo OpenedActionSeq
     | ChangeUrl String
+    | OnTime Time.Time
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -302,13 +308,16 @@ update message ({ query, pagination, openedActionSeq } as model) =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        OnTime now ->
+            ( { model | now = now }, Cmd.none )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Html Message
-view language ({ account, actions, selectedActionCategory, openedActionSeq } as model) =
+view language ({ account, actions, selectedActionCategory, openedActionSeq, now } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -389,6 +398,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq } as 
                         [ span [] [ text "Refunding" ]
                         , strong [ title unstakingAmount ]
                             [ text unstakingAmount ]
+                        , span [ class "remaining time" ] [ text (getLeftTime account.refundRequest.requestTime now) ]
                         ]
                     ]
                 ]
@@ -841,3 +851,30 @@ actionHidden selectedActionCategory currentAction =
 
             else
                 True
+
+
+getLeftTime : String -> Time -> String
+getLeftTime requestTime now =
+    case Date.fromIsoString (requestTime ++ "+00:00") of
+        Ok time ->
+            let
+                expectedDate =
+                    Date.add Hour 72 time
+
+                nowDate =
+                    Date.fromTime now
+
+                leftHours =
+                    Date.diff Hour nowDate expectedDate
+
+                leftMinutes =
+                    Date.diff Minute nowDate expectedDate
+            in
+            if leftHours < 1 then
+                (leftMinutes |> toString) ++ " minutes"
+
+            else
+                (leftHours |> toString) ++ " hours"
+
+        Err _ ->
+            ""

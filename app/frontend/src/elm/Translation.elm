@@ -176,6 +176,7 @@ type I18n
     | All
     | ShowMore
     | SearchPublicKey
+    | LinkedCount String
     | SearchResultPublicKey
     | DelegatebwSucceeded String
     | DelegatebwFailed String
@@ -344,9 +345,9 @@ getMessages i18n =
             }
 
         IfYouHaveEos ->
-            { korean = "EOS 계정이 있으면 로그인을"
-            , english = "If you have an EOS account, sign in."
-            , chinese = "如果有EOS账户请登入"
+            { korean = "EOS 계정이 있으면 로그인을 "
+            , english = "If you have an EOS account, sign in. "
+            , chinese = "如果有EOS账户请登入。"
             }
 
         IfYouAreNew ->
@@ -356,8 +357,8 @@ getMessages i18n =
             }
 
         AttachableWallet1 ->
-            { korean = "다음은 이오스허브와"
-            , english = "Sign in to eoshub"
+            { korean = "다음은 이오스허브와 "
+            , english = "Sign in to eoshub "
             , chinese = "以下是与eoshub"
             }
 
@@ -368,8 +369,8 @@ getMessages i18n =
             }
 
         FurtherUpdate1 ->
-            { korean = "추후 업데이트를 통해 더 많은"
-            , english = "More wallet sign-in"
+            { korean = "추후 업데이트를 통해 더 많은 "
+            , english = "More wallet sign-in "
             , chinese = "通过更新会增加"
             }
 
@@ -1055,6 +1056,12 @@ getMessages i18n =
             { korean = "퍼블릭 키 검색"
             , english = "Search Public Key"
             , chinese = "查询公匙"
+            }
+
+        LinkedCount count ->
+            { korean = "위 퍼블릭 키와 연동된 계정이 " ++ count ++ "개 있습니다."
+            , english = count ++ " account linked to the public key."
+            , chinese = "有" ++ count ++ "个绑定账户存在"
             }
 
         SearchResultPublicKey ->
