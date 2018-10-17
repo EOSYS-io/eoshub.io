@@ -1045,14 +1045,14 @@ getMessages i18n =
             }
 
         SearchPublicKey ->
-            { korean = "공개 키 검색"
+            { korean = "퍼블릭 키 검색"
             , english = "Search Public Key"
             , chinese = "查询公匙"
             }
 
         SearchResultPublicKey ->
-            { korean = "검색하신 공개 키에 대한 정보입니다 :)"
-            , english = "Search result of the public key"
+            { korean = "검색하신 퍼블릭 키에 대한 정보입니다 :)"
+            , english = "Below is the search result of the public key:)"
             , chinese = "如下为查询到的公匙信息"
             }
 

@@ -161,7 +161,7 @@ view language ({ tab } as model) account =
         [ h2 []
             [ text "CPU / NET" ]
         , p []
-            [ text (translate language ManageResourceDesc) ]
+            [ text (translate language ManageResourceDesc ++ " :)") ]
         , div [ class "tab" ]
             [ resourceTabA language model StakeSelected
             , resourceTabA language model UnstakeSelected

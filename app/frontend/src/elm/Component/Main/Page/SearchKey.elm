@@ -89,7 +89,7 @@ view language { accounts, publickey } =
         , div [ class "container" ]
             [ div [ class "summary" ]
                 [ dt []
-                    [ text (translate language SearchPublicKey) ]
+                    [ text (translate language PublicKey) ]
                 , dd []
                     [ text publickey ]
                 ]
