@@ -1,6 +1,7 @@
 ActiveAdmin.register User do
   menu priority: 2
   permit_params :state, :confirm_token
+  actions :all, except: [:new, :create]
 
   index do
     selectable_column
