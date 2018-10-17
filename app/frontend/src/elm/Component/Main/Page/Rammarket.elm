@@ -429,7 +429,7 @@ view : Language -> Model -> Account -> Html Message
 view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
-        , p [] [ text (translate language RamMarketDesc) ]
+        , p [] [ text (translate language RamMarketDesc ++ " :)") ]
         , div [ class "container" ]
             [ section [ class "dashboard" ]
                 [ div [ class "ram status" ]
@@ -572,7 +572,7 @@ buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model)
                 , a
                     [ onClick ToggleModal, hidden buyModel.proxyBuy ]
                     [ text (translate language BuyForOtherAccount) ]
-                , translate language Buy
+                , translate language DoBuy
                 , "EOS"
                 , TypeEosAmount
                 , buyModel.params.quant
@@ -585,7 +585,7 @@ buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model)
                 ( ""
                 , " ing"
                 , text ""
-                , translate language Sell
+                , translate language DoSell
                 , byteText
                 , TypeBytesAmount
                 , byteQuant

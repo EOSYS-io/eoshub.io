@@ -85,7 +85,7 @@ view : Language -> Model -> String -> Html Message
 view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
-        , p [] [ text (translate language TransferDesc) ]
+        , p [] [ text (translate language TransferDesc ++ " :)") ]
         , div [ class "container" ]
             [ div [ class "wallet status" ]
                 [ p []
@@ -154,7 +154,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     , onClick SubmitAction
                     , disabled (not isFormValid)
                     ]
-                    [ text (translate language Transfer) ]
+                    [ text (translate language Send) ]
                 ]
             ]
         ]
