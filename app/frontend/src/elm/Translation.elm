@@ -339,13 +339,13 @@ getMessages i18n =
 
         WelcomeEosHub ->
             { korean = "이오스허브입니다"
-            , english = "Welcome to EOS Hub!"
+            , english = "Welcome to eoshub!"
             , chinese = ""
             }
 
         IfYouHaveEos ->
             { korean = "EOS 계정이 있으면 로그인을"
-            , english = "If you have an EOS account, sign in"
+            , english = "If you have an EOS account, sign in."
             , chinese = "如果有EOS账户请登入"
             }
 

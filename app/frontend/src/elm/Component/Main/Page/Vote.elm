@@ -564,7 +564,7 @@ proxyView { voteStat, producers, proxies } account language =
         ]
     , section [ class "voted bp" ]
         [ h3 []
-            [ text (translate language VotedBp) ]
+            [ text (translate language VoteStatus) ]
         , ul [ class "list" ]
             (List.map (producerSimplifiedView producers) proxies)
         ]
