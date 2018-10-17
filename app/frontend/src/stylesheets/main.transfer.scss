@@ -34,7 +34,8 @@ main.transfer {
 			input[type="number"] {
 				border:0;
 				width:100%;
-				height: 28px;
+				height: 30px;
+				line-height:1.5;
 				font-size: 28px;
 				font-weight: 100;
 				color: $white;
@@ -51,7 +52,7 @@ main.transfer {
 				}
 
 				+ span.description {
-					margin-top:12px;
+					margin-top:10px;
 					display:block;
 					font-size: $x-small;
 					line-height: 1.54;
