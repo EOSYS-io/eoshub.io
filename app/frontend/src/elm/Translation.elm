@@ -85,6 +85,7 @@ type I18n
     | VoteDesc
     | RamMarket
     | RamMarketDesc
+    | DappContestLink
     | GoToTelegramLink
     | Application
     | ApplicationDesc
@@ -175,6 +176,7 @@ type I18n
     | All
     | ShowMore
     | SearchPublicKey
+    | LinkedCount String
     | SearchResultPublicKey
     | DelegatebwSucceeded String
     | DelegatebwFailed String
@@ -272,6 +274,7 @@ type I18n
     | Send
     | DoBuy
     | DoSell
+    | EosConstitutionLink
 
 
 translate : Language -> I18n -> String
@@ -342,9 +345,9 @@ getMessages i18n =
             }
 
         IfYouHaveEos ->
-            { korean = "EOS 계정이 있으면 로그인을"
-            , english = "If you have an EOS account, sign in."
-            , chinese = "如果有EOS账户请登入"
+            { korean = "EOS 계정이 있으면 로그인을 "
+            , english = "If you have an EOS account, sign in. "
+            , chinese = "如果有EOS账户请登入。"
             }
 
         IfYouAreNew ->
@@ -354,8 +357,8 @@ getMessages i18n =
             }
 
         AttachableWallet1 ->
-            { korean = "다음은 이오스허브와"
-            , english = "Sign in to eoshub"
+            { korean = "다음은 이오스허브와 "
+            , english = "Sign in to eoshub "
             , chinese = "以下是与eoshub"
             }
 
@@ -366,8 +369,8 @@ getMessages i18n =
             }
 
         FurtherUpdate1 ->
-            { korean = "추후 업데이트를 통해 더 많은"
-            , english = "More wallet sign-in"
+            { korean = "추후 업데이트를 통해 더 많은 "
+            , english = "More wallet sign-in "
             , chinese = "通过更新会增加"
             }
 
@@ -418,7 +421,6 @@ getMessages i18n =
             , english = "Total"
             , chinese = "总数量"
             }
-
 
         TransactionOptimal ->
             { korean = "트랜잭션 최상"
@@ -508,6 +510,12 @@ getMessages i18n =
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
             , chinese = "在这里可以自由地买卖RAM"
+            }
+
+        DappContestLink ->
+            { korean = "https://medium.com/eosys/%EC%A0%9C1%ED%9A%8C-dapp-contest-3d0a9d1338a8"
+            , english = "https://medium.com/eosys/the-1st-dapp-contest-d2b714a90adc"
+            , chinese = "https://medium.com/eosys/dapp-studio%E6%9D%AF%E9%A6%96%E5%B1%8A-dapp%E5%BC%80%E5%8F%91%E7%AB%9E%E9%80%89-2396e714e10a"
             }
 
         GoToTelegramLink ->
@@ -1048,6 +1056,12 @@ getMessages i18n =
             { korean = "퍼블릭 키 검색"
             , english = "Search Public Key"
             , chinese = "查询公匙"
+            }
+
+        LinkedCount count ->
+            { korean = "위 퍼블릭 키와 연동된 계정이 " ++ count ++ "개 있습니다."
+            , english = count ++ " account linked to the public key."
+            , chinese = "有" ++ count ++ "个绑定账户存在"
             }
 
         SearchResultPublicKey ->
@@ -1657,4 +1671,10 @@ getMessages i18n =
             { korean = "뒤로가기"
             , english = "Back"
             , chinese = "后退"
+            }
+
+        EosConstitutionLink ->
+            { korean = "헌법 전문 보기"
+            , english = "View the Constitution"
+            , chinese = "查看宪法"
             }

@@ -56,6 +56,7 @@ import Html.Attributes
         , placeholder
         , src
         , style
+        , target
         , title
         , type_
         , value
@@ -100,6 +101,7 @@ import Translation
             , CopyAll
             , DebugMessage
             , EmptyMessage
+            , EosConstitutionLink
             , Next
             , PrivateKey
             , PublicKey
@@ -340,6 +342,9 @@ update msg ({ accountName, keys, notification } as model) flags language =
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        _ ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -489,6 +494,8 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
             []
         , label [ for "agreeContract" ]
             [ textViewI18n language AccountCreationAgreeEosConstitution ]
+        , a [ href Urls.eosConstitutionUrl, target "_blank" ]
+            [ textViewI18n language EosConstitutionLink ]
         ]
 
 

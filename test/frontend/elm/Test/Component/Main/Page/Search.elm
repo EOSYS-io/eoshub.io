@@ -49,6 +49,7 @@ tests =
         defaultFilter =
             "eosyscommuni"
     in
+    -- TODO(boseok): Add the getLeftTime test
     describe "Page.Search module"
         [ describe "utility functions"
             [ test "filterDelbandWithAccountName" <|

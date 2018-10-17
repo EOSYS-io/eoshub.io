@@ -574,6 +574,11 @@ update message ({ page, notification, header, sidebar } as model) flags =
             , Cmd.none
             )
 
+        ( NotificationMessage Notification.MoveToAccountPage, _ ) ->
+            ( { model | notification = { notification | open = False } }
+            , Navigation.newUrl ("/search?query=" ++ sidebar.account.accountName)
+            )
+
         ( SidebarMessage sidebarMessage, _ ) ->
             let
                 ( newSidebar, newCmd ) =

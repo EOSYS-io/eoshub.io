@@ -65,7 +65,7 @@ view language =
             [ h3 []
                 [ text "AD" ]
             , div [ class "rolling banner" ]
-                [ a [ class "dapp", href "https://medium.com/eosys/%EC%A0%9C1%ED%9A%8C-dapp-contest-3d0a9d1338a8", target "_blank" ]
+                [ a [ class "dapp", href (translate language DappContestLink), target "_blank" ]
                     [ text "Dapp contest" ]
                 , a [ class "fuze", href "http://fuze.live", target "_blank" ]
                     [ text "Two World meet, FUZE" ]
