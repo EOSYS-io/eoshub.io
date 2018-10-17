@@ -71,8 +71,6 @@ type I18n
     | MyAccount
     | SignOut
     | TotalAmount
-    | StakedAmount
-    | UnstakedAmount
     | TransactionOptimal
     | TransactionFine
     | TransactionAttention
@@ -169,7 +167,7 @@ type I18n
     | StakedTo
     | StakedBy
     | Resource
-    | Transactions
+    | Actions
     | TxId
     | Type
     | Time
@@ -271,6 +269,9 @@ type I18n
     | UndelegatePossible
     | NotFoundDesc
     | GoBack
+    | Send
+    | DoBuy
+    | DoSell
 
 
 translate : Language -> I18n -> String
@@ -335,51 +336,51 @@ getMessages i18n =
             }
 
         WelcomeEosHub ->
-            { korean = "이오스 허브입니다"
-            , english = "Welcome to EOS Hub!"
+            { korean = "이오스허브입니다"
+            , english = "Welcome to eoshub!"
             , chinese = ""
             }
 
         IfYouHaveEos ->
-            { korean = "EOS 계정이 있으면 로그인을,"
-            , english = "If you have an EOS account, sign in"
-            , chinese = "如果有EOS账户请登入,"
+            { korean = "EOS 계정이 있으면 로그인을"
+            , english = "If you have an EOS account, sign in."
+            , chinese = "如果有EOS账户请登入"
             }
 
         IfYouAreNew ->
-            { korean = "이오스가 처음이라면 신규계정을 생성해주세요!"
+            { korean = "이오스가 처음이라면 신규계정을 만들어 주세요!"
             , english = "If you are a newbie, create a new account!"
             , chinese = "如果没有EOS账户请注册!"
             }
 
         AttachableWallet1 ->
-            { korean = "이오스 허브와 연동이"
-            , english = "Attachable wallets"
+            { korean = "다음은 이오스허브와"
+            , english = "Sign in to eoshub"
             , chinese = "以下是与eoshub"
             }
 
         AttachableWallet2 ->
-            { korean = "가능한 EOS 지갑입니다"
-            , english = "for EOS Hub"
+            { korean = "연동 가능한 지갑입니다"
+            , english = "with available wallets"
             , chinese = "能够绑定的钱包"
             }
 
         FurtherUpdate1 ->
-            { korean = "추후 업데이트를 통해 연동가능한"
-            , english = "Wait for further updates to include"
-            , chinese = "通过更新会逐渐增加能"
+            { korean = "추후 업데이트를 통해 더 많은"
+            , english = "More wallet sign-in"
+            , chinese = "通过更新会增加"
             }
 
         FurtherUpdate2 ->
-            { korean = "지갑수를 늘려갈 예정이오니 조금만 기다려주세요!"
-            , english = "more wallets!"
-            , chinese = "够绑定的钱包数量"
+            { korean = "지갑을 지원 할 예정입니다!"
+            , english = "will be available"
+            , chinese = "能够支持的钱包数量!"
             }
 
         HowToAttach ->
-            { korean = "지갑연동방법 알아보기"
-            , english = "How to attach"
-            , chinese = "了解钱包绑定"
+            { korean = "계정 연동 방법"
+            , english = "How to attach wallets"
+            , chinese = "账户联动说明"
             }
 
         HowToAttachLink ->
@@ -414,21 +415,10 @@ getMessages i18n =
 
         TotalAmount ->
             { korean = "총 보유량"
-            , english = "Total Amount"
+            , english = "Total"
             , chinese = "总数量"
             }
 
-        UnstakedAmount ->
-            { korean = "보관 취소 토큰"
-            , english = "Unstaked Amount"
-            , chinese = "unstaking代币"
-            }
-
-        StakedAmount ->
-            { korean = "보관한 토큰"
-            , english = "Staked Amount"
-            , chinese = "staking代币"
-            }
 
         TransactionOptimal ->
             { korean = "트랜잭션 최상"
@@ -472,6 +462,12 @@ getMessages i18n =
             , chinese = "传送"
             }
 
+        Send ->
+            { korean = "보내기"
+            , english = "Send"
+            , chinese = "传送"
+            }
+
         TransferHereDesc ->
             { korean = "여기서 토큰을 보낼 수 있어요"
             , english = "Send tokens here"
@@ -511,7 +507,7 @@ getMessages i18n =
         RamMarketDesc ->
             { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
-            , chinese = "在这里可以自由地买卖RAM :)"
+            , chinese = "在这里可以自由地买卖RAM"
             }
 
         GoToTelegramLink ->
@@ -617,14 +613,14 @@ getMessages i18n =
             }
 
         TransferDesc ->
-            { korean = "원하시는 수량만큼 토큰을 전송하세요 :)"
-            , english = "Transfer Tokens"
-            , chinese = "传送代币"
+            { korean = "여기서 토큰을 보낼 수 있어요"
+            , english = "Transfer tokens here"
+            , chinese = "传动代币"
             }
 
         TransferableAmount ->
-            { korean = "전송 가능한 수량"
-            , english = "Transferable amount"
+            { korean = "전송 가능 수량"
+            , english = "Available Balance"
             , chinese = "可传送数量"
             }
 
@@ -635,20 +631,20 @@ getMessages i18n =
             }
 
         ReceiverAccountName ->
-            { korean = "전송하실 계정의 이름을 입력하세요."
-            , english = "Receiver's Account Name"
-            , chinese = "请输入要传送的账户名"
+            { korean = "전송 받을 계정명을 입력하세요"
+            , english = "Enter account name of receiver"
+            , chinese = "请输入被传送账户名"
             }
 
         AccountExample ->
-            { korean = "계정이름 예시: eoshubby"
-            , english = "Example: eoshubby"
-            , chinese = "比如: eoshubby"
+            { korean = "계정명 예시: eoshuby12345"
+            , english = "ex) eoshuby12345"
+            , chinese = "账户名例：eoshuby12345"
             }
 
         TransferAmount ->
-            { korean = "전송하실 수량을 입력하세요"
-            , english = "Type in the amount to send"
+            { korean = "전송 할 수량을 입력하세요"
+            , english = "Enter amount to send"
             , chinese = "请输入要传送的数量"
             }
 
@@ -665,13 +661,13 @@ getMessages i18n =
             }
 
         TransferableAmountDesc ->
-            { korean = "최대 전송가능한 수량만큼 입력 가능합니다."
-            , english = "Type in up to the transferable amount"
+            { korean = "전송 가능 수량만큼 입력 가능합니다"
+            , english = "The input cannot exceed the available balance"
             , chinese = "传送数量不可超过可传送数量"
             }
 
         Memo ->
-            { korean = "메모하기"
+            { korean = "메모 남기기"
             , english = "Memo"
             , chinese = "记录"
             }
@@ -966,19 +962,19 @@ getMessages i18n =
 
         SearchAccount ->
             { korean = "계정 검색"
-            , english = "Search account "
+            , english = "Search Result "
             , chinese = "查询账户"
             }
 
         SearchResultAccount ->
             { korean = "검색하신 계정에 대한 정보입니다 :)"
-            , english = "Search result"
-            , chinese = "如下为查询到的账户信息"
+            , english = "Below is the search result of the account :)"
+            , chinese = "查询到的账户信息"
             }
 
         Account ->
-            { korean = "계정 이름"
-            , english = "Account"
+            { korean = "계정명"
+            , english = "Account Name"
             , chinese = "账户名"
             }
 
@@ -1006,16 +1002,16 @@ getMessages i18n =
             , chinese = "资源"
             }
 
-        Transactions ->
-            { korean = "트랜잭션"
-            , english = "Transactions"
-            , chinese = "交易"
+        Actions ->
+            { korean = "액션 조회"
+            , english = "Actions"
+            , chinese = "查询"
             }
 
         TxId ->
-            { korean = "트랜잭션 id"
-            , english = "Tx id"
-            , chinese = "Tx id"
+            { korean = "Tx ID"
+            , english = "Tx ID"
+            , chinese = "Tx ID"
             }
 
         Type ->
@@ -1049,14 +1045,14 @@ getMessages i18n =
             }
 
         SearchPublicKey ->
-            { korean = "공개 키 검색"
+            { korean = "퍼블릭 키 검색"
             , english = "Search Public Key"
             , chinese = "查询公匙"
             }
 
         SearchResultPublicKey ->
-            { korean = "검색하신 공개 키에 대한 정보입니다 :)"
-            , english = "Search result of the public key"
+            { korean = "검색하신 퍼블릭 키에 대한 정보입니다 :)"
+            , english = "Below is the search result of the public key:)"
             , chinese = "如下为查询到的公匙信息"
             }
 
@@ -1222,8 +1218,20 @@ getMessages i18n =
             , chinese = "购买"
             }
 
+        DoBuy ->
+            { korean = "구매하기"
+            , english = "Buy"
+            , chinese = "购买"
+            }
+
         Sell ->
             { korean = "판매"
+            , english = "Sell"
+            , chinese = "销售"
+            }
+
+        DoSell ->
+            { korean = "판매하기"
             , english = "Sell"
             , chinese = "销售"
             }

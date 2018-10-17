@@ -304,7 +304,7 @@ view language ({ tab, now } as model) account =
         [ h2 []
             [ text (translate language Vote) ]
         , p []
-            [ text (translate language VoteDesc) ]
+            [ text (translate language VoteDesc ++ " :)") ]
         , div [ class "tab" ]
             [ a
                 [ class ("vote tab button" ++ voteTabClass)
@@ -564,7 +564,7 @@ proxyView { voteStat, producers, proxies } account language =
         ]
     , section [ class "voted bp" ]
         [ h3 []
-            [ text (translate language VotedBp) ]
+            [ text (translate language VoteStatus) ]
         , ul [ class "list" ]
             (List.map (producerSimplifiedView producers) proxies)
         ]

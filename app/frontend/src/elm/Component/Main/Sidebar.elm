@@ -192,7 +192,7 @@ pairWalletView language =
     [ button
         [ type_ "button"
         , class "back button"
-        , onClick (UpdateState SignIn)
+        , onClick CheckWalletStatus
         ]
         [ text (translate language GoBack) ]
     , h2 []
@@ -265,9 +265,6 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
 
         resourceStatusCode =
             Basics.min cpuColorCode netColorCode
-
-        colorClass =
-            resourceStatusCode |> getResourceColorClass
     in
     [ h2 []
         [ text wallet.account
@@ -317,7 +314,6 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
 
             -- NOTE(boseok): Remove resource status temporarily
             -- , span [ class ("status " ++ colorClass) ] [ text (getResourceStatusText language resourceStatusCode) ]
-
             -- span [ class "status unavailable" ] [ text "" ]
             ]
         , li []
