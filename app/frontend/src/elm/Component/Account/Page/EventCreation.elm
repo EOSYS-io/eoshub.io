@@ -494,7 +494,7 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
             []
         , label [ for "agreeContract" ]
             [ textViewI18n language AccountCreationAgreeEosConstitution ]
-        , a [ href "https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md", target "_blank" ]
+        , a [ href Urls.eosConstitutionUrl, target "_blank" ]
             [ textViewI18n language EosConstitutionLink ]
         ]
 

@@ -3,6 +3,7 @@ module Util.Urls exposing
     , createEosAccountByOrderUrl
     , createEosAccountUrl
     , eosAccountProductUrl
+    , eosConstitutionUrl
     , getProducersUrl
     , getRecentVoteStatUrl
     , mainnetRpcUrl
@@ -81,3 +82,8 @@ mainnetRpcUrl =
 
 
 --"https://api.eosnewyork.io"
+
+
+eosConstitutionUrl : String
+eosConstitutionUrl =
+    "https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md"
