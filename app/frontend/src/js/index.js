@@ -155,7 +155,6 @@ function initScatter() {
     }
 
     const { scatter } = ScatterJS;
-    window.ScatterJS = null;
 
     const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
     let scatterState = {
@@ -165,7 +164,6 @@ function initScatter() {
       authority: '',
     };
 
-    window.ScatterJs = null;
     if (scatter.identity) {
       const { authority, name } = getAuthInfo(scatter.identity);
       scatterState = {
@@ -177,6 +175,7 @@ function initScatter() {
 
     updateScatter(scatterState);
     app.ports.receiveWalletStatus.send(createResponseStatus());
+    window.ScatterJS = null;
   });
 }
 
