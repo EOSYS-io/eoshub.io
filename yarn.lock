@@ -6538,9 +6538,9 @@ sax@^1.2.4, sax@~1.2.1:
   version "1.2.4"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.4.tgz#2816234e2378bddc4e5354fab5caa895df7100d9"
 
-scatterjs-core@^2.3.5:
-  version "2.3.5"
-  resolved "https://registry.yarnpkg.com/scatterjs-core/-/scatterjs-core-2.3.5.tgz#313aadace7ae8580d6a5e4003553c82a35388297"
+scatterjs-core@^2.3.6:
+  version "2.3.6"
+  resolved "https://registry.yarnpkg.com/scatterjs-core/-/scatterjs-core-2.3.6.tgz#024e1f10179360d0f309093dc4fec2b0fffa9a3b"
   dependencies:
     create-hash "^1.2.0"
     es6-promise "^4.2.4"
