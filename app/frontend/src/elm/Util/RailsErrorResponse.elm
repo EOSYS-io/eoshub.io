@@ -1,4 +1,4 @@
-module Util.RailsErrorResponseDecoder exposing (decodeRailsErrorResponse)
+module Util.RailsErrorResponse exposing (decodeRailsErrorResponse)
 
 import Data.Json exposing (railsResponseDecoder)
 import Http

@@ -111,7 +111,7 @@ import Translation
         )
 import Util.Flags exposing (Flags)
 import Util.HttpRequest exposing (getAccount)
-import Util.RailsErrorResponseDecoder exposing (decodeRailsErrorResponse)
+import Util.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Util.Urls as Urls
 import Util.Validation
     exposing

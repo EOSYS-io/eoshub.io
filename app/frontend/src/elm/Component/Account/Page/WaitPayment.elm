@@ -48,7 +48,7 @@ import Translation
         , translate
         )
 import Util.Flags exposing (Flags)
-import Util.RailsErrorResponseDecoder exposing (decodeRailsErrorResponse)
+import Util.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Util.Urls as Urls
 import View.I18nViews exposing (textViewI18n)
 import View.Notification as Notification
