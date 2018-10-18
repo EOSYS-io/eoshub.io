@@ -1,0 +1,19 @@
+{
+    "user_id":"testtesttest",
+    "user_name":"testtesttest",
+    "amount":3000, 
+    "tid":"eosys-201810163524840", 
+    "cid":"IniTechPG_inivacct0120181016150207037878", 
+    "order_no":"1234567890", 
+    "service_name":"eoshub.io", 
+    "product_name":"EOS Account", 
+    "custom_parameter":"EOS6VvQoNnujCtKtU34cgyLnVamdZTZzLjAgrqm9RFVM86uN1SG7z",
+    "transaction_date":"2018-10-16 15:04:15",
+    "pay_info":"56211122688349",
+    "pgcode":"virtualaccount",
+    "domestic_flag":"",
+    "bilkey":"",
+    "install_month":"", 
+    "card_info":"", 
+    "payhash":"B74008D86BF07353808933605BA9A3A542867B6432C543DA53B04D434ECFD7B4"
+}

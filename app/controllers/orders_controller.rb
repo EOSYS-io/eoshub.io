@@ -64,7 +64,10 @@ class OrdersController < ApplicationController
         account_no: @order_params[:account_no],
         bank_code: @order_params[:bank_code],
         bank_name: @order_params[:bank_name],
-        expire_date: Date.parse(@order_params[:expire_date])
+        expire_date: Date.parse(@order_params[:expire_date]),
+        tid: @order_params[:tid] || @order_params[:issue_tid],
+        return_code: @order_params[:code],
+        return_message: @order_params[:message]
       )
 
       redirect_to action: 'show', id: order.order_no

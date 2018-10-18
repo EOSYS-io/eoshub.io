@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_15_090453) do
+ActiveRecord::Schema.define(version: 2018_10_18_030038) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -82,6 +82,7 @@ ActiveRecord::Schema.define(version: 2018_10_15_090453) do
     t.string "public_key", default: "", null: false
     t.string "return_code", default: ""
     t.string "return_message", default: ""
+    t.string "tid", default: ""
     t.index ["eos_account"], name: "index_orders_on_eos_account"
     t.index ["order_no"], name: "index_orders_on_order_no"
     t.index ["user_id"], name: "index_orders_on_user_id"
@@ -97,6 +98,9 @@ ActiveRecord::Schema.define(version: 2018_10_15_090453) do
     t.datetime "updated_at", null: false
     t.string "code", default: ""
     t.string "message", default: ""
+    t.string "payhash", default: ""
+    t.string "user_id", default: ""
+    t.string "amount", default: ""
     t.index ["order_id"], name: "index_payment_results_on_order_id"
   end
 

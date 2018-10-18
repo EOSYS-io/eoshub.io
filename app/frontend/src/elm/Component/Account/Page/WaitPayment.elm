@@ -11,9 +11,9 @@ import Data.Json
         ( CreateEosAccountResponse
         , RailsResponse
         , createEosAccountResponseDecoder
-        , decodeRailsResponseBodyMsg
         , railsResponseDecoder
         )
+import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Html
     exposing
         ( Html
@@ -99,27 +99,19 @@ update msg ({ notification } as model) flags language =
 
         NewEosAccount (Err error) ->
             let
-                errorContent =
-                    case error of
-                        Http.BadStatus response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = EmptyMessage
-                                }
-
-                        Http.BadPayload debugMsg response ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                }
-
-                        _ ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage (toString error)
-                                }
+                ( errorMessage, errorDetail ) =
+                    decodeRailsErrorResponse error AccountCreationFailure
             in
-            ( { model | notification = { content = errorContent, open = True } }, Cmd.none )
+            ( { model
+                | notification =
+                    { content =
+                        Notification.Error
+                            { message = errorMessage, detail = errorDetail }
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
 
         NotificationMessage Notification.CloseNotification ->
             ( { model

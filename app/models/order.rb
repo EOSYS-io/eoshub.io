@@ -17,6 +17,7 @@
 #  return_code                                                        :string           default("")
 #  return_message                                                     :string           default("")
 #  state                                                              :integer          default("created"), not null
+#  tid                                                                :string           default("")
 #  created_at                                                         :datetime         not null
 #  updated_at                                                         :datetime         not null
 #  user_id                                                            :bigint(8)
@@ -85,7 +86,7 @@ class Order < ApplicationRecord
 
   class << self
     def permit_attributes_on_create
-      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date]
+      [:user_id, :order_no, :pgcode, :amount, :product_name, :account_name, :account_no, :bank_code, :bank_name, :expire_date, :tid, :issue_tid, :code, :message]
     end
   end
 

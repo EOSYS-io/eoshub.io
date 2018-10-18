@@ -9,6 +9,7 @@ module Exceptions
   ORDER_NOT_PAID = { message: I18n.t('orders.order_not_paid'), error_code: 5, status_code: :bad_request }.freeze
   ORDER_ALREADY_DELIVERED = { message: I18n.t('orders.order_already_delivered'), error_code: 6, status_code: :bad_request }.freeze
   PAYMENT_SERVER_NOT_RESPOND = { message: I18n.t('orders.payment_server_not_respond'), error_code: 7, status_code: :internal_server_error }.freeze
+  INVALID_PAYMENT_RESULT_CALLBACK = { message: I18n.t('payment_results.invalid_payment_result_callback'), error_code: 8, status_code: :not_acceptable }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects
