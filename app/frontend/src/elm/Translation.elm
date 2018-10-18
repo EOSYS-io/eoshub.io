@@ -275,6 +275,7 @@ type I18n
     | DoBuy
     | DoSell
     | EosConstitutionLink
+    | AllowPopup
 
 
 translate : Language -> I18n -> String
@@ -1677,4 +1678,10 @@ getMessages i18n =
             { korean = "헌법 전문 보기"
             , english = "View the Constitution"
             , chinese = "查看宪法"
+            }
+
+        AllowPopup ->
+            { korean = "결제를 위해 팝업을 허용해주세요"
+            , english = "Please allow pop-ups for payment"
+            , chinese = "请允许弹出窗口付款"
             }

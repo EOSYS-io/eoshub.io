@@ -40,7 +40,7 @@ import Translation
             ( AccountCreationFailure
             , AccountCreationWaitPaymentMsg1
             , AccountCreationWaitPaymentMsg2
-            , DebugMessage
+            , AllowPopup
             , EmptyMessage
             , PaymentComplete
             )
@@ -71,7 +71,11 @@ initModel maybeOrderNo =
             Maybe.withDefault "" maybeOrderNo
     in
     { orderNo = orderNo
-    , notification = Notification.initModel
+    , notification =
+        { content =
+            Notification.Ok { message = AllowPopup, detail = EmptyMessage }
+        , open = True
+        }
     }
 
 
@@ -105,8 +109,7 @@ update msg ({ notification } as model) flags language =
             ( { model
                 | notification =
                     { content =
-                        Notification.Error
-                            { message = errorMessage, detail = errorDetail }
+                        Notification.Error { message = errorMessage, detail = errorDetail }
                     , open = True
                     }
               }
