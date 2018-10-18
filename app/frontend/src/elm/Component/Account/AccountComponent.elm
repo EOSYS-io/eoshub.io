@@ -51,25 +51,22 @@ initModel location flags =
 
         page =
             getPage route
+
+        language =
+            case route of
+                EventCreationRoute maybeLocale ->
+                    toLanguage maybeLocale
+
+                CreateRoute maybeLocale ->
+                    toLanguage maybeLocale
+
+                _ ->
+                    Translation.Korean
     in
-    case route of
-        EventCreationRoute maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
-        CreateRoute maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
-        _ ->
-            { page = page
-            , language = Translation.Korean
-            , flags = flags
-            }
+    { page = page
+    , language = language
+    , flags = flags
+    }
 
 
 
@@ -93,21 +90,15 @@ initCmd { page, flags, language } =
             let
                 subCmd =
                     Create.initCmd subModel flags language
-
-                cmd =
-                    Cmd.map CreateMessage subCmd
             in
-            cmd
+            Cmd.map CreateMessage subCmd
 
         EventCreationPage subModel ->
             let
                 subCmd =
                     EventCreation.initCmd
-
-                cmd =
-                    Cmd.map EventCreationMessage subCmd
             in
-            cmd
+            Cmd.map EventCreationMessage subCmd
 
         _ ->
             Cmd.none
@@ -221,11 +212,8 @@ update message ({ page, language, flags } as model) =
 
         ( OnLocationChange location, _ ) ->
             let
-                route =
-                    location |> parseLocation
-
                 newPage =
-                    getPage route
+                    getPage <| parseLocation <| location
 
                 newModel =
                     { model | page = newPage }
