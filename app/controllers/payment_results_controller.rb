@@ -1,29 +1,41 @@
 class PaymentResultsController < ApiController
   def create
-    @payment_result_params = create_params
+    @pr_params = create_params
 
     order = Order.find_by(order_no: params[:order_no])
     if params.dig(:cid).present? || params.dig(:issue_tid).present?
+      validation_hash = sha256_hash(@pr_params[:user_id], @pr_params[:amount], @pr_params[:tid])
+      raise Exceptions::DefaultError, Exceptions::INVALID_PAYMENT_RESULT_CALLBACK if validation_hash != @pr_params[:payhash]
+      
       order.paid!
 
       PaymentResult.create!(
+        user_id: @pr_params[:user_id],
+        amount: @pr_params[:amount],
         order: order,
-        cid: @payment_result_params[:cid],
-        tid: @payment_result_params[:tid],
-        pay_info: @payment_result_params[:pay_info],
-        transaction_date: DateTime.parse(@payment_result_params[:transaction_date]) - 9.hours,
-        code: @payment_result_params[:code],
-        message: @payment_result_params[:message],
+        cid: @pr_params[:cid],
+        tid: @pr_params[:tid],
+        pay_info: @pr_params[:pay_info],
+        transaction_date: DateTime.parse(@pr_params[:transaction_date]) - 9.hours,
+        payhash: @pr_params[:payhash],
+        code: @pr_params[:code],
+        message: @pr_params[:message],
       )
     else
       PaymentResult.create!(
         order: order,
-        code: @payment_result_params[:code],
-        message: @payment_result_params[:message],
+        code: @pr_params[:code],
+        message: @pr_params[:message],
       )
     end
 
     render json: { code: 0 }, status: :ok
+  end
+
+  def sha256_hash(user_id, amount, tid)
+    payment_api_key = Rails.application.credentials.dig(Rails.env.to_sym, :payletter_payment_api_key)
+    validation_value = "#{user_id}#{amount}#{tid}#{payment_api_key}"
+    Digest::SHA256.hexdigest(validation_value).upcase
   end
 
   private 
