@@ -117,8 +117,8 @@ initCmd { page, flags, language } =
 -- VIEW
 
 
-view : Model -> Html Message
-view { language, page } =
+headerView : Language -> Html Message
+headerView language =
     let
         getLanguageClass lang =
             if lang == language then
@@ -126,37 +126,40 @@ view { language, page } =
 
             else
                 class ""
-
-        headerView =
-            Html.header []
-                [ h1 []
-                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
-                    ]
-                , div [ class "language" ]
-                    [ button
-                        [ type_ "button"
-                        , getLanguageClass Korean
-                        , attribute "data-lang" "ko"
-                        , onClick (UpdateLanguage Korean)
-                        ]
-                        [ text "한글" ]
-                    , button
-                        [ type_ "button"
-                        , getLanguageClass English
-                        , attribute "data-lang" "en"
-                        , onClick (UpdateLanguage English)
-                        ]
-                        [ text "ENG" ]
-                    , button
-                        [ type_ "button"
-                        , getLanguageClass Chinese
-                        , attribute "data-lang" "cn"
-                        , onClick (UpdateLanguage Chinese)
-                        ]
-                        [ text "中文" ]
-                    ]
+    in
+    Html.header []
+        [ h1 []
+            [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
+            ]
+        , div [ class "language" ]
+            [ button
+                [ type_ "button"
+                , getLanguageClass Korean
+                , attribute "data-lang" "ko"
+                , onClick (UpdateLanguage Korean)
                 ]
+                [ text "한글" ]
+            , button
+                [ type_ "button"
+                , getLanguageClass English
+                , attribute "data-lang" "en"
+                , onClick (UpdateLanguage English)
+                ]
+                [ text "ENG" ]
+            , button
+                [ type_ "button"
+                , getLanguageClass Chinese
+                , attribute "data-lang" "cn"
+                , onClick (UpdateLanguage Chinese)
+                ]
+                [ text "中文" ]
+            ]
+        ]
 
+
+view : Model -> Html Message
+view { language, page } =
+    let
         newContentHtml =
             case page of
                 CreatePage subModel ->
@@ -175,7 +178,7 @@ view { language, page } =
                     NotFound.view language
     in
     div []
-        [ headerView
+        [ headerView language
         , section [ class "content" ]
             [ newContentHtml ]
         ]
