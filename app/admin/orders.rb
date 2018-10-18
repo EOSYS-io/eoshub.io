@@ -21,6 +21,7 @@ ActiveAdmin.register Order do
       tag_row :pgcode
       row :product_name
       row :public_key
+      row :tid
       row :return_code
       row :return_message
       row :created_at
