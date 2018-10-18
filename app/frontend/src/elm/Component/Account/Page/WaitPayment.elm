@@ -9,11 +9,9 @@ module Component.Account.Page.WaitPayment exposing
 import Data.Json
     exposing
         ( CreateEosAccountResponse
-        , RailsResponse
         , createEosAccountResponseDecoder
-        , railsResponseDecoder
         )
-import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Html
     exposing
         ( Html
@@ -100,7 +98,7 @@ update msg ({ notification } as model) flags language =
         NewEosAccount (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | notification =

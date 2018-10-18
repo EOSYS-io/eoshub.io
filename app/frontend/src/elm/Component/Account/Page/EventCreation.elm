@@ -11,8 +11,7 @@ module Component.Account.Page.EventCreation exposing
     )
 
 import Data.Account exposing (Account)
-import Data.Json exposing (RailsResponse, railsResponseDecoder)
-import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Html
     exposing
         ( Html
@@ -237,7 +236,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
         NewEosAccount (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | accountRequestSuccess = False
@@ -277,7 +276,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
         SendCodeResponse (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error UnknownError
+                    handleRailsErrorResponse error UnknownError
             in
             ( { model
                 | emailRequested = False
