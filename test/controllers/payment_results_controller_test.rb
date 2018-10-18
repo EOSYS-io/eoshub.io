@@ -34,4 +34,15 @@ class PaymentResultsControllerTest < ActionController::TestCase
     assert_equal expected.dig('code'), PaymentResult.last.code
     assert_equal expected.dig('message'), PaymentResult.last.message
   end
+
+  test "should get valid sha256 hash" do
+    user_id = 'eosyskoreabp'
+    amount = 3000
+    tid = 'eosys-201810163524840'
+
+    hash = @controller.sha256_hash(user_id, amount, tid)
+    expected_hash = 'AB25BBCEED2206F5C2C60503C0074EC1FA699DA69B8829FC9A3ADAF0294E439C'
+
+    assert_equal hash, expected_hash
+  end
 end
