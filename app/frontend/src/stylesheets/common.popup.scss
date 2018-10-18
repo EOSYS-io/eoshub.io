@@ -13,7 +13,8 @@ section.modal.popup {
 }
 
 
-aside.shrink ~ .modal.popup {
+aside.shrink ~ .modal.popup,
+aside.shrink ~ main .modal.popup {
 	left:0;
 }
 
@@ -400,11 +401,10 @@ aside.shrink ~ .modal.popup {
 	.form.container {
 		padding:32px 32px 0;
 
-		h3,p {
+		h3, p {
 			font-size:$small;
-			margin:0;
+			margin:0 0 8px;
 		}
-
 		p {
 			margin:8px 0 12px;
 		}
