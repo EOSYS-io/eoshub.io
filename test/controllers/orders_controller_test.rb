@@ -37,4 +37,16 @@ class OrdersControllerTest < ActionController::TestCase
       end
     end
   end
+
+  test "should post orders" do
+    order_one = orders(:one)
+
+    return_params = file_fixture('payletter_payment_return_params_succeeded.json').read
+    post :create, body: return_params, as: :json
+    
+    assert_redirected_to order_path(order_one.order_no)
+    
+    expected = JSON.parse(return_params)
+    assert_equal expected.dig('issue_tid'), Order.last.tid
+  end
 end
