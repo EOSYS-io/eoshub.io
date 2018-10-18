@@ -12,6 +12,7 @@ module Component.Account.Page.EventCreation exposing
 
 import Data.Account exposing (Account)
 import Data.Json exposing (RailsResponse, railsResponseDecoder)
+import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Html
     exposing
         ( Html
@@ -111,7 +112,6 @@ import Translation
         )
 import Util.Flags exposing (Flags)
 import Util.HttpRequest exposing (getAccount)
-import Util.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Util.Urls as Urls
 import Util.Validation
     exposing

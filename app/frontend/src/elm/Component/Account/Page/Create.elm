@@ -19,6 +19,7 @@ import Data.Json
         , railsResponseDecoder
         , requestPaymentResposeDecoder
         )
+import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Data.WindowOpen as WindowOpen
 import Html
     exposing
@@ -91,7 +92,6 @@ import Translation
         )
 import Util.Flags exposing (Flags)
 import Util.HttpRequest exposing (getAccount)
-import Util.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Util.Urls as Urls
 import Util.Validation
     exposing
