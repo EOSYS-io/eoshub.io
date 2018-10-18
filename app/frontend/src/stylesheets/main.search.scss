@@ -523,10 +523,21 @@ main.search.public_key {
 			background-color:$xxx-dark-gray;
 			font-size:$small;
 			padding:21px 32px;
+			cursor:pointer;
 
 			&:first-child {
 				margin-left:0;
 			}
+
+			transition:transform 0.1s,background-color 0.4s;
+			transform-origin:center center;
+
+			&:hover  {
+				background-color:$xxxx-dark-gray;
+				transform:scale(1.02);
+			}
+
+
 
 			strong {
 				margin-top:4px;
