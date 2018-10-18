@@ -14,12 +14,12 @@ import Data.Json
         ( Product
         , RailsResponse
         , RequestPaymentResponse
-        , decodeRailsResponseBodyMsg
         , initProduct
         , productDecoder
         , railsResponseDecoder
         , requestPaymentResposeDecoder
         )
+import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Data.WindowOpen as WindowOpen
 import Html
     exposing
@@ -82,7 +82,6 @@ import Translation
             , AccountCreationNameValid
             , AccountCreationPayment
             , CopyAll
-            , DebugMessage
             , EmptyMessage
             , EosConstitutionLink
             , PaymentTotalAmount
@@ -172,27 +171,17 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         ResultEosAccountProduct (Err error) ->
             let
-                errorContent =
-                    case error of
-                        Http.BadStatus response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = EmptyMessage
-                                }
-
-                        Http.BadPayload debugMsg response ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                }
-
-                        _ ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage (toString error)
-                                }
+                ( errorMessage, errorDetail ) =
+                    decodeRailsErrorResponse error AccountCreationFailure
             in
-            ( { model | notification = { content = errorContent, open = True } }, Cmd.none )
+            ( { model
+                | notification =
+                    { content = Notification.Error { message = errorMessage, detail = errorDetail }
+                    , open = True
+                    }
+              }
+            , Cmd.none
+            )
 
         UpdateKeys keyPair ->
             ( { model | keys = keyPair }, Cmd.none )
@@ -238,27 +227,16 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         ResultRequestPayment (Err error) ->
             let
-                errorContent =
-                    case error of
-                        Http.BadStatus response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = EmptyMessage
-                                }
-
-                        Http.BadPayload debugMsg response ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                }
-
-                        _ ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage (toString error)
-                                }
+                ( errorMessage, errorDetail ) =
+                    decodeRailsErrorResponse error AccountCreationFailure
             in
-            ( { model | accountRequestSuccess = False, notification = { content = errorContent, open = True } }
+            ( { model
+                | accountRequestSuccess = False
+                , notification =
+                    { content = Notification.Error { message = errorMessage, detail = errorDetail }
+                    , open = True
+                    }
+              }
             , Cmd.none
             )
 
@@ -309,7 +287,6 @@ accountInputViews { accountName, accountValidation } language =
         , type_ "text"
         , attribute "maxlength" "12"
         , onInput ValidateAccountNameInput
-        , attribute "maxlength" "12"
         ]
         []
     , span

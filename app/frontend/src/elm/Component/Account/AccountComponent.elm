@@ -51,25 +51,22 @@ initModel location flags =
 
         page =
             getPage route
+
+        language =
+            case route of
+                EventCreationRoute maybeLocale ->
+                    toLanguage maybeLocale
+
+                CreateRoute maybeLocale ->
+                    toLanguage maybeLocale
+
+                _ ->
+                    Translation.Korean
     in
-    case route of
-        EventCreationRoute maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
-        CreateRoute maybeLocale ->
-            { page = page
-            , language = toLanguage maybeLocale
-            , flags = flags
-            }
-
-        _ ->
-            { page = page
-            , language = Translation.Korean
-            , flags = flags
-            }
+    { page = page
+    , language = language
+    , flags = flags
+    }
 
 
 
@@ -93,21 +90,15 @@ initCmd { page, flags, language } =
             let
                 subCmd =
                     Create.initCmd subModel flags language
-
-                cmd =
-                    Cmd.map CreateMessage subCmd
             in
-            cmd
+            Cmd.map CreateMessage subCmd
 
         EventCreationPage subModel ->
             let
                 subCmd =
                     EventCreation.initCmd
-
-                cmd =
-                    Cmd.map EventCreationMessage subCmd
             in
-            cmd
+            Cmd.map EventCreationMessage subCmd
 
         _ ->
             Cmd.none
@@ -117,8 +108,8 @@ initCmd { page, flags, language } =
 -- VIEW
 
 
-view : Model -> Html Message
-view { language, page } =
+headerView : Language -> Html Message
+headerView language =
     let
         getLanguageClass lang =
             if lang == language then
@@ -126,37 +117,40 @@ view { language, page } =
 
             else
                 class ""
-
-        headerView =
-            Html.header []
-                [ h1 []
-                    [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
-                    ]
-                , div [ class "language" ]
-                    [ button
-                        [ type_ "button"
-                        , getLanguageClass Korean
-                        , attribute "data-lang" "ko"
-                        , onClick (UpdateLanguage Korean)
-                        ]
-                        [ text "한글" ]
-                    , button
-                        [ type_ "button"
-                        , getLanguageClass English
-                        , attribute "data-lang" "en"
-                        , onClick (UpdateLanguage English)
-                        ]
-                        [ text "ENG" ]
-                    , button
-                        [ type_ "button"
-                        , getLanguageClass Chinese
-                        , attribute "data-lang" "cn"
-                        , onClick (UpdateLanguage Chinese)
-                        ]
-                        [ text "中文" ]
-                    ]
+    in
+    Html.header []
+        [ h1 []
+            [ a [ onClick (ChangeUrl "/") ] [ text "eoshub" ]
+            ]
+        , div [ class "language" ]
+            [ button
+                [ type_ "button"
+                , getLanguageClass Korean
+                , attribute "data-lang" "ko"
+                , onClick (UpdateLanguage Korean)
                 ]
+                [ text "한글" ]
+            , button
+                [ type_ "button"
+                , getLanguageClass English
+                , attribute "data-lang" "en"
+                , onClick (UpdateLanguage English)
+                ]
+                [ text "ENG" ]
+            , button
+                [ type_ "button"
+                , getLanguageClass Chinese
+                , attribute "data-lang" "cn"
+                , onClick (UpdateLanguage Chinese)
+                ]
+                [ text "中文" ]
+            ]
+        ]
 
+
+view : Model -> Html Message
+view { language, page } =
+    let
         newContentHtml =
             case page of
                 CreatePage subModel ->
@@ -175,7 +169,7 @@ view { language, page } =
                     NotFound.view language
     in
     div []
-        [ headerView
+        [ headerView language
         , section [ class "content" ]
             [ newContentHtml ]
         ]
@@ -218,11 +212,8 @@ update message ({ page, language, flags } as model) =
 
         ( OnLocationChange location, _ ) ->
             let
-                route =
-                    location |> parseLocation
-
                 newPage =
-                    getPage route
+                    getPage <| parseLocation <| location
 
                 newModel =
                     { model | page = newPage }

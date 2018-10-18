@@ -9,7 +9,6 @@ module Data.Json exposing
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
-    , decodeRailsResponseBodyMsg
     , initProducer
     , initProduct
     , initVoteStat
@@ -115,16 +114,6 @@ producersDecoder =
 
 type alias RailsResponse =
     { message : String }
-
-
-decodeRailsResponseBodyMsg : Http.Response String -> String
-decodeRailsResponseBodyMsg response =
-    case Decode.decodeString railsResponseDecoder response.body of
-        Ok body ->
-            body.message
-
-        Err body ->
-            body
 
 
 railsResponseDecoder : Decoder RailsResponse

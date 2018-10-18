@@ -11,7 +11,8 @@ module Component.Account.Page.EventCreation exposing
     )
 
 import Data.Account exposing (Account)
-import Data.Json exposing (RailsResponse, decodeRailsResponseBodyMsg, railsResponseDecoder)
+import Data.Json exposing (RailsResponse, railsResponseDecoder)
+import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
 import Html
     exposing
         ( Html
@@ -235,27 +236,18 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         NewEosAccount (Err error) ->
             let
-                errorContent =
-                    case error of
-                        Http.BadStatus response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = EmptyMessage
-                                }
-
-                        Http.BadPayload debugMsg response ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                }
-
-                        _ ->
-                            Notification.Error
-                                { message = AccountCreationFailure
-                                , detail = DebugMessage (toString error)
-                                }
+                ( errorMessage, errorDetail ) =
+                    decodeRailsErrorResponse error AccountCreationFailure
             in
-            ( { model | accountRequestSuccess = False, notification = { content = errorContent, open = True } }
+            ( { model
+                | accountRequestSuccess = False
+                , notification =
+                    { content =
+                        Notification.Error
+                            { message = errorMessage, detail = errorDetail }
+                    , open = True
+                    }
+              }
             , Cmd.none
             )
 
@@ -284,27 +276,18 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         SendCodeResponse (Err error) ->
             let
-                errorContent =
-                    case error of
-                        Http.BadStatus response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = EmptyMessage
-                                }
-
-                        Http.BadPayload debugMsg response ->
-                            Notification.Error
-                                { message = DebugMessage (decodeRailsResponseBodyMsg response)
-                                , detail = DebugMessage ("debugMsg: " ++ debugMsg ++ ", body: " ++ response.body)
-                                }
-
-                        _ ->
-                            Notification.Error
-                                { message = UnknownError
-                                , detail = DebugMessage (toString error)
-                                }
+                ( errorMessage, errorDetail ) =
+                    decodeRailsErrorResponse error UnknownError
             in
-            ( { model | emailRequested = False, notification = { content = errorContent, open = True } }
+            ( { model
+                | emailRequested = False
+                , notification =
+                    { content =
+                        Notification.Error
+                            { message = errorMessage, detail = errorDetail }
+                    , open = True
+                    }
+              }
             , Cmd.none
             )
 
