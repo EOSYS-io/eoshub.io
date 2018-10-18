@@ -4,6 +4,9 @@ import '../stylesheets/style.scss';
 
 import eos from 'eosjs';
 import ecc from 'eosjs-ecc';
+import ScatterJS from 'scatterjs-core';
+import ScatterEOS from 'scatterjs-plugin-eosjs';
+
 import loadTV from './TradingView/loader';
 
 
@@ -143,29 +146,35 @@ app.ports.openWindow.subscribe(async ({ url, width, height }) => {
   window.open(url, '_blank', specs);
 });
 
-document.addEventListener('scatterLoaded', () => {
-  const { scatter } = window;
+function initScatter() {
+  ScatterJS.plugins(new ScatterEOS());
+  ScatterJS.scatter.connect('eoshub').then((connected) => {
+    if (!connected) {
+      return;
+    }
 
-  // Setting window.scatter to null is recommended.
-  window.scatter = null;
-
-  const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
-  let scatterState = {
-    scatterClient: scatter,
-    eosjsClient: eosjs,
-    account: '',
-    authority: '',
-  };
-
-  if (scatter.identity) {
-    const { authority, name } = getAuthInfo(scatter.identity);
-    scatterState = {
-      ...scatterState,
-      account: name,
-      authority,
+    const { scatter } = ScatterJS;
+    const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
+    let scatterState = {
+      scatterClient: scatter,
+      eosjsClient: eosjs,
+      account: '',
+      authority: '',
     };
-  }
 
-  updateScatter(scatterState);
-  app.ports.receiveWalletStatus.send(createResponseStatus());
-});
+    window.ScatterJs = null;
+    if (scatter.identity) {
+      const { authority, name } = getAuthInfo(scatter.identity);
+      scatterState = {
+        ...scatterState,
+        account: name,
+        authority,
+      };
+    }
+
+    updateScatter(scatterState);
+    app.ports.receiveWalletStatus.send(createResponseStatus());
+  });
+}
+
+initScatter();
