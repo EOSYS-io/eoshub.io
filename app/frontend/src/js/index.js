@@ -2,10 +2,12 @@
 import 'babel-polyfill';
 import '../stylesheets/style.scss';
 
+import ScatterJS from 'scatterjs-core';
+import ScatterEOS from 'scatterjs-plugin-eosjs';
 import eos from 'eosjs';
 import ecc from 'eosjs-ecc';
-import loadTV from './TradingView/loader';
 
+import loadTV from './TradingView/loader';
 
 import Elm from '../elm/Main'; // eslint-disable-line import/no-unresolved
 import {
@@ -143,29 +145,38 @@ app.ports.openWindow.subscribe(async ({ url, width, height }) => {
   window.open(url, '_blank', specs);
 });
 
-document.addEventListener('scatterLoaded', () => {
-  const { scatter } = window;
+function initScatter() {
+  // const ScatterJS = await System.import('scatterjs-core'); // eslint-disable-line no-undef
+  ScatterJS.plugins(new ScatterEOS());
+  ScatterJS.scatter.connect('eoshub.io').then((connected) => {
+    if (!connected) {
+      console.error('Failed to connect with Scatter.');
+      return;
+    }
 
-  // Setting window.scatter to null is recommended.
-  window.scatter = null;
+    const { scatter } = ScatterJS;
 
-  const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
-  let scatterState = {
-    scatterClient: scatter,
-    eosjsClient: eosjs,
-    account: '',
-    authority: '',
-  };
-
-  if (scatter.identity) {
-    const { authority, name } = getAuthInfo(scatter.identity);
-    scatterState = {
-      ...scatterState,
-      account: name,
-      authority,
+    const eosjs = scatter.eos(scatterConfig, eos, eosjsConfig, 'https');
+    let scatterState = {
+      scatterClient: scatter,
+      eosjsClient: eosjs,
+      account: '',
+      authority: '',
     };
-  }
 
-  updateScatter(scatterState);
-  app.ports.receiveWalletStatus.send(createResponseStatus());
-});
+    if (scatter.identity) {
+      const { authority, name } = getAuthInfo(scatter.identity);
+      scatterState = {
+        ...scatterState,
+        account: name,
+        authority,
+      };
+    }
+
+    updateScatter(scatterState);
+    app.ports.receiveWalletStatus.send(createResponseStatus());
+    window.ScatterJS = null;
+  });
+}
+
+initScatter();

@@ -2,6 +2,7 @@
   "name": "eoshub_io",
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.1.2",
     "@rails/webpacker": "3.5",
     "axios": "^0.18.0",
     "babel-plugin-syntax-async-functions": "^6.13.0",
@@ -29,7 +30,9 @@
     "jquery": "^3.3.1",
     "lodash": "^4.17.10",
     "node-sass": "^4.9.2",
-    "sass-loader": "^7.0.3"
+    "sass-loader": "^7.0.3",
+    "scatterjs-core": "^2.3.6",
+    "scatterjs-plugin-eosjs": "^1.3.6"
   },
   "devDependencies": {
     "elm-hot-loader": "^0.5.4",
