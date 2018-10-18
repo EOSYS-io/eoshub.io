@@ -6,7 +6,7 @@ class PaymentResultsControllerTest < ActionController::TestCase
   test "should create succeeded payment_result and change the order's state to paid" do
     order_one = orders(:one)
 
-    callback_params = file_fixture('payletter_payment_return_params_succeeded.json').read
+    callback_params = file_fixture('payletter_payment_callback_params_succeeded.json').read
     post :create, body: callback_params, as: :json
     
     assert_response :ok
@@ -22,7 +22,7 @@ class PaymentResultsControllerTest < ActionController::TestCase
   test "should create failed payment_result and the order's state should be created state" do
     order_one = orders(:one)
 
-    callback_params = file_fixture('payletter_payment_return_params_failed.json').read
+    callback_params = file_fixture('payletter_payment_callback_params_failed.json').read
     post :create, body: callback_params, as: :json
     
     assert_response :ok
