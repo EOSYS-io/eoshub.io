@@ -632,7 +632,7 @@ viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountA
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td [ title trxId ]
             [ text trxId ]
-        , td []
+        , td [ class (String.toLower actionTag) ]
             [ text actionTag ]
         , td []
             [ text (timeFormatter blockTime) ]
