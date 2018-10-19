@@ -19,3 +19,4 @@ one:
   name: EOS Account
   price: 3000
   active: true
+  event_activation: true
