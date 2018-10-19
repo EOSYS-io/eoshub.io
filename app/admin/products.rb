@@ -1,11 +1,12 @@
 ActiveAdmin.register Product do
   menu priority: 3
-  permit_params :active, :name, :price
+  permit_params :active, :name, :price, :event_activation
 
   index do
     selectable_column
     id_column
     toggle_bool_column :active
+    toggle_bool_column :event_activation
     column :name
     number_column :price, as: :currency, unit: "원", separator: ","
     column :created_at
@@ -16,6 +17,7 @@ ActiveAdmin.register Product do
   show do
     attributes_table do
       bool_row :active
+      bool_row :event_activation
       row :name
       number_row :price, as: :currency, unit: "원", separator: ","
       row :created_at
@@ -27,6 +29,7 @@ ActiveAdmin.register Product do
   form do |f|
     f.inputs do
       f.input :active
+      f.input :event_activation
       f.input :name
       f.input :price
     end

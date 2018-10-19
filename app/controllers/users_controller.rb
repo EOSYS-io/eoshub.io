@@ -1,6 +1,8 @@
 class UsersController < ApiController
   include EosAccount
 
+  before_action :event_activated?
+  
   def create
     unless User.qualify_for_event(request.remote_ip)
       render json: { message: I18n.t('users.too_many_request_with_same_ip_address') }, status: :precondition_failed and return
@@ -20,10 +22,12 @@ class UsersController < ApiController
       end
     end
 
-    UserMailer.email_confirmation(@user).deliver
-    render json: { message: I18n.t('users.create_ok') }, status: :ok
-  rescue Net::SMTPAuthenticationError
-    render json: { message: I18n.t('users.smtp_authentication_error') }, status: :internal_server_error
+    begin
+      UserMailer.email_confirmation(@user).deliver
+      render json: { message: I18n.t('users.create_ok') }, status: :ok
+    rescue Net::SMTPAuthenticationError
+      render json: { message: I18n.t('users.smtp_authentication_error') }, status: :internal_server_error
+    end
   end
 
   def confirm_email
@@ -55,7 +59,7 @@ class UsersController < ApiController
       if response.code == 200
         user.assign_attributes(eos_account: eos_account, ip_address: request.remote_ip)
         user.eos_account_created!
-        render json: { message: I18n.t('users.eos_account_created') }, status: :ok
+        render json: { message: I18n.t('users.eos_account_created', eos_account: eos_account) }, status: :ok
       elsif response.return_code == :couldnt_connect
         render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
       elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
@@ -64,5 +68,12 @@ class UsersController < ApiController
         render json: response.body, status: response.code
       end
     end
+  end
+
+  private
+
+  def event_activated?
+    eos_account_product = Product.eos_account
+    raise Exceptions::DefaultError, Exceptions::NOT_EVENT_PERIOD unless eos_account_product&.event_activation
   end
 end

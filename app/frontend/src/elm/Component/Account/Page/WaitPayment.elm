@@ -9,11 +9,9 @@ module Component.Account.Page.WaitPayment exposing
 import Data.Json
     exposing
         ( CreateEosAccountResponse
-        , RailsResponse
         , createEosAccountResponseDecoder
-        , railsResponseDecoder
         )
-import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Html
     exposing
         ( Html
@@ -40,6 +38,7 @@ import Translation
             ( AccountCreationFailure
             , AccountCreationWaitPaymentMsg1
             , AccountCreationWaitPaymentMsg2
+            , AccountCreationWaitPaymentMsg3
             , DebugMessage
             , EmptyMessage
             , PaymentComplete
@@ -100,7 +99,7 @@ update msg ({ notification } as model) flags language =
         NewEosAccount (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | notification =
@@ -140,6 +139,8 @@ view { notification } language =
                 [ textViewI18n language AccountCreationWaitPaymentMsg1 ]
             , p []
                 [ textViewI18n language AccountCreationWaitPaymentMsg2 ]
+            , p [ class "important description"]
+                [ textViewI18n language AccountCreationWaitPaymentMsg3 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", type_ "button", onClick CreateEosAccount ]
                     [ textViewI18n language PaymentComplete ]

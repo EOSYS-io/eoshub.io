@@ -7,13 +7,14 @@ ko:
     email_confirmed: '이메일 인증 완료'
     invalid_email_confirm_token: '유효하지않은 인증 토큰입니다.'
     eos_account_already_exist: 'EOS 블록체인에 해당 계정이 이미 존재합니다.'
-    eos_account_created: "환영합니다! EOS 계정, \"%{account_name}\"이(가) 만들어졌습니다."
+    eos_account_created: "환영합니다! EOS 계정, \"%{eos_account}\"이(가) 만들어졌습니다."
     too_many_request_with_same_ip_address: '동일한 IP Address로 4회 이상 이벤트에 참여하실 수 없습니다.'
     eos_account_creation_failure_no_such_email: '해당 이메일로 생성된 사용자가 없습니다.'
     eos_account_creation_failure_email_not_confirmed: '이메일이 인증되지 않았습니다.'
     eos_account_creation_failure_already_created: '해당 이메일로 이미 EOS 계정을 생성하였습니다.'
     eos_node_connection_failed: 'EOS 노드 접속에 실패하였습니다.'
     eos_wallet_connection_failed: 'EOS 지갑 서버 접속에 실패하였습니다. 관리자에게 연락해주세요.'
+    not_event_activated: '이벤트 기간이 아닙니다.'
   orders:
     deactivated_product: '해당 상품은 현재 주문하실 수 없습니다.'
     order_not_exist: "해당 주문이 존재하지 않습니다."

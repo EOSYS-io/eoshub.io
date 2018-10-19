@@ -1,9 +1,19 @@
-module Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+module Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 
-import Data.Json exposing (railsResponseDecoder)
 import Http
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Pipeline exposing (decode, required)
 import Translation exposing (I18n(DebugMessage, EmptyMessage))
+
+
+type alias RailsResponse =
+    { message : String }
+
+
+railsResponseDecoder : Decoder RailsResponse
+railsResponseDecoder =
+    decode RailsResponse
+        |> required "message" Decode.string
 
 
 decodeBodyMessage : Http.Response String -> String
@@ -16,8 +26,8 @@ decodeBodyMessage response =
             body
 
 
-decodeRailsErrorResponse : Http.Error -> I18n -> ( I18n, I18n )
-decodeRailsErrorResponse error badPayloadMsg =
+handleRailsErrorResponse : Http.Error -> I18n -> ( I18n, I18n )
+handleRailsErrorResponse error badPayloadMsg =
     case error of
         Http.BadStatus response ->
             ( DebugMessage (decodeBodyMessage response), EmptyMessage )

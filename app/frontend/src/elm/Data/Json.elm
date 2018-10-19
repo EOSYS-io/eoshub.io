@@ -5,7 +5,6 @@ module Data.Json exposing
     ( CreateEosAccountResponse
     , Producer
     , Product
-    , RailsResponse
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
@@ -15,12 +14,10 @@ module Data.Json exposing
     , producerDecoder
     , producersDecoder
     , productDecoder
-    , railsResponseDecoder
     , requestPaymentResposeDecoder
     , voteStatDecoder
     )
 
-import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
@@ -112,16 +109,6 @@ producersDecoder =
     Decode.list producerDecoder
 
 
-type alias RailsResponse =
-    { message : String }
-
-
-railsResponseDecoder : Decoder RailsResponse
-railsResponseDecoder =
-    decode RailsResponse
-        |> required "message" Decode.string
-
-
 type alias RequestPaymentResponse =
     { token : Int
     , onlineUrl : String
@@ -143,6 +130,7 @@ type alias Product =
     { id : Int
     , name : String
     , price : Int
+    , eventActivation : Bool
     }
 
 
@@ -151,6 +139,7 @@ initProduct =
     { id = 0
     , name = ""
     , price = 0
+    , eventActivation = False
     }
 
 
@@ -160,6 +149,7 @@ productDecoder =
         |> required "id" Decode.int
         |> required "name" Decode.string
         |> required "price" Decode.int
+        |> required "event_activation" Decode.bool
 
 
 type alias CreateEosAccountResponse =

@@ -12,14 +12,12 @@ import Data.Account exposing (Account)
 import Data.Json
     exposing
         ( Product
-        , RailsResponse
         , RequestPaymentResponse
         , initProduct
         , productDecoder
-        , railsResponseDecoder
         , requestPaymentResposeDecoder
         )
-import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Data.WindowOpen as WindowOpen
 import Html
     exposing
@@ -166,13 +164,21 @@ update msg ({ accountName, keys, notification } as model) flags language =
         GenerateKeys ->
             ( model, Port.generateKeys () )
 
-        ResultEosAccountProduct (Ok res) ->
-            ( { model | product = res }, Cmd.none )
+        ResultEosAccountProduct (Ok product) ->
+            let
+                cmd =
+                    if product.eventActivation then
+                        Navigation.modifyUrl ("/account/event_creation?locale=" ++ toLocale language)
+
+                    else
+                        Cmd.none
+            in
+            ( { model | product = product }, cmd )
 
         ResultEosAccountProduct (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | notification =
@@ -228,7 +234,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
         ResultRequestPayment (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | accountRequestSuccess = False

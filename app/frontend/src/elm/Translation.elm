@@ -23,7 +23,7 @@ toLanguage locale =
         "en" ->
             English
 
-        "zh-cn" ->
+        "zh-CN" ->
             Chinese
 
         _ ->
@@ -40,7 +40,7 @@ toLocale language =
             "en"
 
         Chinese ->
-            "zh-cn"
+            "zh-CN"
 
 
 type alias Messages =
@@ -154,6 +154,7 @@ type I18n
     | PaymentTotalAmount
     | AccountCreationWaitPaymentMsg1
     | AccountCreationWaitPaymentMsg2
+    | AccountCreationWaitPaymentMsg3
     | PaymentComplete
     | AccountCreationCongratulation
     | AccountCreationWelcome
@@ -913,7 +914,11 @@ getMessages i18n =
             , english = "Check again that you have made the deposit and click Finish Payment."
             , chinese = "请再次检查您是否已支付押金，然后单击“完成付款”。"
             }
-
+        AccountCreationWaitPaymentMsg3 ->
+            { korean = "브라우저 설정에서 팝업 차단을 해제해주세요."
+            , english = "Please deactivate the Pop-up blocker in the browser settings"
+            , chinese = "请在浏览器设置解除关闭弹出式窗口设置"
+            }
         PaymentComplete ->
             { korean = "결제완료"
             , english = "Payment Complete"

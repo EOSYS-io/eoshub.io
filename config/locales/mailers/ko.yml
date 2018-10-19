@@ -1,4 +1,6 @@
 ko:
   user_mailer:
-    subject: "[EOSHUB.IO] 이메일 인증"
-    body: 'EOS 계정 생성을 환영합니다! 이메일을 인증하고 EOS 계정 생성을 계속 진행하시려면 아래의 코드를 입력해주세요. 코드는 10분간 유효합니다.'
+    subject: "[eoshub.io] 이메일 인증"
+    title: "EOS 계정 생성을 위한 이메일 인증"
+    greetings: "안녕하세요, %{user_name} 님"
+    body: 'EOS 계정 생성을 환영합니다. 계속 진행하시려면 아래의 코드를 확인 후 입력해 주세요. 코드는 10분간 유효합니다.'
