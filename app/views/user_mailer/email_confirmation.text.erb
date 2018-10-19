@@ -77,7 +77,7 @@
 	</tr>
 	<tr>
 		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #fff; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 30px; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 30px 0; word-break: break-all;" valign="middle" align="left">
-			<img src="https://eoshub.io/assets/packs/conf/email-hero-hubby.png" alt="" width="64" height="70" style="-ms-interpolation-mode: bicubic; border: 0; outline: 0; vertical-align: middle;">
+			<img src="<%= #{Rails.application.credentials.dig(Rails.env.to_sym, :redis_rails_url)} %>/assets/packs/conf/email-hero-hubby.png" alt="" width="64" height="70" style="-ms-interpolation-mode: bicubic; border: 0; outline: 0; vertical-align: middle;">
 			&nbsp;
 			<%= user_mailer.title %>
 		</td>
