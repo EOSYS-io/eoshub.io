@@ -46,6 +46,7 @@ import Html.Attributes
         ( attribute
         , checked
         , class
+        , disabled
         , for
         , href
         , id
@@ -332,34 +333,38 @@ keypairGenerationViews { keys } language =
 
 paymentView : Model -> Language -> Html Message
 paymentView { product } language =
-    div [ class "container" ]
-        [ h3 []
-            [ textViewI18n language AccountCreationPayment ]
-        , dl [ class "invoice" ]
-            [ dt []
-                [ text "CPU" ]
-            , dd []
-                [ text "0.1 EOS" ]
-            , dt []
-                [ text "NET" ]
-            , dd []
-                [ text "0.01 EOS" ]
-            , dt []
-                [ text "RAM" ]
-            , dd []
-                [ text "3KB" ]
-            ]
-        , div [ class "select_payment_type area" ]
-            [ button [ class "choice ing button", type_ "button" ]
-                [ textViewI18n language PaymentVirtualAccount ]
-            , p [ class "amount" ]
-                [ textViewI18n language PaymentTotalAmount
-                , strong []
-                    [ text (toString product.price) ]
-                , text "₩"
+    if product.active then
+        div [ class "container" ]
+            [ h3 []
+                [ textViewI18n language AccountCreationPayment ]
+            , dl [ class "invoice" ]
+                [ dt []
+                    [ text "CPU" ]
+                , dd []
+                    [ text "0.1 EOS" ]
+                , dt []
+                    [ text "NET" ]
+                , dd []
+                    [ text "0.01 EOS" ]
+                , dt []
+                    [ text "RAM" ]
+                , dd []
+                    [ text "3KB" ]
+                ]
+            , div [ class "select_payment_type area" ]
+                [ button [ class "choice ing button", type_ "button" ]
+                    [ textViewI18n language PaymentVirtualAccount ]
+                , p [ class "amount" ]
+                    [ textViewI18n language PaymentTotalAmount
+                    , strong []
+                        [ text (toString product.price) ]
+                    , text "₩"
+                    ]
                 ]
             ]
-        ]
+
+    else
+        div [] []
 
 
 agreeEosConstitutionSection : Model -> Language -> Html Message
@@ -380,17 +385,16 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
 
 
 okButton : Model -> Language -> Html Message
-okButton { accountValidation, agreeEosConstitution } language =
+okButton { accountValidation, agreeEosConstitution, product } language =
+    let
+        enabled =
+            (accountValidation == InexistentAccount)
+                && product.active
+                && agreeEosConstitution
+    in
     button
         [ class "ok button"
-        , attribute
-            (if (accountValidation == InexistentAccount) && agreeEosConstitution then
-                "enabled"
-
-             else
-                "disabled"
-            )
-            ""
+        , disabled (not enabled)
         , type_ "button"
         , onClick RequestPayment
         ]
