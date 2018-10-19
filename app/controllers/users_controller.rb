@@ -59,7 +59,7 @@ class UsersController < ApiController
       if response.code == 200
         user.assign_attributes(eos_account: eos_account, ip_address: request.remote_ip)
         user.eos_account_created!
-        render json: { message: I18n.t('users.eos_account_created') }, status: :ok
+        render json: { message: I18n.t('users.eos_account_created', eos_account: eos_account) }, status: :ok
       elsif response.return_code == :couldnt_connect
         render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
       elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
