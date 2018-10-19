@@ -1,5 +1,123 @@
-Hi <%= @user.name %>,
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>mail from eoshub</title>
+	<meta name="viewport" content="width=device-width, initial-scale=0.66667, maximum-scale=0.66667, user-scalable=no">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="viewport" content="width=device-width">
 
-<%= I18n.t('user_mailer.body') %>
+<!--[if mso]>
+        <style type="text/css">
+        body,table,p,th,td,h1,h2,h3,h4,h5,h6 {font-family: '맑은 고딕', 'MalgunGothic', sans-serif !important;}
+        table.wrapper { min-width:320px; max-width:600px; margin:auto; }</style>
+    <![endif]-->
+<!--[if IE]><style type="text/css">table.wrapper {width: 600px !important;}</style><![endif]-->
+    <style>
+@media screen and (min-width:421px) {
+  body {
+    font-size: 12px !important;
+  }
+}
 
-<%= @user.confirm_token %>
+
+@media screen and (max-width:420px) {
+  body {
+    font-size: 19px;
+  }
+  .header img {
+    width: 114px;
+    height: 18px;
+  }
+  td {
+    font-size: 1em;
+  }
+  td.detail_info table tr > th,
+            td.detail_info table tr > td {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+  td.incident_status {
+    padding: 15px;
+  }
+  td.incident_status a {
+    font-size: 1.1em;
+  }
+  td.description {
+    padding: 15px;
+  }
+  td.header {
+    padding: 30px 0 15px 0;
+  }
+  td.description a {
+    font-size: 1.1875em;
+  }
+  td.footer .align.center {
+    font-size: 0.75em;
+  }
+}
+</style>
+</head>
+<body style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; background: #161616; color: #000; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 16px; line-height: 1.5; margin: 0; mso-line-height-rule: exactly; padding: 0; text-align: left; width: 100% !important;">
+<!--[if mso]>
+<table cellpadding="0" cellspacing="0" border="0" style="padding:0px;margin:0px;width:100%;">
+    <tr><td colspan="3" style="padding:0px;margin:0px;font-size:20px;height:20px;" height="20">&nbsp;</td></tr>
+    <tr>
+        <td style="padding:0px;margin:0px;">&nbsp;</td>
+        <td style="padding:0px;margin:0px;" width="600">
+<![endif]-->
+<table style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; border-collapse: collapse; border-spacing: 0; color: #000; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 16px; line-height: 1.5; margin: auto; max-width: 600px; min-width: 320px; mso-line-height-rule: exactly; mso-padding-alt: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-top: 0; mso-table-tspace: 0pt; mso-table-wrap: around; padding: 0; table-layout: fixed; text-align: left;" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #aaa; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 14px; line-height: 2; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 0; padding-bottom: 40px; padding-left: 15px; padding-right: 15px; word-break: break-all;" valign="middle" align="left">
+
+
+<table style="-ms-text-size-adjust: 100%; -webkit-text-size-adjust: 100%; border-collapse: collapse; border-spacing: 0; color: #000; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 16px; line-height: 1.5; margin: 0; mso-line-height-rule: exactly; mso-padding-alt: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-top: 0; mso-table-tspace: 0pt; mso-table-wrap: around; padding: 0; table-layout: fixed; text-align: left;" border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #aaa; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 1em; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 0; word-break: break-all;" height="120px" valign="middle" align="left"></td>
+	</tr>
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #fff; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 30px; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 30px 0; word-break: break-all;" valign="middle" align="left">
+			<img src="https://eoshub.io/assets/packs/conf/email-hero-hubby.png" alt="" width="64" height="70" style="-ms-interpolation-mode: bicubic; border: 0; outline: 0; vertical-align: middle;">
+			&nbsp;
+			<%= user_mailer.title %>
+		</td>
+	</tr>
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #fff; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 1em; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 0; padding-bottom: 25px; padding-left: 15px; padding-right: 15px; padding-top: 25px; word-break: break-all;" valign="middle" align="left">
+			안녕하세요
+			<%= @user.name %>
+			님.
+		</td>
+	</tr>
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #aaa; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 14px; line-height: 2; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 0; padding-bottom: 40px; padding-left: 15px; padding-right: 15px; word-break: break-all;" valign="middle" align="left">
+
+			<%= I18n.t('user_mailer.body') %><br>
+		</td>
+	</tr>
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; background: #000; box-sizing: border-box; color: #fff; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 14px; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 0; padding-bottom: 15px; padding-left: 15px; padding-right: 15px; padding-top: 15px; word-break: break-all;" valign="middle" align="left">
+			<%= @user.confirm_token %>
+		</td>
+	</tr>
+	<tr>
+		<td style="-webkit-text-size-adjust: 100%; box-sizing: border-box; color: #999; font-family: 'Noto Sans Kr',applesdgothicneo-regular, '맑은고딕', malgun gothic, dotum, '돋움', dotum, helvetica; font-size: 12px; mso-cellspacing: 0; mso-table-bspace: 0pt; mso-table-lspace: 0pt; mso-table-rspace: 0pt; mso-table-tspace: 0pt; padding: 5em 0; word-break: break-all;" width="100%" valign="middle" align="center">
+			Copyright ⓒ 2018 <strong style="color: #fff; font-weight: 500;">EOSYS</strong>. All Right Reserved
+		</td>
+	</tr>
+</table>
+
+
+        </td>
+    </tr>
+</table>
+<!--[if mso]>
+        </td>
+        <td style="padding:0px;margin:0px;">&nbsp;</td>
+    </tr>
+    <tr><td colspan="3" style="padding:0px;margin:0px;font-size:20px;height:20px;" height="20">&nbsp;</td></tr>
+</table>
+<![endif]-->
+</body>
+</html>
+
