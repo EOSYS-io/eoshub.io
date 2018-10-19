@@ -166,8 +166,16 @@ update msg ({ accountName, keys, notification } as model) flags language =
         GenerateKeys ->
             ( model, Port.generateKeys () )
 
-        ResultEosAccountProduct (Ok res) ->
-            ( { model | product = res }, Cmd.none )
+        ResultEosAccountProduct (Ok product) ->
+            let
+                cmd =
+                    if product.eventActivation then
+                        Navigation.newUrl ("/account/event_creation?locale=" ++ toLocale language)
+
+                    else
+                        Cmd.none
+            in
+            ( { model | product = product }, cmd )
 
         ResultEosAccountProduct (Err error) ->
             let
