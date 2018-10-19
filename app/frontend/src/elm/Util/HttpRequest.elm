@@ -37,6 +37,10 @@ getAccount accountName =
     post (getFullPath "/v1/chain/get_account") body accountDecoder
 
 
+
+-- NOTE(boseok): limit: -1 means 'fetch all without limit'
+
+
 getTableRows : String -> String -> String -> Int -> Http.Request (List Row)
 getTableRows code scope table limit =
     let
