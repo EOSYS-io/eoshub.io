@@ -472,6 +472,17 @@ main.search {
 					}
 				}
 			}
+
+			td.received {
+				font-weight:600;
+				color:$green;
+			}
+
+
+			td.sent {
+				font-weight:600;
+				color:$red;
+			}
 		}
 	}
 
