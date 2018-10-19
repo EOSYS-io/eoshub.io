@@ -210,13 +210,13 @@ getActions =
 
 getRammarketTable : Cmd Message
 getRammarketTable =
-    getTableRows "eosio" "eosio" "rammarket"
+    getTableRows "eosio" "eosio" "rammarket" 1
         |> Http.send OnFetchTableRows
 
 
 getGlobalTable : Cmd Message
 getGlobalTable =
-    getTableRows "eosio" "eosio" "global"
+    getTableRows "eosio" "eosio" "global" 1
         |> Http.send OnFetchTableRows
 
 

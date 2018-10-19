@@ -197,7 +197,7 @@ initCmd query { pagination } =
             getActions query pagination.nextPos pagination.offset
 
         delbandCmd =
-            getTableRows "eosio" query "delband"
+            getTableRows "eosio" query "delband" -1
                 |> Http.send OnFetchTableRows
     in
     Cmd.batch

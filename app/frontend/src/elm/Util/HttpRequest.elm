@@ -37,14 +37,19 @@ getAccount accountName =
     post (getFullPath "/v1/chain/get_account") body accountDecoder
 
 
-getTableRows : String -> String -> String -> Http.Request (List Row)
-getTableRows code scope table =
+
+-- NOTE(boseok): limit: -1 means 'fetch all without limit'
+
+
+getTableRows : String -> String -> String -> Int -> Http.Request (List Row)
+getTableRows code scope table limit =
     let
         requestBody =
             [ ( "code", code |> Encode.string )
             , ( "scope", scope |> Encode.string )
             , ( "table", table |> Encode.string )
             , ( "json", True |> Encode.bool )
+            , ( "limit", limit |> Encode.int )
             ]
                 |> Encode.object
                 |> Http.jsonBody

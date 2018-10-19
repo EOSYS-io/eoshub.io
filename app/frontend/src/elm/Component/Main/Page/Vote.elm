@@ -147,13 +147,13 @@ initModel =
 
 getGlobalTable : Cmd Message
 getGlobalTable =
-    getTableRows "eosio" "eosio" "global"
+    getTableRows "eosio" "eosio" "global" 1
         |> Http.send OnFetchTableRows
 
 
 getTokenStatTable : Cmd Message
 getTokenStatTable =
-    getTableRows "eosio.token" "EOS" "stat"
+    getTableRows "eosio.token" "EOS" "stat" 1
         |> Http.send OnFetchTableRows
 
 
