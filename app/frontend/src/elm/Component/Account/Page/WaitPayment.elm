@@ -38,6 +38,7 @@ import Translation
             ( AccountCreationFailure
             , AccountCreationWaitPaymentMsg1
             , AccountCreationWaitPaymentMsg2
+            , AccountCreationWaitPaymentMsg3
             , DebugMessage
             , EmptyMessage
             , PaymentComplete
@@ -138,6 +139,8 @@ view { notification } language =
                 [ textViewI18n language AccountCreationWaitPaymentMsg1 ]
             , p []
                 [ textViewI18n language AccountCreationWaitPaymentMsg2 ]
+            , p [ class "important description"]
+                [ textViewI18n language AccountCreationWaitPaymentMsg3 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", type_ "button", onClick CreateEosAccount ]
                     [ textViewI18n language PaymentComplete ]
