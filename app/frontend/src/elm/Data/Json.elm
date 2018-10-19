@@ -5,7 +5,6 @@ module Data.Json exposing
     ( CreateEosAccountResponse
     , Producer
     , Product
-    , RailsResponse
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
@@ -15,7 +14,6 @@ module Data.Json exposing
     , producerDecoder
     , producersDecoder
     , productDecoder
-    , railsResponseDecoder
     , requestPaymentResposeDecoder
     , voteStatDecoder
     )
@@ -110,16 +108,6 @@ producerDecoder =
 producersDecoder : Decoder (List Producer)
 producersDecoder =
     Decode.list producerDecoder
-
-
-type alias RailsResponse =
-    { message : String }
-
-
-railsResponseDecoder : Decoder RailsResponse
-railsResponseDecoder =
-    decode RailsResponse
-        |> required "message" Decode.string
 
 
 type alias RequestPaymentResponse =

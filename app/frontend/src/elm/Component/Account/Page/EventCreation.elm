@@ -11,8 +11,7 @@ module Component.Account.Page.EventCreation exposing
     )
 
 import Data.Account exposing (Account)
-import Data.Json exposing (RailsResponse, railsResponseDecoder)
-import Data.RailsErrorResponse exposing (decodeRailsErrorResponse)
+import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Html
     exposing
         ( Html
@@ -237,7 +236,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
         NewEosAccount (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error AccountCreationFailure
+                    handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
                 | accountRequestSuccess = False
@@ -277,7 +276,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
         SendCodeResponse (Err error) ->
             let
                 ( errorMessage, errorDetail ) =
-                    decodeRailsErrorResponse error UnknownError
+                    handleRailsErrorResponse error UnknownError
             in
             ( { model
                 | emailRequested = False
@@ -432,35 +431,25 @@ emailConfirmSection { emailValid, confirmTokenValid } language =
 emailConfirmationMsgView : Model -> Language -> Html Message
 emailConfirmationMsgView { emailConfirmationRequested, emailConfirmed } language =
     let
-        emailConfirmationMsg =
+        ( divClassAttr, spanClassAttr, emailConfirmationMsg ) =
             if emailConfirmationRequested then
                 if emailConfirmed then
-                    AccountCreationEmailConfirmed
+                    ( "validation bunch viewing"
+                    , "true validate description"
+                    , AccountCreationEmailConfirmed
+                    )
 
                 else
-                    AccountCreationEmailConfirmFailure
+                    ( "validation bunch viewing"
+                    , "false validate description"
+                    , AccountCreationEmailConfirmFailure
+                    )
 
             else
-                EmptyMessage
+                ( "validation bunch", "false validate description", EmptyMessage )
     in
-    div
-        [ class
-            (if emailConfirmationRequested then
-                "validation bunch viewing"
-
-             else
-                "validation bunch"
-            )
-        ]
-        [ span
-            [ class
-                (if emailConfirmed then
-                    "true validate description"
-
-                 else
-                    "false validate description"
-                )
-            ]
+    div [ class divClassAttr ]
+        [ span [ class spanClassAttr ]
             [ textViewI18n language emailConfirmationMsg ]
         ]
 
@@ -484,16 +473,15 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
 
 okButton : Model -> Language -> Html Message
 okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstitution } language =
+    let
+        enabled =
+            (accountValidation == InexistentAccount)
+                && emailConfirmed
+                && agreeEosConstitution
+    in
     button
         [ class "ok button"
-        , attribute
-            (if (accountValidation == InexistentAccount) && emailRequested && emailConfirmed && agreeEosConstitution then
-                "enabled"
-
-             else
-                "disabled"
-            )
-            ""
+        , disabled (not enabled)
         , type_ "button"
         , onClick CreateEosAccount
         ]
