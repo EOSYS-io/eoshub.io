@@ -33,7 +33,7 @@ module EoshubIo
     config.eager_load_paths << "#{Rails.root}/lib/autoloads"
 
     # redis cache store
-    config.cache_store = :redis_cache_store, { url: "#{Rails.application.credentials.dig('redis_rails_url')}",
+    config.cache_store = :redis_cache_store, { url: "#{Rails.application.credentials.dig(Rails.env.to_sym, :redis_rails_url)}",
                                                driver: :hiredis,
                                                namespace: 'cache' }
   end
