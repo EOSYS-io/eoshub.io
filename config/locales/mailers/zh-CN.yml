@@ -1,0 +1,6 @@
+zh-CN:
+  user_mailer:
+    subject: "[eoshub.io] 邮件认证"
+    title: "邮件认证"
+    greetings: "哈罗, %{user_name}"
+    body: "创建账户成功！如果要继续请输入以下代码。代码的有效时间为10分钟。"
