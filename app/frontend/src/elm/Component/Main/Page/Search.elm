@@ -415,7 +415,12 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now 
             , section [ class "transaction history" ]
                 [ h3 []
                     [ text (translate language Actions) ]
-                , select [ id "", name "", on "change" (Decode.map SelectActionCategory targetValue) ]
+                , select
+                    [ id ""
+                    , name ""
+                    , Html.Attributes.value selectedActionCategory
+                    , on "change" (Decode.map SelectActionCategory targetValue)
+                    ]
                     [ option [ Html.Attributes.value "all" ]
                         [ text (translate language All) ]
                     , option [ Html.Attributes.value "transfer" ]
@@ -627,7 +632,7 @@ viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountA
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td [ title trxId ]
             [ text trxId ]
-        , td []
+        , td [ class (String.toLower actionTag) ]
             [ text actionTag ]
         , td []
             [ text (timeFormatter blockTime) ]
