@@ -19,7 +19,6 @@ class Product < ApplicationRecord
   validates :name, presence: true
   validates :price, presence: true
   validates :active, inclusion: { in: [true, false] }
-  validates :event_activation, inclusion: { in: [true, false] }
 
   scope :eos_account, -> { where(name: 'EOS Account').where(active: true).take }
 
