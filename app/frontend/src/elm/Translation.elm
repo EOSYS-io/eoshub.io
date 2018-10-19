@@ -23,7 +23,7 @@ toLanguage locale =
         "en" ->
             English
 
-        "zh-cn" ->
+        "zh-CN" ->
             Chinese
 
         _ ->
@@ -40,7 +40,7 @@ toLocale language =
             "en"
 
         Chinese ->
-            "zh-cn"
+            "zh-CN"
 
 
 type alias Messages =
