@@ -21,6 +21,8 @@ class Product < ApplicationRecord
   validates :active, inclusion: { in: [true, false] }
   validates :event_activation, inclusion: { in: [true, false] }
 
+  scope :eos_account, -> { where(name: 'EOS Account').where(active: true).take }
+
   def as_json(*args)
     { id: id, name: name, price: price, event_activation: event_activation }
   end
