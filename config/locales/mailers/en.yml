@@ -1,4 +1,6 @@
 en:
   user_mailer:
     subject: "[EOSHUB.IO] Email Confirmation"
+    title: "Email Verification for the EOS Account"
+    greetings: "Hello %{user_name},"
     body: 'Thanks for the EOS account creation! To confirm your EOS account creation enter the code below. The code is valid for 10 minutes.'
