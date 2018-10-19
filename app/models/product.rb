@@ -2,12 +2,13 @@
 #
 # Table name: products
 #
-#  id         :bigint(8)        not null, primary key
-#  active     :boolean          default(FALSE), not null
-#  name       :string           not null
-#  price      :integer          not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id               :bigint(8)        not null, primary key
+#  active           :boolean          default(FALSE), not null
+#  event_activation :boolean          default(FALSE), not null
+#  name             :string           not null
+#  price            :integer          not null
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
 #
 # Indexes
 #
@@ -19,7 +20,9 @@ class Product < ApplicationRecord
   validates :price, presence: true
   validates :active, inclusion: { in: [true, false] }
 
+  scope :eos_account, -> { where(name: 'EOS Account').where(active: true).take }
+
   def as_json(*args)
-    { id: id, name: name, price: price }
+    { id: id, name: name, price: price, event_activation: event_activation }
   end
 end

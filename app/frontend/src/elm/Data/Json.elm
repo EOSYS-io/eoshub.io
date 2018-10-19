@@ -18,7 +18,6 @@ module Data.Json exposing
     , voteStatDecoder
     )
 
-import Http
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
@@ -131,6 +130,7 @@ type alias Product =
     { id : Int
     , name : String
     , price : Int
+    , eventActivation : Bool
     }
 
 
@@ -139,6 +139,7 @@ initProduct =
     { id = 0
     , name = ""
     , price = 0
+    , eventActivation = False
     }
 
 
@@ -148,6 +149,7 @@ productDecoder =
         |> required "id" Decode.int
         |> required "name" Decode.string
         |> required "price" Decode.int
+        |> required "event_activation" Decode.bool
 
 
 type alias CreateEosAccountResponse =
