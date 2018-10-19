@@ -168,7 +168,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
             let
                 cmd =
                     if product.eventActivation then
-                        Navigation.newUrl ("/account/event_creation?locale=" ++ toLocale language)
+                        Navigation.modifyUrl ("/account/event_creation?locale=" ++ toLocale language)
 
                     else
                         Cmd.none
