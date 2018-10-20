@@ -3,6 +3,8 @@ module Component.Main.Page.Resource.Undelegate exposing
     , Model
     , PercentageOfResource(..)
     , ResourceType(..)
+    , getEmptyStringIfZeroEos
+    , getNoOpIfZeroEos
     , getPercentageOfResource
     , initCmd
     , initModel
@@ -177,6 +179,7 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                     assetToFloat unstakePossibleCpu
                         * ratio
                         |> Round.round 4
+                        |> getEmptyStringIfZeroEos
 
                 newModel =
                     { model
@@ -198,6 +201,7 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                     assetToFloat unstakePossibleNet
                         * ratio
                         |> Round.round 4
+                        |> getEmptyStringIfZeroEos
 
                 newModel =
                     { model
@@ -239,13 +243,19 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                                 | undelegatebw =
                                     { undelegatebw
                                         | receiver = receiver
-                                        , unstakeCpuQuantity = cpu |> removeSymbolIfExists
-                                        , unstakeNetQuantity = net |> removeSymbolIfExists
+                                        , unstakeCpuQuantity =
+                                            cpu
+                                                |> removeSymbolIfExists
+                                                |> getEmptyStringIfZeroEos
+                                        , unstakeNetQuantity =
+                                            net
+                                                |> removeSymbolIfExists
+                                                |> getEmptyStringIfZeroEos
                                     }
                                 , unstakePossibleCpu = cpu
                                 , unstakePossibleNet = net
-                                , percentageOfCpu = Percentage100
-                                , percentageOfNet = Percentage100
+                                , percentageOfCpu = getNoOpIfZeroEos cpu Percentage100
+                                , percentageOfNet = getNoOpIfZeroEos net Percentage100
                                 , delegateListModal =
                                     { delegateListModal
                                         | isDelegateListModalOpened = False
@@ -524,3 +534,21 @@ getPercentageOfResource percentageOfResource =
 
         _ ->
             1
+
+
+getEmptyStringIfZeroEos : String -> String
+getEmptyStringIfZeroEos asset =
+    if assetToFloat asset == 0 then
+        ""
+
+    else
+        asset
+
+
+getNoOpIfZeroEos : String -> PercentageOfResource -> PercentageOfResource
+getNoOpIfZeroEos asset currentPercentage =
+    if assetToFloat asset == 0 then
+        NoOp
+
+    else
+        currentPercentage
