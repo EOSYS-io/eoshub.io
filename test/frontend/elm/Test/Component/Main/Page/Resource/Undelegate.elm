@@ -220,4 +220,32 @@ tests =
             ]
 
         -- TODO(boseok): validateText test. comment will be changed.
+        , describe "getEmptyStringIfZeroEos"
+            [ test "0.0000" <|
+                \() ->
+                    Expect.equal "" (getEmptyStringIfZeroEos "0.0000")
+            , test "0.0000 EOS" <|
+                \() ->
+                    Expect.equal "" (getEmptyStringIfZeroEos "0.0000 EOS")
+            , test "0.0003 EOS" <|
+                \() ->
+                    Expect.equal "0.0003 EOS" (getEmptyStringIfZeroEos "0.0003 EOS")
+            , test "0.0003" <|
+                \() ->
+                    Expect.equal "0.0003" (getEmptyStringIfZeroEos "0.0003")
+            ]
+        , describe "getNoOpIfZeroEos"
+            [ test "0.0000, Percentage100" <|
+                \() ->
+                    Expect.equal NoOp (getNoOpIfZeroEos "0.0000" Percentage100)
+            , test "0.0000 EOS" <|
+                \() ->
+                    Expect.equal NoOp (getNoOpIfZeroEos "0.0000 EOS" Percentage100)
+            , test "0.0003 EOS" <|
+                \() ->
+                    Expect.equal Percentage100 (getNoOpIfZeroEos "0.0003 EOS" Percentage100)
+            , test "0.0003" <|
+                \() ->
+                    Expect.equal Percentage100 (getNoOpIfZeroEos "0.0003" Percentage100)
+            ]
         ]
