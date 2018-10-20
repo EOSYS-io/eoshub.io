@@ -23,6 +23,6 @@ class Product < ApplicationRecord
   scope :eos_account, -> { where(name: 'EOS Account').where(active: true).take }
 
   def as_json(*args)
-    { id: id, name: name, price: price, event_activation: event_activation }
+    { id: id, active: active, name: name, price: price, event_activation: event_activation }
   end
 end

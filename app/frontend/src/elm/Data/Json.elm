@@ -128,6 +128,7 @@ requestPaymentResposeDecoder =
 
 type alias Product =
     { id : Int
+    , active : Bool
     , name : String
     , price : Int
     , eventActivation : Bool
@@ -137,6 +138,7 @@ type alias Product =
 initProduct : Product
 initProduct =
     { id = 0
+    , active = False
     , name = ""
     , price = 0
     , eventActivation = False
@@ -147,6 +149,7 @@ productDecoder : Decoder Product
 productDecoder =
     decode Product
         |> required "id" Decode.int
+        |> required "active" Decode.bool
         |> required "name" Decode.string
         |> required "price" Decode.int
         |> required "event_activation" Decode.bool
