@@ -16,7 +16,7 @@ class PaymentResultsController < ApiController
         cid: @pr_params[:cid],
         tid: @pr_params[:tid],
         pay_info: @pr_params[:pay_info],
-        transaction_date: DateTime.parse(@pr_params[:transaction_date]) - 9.hours,
+        transaction_date: Time.zone.parse(@pr_params[:transaction_date]),
         payhash: @pr_params[:payhash],
         code: @pr_params[:code],
         message: @pr_params[:message],
