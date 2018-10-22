@@ -13,11 +13,18 @@ module EosAccount
   end
 
   def request_eos_account_creation(account_name, pubkey)
+    eos_account_product = Product.eos_account
+    raise Exceptions::DefaultError, Exceptions::PRODUCT_NOT_EXIST if eos_account_product.blank?
+
+    cpu = eos_account_product.cpu
+    net = eos_account_product.net
+    ram = eos_account_product.ram
+
     response = Typhoeus::Request.new(
       Rails.application.credentials.dig(Rails.env.to_sym, :eos_wallet_node_host)+Rails.configuration.urls['eos_account_url'],
       method: :post,
       headers: {'Content-Type'=> "application/json"},
-      body: JSON.generate({account_name: account_name, pubkey: pubkey}),
+      body: JSON.generate({account_name: account_name, pubkey: pubkey, cpu: cpu, net: net, ram: ram}),
       timeout: 5
     ).run
 
