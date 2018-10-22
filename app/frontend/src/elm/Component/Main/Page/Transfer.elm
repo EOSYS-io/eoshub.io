@@ -43,8 +43,8 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (getDefaultLiquidAmount, numberWithinDigitLimit)
-import Util.HttpRequest exposing (getAccount)
+import Util.Formatter exposing (getDefaultAsset, getSymbolFromAsset, numberWithinDigitLimit)
+import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
     exposing
@@ -332,7 +332,7 @@ update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
 update message ({ transfer, modalOpened, token } as model) accountName eosLiquidAmount =
     let
         defaultLiquidValue =
-            token |> getDefaultLiquidAmount
+            token |> getDefaultAsset
     in
     case message of
         SubmitAction ->
@@ -354,8 +354,17 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
         ToggleModal ->
             ( { model | modalOpened = not modalOpened }, Cmd.none )
 
-        SwitchToken newToken ->
-            update ToggleModal { model | token = newToken } accountName eosLiquidAmount
+        SwitchToken ({ symbol, contractAccount } as newToken) ->
+            let
+                newCmd =
+                    if symbol == "EOS" then
+                        Cmd.none
+
+                    else
+                        getTableRows contractAccount accountName "accounts" -1
+                            |> Http.send OnFetchTableRows
+            in
+            ( { model | token = newToken, modalOpened = not modalOpened }, newCmd )
 
         SearchToken input ->
             ( { model | tokenSearchInput = input }, Cmd.none )
@@ -366,8 +375,16 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
                 [] ->
                     ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
 
-                (Data.Table.Accounts fields) :: tail ->
-                    ( model, Cmd.none )
+                (Data.Table.Accounts { balance }) :: tail ->
+                    let
+                        symbol =
+                            balance |> getSymbolFromAsset |> Maybe.withDefault ""
+                    in
+                    if symbol == token.symbol then
+                        ( { model | tokenBalance = balance }, Cmd.none )
+
+                    else
+                        update (OnFetchTableRows (Ok tail)) model accountName eosLiquidAmount
 
                 _ ->
                     ( model, Cmd.none )

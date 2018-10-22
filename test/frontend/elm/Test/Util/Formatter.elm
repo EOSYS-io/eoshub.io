@@ -84,11 +84,11 @@ tests =
                 \() -> Expect.equal False (numberWithinDigitLimit digitLimit "400.01243")
              ]
             )
-        , describe "getDefaultLiquidAmount"
+        , describe "getDefaultAsset"
             [ test "BTC" <|
                 \() ->
                     Expect.equal "0.00000000 BTC"
-                        (getDefaultLiquidAmount
+                        (getDefaultAsset
                             (Token "Bitcoin" "BTC" "" 8)
                         )
             ]

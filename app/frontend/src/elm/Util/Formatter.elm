@@ -6,8 +6,9 @@ module Util.Formatter exposing
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
-    , getDefaultLiquidAmount
+    , getDefaultAsset
     , getNow
+    , getSymbolFromAsset
     , larimerToEos
     , numberWithinDigitLimit
     , percentageConverter
@@ -225,8 +226,8 @@ numberWithinDigitLimit digitLimit value =
         True
 
 
-getDefaultLiquidAmount : Token -> String
-getDefaultLiquidAmount { symbol, precision } =
+getDefaultAsset : Token -> String
+getDefaultAsset { symbol, precision } =
     let
         helper addZeroCount asset =
             case addZeroCount of
@@ -237,3 +238,8 @@ getDefaultLiquidAmount { symbol, precision } =
                     helper (addZeroCount - 1) (asset ++ "0")
     in
     helper precision "0." ++ " " ++ symbol
+
+
+getSymbolFromAsset : String -> Maybe String
+getSymbolFromAsset asset =
+    asset |> String.split " " |> List.drop 1 |> List.head
