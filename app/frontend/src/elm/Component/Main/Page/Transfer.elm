@@ -44,6 +44,7 @@ import Port
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter exposing (numberWithinDigitLimit)
 import Util.HttpRequest exposing (getAccount)
+import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -67,6 +68,7 @@ type alias Model =
     , memoValidation : MemoStatus
     , isFormValid : Bool
     , modalOpened : Bool
+    , token : Token
     }
 
 
@@ -78,6 +80,11 @@ initModel =
     , memoValidation = EmptyMemo
     , isFormValid = False
     , modalOpened = False
+    , token =
+        { name = "EOS"
+        , symbol = "EOS"
+        , contractAccount = "eosio.token"
+        }
     }
 
 
@@ -96,6 +103,7 @@ type Message
     | SubmitAction
     | OpenUnderConstruction
     | OnFetchAccountToVerify (Result Http.Error Account)
+    | SwitchToken Token
     | ToggleModal
 
 
@@ -178,7 +186,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language Send) ]
                 ]
             ]
-        , tokenListSection modalOpened
+        , tokenListSection language modalOpened
         ]
 
 
@@ -249,8 +257,23 @@ memoWarningSpan memoStatus language =
         [ text textValue ]
 
 
-tokenListSection : Bool -> Html Message
-tokenListSection modalOpened =
+generateTokenButton : Token -> Html Message
+generateTokenButton ({ name, symbol } as token) =
+    button
+        [ type_ "button"
+        , class "token bi eos"
+        , onClick (SwitchToken token)
+        ]
+        [ span []
+            [ strong []
+                [ text symbol ]
+            , text name
+            ]
+        ]
+
+
+tokenListSection : Language -> Bool -> Html Message
+tokenListSection language modalOpened =
     let
         addedClass =
             if modalOpened then
@@ -267,19 +290,12 @@ tokenListSection modalOpened =
                 [ input [ class "search_token", placeholder "토큰 검색하기", type_ "text" ]
                     []
                 , button [ type_ "button" ]
-                    [ text "검색" ]
+                    [ text (translate language Search) ]
                 ]
             , div [ class "result list" ]
-                [ button [ type_ "button", class "token bi eos" ]
-                    [ span []
-                        [ strong []
-                            [ text "EOS" ]
-                        , text "blockone"
-                        ]
-                    ]
-                ]
+                (List.map generateTokenButton tokens)
             , button [ class "close", type_ "button", onClick ToggleModal ]
-                [ text "닫기" ]
+                [ text (translate language Close) ]
             ]
         ]
 
@@ -289,12 +305,12 @@ tokenListSection modalOpened =
 
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
-update message ({ transfer, modalOpened } as model) accountName eosLiquidAmount =
+update message ({ transfer, modalOpened, token } as model) accountName eosLiquidAmount =
     case message of
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = accountName } |> Action.Transfer "eosio.token" |> encodeAction |> Port.pushAction
+                    { transfer | from = accountName } |> Action.Transfer token.contractAccount |> encodeAction |> Port.pushAction
             in
             ( model, cmd )
 
@@ -309,6 +325,9 @@ update message ({ transfer, modalOpened } as model) accountName eosLiquidAmount 
 
         ToggleModal ->
             ( { model | modalOpened = not modalOpened }, Cmd.none )
+
+        SwitchToken newToken ->
+            update ToggleModal { model | token = newToken } accountName eosLiquidAmount
 
         _ ->
             ( model, Cmd.none )
