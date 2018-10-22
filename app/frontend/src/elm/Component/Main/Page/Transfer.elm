@@ -69,6 +69,8 @@ type alias Model =
     , isFormValid : Bool
     , modalOpened : Bool
     , token : Token
+    , tokenBalance : String
+    , tokenSearchInput : String
     }
 
 
@@ -85,6 +87,8 @@ initModel =
         , symbol = "EOS"
         , contractAccount = "eosio.token"
         }
+    , tokenBalance = ""
+    , tokenSearchInput = ""
     }
 
 
@@ -105,6 +109,7 @@ type Message
     | OnFetchAccountToVerify (Result Http.Error Account)
     | SwitchToken Token
     | ToggleModal
+    | SearchToken String
 
 
 
@@ -112,33 +117,41 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened } eosLiquidAmount =
+view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened, token, tokenBalance } as model) eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
-        , div [ class "container" ]
+        , let
+            { to, quantity, memo } =
+                transfer
+
+            accountWarning =
+                accountWarningSpan accountValidation language
+
+            quantityWarning =
+                quantityWarningSpan quantityValidation language
+
+            memoWarning =
+                memoWarningSpan memoValidation language
+
+            tokenAmount =
+                case token.symbol of
+                    "EOS" ->
+                        eosLiquidAmount
+
+                    _ ->
+                        tokenBalance
+          in
+          div [ class "container" ]
             [ div [ class "wallet status" ]
                 [ p []
                     [ text (translate language TransferableAmount)
-                    , em [] [ text eosLiquidAmount ]
+                    , em [] [ text tokenAmount ]
                     ]
                 , a [ onClick ToggleModal ]
                     [ text (translate language SwitchTokens) ]
                 ]
-            , let
-                { to, quantity, memo } =
-                    transfer
-
-                accountWarning =
-                    accountWarningSpan accountValidation language
-
-                quantityWarning =
-                    quantityWarningSpan quantityValidation language
-
-                memoWarning =
-                    memoWarningSpan memoValidation language
-              in
-              Html.form []
+            , Html.form []
                 [ ul []
                     [ li []
                         [ input
@@ -186,7 +199,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language Send) ]
                 ]
             ]
-        , tokenListSection language modalOpened
+        , tokenListSection language model
         ]
 
 
@@ -272,8 +285,8 @@ generateTokenButton ({ name, symbol } as token) =
         ]
 
 
-tokenListSection : Language -> Bool -> Html Message
-tokenListSection language modalOpened =
+tokenListSection : Language -> Model -> Html Message
+tokenListSection language { modalOpened, tokenSearchInput } =
     let
         addedClass =
             if modalOpened then
@@ -281,19 +294,27 @@ tokenListSection language modalOpened =
 
             else
                 ""
+
+        filterWithSearchInput =
+            List.filter (\tkn -> String.startsWith (tokenSearchInput |> String.toUpper) tkn.symbol)
     in
     section [ class ("tokenlist modal popup" ++ addedClass) ]
         [ div [ class "wrapper" ]
             [ h2 []
                 [ text "토큰 리스트" ]
             , form []
-                [ input [ class "search_token", placeholder "토큰 검색하기", type_ "text" ]
+                [ input
+                    [ class "search_token"
+                    , placeholder "토큰 검색하기"
+                    , type_ "text"
+                    , onInput <| SearchToken
+                    ]
                     []
                 , button [ type_ "button" ]
                     [ text (translate language Search) ]
                 ]
             , div [ class "result list" ]
-                (List.map generateTokenButton tokens)
+                (List.map generateTokenButton (filterWithSearchInput tokens))
             , button [ class "close", type_ "button", onClick ToggleModal ]
                 [ text (translate language Close) ]
             ]
@@ -328,6 +349,9 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
         SwitchToken newToken ->
             update ToggleModal { model | token = newToken } accountName eosLiquidAmount
+
+        SearchToken input ->
+            ( { model | tokenSearchInput = input }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
