@@ -115,7 +115,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     , em [] [ text eosLiquidAmount ]
                     ]
                 , a [ onClick ToggleModal ]
-                    [ text "토큰 바꾸기" ]
+                    [ text (translate language SwitchTokens) ]
                 ]
             , let
                 { to, quantity, memo } =
