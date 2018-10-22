@@ -11,7 +11,7 @@ ActiveAdmin.register Product do
     number_column :price, as: :currency, unit: "원"
     number_column :cpu, as: :currency, unit: "EOS", precision: 4
     number_column :net, as: :currency, unit: "EOS", precision: 4
-    number_column :ram, as: :human_size, locale: :en
+    number_column :ram, as: :human_size, locale: :en, precision: 4
     actions
   end
 
@@ -23,7 +23,7 @@ ActiveAdmin.register Product do
       number_row :price, as: :currency, unit: "원"
       number_row :cpu, as: :currency, unit: "EOS", precision: 4
       number_row :net, as: :currency, unit: "EOS", precision: 4
-      number_row :ram, as: :human_size, locale: :en
+      number_row :ram, as: :human_size, locale: :en, precision: 4
       row :created_at
       row :updated_at
     end
