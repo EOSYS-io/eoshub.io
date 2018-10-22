@@ -26,6 +26,7 @@ model =
         , quantity = "300"
         , memo = "memo"
         }
+    , modalOpened = False
     }
 
 
