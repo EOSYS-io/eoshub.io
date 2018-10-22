@@ -757,7 +757,7 @@ subscriptions =
 actionToTableRow : Language -> Action -> Html Message
 actionToTableRow language { blockTime, data, trxId } =
     case data of
-        Ok (Data.Action.Transfer { from, to, quantity }) ->
+        Ok (Data.Action.Transfer _ { from, to, quantity }) ->
             let
                 ( actionClass, actionType, account ) =
                     if from == "eosio.ram" then

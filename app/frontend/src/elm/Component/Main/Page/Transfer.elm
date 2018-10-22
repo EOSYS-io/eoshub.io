@@ -17,7 +17,26 @@ module Component.Main.Page.Transfer exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
-import Html exposing (Html, button, div, em, h2, input, li, main_, p, span, text, ul)
+import Html
+    exposing
+        ( Html
+        , a
+        , button
+        , div
+        , em
+        , form
+        , h2
+        , img
+        , input
+        , li
+        , main_
+        , p
+        , section
+        , span
+        , strong
+        , text
+        , ul
+        )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
@@ -47,6 +66,7 @@ type alias Model =
     , quantityValidation : QuantityStatus
     , memoValidation : MemoStatus
     , isFormValid : Bool
+    , modalOpened : Bool
     }
 
 
@@ -57,6 +77,7 @@ initModel =
     , quantityValidation = EmptyQuantity
     , memoValidation = EmptyMemo
     , isFormValid = False
+    , modalOpened = False
     }
 
 
@@ -75,6 +96,7 @@ type Message
     | SubmitAction
     | OpenUnderConstruction
     | OnFetchAccountToVerify (Result Http.Error Account)
+    | ToggleModal
 
 
 
@@ -82,7 +104,7 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
+view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened } eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
@@ -92,9 +114,8 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language TransferableAmount)
                     , em [] [ text eosLiquidAmount ]
                     ]
-
-                -- , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
-                --     [ text "토큰 바꾸기" ]
+                , a [ onClick ToggleModal ]
+                    [ text "토큰 바꾸기" ]
                 ]
             , let
                 { to, quantity, memo } =
@@ -157,6 +178,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language Send) ]
                 ]
             ]
+        , tokenListSection modalOpened
         ]
 
 
@@ -227,17 +249,54 @@ memoWarningSpan memoStatus language =
         [ text textValue ]
 
 
+tokenListSection : Bool -> Html Message
+tokenListSection modalOpened =
+    let
+        addedClass =
+            if modalOpened then
+                " viewing"
+
+            else
+                ""
+    in
+    section [ class ("tokenlist modal popup" ++ addedClass) ]
+        [ div [ class "wrapper" ]
+            [ h2 []
+                [ text "토큰 리스트" ]
+            , form []
+                [ input [ class "search_token", placeholder "토큰 검색하기", type_ "text" ]
+                    []
+                , button [ type_ "button" ]
+                    [ text "검색" ]
+                ]
+            , div [ class "result list", attribute "role" "listbox" ]
+                [ button [ attribute "role" "listitem", type_ "button" ]
+                    [ img []
+                        []
+                    , span []
+                        [ strong []
+                            [ text "EOS" ]
+                        , text "blockone"
+                        ]
+                    ]
+                ]
+            , button [ class "close", type_ "button", onClick ToggleModal ]
+                [ text "닫기" ]
+            ]
+        ]
+
+
 
 -- UPDATE
 
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
-update message ({ transfer } as model) accountName eosLiquidAmount =
+update message ({ transfer, modalOpened } as model) accountName eosLiquidAmount =
     case message of
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = accountName } |> Action.Transfer |> encodeAction |> Port.pushAction
+                    { transfer | from = accountName } |> Action.Transfer "eosio.token" |> encodeAction |> Port.pushAction
             in
             ( model, cmd )
 
@@ -249,6 +308,9 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
 
         OnFetchAccountToVerify (Err _) ->
             validateToField model Fail
+
+        ToggleModal ->
+            ( { model | modalOpened = not modalOpened }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )

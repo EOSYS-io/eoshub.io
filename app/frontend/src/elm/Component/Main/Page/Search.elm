@@ -648,7 +648,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
             case ( contractAccount, actionName ) of
                 ( "eosio.token", "transfer" ) ->
                     case actionParameters of
-                        Action.Transfer params ->
+                        Action.Transfer _ params ->
                             td [ class "info" ]
                                 [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
                                 , text " -> "
