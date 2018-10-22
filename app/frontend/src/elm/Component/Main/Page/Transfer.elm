@@ -87,6 +87,7 @@ initModel =
         { name = "EOS"
         , symbol = "EOS"
         , contractAccount = "eosio.token"
+        , precision = 4
         }
     , tokenBalance = ""
     , tokenSearchInput = ""
@@ -357,6 +358,7 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
         OnFetchTableRows (Ok rows) ->
             case rows of
+                -- Account not found on the table.
                 [] ->
                     ( model, Cmd.none )
 
@@ -378,13 +380,13 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
-setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
+setTransferMessageField field value ({ transfer, token } as model) eosLiquidAmount =
     case field of
         To ->
             validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
-            if numberWithinDigitLimit 4 value then
+            if numberWithinDigitLimit token.precision value then
                 ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
                 , Cmd.none
                 )
