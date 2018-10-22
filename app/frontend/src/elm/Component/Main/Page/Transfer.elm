@@ -43,7 +43,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (numberWithinDigitLimit)
+import Util.Formatter exposing (getDefaultLiquidAmount, numberWithinDigitLimit)
 import Util.HttpRequest exposing (getAccount)
 import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
@@ -330,6 +330,10 @@ tokenListSection language { modalOpened, tokenSearchInput } =
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
 update message ({ transfer, modalOpened, token } as model) accountName eosLiquidAmount =
+    let
+        defaultLiquidValue =
+            token |> getDefaultLiquidAmount
+    in
     case message of
         SubmitAction ->
             let
@@ -360,7 +364,7 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
             case rows of
                 -- Account not found on the table.
                 [] ->
-                    ( model, Cmd.none )
+                    ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
 
                 (Data.Table.Accounts fields) :: tail ->
                     ( model, Cmd.none )
@@ -369,7 +373,7 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
                     ( model, Cmd.none )
 
         OnFetchTableRows (Err _) ->
-            ( model, Cmd.none )
+            ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )

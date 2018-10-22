@@ -4,6 +4,7 @@ import Expect
 import Test exposing (..)
 import Util.Constant exposing (..)
 import Util.Formatter exposing (..)
+import Util.Token exposing (Token)
 
 
 tests : Test
@@ -83,4 +84,12 @@ tests =
                 \() -> Expect.equal False (numberWithinDigitLimit digitLimit "400.01243")
              ]
             )
+        , describe "getDefaultLiquidAmount"
+            [ test "BTC" <|
+                \() ->
+                    Expect.equal "0.00000000 BTC"
+                        (getDefaultLiquidAmount
+                            (Token "Bitcoin" "BTC" "" 8)
+                        )
+            ]
         ]

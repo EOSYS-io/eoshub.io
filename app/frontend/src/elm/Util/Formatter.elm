@@ -6,6 +6,7 @@ module Util.Formatter exposing
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
+    , getDefaultLiquidAmount
     , getNow
     , larimerToEos
     , numberWithinDigitLimit
@@ -24,6 +25,7 @@ import Round
 import Task
 import Time exposing (Time)
 import Util.Constant exposing (day, giga, hour, kilo, mega, millisec, minute, second, tera)
+import Util.Token exposing (Token)
 
 
 larimerToEos : Int -> Float
@@ -221,3 +223,17 @@ numberWithinDigitLimit digitLimit value =
 
     else
         True
+
+
+getDefaultLiquidAmount : Token -> String
+getDefaultLiquidAmount { symbol, precision } =
+    let
+        helper addZeroCount asset =
+            case addZeroCount of
+                0 ->
+                    asset
+
+                _ ->
+                    helper (addZeroCount - 1) (asset ++ "0")
+    in
+    helper precision "0." ++ " " ++ symbol
