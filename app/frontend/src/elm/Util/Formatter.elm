@@ -23,7 +23,7 @@ import Regex exposing (contains, regex, replace)
 import Round
 import Task
 import Time exposing (Time)
-import Util.Constant exposing (day, giga, hour, kilo, mega, minute, millisec, second, tera)
+import Util.Constant exposing (day, giga, hour, kilo, mega, millisec, minute, second, tera)
 
 
 larimerToEos : Int -> Float
@@ -107,7 +107,6 @@ resourceUnitConverter resourceType value =
                 unitConverterRound2 value tera ++ " TB"
 
         "cpu" ->
-            
             if value < millisec then
                 toString value ++ " us"
 

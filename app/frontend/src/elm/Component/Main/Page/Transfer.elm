@@ -17,6 +17,7 @@ module Component.Main.Page.Transfer exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
+import Data.Table exposing (AccountsFields, Row)
 import Html
     exposing
         ( Html
@@ -110,6 +111,7 @@ type Message
     | SwitchToken Token
     | ToggleModal
     | SearchToken String
+    | OnFetchTableRows (Result Http.Error (List Row))
 
 
 
@@ -352,6 +354,20 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
         SearchToken input ->
             ( { model | tokenSearchInput = input }, Cmd.none )
+
+        OnFetchTableRows (Ok rows) ->
+            case rows of
+                [] ->
+                    ( model, Cmd.none )
+
+                (Data.Table.Accounts fields) :: tail ->
+                    ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnFetchTableRows (Err _) ->
+            ( model, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
