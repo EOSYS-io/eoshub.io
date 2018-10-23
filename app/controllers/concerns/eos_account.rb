@@ -41,7 +41,7 @@ module EosAccount
     ).run
 
     if response.code == 200
-      JSON.parse(response.body).dig('core_liquid_balance')&.delete(' EOS')&.to_f
+      JSON.parse(response.body).dig('core_liquid_balance')&.delete(' EOS')&.to_f || 0
     else
       -1
     end
