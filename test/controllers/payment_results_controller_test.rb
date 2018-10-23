@@ -17,6 +17,7 @@ class PaymentResultsControllerTest < ActionController::TestCase
     assert_equal expected.dig('cid'), PaymentResult.last.cid
     assert_equal expected.dig('tid'), PaymentResult.last.tid
     assert_equal expected.dig('pay_info'), PaymentResult.last.pay_info
+    assert_equal DateTime.parse(expected.dig('transaction_date')+' KST'), PaymentResult.last.transaction_date
   end
 
   test "should create failed payment_result and the order's state should be created state" do
