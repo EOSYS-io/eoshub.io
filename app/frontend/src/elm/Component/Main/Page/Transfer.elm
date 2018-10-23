@@ -277,7 +277,7 @@ generateTokenButton : Token -> Html Message
 generateTokenButton ({ name, symbol } as token) =
     button
         [ type_ "button"
-        , class "token bi eos"
+        , class ("token bi " ++ symbol)
         , onClick (SwitchToken token)
         ]
         [ span []
