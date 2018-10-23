@@ -16,7 +16,8 @@ class ProductsController < ApplicationController
     eos_account = Rails.application.credentials.dig(:creator_eos_account_event)
     balance = core_liquid_balance(eos_account)
     if balance < 1
-      Product.eos_account.update(event_activation: false)
+      eos_account_product = Product.eos_account
+      eos_account_product.update(event_activation: false) if eos_account_product.event_activation
     end
   end
 end
