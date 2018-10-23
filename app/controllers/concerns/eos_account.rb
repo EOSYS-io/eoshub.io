@@ -48,6 +48,8 @@ module EosAccount
     if response.code == 200
       JSON.parse(response.body).dig('core_liquid_balance')&.delete(' EOS')&.to_f || 0
     else
+      logger.i_msg "EosAccount.core_liquid_balance", account_name
+      logger.i_msg "EosAccount.core_liquid_balance", response.body
       -1
     end
   end
