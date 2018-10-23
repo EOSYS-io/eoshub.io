@@ -8,6 +8,9 @@ default: &default
     - https://api.eosnewyork.io  # Thanks eos newyork!
     - http://mainnet.eoscalgary.io  # Thanks eos calgary!
   eos_get_table_url: /v1/chain/get_table_rows
+  
+  eos_rpc_host: https://rpc.eosys.io
+  eos_get_account_url: /v1/chain/get_account
 
   # Payment
   payletter_pay_api_url: /v1.0/payments/request
