@@ -489,7 +489,7 @@ transferParametersToValue contractAccount { from, to, quantity, memo } =
           , Encode.object
                 [ ( "from", Encode.string from )
                 , ( "to", Encode.string to )
-                , ( "quantity", Encode.string (quantity |> formatAsset) )
+                , ( "quantity", Encode.string quantity )
                 , ( "memo", Encode.string memo )
                 ]
           )

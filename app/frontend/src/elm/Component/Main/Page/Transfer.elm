@@ -42,8 +42,10 @@ import Html.Attributes exposing (attribute, autofocus, class, disabled, placehol
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
+import Regex
+import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (getDefaultAsset, getSymbolFromAsset, numberWithinDigitLimit)
+import Util.Formatter exposing (assetToFloat, getDefaultAsset, getSymbolFromAsset, numberWithinDigitLimit)
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
@@ -338,7 +340,20 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = accountName } |> Action.Transfer token.contractAccount |> encodeAction |> Port.pushAction
+                    { transfer
+                        | from = accountName
+                        , quantity =
+                            (transfer.quantity
+                                |> String.toFloat
+                                |> Result.withDefault 0
+                                |> Round.round token.precision
+                            )
+                                ++ " "
+                                ++ token.symbol
+                    }
+                        |> Action.Transfer token.contractAccount
+                        |> encodeAction
+                        |> Port.pushAction
             in
             ( model, cmd )
 
@@ -364,7 +379,17 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
                         getTableRows contractAccount accountName "accounts" -1
                             |> Http.send OnFetchTableRows
             in
-            ( { model | token = newToken, modalOpened = not modalOpened }, newCmd )
+            -- Clear form.
+            ( { model
+                | token = newToken
+                , modalOpened = not modalOpened
+                , transfer = { from = "", to = "", quantity = "", memo = "" }
+                , accountValidation = EmptyAccount
+                , quantityValidation = EmptyQuantity
+                , memoValidation = EmptyMemo
+              }
+            , newCmd
+            )
 
         SearchToken input ->
             ( { model | tokenSearchInput = input }, Cmd.none )
@@ -401,14 +426,25 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
-setTransferMessageField field value ({ transfer, token } as model) eosLiquidAmount =
+setTransferMessageField field value ({ transfer, token, tokenBalance } as model) eosLiquidAmount =
     case field of
         To ->
             validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
             if numberWithinDigitLimit token.precision value then
-                ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+                let
+                    liquidAmount =
+                        if token.symbol == "EOS" then
+                            eosLiquidAmount
+
+                        else
+                            tokenBalance
+                                |> Regex.replace Regex.All (Regex.regex (" " ++ token.symbol)) (\_ -> "")
+                                |> String.toFloat
+                                |> Result.withDefault 0
+                in
+                ( validateQuantityField { model | transfer = { transfer | quantity = value } } liquidAmount
                 , Cmd.none
                 )
 
