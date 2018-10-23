@@ -60,6 +60,7 @@ import Http
 import Json.Encode as Encode
 import Navigation
 import Port exposing (KeyPair)
+import Round
 import Translation
     exposing
         ( I18n
@@ -333,6 +334,16 @@ keypairGenerationViews { keys } language =
 
 paymentView : Model -> Language -> Html Message
 paymentView { product } language =
+    let
+        cpu =
+            toString product.cpu ++ " EOS"
+
+        net =
+            toString product.net ++ " EOS"
+
+        ram =
+            (toFloat product.ram / 1024.0 |> Round.round 3) ++ " KB"
+    in
     if product.active then
         div [ class "container" ]
             [ h3 []
@@ -341,15 +352,15 @@ paymentView { product } language =
                 [ dt []
                     [ text "CPU" ]
                 , dd []
-                    [ text "0.1 EOS" ]
+                    [ text cpu ]
                 , dt []
                     [ text "NET" ]
                 , dd []
-                    [ text "0.01 EOS" ]
+                    [ text net ]
                 , dt []
                     [ text "RAM" ]
                 , dd []
-                    [ text "3KB" ]
+                    [ text ram ]
                 ]
             , div [ class "select_payment_type area" ]
                 [ button [ class "choice ing button", type_ "button" ]

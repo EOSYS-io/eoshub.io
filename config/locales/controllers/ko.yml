@@ -21,6 +21,7 @@ ko:
     order_not_paid: "주문이 결제되지 않았습니다."
     order_already_delivered: "계정이 이미 생성되었습니다."
     payment_server_not_respond: "결제 서버가 응답하지않습니다. 잠시 후 다시 시도하시거나 관리자에게 연락해주세요."
+    product_not_exist: "\"EOS Account\" 상품이 존재하지 않습니다. 관리자에게 연락해주세요."
   payment_results:
     invalid_payment_result_callback: '유효하지않은 결제 완료 콜백 요청입니다.'
   eos_ram_price_histores:

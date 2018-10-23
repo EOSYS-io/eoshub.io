@@ -21,6 +21,7 @@ en:
     order_not_paid: "The order has not been paid"
     order_already_delivered: "The account has already been created"
     payment_server_not_respond: "The billing server is not responding. Please try again later or contact your administrator."
+    product_not_exist: "\"EOS Account\" product does not exist. Please contact the administrator."
   payment_results:
     invalid_payment_result_callback: 'Invalid payment result callback request'
   eos_ram_price_histores:

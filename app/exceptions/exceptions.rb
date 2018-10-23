@@ -11,6 +11,7 @@ module Exceptions
   PAYMENT_SERVER_NOT_RESPOND = { message: I18n.t('orders.payment_server_not_respond'), error_code: 7, status_code: :internal_server_error }.freeze
   INVALID_PAYMENT_RESULT_CALLBACK = { message: I18n.t('payment_results.invalid_payment_result_callback'), error_code: 8, status_code: :not_acceptable }.freeze
   NOT_EVENT_PERIOD = { message: I18n.t('users.not_event_period'), error_code: 9, status_code: :not_acceptable }.freeze
+  PRODUCT_NOT_EXIST = { message: I18n.t('orders.product_not_exist'), error_code: 10, status_code: :internal_server_error }.freeze
 
   class DefaultError < RuntimeError
     attr_accessor :status_code, :error_code, :objects
