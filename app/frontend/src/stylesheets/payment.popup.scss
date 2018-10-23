@@ -1,0 +1,118 @@
+// var
+$header_height:64px;
+$lnb_width:60px;
+$browser_min_width:1260px;
+$browser_min_height:580px;
+
+// --------------------------------------------------------------------------------
+// modal popup
+// --------------------------------------------------------------------------------
+.modal.popup {
+	position:fixed;
+	background-color: rgba(0, 0, 0, 0.64);
+
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+
+	// 가입 프로세스
+	p {
+		line-height:1.6;
+
+		> strong {
+			color:$white;
+			font-weight:$light;
+			margin-right:0.1em;
+		}
+	}
+
+	// superset
+	.wrapper {
+		top:50%;
+		background-color:$x-dark-gray;
+
+		position:absolute;
+		top:calc(50% + 61px/2);
+		// top:calc(#{$header_height} + 61px + 100px);		// 대충 중간...
+		left:50%;
+		min-width:386px;
+		width:30.15625%;
+		max-width:500px;
+		border-radius:4px;
+
+		padding:32px 0;
+		box-sizing:border-box;
+		z-index:100;
+		transform:translate(-50%, -50%);
+
+		h2 {
+			margin-left:32px;
+			+ p {
+				margin-left:32px;
+			}
+		}
+	}
+
+	button.close {
+		position:absolute;
+		top:32px;
+		right:32px;
+
+		width:18px;
+		height:18px;
+
+		@include ir();
+
+		background:url('icon-close-popup.svg') center center no-repeat transparent;
+		background-size:contain;
+		outline:0;
+
+		transition:transform 0.2s;
+
+		&:hover {
+			transform:scale(1.2);
+		}
+	}
+}
+
+// for payment (ruby)
+
+// virtual account deposit
+.modal.popup.virtual_account_check {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+
+	dl {
+		margin: 32px;
+		background-color:$xxx-dark-gray;
+		display:grid;
+		grid-template-columns:50% 50%;
+		padding:12px 24px;
+		font-size:$small;
+
+		* {
+			padding:6px 0;
+		}
+
+		dt {
+			color:$white;
+			text-align:left;
+		}
+		dd {
+			text-align:right;
+			word-break:break-all;
+		}
+	}
+
+	dl + .btn_area {
+		margin:16px 32px;
+		display:flex;
+		button {
+			flex:1;
+		}
+	}
+}
+// type case
