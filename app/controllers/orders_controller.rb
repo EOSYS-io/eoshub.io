@@ -29,13 +29,20 @@ class OrdersController < ApplicationController
       order_no: order.order_no,
       amount: product.price,
       product_name: product.name,
-      custom_parameter: order.public_key,
-      # for local test, pg company do not accept localhost url
-      # return_url: 'http://alpha.eoshub.io/orders',
-      # callback_url: 'http://alpha.eoshub.io/payment_results'
-      return_url: orders_url,
-      callback_url: payment_results_url
+      custom_parameter: order.public_key
     }
+    # for local test, pg company do not accept localhost url
+    if Rails.env.development?
+      payment_params.merge!(
+        return_url: 'http://alpha.eoshub.io/orders',
+        callback_url: 'http://alpha.eoshub.io/payment_results'
+      )
+    else
+      payment_params.merge!(
+        return_url: orders_url,
+        callback_url: payment_results_url
+      )
+    end
 
     response = Typhoeus::Request.new(
       Rails.application.credentials.dig(Rails.env.to_sym, :payletter_host) + Rails.configuration.urls['payletter_pay_api_url'],
@@ -51,6 +58,10 @@ class OrdersController < ApplicationController
     raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
 
     result = JSON.parse(response.body).merge(order_no: order.order_no)
+    if Rails.env.development?
+      result[:online_url] = order_url(id: order.order_no)
+    end
+
     render json: result, status: response.code
   end
 
