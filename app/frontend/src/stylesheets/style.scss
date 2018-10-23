@@ -7,6 +7,8 @@
 // enviorment, varible, functions
 @import 'env.scss';
 
+// resource
+
 // reset
 @import 'base.scss';
 
@@ -17,8 +19,10 @@
 @import 'layout.scss';
 
 // modal popup
+@import 'main.token.list.scss';
 @import 'common.popup.scss';
 @import 'common.notification.scss';
+
 
 
 // specific
