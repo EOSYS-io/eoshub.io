@@ -1,7 +1,7 @@
 class ProductsController < ApplicationController
   include EosAccount
 
-  before_action :checkEventBalance
+  before_action :check_event_balance
 
   def eos_account
     eos_account_product = Product.eos_account
