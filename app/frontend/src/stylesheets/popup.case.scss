@@ -1,0 +1,325 @@
+
+
+
+
+// type case
+.resource_management .modal.popup {
+	@include media ('>1600px') {
+		left:300px;
+	}
+	@include media ('>1280px','<=1600px') {
+		left:18.75vw;
+	}
+	@include media ('<=1280px') {
+		left:240px;
+	}
+}
+
+
+
+// type case
+.modal.popup.buy_ram {
+	form {
+		margin-bottom:0;
+		border-radius:0;
+		border-bottom:1px solid $white;
+	}
+
+	form + .container {
+		margin-top:12px;
+		margin-left:32px;
+	}
+
+	.btn_area {
+		margin:43px 32px 0;
+		button {
+			width:100%;
+		}
+	}
+}
+
+.modal.popup.set_division_manual {
+	.wrapper {
+		background-color:$xx-dark-gray;
+		padding:0 0 32px 0;
+	}
+
+	h2 {
+		@include screen_reader();
+	}
+
+	.form.container {
+		padding:32px 32px 0;
+
+		h3, p {
+			font-size:$small;
+			margin:0 0 8px;
+		}
+		p {
+			margin:8px 0 12px;
+		}
+
+		form {
+			margin:0;
+			padding:0;
+			display:block;
+			position:relative;
+			background-color:#232323;
+
+			input {
+				border:0;
+				border-bottom:1px solid $dark-gray;
+				line-height:48px;
+				height:48px;
+				background:none;
+				padding:0 8px;
+				box-sizing:border-box;
+				width:100%;
+
+				&[data-validate='true'] {
+					border-color:$green;
+				}
+
+				&[data-validate='false'],
+				&:invalid {
+					border-color:$red;
+				}
+			}
+
+			span {
+				margin-right:8px;
+				font-size:$small;
+
+				position:absolute;
+				top:50%;
+				right:0;
+
+				transform:translateY(-50%);
+
+			}
+		}
+	}
+
+	p.validate.description {
+		text-align:center;
+		font-size:$small;
+		margin:32px 0;
+
+		&.false {
+			color:$red;
+		}
+
+		&.true {
+			color:$green;
+		}
+	}
+
+	.btn_area {
+		margin:0 32px;
+		display:flex;
+
+		button {
+			flex:1;
+			&:last-child {
+				margin-left:8px;
+			}
+		}
+	}
+}
+
+
+// 계정생성시 출력되는 팝업
+.modal.popup.create_account {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+
+	h2 + p {
+		margin-top:16px;
+		line-height:1.6;
+		max-width:20em;
+	}
+
+	dl {
+		margin:24px 32px 8px;
+		display:grid;
+		grid-template-columns:110px 1fr;
+		grid-template-rows:repeat(3,65px);
+		text-align:center;
+
+		dt, dd {
+			display:flex;
+			justify-content:center;
+			align-items:center;
+			margin:1px;
+		}
+
+		dt {
+			font-size:$small;
+			vertical-align:middle;
+			background-color:$xxxx-dark-gray;
+		}
+
+		dd {
+			font-size:$x-small;
+			background-color:$xxx-dark-gray;
+		}
+	}
+
+	dl ~ .btn_area {
+		margin-left:32px;
+		margin-right:32px;
+
+		margin-top:24px;
+		button {
+			width:100%;
+		}
+	}
+
+	dl + .btn_area {
+		margin-top:16px;
+		margin-bottom:0px;
+		display:flex;
+		button {
+			height:36px;
+			line-height:34px;
+			flex:1;
+			&:first-child {
+				margin-right:8px;
+			}
+		}
+	}
+
+}
+
+.modal.popup.virtual_account_check {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+	dl {
+		margin: 32px;
+		background-color:$xxx-dark-gray;
+		display:grid;
+		grid-template-columns:50% 50%;
+		padding:12px 24px;
+		font-size:$small;
+
+		* {
+			padding:6px 0;
+		}
+		dt {
+			color:$white;
+			text-align:left;
+		}
+		dd {
+			text-align:right;
+			word-break:break-all;
+		}
+	}
+
+	dl + .btn_area {
+		margin:16px 32px;
+		display:flex;
+		button {
+			flex:1;
+			&:first-child {
+				margin-right:8px;
+			}
+		}
+	}
+}
+
+.modal.popup.tokenlist {
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+
+	form {
+		background-color:$xxx-dark-gray;
+	}
+
+	.result.list {
+		> button {
+			text-align:left;
+			font-size:$x-small;
+			background-color:$xxx-dark-gray;
+			padding:20px 64px;
+			position:relative;
+			width:100%;
+			box-sizing:border-box;
+			margin-bottom:5px;
+			&:last-child {
+				margin-bottom:0;
+			}
+
+			span {
+				display:block;
+
+				strong {
+					font-size:$normal;
+					font-weight:400;
+					color:$white;
+					display:block;
+				}
+			}
+
+			&.token:before {
+				content:'';
+				position:absolute;
+				top:50%;
+				left:20px;
+				display:block;
+				border-radius:100%;
+				transform:translateY(-50%);
+				transform-origin:left center;
+				background-image:url('../image/icon-eos.png');
+				background-position:center center;
+				background-repeat:no-repeat;
+				width:32px;
+				height:32px;
+				background-color:#443f54;
+			}
+
+			@mixin sprites-token($sprites) {
+				@each $sprite in $sprites {
+					$sprite-name: nth($sprite, 10);
+
+					&.#{$sprite-name}:before {
+						display:none;
+					}
+					&.#{$sprite-name}:after {
+						@include sprite($sprite);
+						content:'';
+						position:absolute;
+						top:50%;
+						left:20px;
+						display:block;
+						border-radius:100%;
+						transform:translateY(-50%) scale(0.25);
+						background-color:$white;
+						transform-origin:left center;
+						box-shadow:0 0 10px 0 rgba(255,255,255,1);
+					}
+				}
+			}
+
+			@include sprites-token($spritesheet-sprites);
+
+
+			transition:background-color 0.2s;
+			&:hover {
+				background-color:$xxxx-dark-gray;
+			}
+		}
+	}
+}
+
+
+// bp name list
+
+// $spritesheet-width: 1216px;
+// $spritesheet-height: 1179px;
+
+
