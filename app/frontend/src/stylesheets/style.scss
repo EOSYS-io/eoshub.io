@@ -19,7 +19,6 @@
 @import 'layout.scss';
 
 // modal popup
-@import 'main.token.list.scss';
 @import 'common.popup.scss';
 @import 'common.notification.scss';
 
@@ -31,6 +30,8 @@
 @import 'footer.scss';
 @import 'aside.scss';
 
+@import 'main.token.list.scss';
+@import 'popup.case.scss';
 @import 'main.index.scss';
 @import 'main.join.scss';
 @import 'main.transfer.scss';
