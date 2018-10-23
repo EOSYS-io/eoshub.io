@@ -55,8 +55,14 @@ class UsersControllerTest < ActionController::TestCase
         alice = users(:alice)
         post :confirm_email, params: { id: alice.confirm_token }
     
+        creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_event)
         eos_account = 'chainpartner'
-        post :create_eos_account, params: { id: alice.confirm_token }, body: { account_name: eos_account, pubkey: 'EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3' }.to_json, as: :json
+        body = {
+          creator_eos_account: creator_eos_account,
+          account_name: eos_account,
+          pubkey: 'EOS5x2nWYYncpQ6h3dz9QEjBBisSPymX1fkyguJUv6bGkZfr5Uvx3'
+        }
+        post :create_eos_account, params: { id: alice.confirm_token }, body: body.to_json, as: :json
         assert_response :ok
 
         assert_equal alice.reload.eos_account, eos_account

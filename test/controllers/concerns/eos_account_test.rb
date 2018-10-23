@@ -67,7 +67,8 @@ class EosAccountFakeControllerTest < ActionController::TestCase
 
     mock_body = file_fixture('eos_create_account_response_already_exist.json').read
     Typhoeus::Request.stub_any_instance :run, MockResponse.new(mock_body) do
-      response = @controller.request_eos_account_creation(account_name, pubkey)
+      creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_order)
+      response = @controller.request_eos_account_creation(creator_eos_account, account_name, pubkey)
       assert_equal 500, response.code
     end
   end
