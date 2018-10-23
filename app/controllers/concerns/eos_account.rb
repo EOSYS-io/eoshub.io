@@ -35,4 +35,20 @@ module EosAccount
 
     response
   end
+
+  def core_liquid_balance(account_name)
+    response = Typhoeus::Request.new(
+      Rails.configuration.urls['eos_rpc_host']+Rails.configuration.urls['eos_get_account_url'],
+      method: :post,
+      headers: {'Content-Type'=> "application/json"},
+      body: JSON.generate({account_name: account_name}),
+      timeout: 5
+    ).run
+
+    if response.code == 200
+      JSON.parse(response.body).dig('core_liquid_balance')&.delete(' EOS')&.to_f || 0
+    else
+      -1
+    end
+  end
 end

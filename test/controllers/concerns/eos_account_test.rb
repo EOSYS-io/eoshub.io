@@ -72,4 +72,10 @@ class EosAccountFakeControllerTest < ActionController::TestCase
       assert_equal 500, response.code
     end
   end
+
+  test "should get core liquid balance" do
+    eos_account = 'eoshubevent1'
+    balance = @controller.core_liquid_balance(eos_account)
+    assert balance >= 0
+  end
 end
