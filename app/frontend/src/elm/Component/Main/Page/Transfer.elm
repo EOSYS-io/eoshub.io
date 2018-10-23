@@ -301,7 +301,7 @@ tokenListSection language { modalOpened, tokenSearchInput } =
                 ""
 
         filterWithSearchInput =
-            List.filter (\tkn -> String.startsWith (tokenSearchInput |> String.toUpper) tkn.symbol)
+            List.filter (\token -> String.startsWith (tokenSearchInput |> String.toUpper) token.symbol)
     in
     section [ class ("tokenlist modal popup" ++ addedClass) ]
         [ div [ class "wrapper" ]
