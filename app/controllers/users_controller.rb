@@ -54,8 +54,9 @@ class UsersController < ApiController
     else
       raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:account_name])
 
+      creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_event)
       eos_account = params[:account_name]
-      response = request_eos_account_creation(eos_account, params[:pubkey])
+      response = request_eos_account_creation(creator_eos_account, eos_account, params[:pubkey])
       if response.code == 200
         user.assign_attributes(eos_account: eos_account, ip_address: request.remote_ip)
         user.eos_account_created!

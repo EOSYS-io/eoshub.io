@@ -101,7 +101,8 @@ class OrdersController < ApplicationController
     eos_account = order.eos_account
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(eos_account)
 
-    response = request_eos_account_creation(eos_account, public_key)
+    creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_order)
+    response = request_eos_account_creation(creator_eos_account, eos_account, public_key)
     if response.code == 200
       order.delivered!
       render json: { eos_account: eos_account, public_key: public_key }, status: :ok
