@@ -1048,6 +1048,10 @@ $browser_min_height:580px;
 // --------------------------------------------------------------------------------
 // modal popup
 // --------------------------------------------------------------------------------
+body {
+	overflow:hidden;
+}
+
 .modal.popup {
 	position:fixed;
 	background-color: rgba(0, 0, 0, 0.64);
@@ -1074,8 +1078,6 @@ $browser_min_height:580px;
 		background-color:$x-dark-gray;
 
 		position:absolute;
-		top:calc(50% + 61px/2);
-		// top:calc(#{$header_height} + 61px + 100px);		// 대충 중간...
 		left:50%;
 		min-width:386px;
 		width:30.15625%;

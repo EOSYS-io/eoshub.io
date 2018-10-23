@@ -39,3 +39,4 @@ yarn-debug.log*
 .env
 .vscode*
 bin/ecs-deploy
+payment.popup.scss
