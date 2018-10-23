@@ -15,6 +15,7 @@ zh-CN:
     eos_node_connection_failed: '与EOS节点的连接失败。'
     eos_wallet_connection_failed: 'EOS电子钱包服务器连接失败。请联系您的管理员。'
     not_event_activated: '这不是活动期。'
+    not_enough_balance: '帐户创建活动的EOS余额已用尽'
   orders:
     deactivated_product: '此商品目前无法订购。'
     order_not_exist: '订单不存在。'

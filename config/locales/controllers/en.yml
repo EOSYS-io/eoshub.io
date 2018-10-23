@@ -15,6 +15,7 @@ en:
     eos_node_connection_failed: 'Failed to connect EOS node'
     eos_wallet_connection_failed: 'Failed to connect EOS wallet'
     not_event_activated: 'Not event period'
+    not_enough_balance: 'The EOS balance for the account creation event has run out'
   orders:
     deactivated_product: "You can't order this item for now"
     order_not_exist: "The order does not exist"

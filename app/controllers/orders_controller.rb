@@ -110,6 +110,8 @@ class OrdersController < ApplicationController
       render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
     elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
       render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
+    elsif response.code == 500 && JSON.parse(response.body).dig('error', 'code') == 3050003
+      render json: { message: I18n.t('users.not_enough_balance') }, status: response.code
     else
       render json: response.body, status: response.code
     end

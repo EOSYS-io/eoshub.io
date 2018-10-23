@@ -22,7 +22,7 @@ class OrdersControllerTest < ActionController::TestCase
       end
     end
 
-    product = products(:one)
+    product = products(:eos_account)
 
     @controller.stub :eos_account_exist?, false do
       mock_body = file_fixture('payletter_payment_request_response_success.json').read
