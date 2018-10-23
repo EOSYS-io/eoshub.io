@@ -92,4 +92,10 @@ tests =
                             (Token "Bitcoin" "BTC" "" 8)
                         )
             ]
+        , describe "getSymbolFromAsset"
+            [ test "BTC" <|
+                \() -> Expect.equal "BTC" ("1.0000 BTC" |> getSymbolFromAsset |> Maybe.withDefault "")
+            , test "No symbol" <|
+                \() -> Expect.equal "" ("1.0000" |> getSymbolFromAsset |> Maybe.withDefault "")
+            ]
         ]

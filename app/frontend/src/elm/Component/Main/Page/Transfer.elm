@@ -91,7 +91,7 @@ initModel =
         , contractAccount = "eosio.token"
         , precision = 4
         }
-    , tokenBalance = ""
+    , tokenBalance = "0.0000 EOS"
     , tokenSearchInput = ""
     }
 
@@ -382,6 +382,7 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
             -- Clear form.
             ( { model
                 | token = newToken
+                , tokenBalance = newToken |> getDefaultAsset
                 , modalOpened = not modalOpened
                 , transfer = { from = "", to = "", quantity = "", memo = "" }
                 , accountValidation = EmptyAccount
