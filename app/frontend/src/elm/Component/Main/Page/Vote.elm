@@ -130,8 +130,8 @@ type alias Model =
     }
 
 
-initModel : Model
-initModel =
+initModel : Account -> Model
+initModel { voterInfo } =
     { tab = VoteTab
     , globalTable = initGlobalFields
     , tokenStatTable = initTokenStatFields
@@ -141,7 +141,7 @@ initModel =
     , proxies = []
     , producersLimit = 100
     , searchInput = ""
-    , producerNamesToVote = Set.empty
+    , producerNamesToVote = Set.fromList voterInfo.producers
     }
 
 

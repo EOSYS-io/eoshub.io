@@ -5,6 +5,7 @@ import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar exposing (accountCmd)
+import Data.Account exposing (defaultAccount)
 import Expect
 import Navigation exposing (Location)
 import Test exposing (..)
@@ -44,16 +45,21 @@ tests =
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
-                \() -> Expect.equal IndexPage (getPage { location | pathname = "/" })
+                \() -> Expect.equal IndexPage (getPage defaultAccount { location | pathname = "/" })
             , test "VoteRoute" <|
-                \() -> Expect.equal (VotePage Vote.initModel) (getPage { location | pathname = "/vote" })
+                \() ->
+                    Expect.equal (VotePage (Vote.initModel defaultAccount))
+                        (getPage defaultAccount { location | pathname = "/vote" })
             , test "TransferRoute" <|
-                \() -> Expect.equal (TransferPage Transfer.initModel) (getPage { location | pathname = "/transfer" })
+                \() ->
+                    Expect.equal (TransferPage Transfer.initModel)
+                        (getPage defaultAccount { location | pathname = "/transfer" })
             , test "SearchRoute" <|
                 \() ->
-                    Expect.equal (SearchPage (Search.initModel "123412341234")) (getPage { location | pathname = "/search", search = "?query=123412341234" })
+                    Expect.equal (SearchPage (Search.initModel "123412341234"))
+                        (getPage defaultAccount { location | pathname = "/search", search = "?query=123412341234" })
             , test "NotFoundRoute" <|
-                \() -> Expect.equal NotFoundPage (getPage location)
+                \() -> Expect.equal NotFoundPage (getPage defaultAccount location)
             ]
         , describe "getPageNav"
             [ test "/transfer" <|
