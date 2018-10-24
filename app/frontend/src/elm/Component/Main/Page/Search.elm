@@ -101,8 +101,8 @@ import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( assetAdd
-        , assetSubtract
+        ( eosAdd
+        , eosSubtract
         , floatToAsset
         , getNow
         , larimerToEos
@@ -330,7 +330,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now 
             getUnstakingAmount account.refundRequest.netAmount account.refundRequest.cpuAmount
 
         stakedAmount =
-            floatToAsset (larimerToEos account.voterInfo.staked)
+            account.voterInfo.staked |> larimerToEos |> floatToAsset 4 "EOS"
 
         ( cpuUsed, cpuAvailable, cpuTotal, cpuPercent, cpuColorCode ) =
             getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
@@ -470,13 +470,13 @@ viewStakedDetail language { account, delbandTable } =
             account
 
         totalResourceAmount =
-            assetAdd totalResources.cpuWeight totalResources.netWeight
+            eosAdd totalResources.cpuWeight totalResources.netWeight
 
         selfStakedAmount =
-            assetAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
+            eosAdd selfDelegatedBandwidth.cpuWeight selfDelegatedBandwidth.netWeight
 
         stakedByAmount =
-            assetSubtract totalResourceAmount selfStakedAmount
+            eosSubtract totalResourceAmount selfStakedAmount
 
         stakedToAmount =
             sumStakedToList delbandTable account.accountName
@@ -505,7 +505,7 @@ viewStakedDetail language { account, delbandTable } =
                             ( maybeReceiver, sum ) =
                                 case maybeDelband of
                                     Delband { receiver, cpuWeight, netWeight } ->
-                                        ( receiver, assetAdd cpuWeight netWeight )
+                                        ( receiver, eosAdd cpuWeight netWeight )
 
                                     _ ->
                                         ( "", "0 EOS" )
@@ -527,13 +527,13 @@ sumStakedToList delbandTable accountName =
                     (\maybeDelband ->
                         case maybeDelband of
                             Delband { cpuWeight, netWeight } ->
-                                assetAdd cpuWeight netWeight
+                                eosAdd cpuWeight netWeight
 
                             _ ->
                                 "0 EOS"
                     )
     in
-    List.foldl assetAdd "0 EOS" delbandEachSumList
+    List.foldl eosAdd "0 EOS" delbandEachSumList
 
 
 filterDelbandWithAccountName : String -> List Row -> List Row
@@ -648,7 +648,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
             case ( contractAccount, actionName ) of
                 ( "eosio.token", "transfer" ) ->
                     case actionParameters of
-                        Action.Transfer params ->
+                        Action.Transfer _ params ->
                             td [ class "info" ]
                                 [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
                                 , text " -> "

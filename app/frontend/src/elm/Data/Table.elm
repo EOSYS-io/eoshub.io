@@ -2,7 +2,8 @@
 
 
 module Data.Table exposing
-    ( BalanceWeight
+    ( AccountsFields
+    , BalanceWeight
     , DelbandFields
     , GlobalFields
     , RammarketFields
@@ -12,6 +13,7 @@ module Data.Table exposing
     , balanceWeightDecoder
     , delbandDecoder
     , globalDecoder
+    , initAccountsFields
     , initDelbandFields
     , initGlobalFields
     , initRammarketFields
@@ -37,6 +39,7 @@ type Row
     | Global GlobalFields
     | Delband DelbandFields
     | TokenStat TokenStatFields
+    | Accounts AccountsFields
 
 
 type alias BalanceWeight =
@@ -167,6 +170,14 @@ initTokenStatFields =
     }
 
 
+type alias AccountsFields =
+    { balance : String }
+
+
+initAccountsFields =
+    { balance = "0.0000 EOS" }
+
+
 rowsDecoder : Decoder (List Row)
 rowsDecoder =
     Decode.field "rows"
@@ -180,6 +191,7 @@ rowDecoder =
         , Decode.map Global globalDecoder
         , Decode.map Delband delbandDecoder
         , Decode.map TokenStat tokenStatDecoder
+        , Decode.map Accounts accountsDecoder
         ]
 
 
@@ -248,3 +260,8 @@ tokenStatDecoder =
         (Decode.field "supply" Decode.string)
         (Decode.field "max_supply" Decode.string)
         (Decode.field "issuer" Decode.string)
+
+
+accountsDecoder : Decoder AccountsFields
+accountsDecoder =
+    Decode.map AccountsFields (Decode.field "balance" Decode.string)

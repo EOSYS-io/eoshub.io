@@ -1,7 +1,13 @@
-module Test.Component.Main.Page.Transfer exposing (balance, model, submitActionTest, tests)
+module Test.Component.Main.Page.Transfer exposing
+    ( balance
+    , model
+    , tests
+    )
 
 import Component.Main.Page.Transfer exposing (..)
+import Data.Table
 import Expect
+import Http
 import Json.Encode as JE
 import Port
 import Test exposing (..)
@@ -26,6 +32,15 @@ model =
         , quantity = "300"
         , memo = "memo"
         }
+    , token =
+        { name = "SYS"
+        , symbol = "SYS"
+        , contractAccount = "eosio.token"
+        , precision = 4
+        }
+    , modalOpened = True
+    , tokenBalance = "3.0123 SYS"
+    , tokenSearchInput = ""
     }
 
 
@@ -34,32 +49,98 @@ balance =
     300.0
 
 
-submitActionTest : Test
-submitActionTest =
-    let
-        expectedJson =
-            JE.object
-                [ ( "account", JE.string "eosio.token" )
-                , ( "action", JE.string "transfer" )
-                , ( "payload"
-                  , JE.object
-                        [ ( "from", JE.string "from" )
-                        , ( "to", JE.string "to" )
-                        , ( "quantity", JE.string "300.0000 EOS" )
-                        , ( "memo", JE.string "memo" )
-                        ]
-                  )
-                ]
-    in
-    test "SubmitAction" <|
-        \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from" 300.0)
-
-
 tests : Test
 tests =
+    let
+        submitActionTest =
+            let
+                expectedJson =
+                    JE.object
+                        [ ( "account", JE.string "eosio.token" )
+                        , ( "action", JE.string "transfer" )
+                        , ( "payload"
+                          , JE.object
+                                [ ( "from", JE.string "from" )
+                                , ( "to", JE.string "to" )
+                                , ( "quantity", JE.string "300.0000 SYS" )
+                                , ( "memo", JE.string "memo" )
+                                ]
+                          )
+                        ]
+            in
+            test "SubmitAction" <|
+                \() -> Expect.equal ( model, Port.pushAction expectedJson ) (update SubmitAction model "from" 300.0)
+
+        switchTokenTest =
+            let
+                newToken =
+                    { name = "BTC"
+                    , symbol = "BTC"
+                    , contractAccount = "bitcoinacc11"
+                    , precision = 8
+                    }
+            in
+            test "SwitchToken" <|
+                \() ->
+                    Expect.equal
+                        { model
+                            | modalOpened = False
+                            , transfer = { from = "", to = "", quantity = "", memo = "" }
+                            , accountValidation = EmptyAccount
+                            , quantityValidation = EmptyQuantity
+                            , memoValidation = EmptyMemo
+                            , tokenBalance = "0.00000000 BTC"
+                            , token = newToken
+                        }
+                        (Tuple.first
+                            (update
+                                (SwitchToken newToken)
+                                model
+                                "from"
+                                300.0
+                            )
+                        )
+
+        onFetchTableRowsTest =
+            let
+                defaultSysAmount =
+                    "0.0000 SYS"
+
+                sysBalance =
+                    Data.Table.Accounts { balance = "4.0000 SYS" }
+
+                btcBalance =
+                    Data.Table.Accounts { balance = "1.00000000 BTC" }
+            in
+            describe "OnFetchTableRows"
+                [ test "Ok with empty rows" <|
+                    \() ->
+                        Expect.equal ( { model | tokenBalance = defaultSysAmount }, Cmd.none )
+                            (update (OnFetchTableRows (Ok [])) model "from" 300.0)
+                , test "Ok with matched symbol at head" <|
+                    \() ->
+                        Expect.equal ( { model | tokenBalance = "4.0000 SYS" }, Cmd.none )
+                            (update (OnFetchTableRows (Ok [ sysBalance, btcBalance ])) model "from" 300.0)
+                , test "Ok with matched symbol at tail" <|
+                    \() ->
+                        Expect.equal ( { model | tokenBalance = "4.0000 SYS" }, Cmd.none )
+                            (update (OnFetchTableRows (Ok [ btcBalance, sysBalance ])) model "from" 300.0)
+                , test "Ok with no matched symbols" <|
+                    \() ->
+                        Expect.equal ( { model | tokenBalance = "0.0000 SYS" }, Cmd.none )
+                            (update (OnFetchTableRows (Ok [ btcBalance, btcBalance ])) model "from" 300.0)
+                , test "Err" <|
+                    \() ->
+                        Expect.equal ( { model | tokenBalance = "0.0000 SYS" }, Cmd.none )
+                            (update (OnFetchTableRows (Err Http.Timeout)) model "from" 300.0)
+                ]
+    in
     describe "Transfer page module"
         [ describe "update"
-            [ submitActionTest ]
+            [ submitActionTest
+            , switchTokenTest
+            , onFetchTableRowsTest
+            ]
         , describe "setTransferMessageField"
             (let
                 { transfer } =

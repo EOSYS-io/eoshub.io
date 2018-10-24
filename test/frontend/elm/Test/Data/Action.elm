@@ -31,7 +31,7 @@ tests =
               , actionName = "transfer"
               , data =
                     Ok
-                        (Transfer
+                        (Transfer "eosio.token"
                             { from = "eosio.vpay"
                             , to = "eosyskoreabp"
                             , quantity = "289.4270 EOS"
@@ -48,7 +48,7 @@ tests =
               , actionName = "transfer"
               , data =
                     Ok
-                        (Transfer
+                        (Transfer "eosio.token"
                             { from = "eosio.vpay"
                             , to = "eosyskoreabp"
                             , quantity = "289.4270 EOS"
@@ -65,7 +65,7 @@ tests =
               , actionName = "transfer"
               , data =
                     Ok
-                        (Transfer
+                        (Transfer "eosio.token"
                             { from = "eosio.vpay"
                             , to = "eosyskoreabp"
                             , quantity = "289.4270 EOS"
@@ -104,7 +104,7 @@ tests =
                               , actionName = "transfer"
                               , data =
                                     Ok
-                                        (Transfer
+                                        (Transfer "eosio.token"
                                             { from = "eosio.vpay"
                                             , to = "eosyskoreabp"
                                             , quantity = "289.4270 EOS"

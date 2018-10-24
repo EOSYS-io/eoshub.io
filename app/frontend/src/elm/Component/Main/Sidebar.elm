@@ -242,7 +242,7 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             getUnstakingAmount refundRequest.netAmount refundRequest.cpuAmount
 
         stakedAmount =
-            floatToAsset (larimerToEos voterInfo.staked)
+            floatToAsset 4 "EOS" <| larimerToEos <| voterInfo.staked
 
         configPanelClass =
             class

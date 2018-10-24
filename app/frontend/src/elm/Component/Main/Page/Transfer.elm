@@ -17,14 +17,44 @@ module Component.Main.Page.Transfer exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
-import Html exposing (Html, button, div, em, h2, input, li, main_, p, span, text, ul)
+import Data.Table exposing (AccountsFields, Row)
+import Html
+    exposing
+        ( Html
+        , a
+        , button
+        , div
+        , em
+        , form
+        , h2
+        , img
+        , input
+        , li
+        , main_
+        , p
+        , section
+        , span
+        , strong
+        , text
+        , ul
+        )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
+import Regex
+import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (numberWithinDigitLimit)
-import Util.HttpRequest exposing (getAccount)
+import Util.Formatter
+    exposing
+        ( assetToFloat
+        , floatToAsset
+        , getDefaultAsset
+        , getSymbolFromAsset
+        , numberWithinDigitLimit
+        )
+import Util.HttpRequest exposing (getAccount, getTableRows)
+import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -47,6 +77,10 @@ type alias Model =
     , quantityValidation : QuantityStatus
     , memoValidation : MemoStatus
     , isFormValid : Bool
+    , modalOpened : Bool
+    , token : Token
+    , tokenBalance : String
+    , tokenSearchInput : String
     }
 
 
@@ -57,6 +91,15 @@ initModel =
     , quantityValidation = EmptyQuantity
     , memoValidation = EmptyMemo
     , isFormValid = False
+    , modalOpened = False
+    , token =
+        { name = "EOS"
+        , symbol = "EOS"
+        , contractAccount = "eosio.token"
+        , precision = 4
+        }
+    , tokenBalance = "0.0000 EOS"
+    , tokenSearchInput = ""
     }
 
 
@@ -75,6 +118,10 @@ type Message
     | SubmitAction
     | OpenUnderConstruction
     | OnFetchAccountToVerify (Result Http.Error Account)
+    | SwitchToken Token
+    | ToggleModal
+    | SearchToken String
+    | OnFetchTableRows (Result Http.Error (List Row))
 
 
 
@@ -82,34 +129,41 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language { transfer, accountValidation, quantityValidation, memoValidation, isFormValid } eosLiquidAmount =
+view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened, token, tokenBalance } as model) eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
-        , div [ class "container" ]
+        , let
+            { to, quantity, memo } =
+                transfer
+
+            accountWarning =
+                accountWarningSpan accountValidation language
+
+            quantityWarning =
+                quantityWarningSpan quantityValidation language
+
+            memoWarning =
+                memoWarningSpan memoValidation language
+
+            tokenAmount =
+                case token.symbol of
+                    "EOS" ->
+                        eosLiquidAmount
+
+                    _ ->
+                        tokenBalance
+          in
+          div [ class "container" ]
             [ div [ class "wallet status" ]
                 [ p []
                     [ text (translate language TransferableAmount)
-                    , em [] [ text eosLiquidAmount ]
+                    , em [] [ text tokenAmount ]
                     ]
-
-                -- , a [ title "전송가능한 토큰을 변경하시려면 클릭해주세요." ]
-                --     [ text "토큰 바꾸기" ]
+                , a [ onClick ToggleModal ]
+                    [ text (translate language SwitchTokens) ]
                 ]
-            , let
-                { to, quantity, memo } =
-                    transfer
-
-                accountWarning =
-                    accountWarningSpan accountValidation language
-
-                quantityWarning =
-                    quantityWarningSpan quantityValidation language
-
-                memoWarning =
-                    memoWarningSpan memoValidation language
-              in
-              Html.form []
+            , Html.form []
                 [ ul []
                     [ li []
                         [ input
@@ -157,6 +211,7 @@ view language { transfer, accountValidation, quantityValidation, memoValidation,
                     [ text (translate language Send) ]
                 ]
             ]
+        , tokenListSection language model
         ]
 
 
@@ -227,17 +282,81 @@ memoWarningSpan memoStatus language =
         [ text textValue ]
 
 
+generateTokenButton : Token -> Html Message
+generateTokenButton ({ name, symbol } as token) =
+    button
+        [ type_ "button"
+        , class ("token bi " ++ symbol)
+        , onClick (SwitchToken token)
+        ]
+        [ span []
+            [ strong []
+                [ text symbol ]
+            , text name
+            ]
+        ]
+
+
+tokenListSection : Language -> Model -> Html Message
+tokenListSection language { modalOpened, tokenSearchInput } =
+    let
+        addedClass =
+            if modalOpened then
+                " viewing"
+
+            else
+                ""
+
+        filterWithSearchInput =
+            List.filter (\token -> String.startsWith (tokenSearchInput |> String.toUpper) token.symbol)
+    in
+    section [ class ("tokenlist modal popup" ++ addedClass) ]
+        [ div [ class "wrapper" ]
+            [ h2 []
+                [ text "토큰 리스트" ]
+            , form []
+                [ input
+                    [ class "search_token"
+                    , placeholder "토큰 검색하기"
+                    , type_ "text"
+                    , onInput <| SearchToken
+                    ]
+                    []
+                , button [ type_ "button" ]
+                    [ text (translate language Search) ]
+                ]
+            , div [ class "result list" ]
+                (List.map generateTokenButton (filterWithSearchInput tokens))
+            , button [ class "close", type_ "button", onClick ToggleModal ]
+                [ text (translate language Close) ]
+            ]
+        ]
+
+
 
 -- UPDATE
 
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
-update message ({ transfer } as model) accountName eosLiquidAmount =
+update message ({ transfer, modalOpened, token } as model) accountName eosLiquidAmount =
+    let
+        defaultLiquidValue =
+            token |> getDefaultAsset
+    in
     case message of
         SubmitAction ->
             let
                 cmd =
-                    { transfer | from = accountName } |> Action.Transfer |> encodeAction |> Port.pushAction
+                    { transfer
+                        | from = accountName
+                        , quantity =
+                            transfer.quantity
+                                |> assetToFloat
+                                |> floatToAsset token.precision token.symbol
+                    }
+                        |> Action.Transfer token.contractAccount
+                        |> encodeAction
+                        |> Port.pushAction
             in
             ( model, cmd )
 
@@ -250,6 +369,58 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
         OnFetchAccountToVerify (Err _) ->
             validateToField model Fail
 
+        ToggleModal ->
+            ( { model | modalOpened = not modalOpened }, Cmd.none )
+
+        SwitchToken ({ symbol, contractAccount } as newToken) ->
+            let
+                newCmd =
+                    if symbol == "EOS" then
+                        Cmd.none
+
+                    else
+                        getTableRows contractAccount accountName "accounts" -1
+                            |> Http.send OnFetchTableRows
+            in
+            -- Clear form.
+            ( { model
+                | token = newToken
+                , tokenBalance = newToken |> getDefaultAsset
+                , modalOpened = not modalOpened
+                , transfer = { from = "", to = "", quantity = "", memo = "" }
+                , accountValidation = EmptyAccount
+                , quantityValidation = EmptyQuantity
+                , memoValidation = EmptyMemo
+              }
+            , newCmd
+            )
+
+        SearchToken input ->
+            ( { model | tokenSearchInput = input }, Cmd.none )
+
+        OnFetchTableRows (Ok rows) ->
+            case rows of
+                -- Account not found on the table.
+                [] ->
+                    ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
+
+                (Data.Table.Accounts { balance }) :: tail ->
+                    let
+                        symbol =
+                            balance |> getSymbolFromAsset |> Maybe.withDefault ""
+                    in
+                    if symbol == token.symbol then
+                        ( { model | tokenBalance = balance }, Cmd.none )
+
+                    else
+                        update (OnFetchTableRows (Ok tail)) model accountName eosLiquidAmount
+
+                _ ->
+                    ( model, Cmd.none )
+
+        OnFetchTableRows (Err _) ->
+            ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
+
         _ ->
             ( model, Cmd.none )
 
@@ -259,14 +430,23 @@ update message ({ transfer } as model) accountName eosLiquidAmount =
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
-setTransferMessageField field value ({ transfer } as model) eosLiquidAmount =
+setTransferMessageField field value ({ transfer, token, tokenBalance } as model) eosLiquidAmount =
     case field of
         To ->
             validateToField { model | transfer = { transfer | to = value } } NotSent
 
         Quantity ->
-            if numberWithinDigitLimit 4 value then
-                ( validateQuantityField { model | transfer = { transfer | quantity = value } } eosLiquidAmount
+            if numberWithinDigitLimit token.precision value then
+                let
+                    liquidAmount =
+                        if token.symbol == "EOS" then
+                            eosLiquidAmount
+
+                        else
+                            tokenBalance
+                                |> assetToFloat
+                in
+                ( validateQuantityField { model | transfer = { transfer | quantity = value } } liquidAmount
                 , Cmd.none
                 )
 

@@ -38,9 +38,9 @@ import Round
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( assetAdd
-        , assetSubtract
-        , assetToFloat
+        ( assetToFloat
+        , eosAdd
+        , eosSubtract
         , numberWithinDigitLimit
         , removeSymbolIfExists
         )
@@ -215,7 +215,7 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
                     if numberWithinDigitLimit 4 value then
                         let
                             newTotalQuantity =
-                                assetAdd value stakeAmountModal.netQuantity
+                                eosAdd value stakeAmountModal.netQuantity
                                     |> assetToFloat
                                     |> toString
 
@@ -237,7 +237,7 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
                     if numberWithinDigitLimit 4 value then
                         let
                             newTotalQuantity =
-                                assetAdd stakeAmountModal.cpuQuantity value
+                                eosAdd stakeAmountModal.cpuQuantity value
                                     |> assetToFloat
                                     |> toString
 
@@ -508,7 +508,7 @@ validate ({ delegatebw, stakeAmountModal } as model) eosLiquidAmount isModal =
                 ( stakeAmountModal.cpuQuantity, stakeAmountModal.netQuantity )
 
         totalQuantity =
-            assetAdd netQuantity cpuQuantity
+            eosAdd netQuantity cpuQuantity
 
         netQuantityValidation =
             validateQuantity netQuantity eosLiquidAmount
@@ -557,7 +557,7 @@ distributeCpuNet totalQuantity alpha beta =
             Round.round 4 <| assetToFloat totalQuantity * (alpha / (alpha + beta))
 
         netQuantity =
-            assetSubtract totalQuantity cpuQuantity
+            eosSubtract totalQuantity cpuQuantity
                 |> removeSymbolIfExists
     in
     ( cpuQuantity, netQuantity )
