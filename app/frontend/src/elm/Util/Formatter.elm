@@ -3,6 +3,8 @@ module Util.Formatter exposing
     , assetSubtract
     , assetToFloat
     , deleteFromBack
+    , eosAdd
+    , eosSubtract
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
@@ -21,7 +23,7 @@ module Util.Formatter exposing
 import Date.Extra as Date
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Regex exposing (contains, regex, replace)
+import Regex exposing (contains, regex)
 import Round
 import Task
 import Time exposing (Time)
@@ -34,44 +36,48 @@ larimerToEos valInt =
     toFloat valInt * 0.0001
 
 
-floatToAsset : Float -> String
-floatToAsset valFloat =
-    Round.round 4 valFloat ++ " EOS"
+floatToAsset : Int -> String -> Float -> String
+floatToAsset precision symbol val =
+    Round.round precision val ++ " " ++ symbol
 
 
 removeSymbolIfExists : String -> String
 removeSymbolIfExists asset =
-    asset |> replace Regex.All (regex " EOS") (\_ -> "")
+    asset
+        |> String.split " "
+        |> List.head
+        |> Maybe.withDefault ""
 
 
 assetToFloat : String -> Float
-assetToFloat str =
-    let
-        result =
-            str
-                |> removeSymbolIfExists
-                |> String.toFloat
-    in
-    case result of
-        Ok val ->
-            val
-
-        Err _ ->
-            0
+assetToFloat =
+    removeSymbolIfExists
+        >> String.toFloat
+        >> Result.withDefault 0
 
 
-assetAdd : String -> String -> String
-assetAdd a b =
+assetAdd : String -> String -> Int -> String -> String
+assetAdd a b precision symbol =
     assetToFloat a
         + assetToFloat b
-        |> floatToAsset
+        |> floatToAsset precision symbol
 
 
-assetSubtract : String -> String -> String
-assetSubtract a b =
+eosAdd : String -> String -> String
+eosAdd a b =
+    assetAdd a b 4 "EOS"
+
+
+assetSubtract : String -> String -> Int -> String -> String
+assetSubtract a b precision symbol =
     assetToFloat a
         - assetToFloat b
-        |> floatToAsset
+        |> floatToAsset precision symbol
+
+
+eosSubtract : String -> String -> String
+eosSubtract a b =
+    assetSubtract a b 4 "EOS"
 
 
 
@@ -229,15 +235,14 @@ numberWithinDigitLimit digitLimit value =
 getDefaultAsset : Token -> String
 getDefaultAsset { symbol, precision } =
     let
-        helper addZeroCount asset =
-            case addZeroCount of
-                0 ->
-                    asset
+        base =
+            if precision == 0 then
+                "0"
 
-                _ ->
-                    helper (addZeroCount - 1) (asset ++ "0")
+            else
+                "0." ++ String.repeat precision "0"
     in
-    helper precision "0." ++ " " ++ symbol
+    base ++ " " ++ symbol
 
 
 getSymbolFromAsset : String -> Maybe String

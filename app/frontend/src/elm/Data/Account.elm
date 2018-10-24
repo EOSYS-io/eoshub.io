@@ -26,7 +26,7 @@ import Round
 import Util.Formatter
     exposing
         ( assetToFloat
-        , floatToAsset
+        , eosAdd
         , larimerToEos
         , percentageConverter
         , resourceUnitConverter
@@ -265,7 +265,7 @@ getTotalAmount coreLiquidBalance staked unstakingNetAmount unstakingCpuAmount =
 
 getUnstakingAmount : String -> String -> String
 getUnstakingAmount unstakingNetAmount unstakingCpuAmount =
-    floatToAsset (assetToFloat unstakingNetAmount + assetToFloat unstakingCpuAmount)
+    eosAdd unstakingNetAmount unstakingCpuAmount
 
 
 getResource : String -> Int -> Int -> Int -> ( String, String, String, String, Int )

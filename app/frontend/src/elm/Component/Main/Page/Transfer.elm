@@ -45,7 +45,14 @@ import Port
 import Regex
 import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Formatter exposing (assetToFloat, getDefaultAsset, getSymbolFromAsset, numberWithinDigitLimit)
+import Util.Formatter
+    exposing
+        ( assetToFloat
+        , floatToAsset
+        , getDefaultAsset
+        , getSymbolFromAsset
+        , numberWithinDigitLimit
+        )
 import Util.HttpRequest exposing (getAccount, getTableRows)
 import Util.Token exposing (Token, tokens)
 import Util.Validation as Validation
@@ -343,13 +350,9 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
                     { transfer
                         | from = accountName
                         , quantity =
-                            (transfer.quantity
-                                |> String.toFloat
-                                |> Result.withDefault 0
-                                |> Round.round token.precision
-                            )
-                                ++ " "
-                                ++ token.symbol
+                            transfer.quantity
+                                |> assetToFloat
+                                |> floatToAsset token.precision token.symbol
                     }
                         |> Action.Transfer token.contractAccount
                         |> encodeAction
@@ -441,9 +444,7 @@ setTransferMessageField field value ({ transfer, token, tokenBalance } as model)
 
                         else
                             tokenBalance
-                                |> Regex.replace Regex.All (Regex.regex (" " ++ token.symbol)) (\_ -> "")
-                                |> String.toFloat
-                                |> Result.withDefault 0
+                                |> assetToFloat
                 in
                 ( validateQuantityField { model | transfer = { transfer | quantity = value } } liquidAmount
                 , Cmd.none
