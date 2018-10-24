@@ -7,9 +7,6 @@ sudo: required
 git:
   submodules: false
 
-addons:
-  postgresql: "9.6"
-
 jobs:
   include:
     - stage: Test
@@ -21,6 +18,8 @@ jobs:
       services:
         - redis-server
         - postgresql
+      addons:
+        postgresql: "9.6"
       env:
         - RACK_ENV=test
         - RAILS_ENV=test
