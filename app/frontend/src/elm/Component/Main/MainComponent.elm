@@ -29,6 +29,7 @@ import Component.Main.Page.SearchKey as SearchKey
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
+import Data.Account exposing (Account, defaultAccount)
 import Html
     exposing
         ( Html
@@ -105,7 +106,7 @@ type alias Model =
 
 initModel : Location -> Model
 initModel location =
-    { page = location |> getPage
+    { page = location |> getPage defaultAccount
     , notification = Notification.initModel
     , header =
         { searchInput = ""
@@ -531,7 +532,7 @@ update message ({ page, notification, header, sidebar } as model) flags =
         ( OnLocationChange location newComponent, _ ) ->
             let
                 newPage =
-                    getPage location
+                    getPage sidebar.account location
 
                 newSelectedNav =
                     getPageNav location.pathname
@@ -635,8 +636,8 @@ subscriptions { page } =
 -- Utility functions
 
 
-getPage : Location -> Page
-getPage location =
+getPage : Account -> Location -> Page
+getPage account location =
     let
         route =
             location |> parseLocation
@@ -661,7 +662,7 @@ getPage location =
                     NotFoundPage
 
         VoteRoute ->
-            VotePage Vote.initModel
+            VotePage (Vote.initModel account)
 
         TransferRoute ->
             TransferPage Transfer.initModel
