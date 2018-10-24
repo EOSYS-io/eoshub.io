@@ -1,0 +1,475 @@
+// SCSS variables are information about icon's compiled state, stored under its original file name
+//
+// .icon-home {
+//   width: $icon-home-width;
+// }
+//
+// The large array-like variables contain all information about a single icon
+// $icon-home: x y offset_x offset_y width height total_width total_height image_path;
+//
+// At the bottom of this section, we provide information about the spritesheet itself
+// $spritesheet: width height image $spritesheet-sprites;
+$-a-d-e-name: 'ADE';
+$-a-d-e-x: 188px;
+$-a-d-e-y: 0px;
+$-a-d-e-offset-x: -188px;
+$-a-d-e-offset-y: 0px;
+$-a-d-e-width: 128px;
+$-a-d-e-height: 128px;
+$-a-d-e-total-width: 1068px;
+$-a-d-e-total-height: 1068px;
+$-a-d-e-image: '../image/token-list.png';
+$-a-d-e: (188px, 0px, -188px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ADE', );
+$-a-t-d-name: 'ATD';
+$-a-t-d-x: 752px;
+$-a-t-d-y: 376px;
+$-a-t-d-offset-x: -752px;
+$-a-t-d-offset-y: -376px;
+$-a-t-d-width: 128px;
+$-a-t-d-height: 128px;
+$-a-t-d-total-width: 1068px;
+$-a-t-d-total-height: 1068px;
+$-a-t-d-image: '../image/token-list.png';
+$-a-t-d: (752px, 376px, -752px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ATD', );
+$-a-t-m-o-s-name: 'ATMOS';
+$-a-t-m-o-s-x: 0px;
+$-a-t-m-o-s-y: 188px;
+$-a-t-m-o-s-offset-x: 0px;
+$-a-t-m-o-s-offset-y: -188px;
+$-a-t-m-o-s-width: 128px;
+$-a-t-m-o-s-height: 128px;
+$-a-t-m-o-s-total-width: 1068px;
+$-a-t-m-o-s-total-height: 1068px;
+$-a-t-m-o-s-image: '../image/token-list.png';
+$-a-t-m-o-s: (0px, 188px, 0px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ATMOS', );
+$-b-e-a-n-name: 'BEAN';
+$-b-e-a-n-x: 188px;
+$-b-e-a-n-y: 188px;
+$-b-e-a-n-offset-x: -188px;
+$-b-e-a-n-offset-y: -188px;
+$-b-e-a-n-width: 128px;
+$-b-e-a-n-height: 128px;
+$-b-e-a-n-total-width: 1068px;
+$-b-e-a-n-total-height: 1068px;
+$-b-e-a-n-image: '../image/token-list.png';
+$-b-e-a-n: (188px, 188px, -188px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'BEAN', );
+$-b-e-t-name: 'BET';
+$-b-e-t-x: 376px;
+$-b-e-t-y: 0px;
+$-b-e-t-offset-x: -376px;
+$-b-e-t-offset-y: 0px;
+$-b-e-t-width: 128px;
+$-b-e-t-height: 128px;
+$-b-e-t-total-width: 1068px;
+$-b-e-t-total-height: 1068px;
+$-b-e-t-image: '../image/token-list.png';
+$-b-e-t: (376px, 0px, -376px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'BET', );
+$-b-l-a-c-k-name: 'BLACK';
+$-b-l-a-c-k-x: 376px;
+$-b-l-a-c-k-y: 188px;
+$-b-l-a-c-k-offset-x: -376px;
+$-b-l-a-c-k-offset-y: -188px;
+$-b-l-a-c-k-width: 128px;
+$-b-l-a-c-k-height: 128px;
+$-b-l-a-c-k-total-width: 1068px;
+$-b-l-a-c-k-total-height: 1068px;
+$-b-l-a-c-k-image: '../image/token-list.png';
+$-b-l-a-c-k: (376px, 188px, -376px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'BLACK', );
+$-b-t-c-name: 'BTC';
+$-b-t-c-x: 0px;
+$-b-t-c-y: 376px;
+$-b-t-c-offset-x: 0px;
+$-b-t-c-offset-y: -376px;
+$-b-t-c-width: 128px;
+$-b-t-c-height: 128px;
+$-b-t-c-total-width: 1068px;
+$-b-t-c-total-height: 1068px;
+$-b-t-c-image: '../image/token-list.png';
+$-b-t-c: (0px, 376px, 0px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'BTC', );
+$-c-e-t-name: 'CET';
+$-c-e-t-x: 188px;
+$-c-e-t-y: 376px;
+$-c-e-t-offset-x: -188px;
+$-c-e-t-offset-y: -376px;
+$-c-e-t-width: 128px;
+$-c-e-t-height: 128px;
+$-c-e-t-total-width: 1068px;
+$-c-e-t-total-height: 1068px;
+$-c-e-t-image: '../image/token-list.png';
+$-c-e-t: (188px, 376px, -188px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'CET', );
+$-c-h-l-name: 'CHL';
+$-c-h-l-x: 376px;
+$-c-h-l-y: 376px;
+$-c-h-l-offset-x: -376px;
+$-c-h-l-offset-y: -376px;
+$-c-h-l-width: 128px;
+$-c-h-l-height: 128px;
+$-c-h-l-total-width: 1068px;
+$-c-h-l-total-height: 1068px;
+$-c-h-l-image: '../image/token-list.png';
+$-c-h-l: (376px, 376px, -376px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'CHL', );
+$-d-a-b-name: 'DAB';
+$-d-a-b-x: 564px;
+$-d-a-b-y: 0px;
+$-d-a-b-offset-x: -564px;
+$-d-a-b-offset-y: 0px;
+$-d-a-b-width: 128px;
+$-d-a-b-height: 128px;
+$-d-a-b-total-width: 1068px;
+$-d-a-b-total-height: 1068px;
+$-d-a-b-image: '../image/token-list.png';
+$-d-a-b: (564px, 0px, -564px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'DAB', );
+$-d-e-o-s-name: 'DEOS';
+$-d-e-o-s-x: 564px;
+$-d-e-o-s-y: 188px;
+$-d-e-o-s-offset-x: -564px;
+$-d-e-o-s-offset-y: -188px;
+$-d-e-o-s-width: 128px;
+$-d-e-o-s-height: 128px;
+$-d-e-o-s-total-width: 1068px;
+$-d-e-o-s-total-height: 1068px;
+$-d-e-o-s-image: '../image/token-list.png';
+$-d-e-o-s: (564px, 188px, -564px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'DEOS', );
+$-d-i-c-e-name: 'DICE';
+$-d-i-c-e-x: 564px;
+$-d-i-c-e-y: 376px;
+$-d-i-c-e-offset-x: -564px;
+$-d-i-c-e-offset-y: -376px;
+$-d-i-c-e-width: 128px;
+$-d-i-c-e-height: 128px;
+$-d-i-c-e-total-width: 1068px;
+$-d-i-c-e-total-height: 1068px;
+$-d-i-c-e-image: '../image/token-list.png';
+$-d-i-c-e: (564px, 376px, -564px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'DICE', );
+$-d-o-g-e-name: 'DOGE';
+$-d-o-g-e-x: 0px;
+$-d-o-g-e-y: 564px;
+$-d-o-g-e-offset-x: 0px;
+$-d-o-g-e-offset-y: -564px;
+$-d-o-g-e-width: 128px;
+$-d-o-g-e-height: 128px;
+$-d-o-g-e-total-width: 1068px;
+$-d-o-g-e-total-height: 1068px;
+$-d-o-g-e-image: '../image/token-list.png';
+$-d-o-g-e: (0px, 564px, 0px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'DOGE', );
+$-e-d-n-a-name: 'EDNA';
+$-e-d-n-a-x: 188px;
+$-e-d-n-a-y: 564px;
+$-e-d-n-a-offset-x: -188px;
+$-e-d-n-a-offset-y: -564px;
+$-e-d-n-a-width: 128px;
+$-e-d-n-a-height: 128px;
+$-e-d-n-a-total-width: 1068px;
+$-e-d-n-a-total-height: 1068px;
+$-e-d-n-a-image: '../image/token-list.png';
+$-e-d-n-a: (188px, 564px, -188px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'EDNA', );
+$-e-o-s-name: 'EOS';
+$-e-o-s-x: 376px;
+$-e-o-s-y: 564px;
+$-e-o-s-offset-x: -376px;
+$-e-o-s-offset-y: -564px;
+$-e-o-s-width: 128px;
+$-e-o-s-height: 128px;
+$-e-o-s-total-width: 1068px;
+$-e-o-s-total-height: 1068px;
+$-e-o-s-image: '../image/token-list.png';
+$-e-o-s: (376px, 564px, -376px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'EOS', );
+$-e-o-s-d-a-c-name: 'EOSDAC';
+$-e-o-s-d-a-c-x: 564px;
+$-e-o-s-d-a-c-y: 564px;
+$-e-o-s-d-a-c-offset-x: -564px;
+$-e-o-s-d-a-c-offset-y: -564px;
+$-e-o-s-d-a-c-width: 128px;
+$-e-o-s-d-a-c-height: 128px;
+$-e-o-s-d-a-c-total-width: 1068px;
+$-e-o-s-d-a-c-total-height: 1068px;
+$-e-o-s-d-a-c-image: '../image/token-list.png';
+$-e-o-s-d-a-c: (564px, 564px, -564px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'EOSDAC', );
+$-e-o-x-name: 'EOX';
+$-e-o-x-x: 752px;
+$-e-o-x-y: 0px;
+$-e-o-x-offset-x: -752px;
+$-e-o-x-offset-y: 0px;
+$-e-o-x-width: 128px;
+$-e-o-x-height: 128px;
+$-e-o-x-total-width: 1068px;
+$-e-o-x-total-height: 1068px;
+$-e-o-x-image: '../image/token-list.png';
+$-e-o-x: (752px, 0px, -752px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'EOX', );
+$-e-s-b-name: 'ESB';
+$-e-s-b-x: 752px;
+$-e-s-b-y: 188px;
+$-e-s-b-offset-x: -752px;
+$-e-s-b-offset-y: -188px;
+$-e-s-b-width: 128px;
+$-e-s-b-height: 128px;
+$-e-s-b-total-width: 1068px;
+$-e-s-b-total-height: 1068px;
+$-e-s-b-image: '../image/token-list.png';
+$-e-s-b: (752px, 188px, -752px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ESB', );
+$-e-t-h-name: 'ETH';
+$-e-t-h-x: 0px;
+$-e-t-h-y: 0px;
+$-e-t-h-offset-x: 0px;
+$-e-t-h-offset-y: 0px;
+$-e-t-h-width: 128px;
+$-e-t-h-height: 128px;
+$-e-t-h-total-width: 1068px;
+$-e-t-h-total-height: 1068px;
+$-e-t-h-image: '../image/token-list.png';
+$-e-t-h: (0px, 0px, 0px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ETH', );
+$-e-v-r-name: 'EVR';
+$-e-v-r-x: 752px;
+$-e-v-r-y: 564px;
+$-e-v-r-offset-x: -752px;
+$-e-v-r-offset-y: -564px;
+$-e-v-r-width: 128px;
+$-e-v-r-height: 128px;
+$-e-v-r-total-width: 1068px;
+$-e-v-r-total-height: 1068px;
+$-e-v-r-image: '../image/token-list.png';
+$-e-v-r: (752px, 564px, -752px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'EVR', );
+$-h-o-r-u-s-name: 'HORUS';
+$-h-o-r-u-s-x: 0px;
+$-h-o-r-u-s-y: 752px;
+$-h-o-r-u-s-offset-x: 0px;
+$-h-o-r-u-s-offset-y: -752px;
+$-h-o-r-u-s-width: 128px;
+$-h-o-r-u-s-height: 128px;
+$-h-o-r-u-s-total-width: 1068px;
+$-h-o-r-u-s-total-height: 1068px;
+$-h-o-r-u-s-image: '../image/token-list.png';
+$-h-o-r-u-s: (0px, 752px, 0px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'HORUS', );
+$-i-n-f-name: 'INF';
+$-i-n-f-x: 188px;
+$-i-n-f-y: 752px;
+$-i-n-f-offset-x: -188px;
+$-i-n-f-offset-y: -752px;
+$-i-n-f-width: 128px;
+$-i-n-f-height: 128px;
+$-i-n-f-total-width: 1068px;
+$-i-n-f-total-height: 1068px;
+$-i-n-f-image: '../image/token-list.png';
+$-i-n-f: (188px, 752px, -188px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'INF', );
+$-i-q-name: 'IQ';
+$-i-q-x: 376px;
+$-i-q-y: 752px;
+$-i-q-offset-x: -376px;
+$-i-q-offset-y: -752px;
+$-i-q-width: 128px;
+$-i-q-height: 128px;
+$-i-q-total-width: 1068px;
+$-i-q-total-height: 1068px;
+$-i-q-image: '../image/token-list.png';
+$-i-q: (376px, 752px, -376px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'IQ', );
+$-i-r-e-s-p-o-name: 'IRESPO';
+$-i-r-e-s-p-o-x: 564px;
+$-i-r-e-s-p-o-y: 752px;
+$-i-r-e-s-p-o-offset-x: -564px;
+$-i-r-e-s-p-o-offset-y: -752px;
+$-i-r-e-s-p-o-width: 128px;
+$-i-r-e-s-p-o-height: 128px;
+$-i-r-e-s-p-o-total-width: 1068px;
+$-i-r-e-s-p-o-total-height: 1068px;
+$-i-r-e-s-p-o-image: '../image/token-list.png';
+$-i-r-e-s-p-o: (564px, 752px, -564px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'IRESPO', );
+$-k-a-r-m-a-name: 'KARMA';
+$-k-a-r-m-a-x: 752px;
+$-k-a-r-m-a-y: 752px;
+$-k-a-r-m-a-offset-x: -752px;
+$-k-a-r-m-a-offset-y: -752px;
+$-k-a-r-m-a-width: 128px;
+$-k-a-r-m-a-height: 128px;
+$-k-a-r-m-a-total-width: 1068px;
+$-k-a-r-m-a-total-height: 1068px;
+$-k-a-r-m-a-image: '../image/token-list.png';
+$-k-a-r-m-a: (752px, 752px, -752px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'KARMA', );
+$-l-l-g-name: 'LLG';
+$-l-l-g-x: 940px;
+$-l-l-g-y: 0px;
+$-l-l-g-offset-x: -940px;
+$-l-l-g-offset-y: 0px;
+$-l-l-g-width: 128px;
+$-l-l-g-height: 128px;
+$-l-l-g-total-width: 1068px;
+$-l-l-g-total-height: 1068px;
+$-l-l-g-image: '../image/token-list.png';
+$-l-l-g: (940px, 0px, -940px, 0px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'LLG', );
+$-m-e-e-t-o-n-e-name: 'MEETONE';
+$-m-e-e-t-o-n-e-x: 940px;
+$-m-e-e-t-o-n-e-y: 188px;
+$-m-e-e-t-o-n-e-offset-x: -940px;
+$-m-e-e-t-o-n-e-offset-y: -188px;
+$-m-e-e-t-o-n-e-width: 128px;
+$-m-e-e-t-o-n-e-height: 128px;
+$-m-e-e-t-o-n-e-total-width: 1068px;
+$-m-e-e-t-o-n-e-total-height: 1068px;
+$-m-e-e-t-o-n-e-image: '../image/token-list.png';
+$-m-e-e-t-o-n-e: (940px, 188px, -940px, -188px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'MEETONE', );
+$-o-c-t-name: 'OCT';
+$-o-c-t-x: 940px;
+$-o-c-t-y: 376px;
+$-o-c-t-offset-x: -940px;
+$-o-c-t-offset-y: -376px;
+$-o-c-t-width: 128px;
+$-o-c-t-height: 128px;
+$-o-c-t-total-width: 1068px;
+$-o-c-t-total-height: 1068px;
+$-o-c-t-image: '../image/token-list.png';
+$-o-c-t: (940px, 376px, -940px, -376px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'OCT', );
+$-p-o-o-r-name: 'POOR';
+$-p-o-o-r-x: 940px;
+$-p-o-o-r-y: 564px;
+$-p-o-o-r-offset-x: -940px;
+$-p-o-o-r-offset-y: -564px;
+$-p-o-o-r-width: 128px;
+$-p-o-o-r-height: 128px;
+$-p-o-o-r-total-width: 1068px;
+$-p-o-o-r-total-height: 1068px;
+$-p-o-o-r-image: '../image/token-list.png';
+$-p-o-o-r: (940px, 564px, -940px, -564px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'POOR', );
+$-p-s-o-name: 'PSO';
+$-p-s-o-x: 940px;
+$-p-s-o-y: 752px;
+$-p-s-o-offset-x: -940px;
+$-p-s-o-offset-y: -752px;
+$-p-s-o-width: 128px;
+$-p-s-o-height: 128px;
+$-p-s-o-total-width: 1068px;
+$-p-s-o-total-height: 1068px;
+$-p-s-o-image: '../image/token-list.png';
+$-p-s-o: (940px, 752px, -940px, -752px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'PSO', );
+$-p-u-b-name: 'PUB';
+$-p-u-b-x: 0px;
+$-p-u-b-y: 940px;
+$-p-u-b-offset-x: 0px;
+$-p-u-b-offset-y: -940px;
+$-p-u-b-width: 128px;
+$-p-u-b-height: 128px;
+$-p-u-b-total-width: 1068px;
+$-p-u-b-total-height: 1068px;
+$-p-u-b-image: '../image/token-list.png';
+$-p-u-b: (0px, 940px, 0px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'PUB', );
+$-r-i-d-l-name: 'RIDL';
+$-r-i-d-l-x: 188px;
+$-r-i-d-l-y: 940px;
+$-r-i-d-l-offset-x: -188px;
+$-r-i-d-l-offset-y: -940px;
+$-r-i-d-l-width: 128px;
+$-r-i-d-l-height: 128px;
+$-r-i-d-l-total-width: 1068px;
+$-r-i-d-l-total-height: 1068px;
+$-r-i-d-l-image: '../image/token-list.png';
+$-r-i-d-l: (188px, 940px, -188px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'RIDL', );
+$-t-r-y-b-e-name: 'TRYBE';
+$-t-r-y-b-e-x: 376px;
+$-t-r-y-b-e-y: 940px;
+$-t-r-y-b-e-offset-x: -376px;
+$-t-r-y-b-e-offset-y: -940px;
+$-t-r-y-b-e-width: 128px;
+$-t-r-y-b-e-height: 128px;
+$-t-r-y-b-e-total-width: 1068px;
+$-t-r-y-b-e-total-height: 1068px;
+$-t-r-y-b-e-image: '../image/token-list.png';
+$-t-r-y-b-e: (376px, 940px, -376px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'TRYBE', );
+$-w-e-c-a-s-h-name: 'WECASH';
+$-w-e-c-a-s-h-x: 564px;
+$-w-e-c-a-s-h-y: 940px;
+$-w-e-c-a-s-h-offset-x: -564px;
+$-w-e-c-a-s-h-offset-y: -940px;
+$-w-e-c-a-s-h-width: 128px;
+$-w-e-c-a-s-h-height: 128px;
+$-w-e-c-a-s-h-total-width: 1068px;
+$-w-e-c-a-s-h-total-height: 1068px;
+$-w-e-c-a-s-h-image: '../image/token-list.png';
+$-w-e-c-a-s-h: (564px, 940px, -564px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'WECASH', );
+$-w-i-z-z-name: 'WIZZ';
+$-w-i-z-z-x: 752px;
+$-w-i-z-z-y: 940px;
+$-w-i-z-z-offset-x: -752px;
+$-w-i-z-z-offset-y: -940px;
+$-w-i-z-z-width: 128px;
+$-w-i-z-z-height: 128px;
+$-w-i-z-z-total-width: 1068px;
+$-w-i-z-z-total-height: 1068px;
+$-w-i-z-z-image: '../image/token-list.png';
+$-w-i-z-z: (752px, 940px, -752px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'WIZZ', );
+$-z-k-s-name: 'ZKS';
+$-z-k-s-x: 940px;
+$-z-k-s-y: 940px;
+$-z-k-s-offset-x: -940px;
+$-z-k-s-offset-y: -940px;
+$-z-k-s-width: 128px;
+$-z-k-s-height: 128px;
+$-z-k-s-total-width: 1068px;
+$-z-k-s-total-height: 1068px;
+$-z-k-s-image: '../image/token-list.png';
+$-z-k-s: (940px, 940px, -940px, -940px, 128px, 128px, 1068px, 1068px, '../image/token-list.png', 'ZKS', );
+$spritesheet-width: 1068px;
+$spritesheet-height: 1068px;
+$spritesheet-image: '../image/token-list.png';
+$spritesheet-sprites: ($-a-d-e, $-a-t-d, $-a-t-m-o-s, $-b-e-a-n, $-b-e-t, $-b-l-a-c-k, $-b-t-c, $-c-e-t, $-c-h-l, $-d-a-b, $-d-e-o-s, $-d-i-c-e, $-d-o-g-e, $-e-d-n-a, $-e-o-s, $-e-o-s-d-a-c, $-e-o-x, $-e-s-b, $-e-t-h, $-e-v-r, $-h-o-r-u-s, $-i-n-f, $-i-q, $-i-r-e-s-p-o, $-k-a-r-m-a, $-l-l-g, $-m-e-e-t-o-n-e, $-o-c-t, $-p-o-o-r, $-p-s-o, $-p-u-b, $-r-i-d-l, $-t-r-y-b-e, $-w-e-c-a-s-h, $-w-i-z-z, $-z-k-s, );
+$spritesheet: (1068px, 1068px, '../image/token-list.png', $spritesheet-sprites, );
+
+// The provided mixins are intended to be used with the array-like variables
+//
+// .icon-home {
+//   @include sprite-width($icon-home);
+// }
+//
+// .icon-email {
+//   @include sprite($icon-email);
+// }
+//
+// Example usage in HTML:
+//
+// `display: block` sprite:
+// <div class="icon-home"></div>
+//
+// To change `display` (e.g. `display: inline-block;`), we suggest using a common CSS class:
+//
+// // CSS
+// .icon {
+//   display: inline-block;
+// }
+//
+// // HTML
+// <i class="icon icon-home"></i>
+@mixin sprite-width($sprite) {
+  width: nth($sprite, 5);
+}
+
+@mixin sprite-height($sprite) {
+  height: nth($sprite, 6);
+}
+
+@mixin sprite-position($sprite) {
+  $sprite-offset-x: nth($sprite, 3);
+  $sprite-offset-y: nth($sprite, 4);
+  background-position: $sprite-offset-x  $sprite-offset-y;
+}
+
+@mixin sprite-image($sprite) {
+  $sprite-image: nth($sprite, 9);
+  background-image: url(#{$sprite-image});
+}
+
+@mixin sprite($sprite) {
+  @include sprite-image($sprite);
+  @include sprite-position($sprite);
+  @include sprite-width($sprite);
+  @include sprite-height($sprite);
+}
+
+// The `sprites` mixin generates identical output to the CSS template
+//   but can be overridden inside of SCSS
+//
+// @include sprites($spritesheet-sprites);
+@mixin sprites($sprites) {
+  @each $sprite in $sprites {
+    $sprite-name: nth($sprite, 10);
+    .#{$sprite-name} {
+      @include sprite($sprite);
+    }
+  }
+}

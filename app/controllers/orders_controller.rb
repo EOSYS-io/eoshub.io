@@ -45,7 +45,7 @@ class OrdersController < ApplicationController
         'Authorization' => "PLKEY #{Rails.application.credentials.dig(Rails.env.to_sym, :payletter_payment_api_key)}"
       },
       body: JSON.generate(payment_params),
-      timeout: 3
+      timeout: 5
     ).run
 
     raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
@@ -101,7 +101,8 @@ class OrdersController < ApplicationController
     eos_account = order.eos_account
     raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(eos_account)
 
-    response = request_eos_account_creation(eos_account, public_key)
+    creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_order)
+    response = request_eos_account_creation(creator_eos_account, eos_account, public_key)
     if response.code == 200
       order.delivered!
       render json: { eos_account: eos_account, public_key: public_key }, status: :ok
@@ -109,6 +110,8 @@ class OrdersController < ApplicationController
       render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
     elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
       render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
+    elsif response.code == 500 && JSON.parse(response.body).dig('error', 'code') == 3050003
+      render json: { message: I18n.t('users.not_enough_balance') }, status: response.code
     else
       render json: response.body, status: response.code
     end

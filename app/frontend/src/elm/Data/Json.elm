@@ -132,6 +132,9 @@ type alias Product =
     , name : String
     , price : Int
     , eventActivation : Bool
+    , cpu : Float
+    , net : Float
+    , ram : Int
     }
 
 
@@ -142,6 +145,9 @@ initProduct =
     , name = ""
     , price = 0
     , eventActivation = False
+    , cpu = 0.0
+    , net = 0.0
+    , ram = 0
     }
 
 
@@ -153,6 +159,9 @@ productDecoder =
         |> required "name" Decode.string
         |> required "price" Decode.int
         |> required "event_activation" Decode.bool
+        |> required "cpu" Decode.float
+        |> required "net" Decode.float
+        |> required "ram" Decode.int
 
 
 type alias CreateEosAccountResponse =

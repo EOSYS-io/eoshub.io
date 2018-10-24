@@ -79,7 +79,11 @@ Rails.application.configure do
     authentication:       'plain',
     enable_starttls_auto: true
   }
-  config.action_mailer.default_url_options = { host: 'eoshub.io', port: 443 }
+  config.action_mailer.default_url_options = { protocol: 'https', :host => 'eoshub.io' }
+
+  config.to_prepare { Admin::AdminUsers::SessionsController.force_ssl }
+  config.to_prepare { Devise::RegistrationsController.force_ssl }
+  config.to_prepare { Devise::PasswordsController.force_ssl }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

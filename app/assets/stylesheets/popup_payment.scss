@@ -1046,22 +1046,12 @@ $browser_min_width:1260px;
 $browser_min_height:580px;
 
 // --------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------
-// --------------------------------------------------------------------------------
-
-section.modal.popup {
-	transition:left 0.4s;
-}
-
-
-aside.shrink ~ .modal.popup,
-aside.shrink ~ main .modal.popup {
-	left:0;
-}
-
-// --------------------------------------------------------------------------------
 // modal popup
 // --------------------------------------------------------------------------------
+body {
+	overflow:hidden;
+}
+
 .modal.popup {
 	position:fixed;
 	background-color: rgba(0, 0, 0, 0.64);
@@ -1069,22 +1059,9 @@ aside.shrink ~ main .modal.popup {
 	top:0;
 	right:0;
 	bottom:0;
-
-	@include media ('>1600px') {
-		left:calc(300px + #{$lnb_width});
-	}
-	@include media ('>1280px','<=1600px') {
-		left:calc(18.75vw + #{$lnb_width});
-	}
-	@include media ('<=1280px') {
-		left:calc(240px + #{$lnb_width});
-	}
+	left:0;
 
 	// 가입 프로세스
-	main.join + & {
-		left:0;
-	}
-
 	p {
 		line-height:1.6;
 
@@ -1096,34 +1073,11 @@ aside.shrink ~ main .modal.popup {
 	}
 
 	// superset
-	span.validate.description {
-		font-size: $small;
-		line-height:20px;
-		height: 20px;
-		background-size: 20px;
-		padding-left: 28px;
-		display: block;
-		visibility: hidden;
-
-		&.true {
-			visibility: visible;
-			color: #ff6b64;
-			background: url('../image/icon-x-circle.svg') left center no-repeat;
-		}
-
-		&.false {
-			visibility: visible;
-			color: #79c720;
-			background: url('../image/icon-check-circle.svg') left center no-repeat;
-		}
-	}
-
 	.wrapper {
+		top:50%;
 		background-color:$x-dark-gray;
 
 		position:absolute;
-		top:calc(50% + 61px/2);
-		// top:calc(#{$header_height} + 61px + 100px);		// 대충 중간...
 		left:50%;
 		min-width:386px;
 		width:30.15625%;
@@ -1133,70 +1087,15 @@ aside.shrink ~ main .modal.popup {
 		padding:32px 0;
 		box-sizing:border-box;
 		z-index:100;
-	}
+		transform:translate(-50%, -50%);
 
-	//layout for scroll area
-	.wrapper {
 		h2 {
 			margin-left:32px;
 			+ p {
 				margin-left:32px;
 			}
 		}
-
-		form {
-			margin-left:32px;
-			margin-right:27px;
-		}
 	}
-
-	form {
-		margin-top:32px;
-		margin-bottom:24px;
-		border-radius:4px;
-		background:$xx-dark-gray;
-
-		display:flex;
-		align-items:center;
-		padding:12px 16px;
-
-		input,button {
-			height:20px;
-		}
-
-		input {
-			flex:1;
-			font-size:inherit;
-			padding-left:32px;
-			outline:0;
-			color:#fff;
-			background-color:transparent;
-			background-position:left center;
-			background-repeat:no-repeat;
-			background-size:20px;
-
-			&.search_token {
-				background-image:url('../image/icon-search.svg');
-			}
-
-			&.user {
-				background-image:url('../image/icon-id-default.svg#lignt-gray');
-			}
-		}
-
-		button {
-			color:$white;
-			font-size:$small;
-		}
-
-	}
-
-	.result.list {
-		height:350px;
-		overflow-x:hidden;
-		overflow:auto;
-	 }
-
 
 	button.close {
 		position:absolute;
@@ -1208,7 +1107,7 @@ aside.shrink ~ main .modal.popup {
 
 		@include ir();
 
-		background:url('../image/icon-close-popup.svg') center center no-repeat transparent;
+		background:url('icon-close-popup.svg') center center no-repeat transparent;
 		background-size:contain;
 		outline:0;
 
@@ -1218,167 +1117,45 @@ aside.shrink ~ main .modal.popup {
 			transform:scale(1.2);
 		}
 	}
-
-	//custom scrollbar
-	.result.list {
-		$scrollbar_width:5px;
-		$padding_right:11px;
-
-		margin-left:32px;
-		margin-right:calc(32px - #{$scrollbar_width} - #{$padding-right});
-		padding-right:$padding_right;
-
-		&::-webkit-scrollbar {
-			width: $scrollbar_width;
-		}
-
-		&::-webkit-scrollbar-track {
-			background: transparent;
-		}
-
-		&::-webkit-scrollbar-thumb {
-			border-radius:$scrollbar_width;
-			background: #666;
-		}
-
-		// &::-webkit-scrollbar-button {
-		// 	background: #666;
-		// 	height: 15px;
-		// 	border-radius: 50%;
-		// }
-	}
-
-
-	// interaction
-	visibility:hidden;
-	opacity:0;
-	transition:opacity 0.4s;
-
-	.wrapper {
-		transition:transform 0.4s;
-		transform:translate(-50%, -60%);
-	}
-
-	&.viewing {
-		opacity:1;
-		visibility:visible;
-
-		.wrapper {
-			transform:translate(-50%, -50%);
-		}
-	}
-
-	.token.status {
-		padding:32px;
-		background-color:$xxx-dark-gray;
-		position:relative;
-
-		h3 {
-			font-size:$small;
-			strong {
-				display:block;
-				margin-top:8px;
-				font-weight:100;
-				font-size:$xx-large;
-			}
-		}
-
-		button.auto.set {
-			position:absolute;
-			right:32px;
-			top:32px;
-
-			padding-right:26px;
-
-			&:after {
-				content:'';
-				display:block;
-				width:22px;
-				height:22px;
-
-				position:absolute;
-				top:50%;
-				right:0;
-				margin-top:-11px;
-				background:url('../image/icon-refresh.svg') right center no-repeat;
-
-				transition:transform 1s, color 1s;
-			}
-
-			&:hover {
-				color:$white;
-				&:after {
-					transform:rotate(180deg);
-				}
-			}
-		}
-	}
-
-	.result.list {
-		ul,li,p {
-			margin:0;
-			padding:0;
-			list-style-type:none;
-		}
-
-		li {
-			font-size:$x-small;
-			background-color:$xxx-dark-gray;
-			padding:16px;
-			position:relative;
-
-			h3 {
-				margin-bottom:8px;
-			}
-
-			p {
-				line-height:1.5;
-			}
-
-			button {
-				color:$red;
-				position:absolute;
-				right:16px;
-				top:50%;
-				transform:translateY(-50%);
-			}
-
-			margin-top:8px;
-			&:first-child {
-				margin-top:0;
-			}
-		}
-
-	}
 }
 
 // for payment (ruby)
-body > .modal.popup.virtual_account_check {
-	left:0 !important;
-	> .wrapper {
-		top:50%;
-	}
-}
 
+// virtual account deposit
+.modal.popup.virtual_account_check {
 
-.modal.popup.rental_account.cancel {
 	.wrapper {
-		padding-top:0;
 		background-color:$xx-dark-gray;
 	}
 
-	.token.status + h3 {
+	dl {
+		margin: 32px;
+		background-color:$xxx-dark-gray;
+		display:grid;
+		grid-template-columns:50% 50%;
+		padding:12px 24px;
 		font-size:$small;
-		margin-left:32px;
-		margin-top:24px;
+
+		* {
+			padding:6px 0;
+		}
+
+		dt {
+			color:$white;
+			text-align:left;
+		}
+		dd {
+			text-align:right;
+			word-break:break-all;
+		}
 	}
 
-	form {
-		margin-top:16px;
-		margin-bottom:16px;
-		background-color:$x-dark-gray;
+	dl + .btn_area {
+		margin:16px 32px;
+		display:flex;
+		button {
+			flex:1;
+		}
 	}
 }
 // type case
-
-

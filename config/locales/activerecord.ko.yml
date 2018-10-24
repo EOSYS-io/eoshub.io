@@ -26,6 +26,9 @@ ko:
         name: '상품명'
         price: '가격'
         active: '활성화'
+        cpu: 'CPU'
+        net: 'NET'
+        ram: 'RAM'
       order:
         <<: *commons
         pgcode: '결제 방식'

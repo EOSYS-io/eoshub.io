@@ -105,7 +105,7 @@ aside.shrink ~ main .modal.popup {
 
 		form {
 			margin-left:32px;
-			margin-right:32px;
+			margin-right:27px;
 		}
 	}
 
@@ -154,46 +154,6 @@ aside.shrink ~ main .modal.popup {
 		height:350px;
 		overflow-x:hidden;
 		overflow:auto;
-
-
-		// case :: tokenlist in transfer
-		.tokenlist & button {
-			width:100%;
-
-			display:flex;
-			align-items:center;
-			background-color:$xx-dark-gray;
-
-			margin-top:4px;
-			padding:20px;
-
-			text-align:initial;
-			font-size:$small;
-
-			outline:0;
-
-			img {
-				background-color:$gray;
-				border-radius:100%;
-				width:100%;
-				max-width:32px;
-				max-height:32px;
-			}
-
-			span {
-				margin-left:12px;
-			}
-
-			strong {
-				font-size:$normal;
-				color:$white;
-				display:block;
-			}
-
-			&:first-child {
-				margin-top:0;
-			}
-		}
 	 }
 
 
@@ -347,8 +307,80 @@ aside.shrink ~ main .modal.popup {
 				margin-top:0;
 			}
 		}
+
 	}
 }
+
+// for payment (ruby)
+body > .modal.popup.virtual_account_check {
+	left:0 !important;
+	> .wrapper {
+		top:50%;
+	}
+}
+
+
+.modal.popup.rental_account.cancel {
+	.wrapper {
+		padding-top:0;
+		background-color:$xx-dark-gray;
+	}
+
+	.token.status + h3 {
+		font-size:$small;
+		margin-left:32px;
+		margin-top:24px;
+	}
+
+	form {
+		margin-top:16px;
+		margin-bottom:16px;
+		background-color:$x-dark-gray;
+	}
+}
+
+// virtual account deposit
+.modal.popup.virtual_account_check {
+
+	.wrapper {
+		background-color:$xx-dark-gray;
+	}
+	dl {
+		margin: 32px;
+		background-color:$xxx-dark-gray;
+		display:grid;
+		grid-template-columns:50% 50%;
+		padding:12px 24px;
+		font-size:$small;
+
+		* {
+			padding:6px 0;
+		}
+		dt {
+			color:$white;
+			text-align:left;
+		}
+		dd {
+			text-align:right;
+			word-break:break-all;
+		}
+	}
+
+	dl + .btn_area {
+		margin:16px 32px;
+		display:flex;
+		button {
+			flex:1;
+			&:first-child {
+				margin-right:8px;
+			}
+		}
+	}
+}
+// type case
+
+
+
 
 
 
@@ -543,70 +575,96 @@ aside.shrink ~ main .modal.popup {
 
 }
 
-.modal.popup.virtual_account_check {
 
+.modal.popup.tokenlist {
 	.wrapper {
 		background-color:$xx-dark-gray;
 	}
-	dl {
-		margin: 32px;
-		background-color:$xxx-dark-gray;
-		display:grid;
-		grid-template-columns:50% 50%;
-		padding:12px 24px;
-		font-size:$small;
 
-		* {
-			padding:6px 0;
-		}
-		dt {
-			color:$white;
-			text-align:left;
-		}
-		dd {
-			text-align:right;
-			word-break:break-all;
-		}
+	form {
+		background-color:$xxx-dark-gray;
 	}
 
-	dl + .btn_area {
-		margin:16px 32px;
-		display:flex;
-		button {
-			flex:1;
-			&:first-child {
-				margin-right:8px;
+	.result.list {
+		> button {
+			text-align:left;
+			font-size:$x-small;
+			background-color:$xxx-dark-gray;
+			padding:20px 64px;
+			position:relative;
+			width:100%;
+			box-sizing:border-box;
+			margin-bottom:5px;
+			&:last-child {
+				margin-bottom:0;
+			}
+
+			span {
+				display:block;
+
+				strong {
+					font-size:$normal;
+					font-weight:400;
+					color:$white;
+					display:block;
+				}
+			}
+
+			&.token:before {
+				content:'';
+				position:absolute;
+				top:50%;
+				left:20px;
+				display:block;
+				border-radius:100%;
+				transform:translateY(-50%);
+				transform-origin:left center;
+				background-image:url('../image/icon-eos.png');
+				background-position:center center;
+				background-repeat:no-repeat;
+				width:32px;
+				height:32px;
+				background-color:#443f54;
+			}
+
+			@mixin sprites-token($sprites) {
+				@each $sprite in $sprites {
+					$sprite-name: nth($sprite, 10);
+
+					&.#{$sprite-name}:before {
+						display:none;
+					}
+					&.#{$sprite-name}:after {
+						@include sprite($sprite);
+						content:'';
+						position:absolute;
+						top:50%;
+						left:20px;
+						display:block;
+						border-radius:100%;
+						transform:translateY(-50%) scale(0.25);
+						background-color:$white;
+						transform-origin:left center;
+						box-shadow:0 0 10px 0 rgba(255,255,255,1);
+					}
+				}
+			}
+
+			@include sprites-token($spritesheet-sprites);
+
+
+			transition:background-color 0.2s;
+			&:hover {
+				background-color:$xxxx-dark-gray;
 			}
 		}
 	}
 }
 
-// for ruby
-body > .modal.popup.virtual_account_check {
-	left:0 !important;
-	> .wrapper {
-		top:50%;
-	}
-}
 
+// bp name list
 
-.modal.popup.rental_account.cancel {
-	.wrapper {
-		padding-top:0;
-		background-color:$xx-dark-gray;
-	}
+// $spritesheet-width: 1216px;
+// $spritesheet-height: 1179px;
 
-	.token.status + h3 {
-		font-size:$small;
-		margin-left:32px;
-		margin-top:24px;
-	}
-
-	form {
-		margin-top:16px;
-		margin-bottom:16px;
-		background-color:$x-dark-gray;
-	}
-}
-// type case
 

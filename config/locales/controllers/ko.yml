@@ -15,12 +15,14 @@ ko:
     eos_node_connection_failed: 'EOS 노드 접속에 실패하였습니다.'
     eos_wallet_connection_failed: 'EOS 지갑 서버 접속에 실패하였습니다. 관리자에게 연락해주세요.'
     not_event_activated: '이벤트 기간이 아닙니다.'
+    not_enough_balance: '계정생성 이벤트를 위한 EOS 잔고가 모두 소진되었습니다'
   orders:
     deactivated_product: '해당 상품은 현재 주문하실 수 없습니다.'
     order_not_exist: "해당 주문이 존재하지 않습니다."
-    order_not_paid: "주문이 결제되지 않았습니다."
+    order_not_paid: "결제가 완료되지 않았습니다."
     order_already_delivered: "계정이 이미 생성되었습니다."
     payment_server_not_respond: "결제 서버가 응답하지않습니다. 잠시 후 다시 시도하시거나 관리자에게 연락해주세요."
+    product_not_exist: "\"EOS Account\" 상품이 존재하지 않습니다. 관리자에게 연락해주세요."
   payment_results:
     invalid_payment_result_callback: '유효하지않은 결제 완료 콜백 요청입니다.'
   eos_ram_price_histores:
