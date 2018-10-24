@@ -436,7 +436,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
 
 
 producerTableRow : Float -> Float -> Set String -> Producer -> Html Message
-producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank } =
+producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank, url } =
     let
         ( upDownClass, delta ) =
             if rank < prevRank then
@@ -485,7 +485,7 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
             [ span [ class ("bi bp-" ++ owner) ]
                 []
             , strong []
-                [ text owner ]
+                [ a [ href url, target "_blank" ] [ text owner ] ]
             , text country
             ]
         , td []
