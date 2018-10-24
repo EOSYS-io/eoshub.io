@@ -45,6 +45,7 @@ jobs:
       language: python
       python:
         - "3.6"
+      cache: pip
       services:
         - docker
       install:
@@ -83,6 +84,7 @@ jobs:
       language: python
       python:
         - "3.6"
+      cache: pip
       install:
         # install AWS SDK
         - pip install awscli
