@@ -349,13 +349,24 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
             producers
                 |> List.filter (\producer -> String.startsWith searchInput producer.owner)
 
+        eosysAddedProducers =
+            if String.isEmpty searchInput then
+                List.append
+                    (producers
+                        |> List.filter (\{ owner } -> owner == "eosyskoreabp")
+                    )
+                    filteredProducers
+
+            else
+                filteredProducers
+
         producersView =
-            filteredProducers
+            eosysAddedProducers
                 |> List.take producersLimit
                 |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds) producerNamesToVote)
 
         viewMoreButton =
-            if List.length filteredProducers > producersLimit then
+            if List.length eosysAddedProducers > producersLimit then
                 div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
                         [ text (translate language ShowMore) ]
