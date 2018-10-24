@@ -19,7 +19,7 @@ zh-CN:
   orders:
     deactivated_product: '此商品目前无法订购。'
     order_not_exist: '订单不存在。'
-    order_not_paid: '订单未支付。'
+    order_not_paid: '您的付款尚未完成。'
     order_already_delivered: '帐户已创建。'
     payment_server_not_respond: '付款服务器没有响应。请稍后再试或联系您的管理员。'
     product_not_exist: "“EOS帐户”不存在。 请联系管理员。"

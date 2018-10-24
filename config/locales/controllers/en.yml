@@ -19,7 +19,7 @@ en:
   orders:
     deactivated_product: "You can't order this item for now"
     order_not_exist: "The order does not exist"
-    order_not_paid: "The order has not been paid"
+    order_not_paid: "The payment not completed"
     order_already_delivered: "The account has already been created"
     payment_server_not_respond: "The billing server is not responding. Please try again later or contact your administrator."
     product_not_exist: "\"EOS Account\" product does not exist. Please contact the administrator."
