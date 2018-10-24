@@ -45,7 +45,7 @@ class OrdersController < ApplicationController
         'Authorization' => "PLKEY #{Rails.application.credentials.dig(Rails.env.to_sym, :payletter_payment_api_key)}"
       },
       body: JSON.generate(payment_params),
-      timeout: 3
+      timeout: 5
     ).run
 
     raise Exceptions::DefaultError, Exceptions::PAYMENT_SERVER_NOT_RESPOND if response.return_code == :operation_timedout
