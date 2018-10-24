@@ -54,7 +54,7 @@ class UsersController < ApiController
     else
       raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(params[:account_name])
 
-      creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_event)
+      creator_eos_account = @eos_account_product.creator_event
       eos_account = params[:account_name]
       response = request_eos_account_creation(creator_eos_account, eos_account, params[:pubkey])
       if response.code == 200
@@ -74,7 +74,7 @@ class UsersController < ApiController
   private
 
   def event_activated?
-    eos_account_product = Product.eos_account
-    raise Exceptions::DefaultError, Exceptions::NOT_EVENT_PERIOD unless eos_account_product&.event_activation
+    @eos_account_product = Product.eos_account
+    raise Exceptions::DefaultError, Exceptions::NOT_EVENT_PERIOD unless @eos_account_product&.event_activation
   end
 end
