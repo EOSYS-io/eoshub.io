@@ -3,8 +3,8 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :exception
 
-  # Payletter return url
-  skip_before_action :verify_authenticity_token, if: -> { controller_name == 'orders' && action_name == 'create' }
+  # PATCH admin/products as JSON
+  skip_before_action :verify_authenticity_token, if: -> { admin_products_update? }
 
   before_action :set_locale
 
@@ -33,5 +33,15 @@ class ApplicationController < ActionController::Base
     else
       root_path
     end
+  end
+
+  private
+
+  def admin_products_update?
+    v = controller_path.split(/\//)&.dig(0) == 'admin' 
+    v &&= controller_name == 'products' 
+    v &&= action_name == 'update' 
+    v &&= request.format.json?
+    v
   end
 end
