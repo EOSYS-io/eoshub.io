@@ -55,7 +55,7 @@ class UsersControllerTest < ActionController::TestCase
         alice = users(:alice)
         post :confirm_email, params: { id: alice.confirm_token }
     
-        creator_eos_account = Rails.application.credentials.dig(:creator_eos_account_event)
+        creator_eos_account = Product.eos_account.creator_event
         eos_account = 'chainpartner'
         body = {
           creator_eos_account: creator_eos_account,
