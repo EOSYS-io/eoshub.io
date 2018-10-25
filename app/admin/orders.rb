@@ -1,6 +1,6 @@
 ActiveAdmin.register Order do
   menu priority: 4
-  permit_params :state
+  permit_params :state, :eos_account
   actions :all, except: [:new, :create, :destroy]
 
   index do
@@ -64,6 +64,7 @@ ActiveAdmin.register Order do
   form do |f|
     f.inputs do
       f.input :state
+      f.input :eos_account
     end
     f.actions
   end
