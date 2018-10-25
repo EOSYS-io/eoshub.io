@@ -67,9 +67,9 @@ jobs:
             export DEPLOYMENT_ENV=production;
           fi
         - export DOCKER_TAG=$TRAVIS_COMMIT
-      script:
         # Dockerhub login
         - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+      script:
         # Rails app docker build and push
         - export EOSHUB_DOCKER_IMAGE=$DOCKER_HUB_REPO-$DEPLOYMENT_ENV:$DOCKER_TAG
         - docker build -f deploy/$DEPLOYMENT_ENV/dockerfile -t $EOSHUB_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
@@ -83,38 +83,10 @@ jobs:
         - ecs-deploy -d $DB_MIGRATION_TASK -i EOSHUB_DOCKER_IMAGE
         - export OVERRIDES="{\"containerOverrides\":[{\"name\":\"$DB_MIGRATION_TASK\",\"command\":[\"bundle\",\"exec\",\"rake\",\"db:migrate\"]}]}"
         - aws ecs run-task --cluster eosys --task-definition $DB_MIGRATION_TASK --overrides "$OVERRIDES"
-    - &deploy-stage
-      stage: Deploy
-      if: type != pull_request
-      language: python
-      python:
-        - "3.6"
-      cache: pip
-      install:
-        # install AWS SDK
-        - pip install awscli
-        - export PATH=$PATH:$HOME/.local/bin
-        # install necessary dependency for ecs-deploy
-        - sudo apt-get update
-        - sudo apt-get install jq -y
-        # install ecs-deploy
-        - curl https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee -a /usr/bin/ecs-deploy
-        - sudo chmod +x /usr/bin/ecs-deploy
-      before_script:
-        - if [ "$TRAVIS_BRANCH" == "alpha" ]; then
-            export DEPLOYMENT_ENV=alpha;
-          elif [ "$TRAVIS_BRANCH" == "master" ]; then
-            export DEPLOYMENT_ENV=production;
-          fi
-        - export DOCKER_TAG=$TRAVIS_COMMIT
-      script:
-        - export EOSHUB_DOCKER_IMAGE=$DOCKER_HUB_REPO-$DEPLOYMENT_ENV:$DOCKER_TAG
+        # Deploy Rails app
         - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME-$DEPLOYMENT_ENV -i $EOSHUB_DOCKER_IMAGE -t 900 --skip-deployments-check
-    - <<: *deploy-stage
-      script:
-        - export SIDEKIQ_DOCKER_IMAGE=$DOCKER_HUB_REPO_SIDEKIQ-$DEPLOYMENT_ENV:$DOCKER_TAG
+        # Deploy Sidekiq
         - ecs-deploy -c $AWS_CLUSTER_NAME -n $AWS_SERVICE_NAME_SIDEKIQ-$DEPLOYMENT_ENV -i $SIDEKIQ_DOCKER_IMAGE -t 900 --skip-deployments-check
-
 
 notifications:
   email: false
