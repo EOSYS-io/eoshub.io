@@ -8,8 +8,8 @@ module Component.Account.Page.WaitPayment exposing
 
 import Data.Json
     exposing
-        ( CreateEosAccountResponse
-        , createEosAccountResponseDecoder
+        ( CheckEosAccountCreatedResponse
+        , checkEosAccountCreatedResponseDecoder
         )
 import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
 import Html
@@ -79,8 +79,8 @@ initModel maybeOrderNo =
 
 
 type Message
-    = CreateEosAccount
-    | NewEosAccount (Result Http.Error CreateEosAccountResponse)
+    = CheckEosAccountCreated
+    | NewEosAccount (Result Http.Error CheckEosAccountCreatedResponse)
     | NotificationMessage Notification.Message
     | ChangeUrl String
 
@@ -88,8 +88,8 @@ type Message
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
 update msg ({ notification } as model) flags language =
     case msg of
-        CreateEosAccount ->
-            ( model, createEosAccountRequest model flags language )
+        CheckEosAccountCreated ->
+            ( model, checkEosAccountCreatedRequest model flags language )
 
         NewEosAccount (Ok res) ->
             ( model
@@ -139,10 +139,10 @@ view { notification } language =
                 [ textViewI18n language AccountCreationWaitPaymentMsg1 ]
             , p []
                 [ textViewI18n language AccountCreationWaitPaymentMsg2 ]
-            , p [ class "important description"]
+            , p [ class "important description" ]
                 [ textViewI18n language AccountCreationWaitPaymentMsg3 ]
             , div [ class "btn_area" ]
-                [ button [ class "ok button", type_ "button", onClick CreateEosAccount ]
+                [ button [ class "ok button", type_ "button", onClick CheckEosAccountCreated ]
                     [ textViewI18n language PaymentComplete ]
                 ]
             , Html.map NotificationMessage (Notification.view notification language)
@@ -154,15 +154,15 @@ view { notification } language =
 -- HTTP
 
 
-postCreateEosAccount : Model -> Flags -> Language -> Http.Request CreateEosAccountResponse
-postCreateEosAccount ({ orderNo } as model) flags language =
+getCheckEosAccountCreated : Model -> Flags -> Language -> Http.Request CheckEosAccountCreatedResponse
+getCheckEosAccountCreated ({ orderNo } as model) flags language =
     let
         url =
-            Urls.createEosAccountByOrderUrl flags orderNo (toLocale language)
+            Urls.checkeEosAccountCreatedUrl flags orderNo (toLocale language)
     in
-    Http.post url Http.emptyBody createEosAccountResponseDecoder
+    Http.get url checkEosAccountCreatedResponseDecoder
 
 
-createEosAccountRequest : Model -> Flags -> Language -> Cmd Message
-createEosAccountRequest model flags language =
-    Http.send NewEosAccount <| postCreateEosAccount model flags language
+checkEosAccountCreatedRequest : Model -> Flags -> Language -> Cmd Message
+checkEosAccountCreatedRequest model flags language =
+    Http.send NewEosAccount <| getCheckEosAccountCreated model flags language

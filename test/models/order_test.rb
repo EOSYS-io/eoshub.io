@@ -8,6 +8,7 @@
 #  amount                                                             :integer          not null
 #  bank_code(Virtual account bank code)                               :string
 #  bank_name(Virtual account bank name)                               :string
+#  delivery_message                                                   :jsonb
 #  eos_account                                                        :string           default(""), not null
 #  expire_date(expiration date of the virtual account)                :date
 #  order_no                                                           :string           not null

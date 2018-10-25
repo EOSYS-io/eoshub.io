@@ -102,29 +102,26 @@ class OrdersController < ApplicationController
     raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if @order.blank?
   end
 
-  def create_eos_account
+  def check_eos_account_created
     order = Order.find_by(order_no: params[:id])
     raise Exceptions::DefaultError, Exceptions::ORDER_NOT_EXIST if order.blank?
-    raise Exceptions::DefaultError, Exceptions::ORDER_NOT_PAID if order.created?
-    raise Exceptions::DefaultError, Exceptions::ORDER_ALREADY_DELIVERED if order.delivered?
 
-    public_key = order.public_key
-    eos_account = order.eos_account
-    raise Exceptions::DefaultError, Exceptions::DUPLICATE_EOS_ACCOUNT if eos_account_exist?(eos_account)
-
-    creator_eos_account = Product.eos_account.creator_order
-    response = request_eos_account_creation(creator_eos_account, eos_account, public_key)
-    if response.code == 200
-      order.delivered!
-      render json: { eos_account: eos_account, public_key: public_key }, status: :ok
-    elsif response.return_code == :couldnt_connect
-      render json: { message: I18n.t('users.eos_wallet_connection_failed')}, status: :internal_server_error
-    elsif JSON.parse(response.body).dig('code') == 'ECONNREFUSED'
-      render json: { message: I18n.t('users.eos_node_connection_failed') }, status: response.code
-    elsif response.code == 500 && JSON.parse(response.body).dig('error', 'code') == 3050003
-      render json: { message: I18n.t('users.not_enough_balance') }, status: response.code
+    if order.delivered?
+      eos_account = order.eos_account
+      if eos_account_exist?(eos_account)
+        render json: { eos_account: eos_account, public_key: order.public_key }, status: :ok
+      else
+        render json: { message: I18n.t('orders.order_delivered_but_eos_account_not_exist') }, status: :internal_server_error
+      end
+    elsif order.created?
+      render json: { message: I18n.t('orders.order_not_paid') }, status: :bad_request
+    elsif order.paid?
+      render json: { message: I18n.t('orders.order_paid_eos_account_creation_progressing') }, status: :bad_request
+    elsif order.delivery_failed?
+      render json: { message: I18n.t('orders.order_delivery_failed') }, status: :internal_server_error
     else
-      render json: response.body, status: response.code
+      # Unreachable
+      render json: { message: I18n.t('errors.unexpected_error') }, status: :internal_server_error
     end
   end
 

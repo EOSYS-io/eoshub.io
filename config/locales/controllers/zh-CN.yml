@@ -23,6 +23,9 @@ zh-CN:
     order_already_delivered: '帐户已创建。'
     payment_server_not_respond: '付款服务器没有响应。请稍后再试或联系您的管理员。'
     product_not_exist: "“EOS帐户”不存在。 请联系管理员。"
+    order_delivered_but_eos_account_not_exist: '您的结算和帐户创建请求已成功，但您的帐户创建未完成。 请联系管理员。'
+    order_paid_eos_account_creation_progressing: '您的付款已完成，并且您的帐户创建正在进行中。 请稍后再回来查看。'
+    order_delivery_failed: '您的付款已完成，但您的帐户创建请求失败。 请联系管理员。'
   payment_results:
     invalid_payment_result_callback: '无效的结算回调请求。'
   eos_ram_price_histores:

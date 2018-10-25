@@ -8,6 +8,7 @@
 #  amount                                                             :integer          not null
 #  bank_code(Virtual account bank code)                               :string
 #  bank_name(Virtual account bank name)                               :string
+#  delivery_message                                                   :jsonb
 #  eos_account                                                        :string           default(""), not null
 #  expire_date(expiration date of the virtual account)                :date
 #  order_no                                                           :string           not null
@@ -68,19 +69,28 @@ class Order < ApplicationRecord
   enum state: {
     created: 0,
     paid: 1,
-    delivered: 2
+    delivered: 2,
+    delivery_failed: 3
   }
 
   aasm column: :state, enum: true do
     state :created, initial: true
-    state :paid, :delivered
+    state :paid, :delivered, :delivery_failed
 
     event :paid do
+      after do
+        CreateEosAccountJob.perform_async(order_no)
+      end
+
       transitions from: :created, to: :paid
     end
 
     event :delivered do
-      transitions from: :paid, to: :delivered
+      transitions from: [:paid, :delivery_failed], to: :delivered
+    end
+
+    event :delivery_failed do
+      transitions from: [:paid, :delivery_failed], to: :delivery_failed
     end
   end
 

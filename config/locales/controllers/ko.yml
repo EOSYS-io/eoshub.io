@@ -23,6 +23,9 @@ ko:
     order_already_delivered: "계정이 이미 생성되었습니다."
     payment_server_not_respond: "결제 서버가 응답하지않습니다. 잠시 후 다시 시도하시거나 관리자에게 연락해주세요."
     product_not_exist: "\"EOS Account\" 상품이 존재하지 않습니다. 관리자에게 연락해주세요."
+    order_delivered_but_eos_account_not_exist: '결제 및 계정 생성 요청에 성공했지만 계정 생성이 완료되지않았습니다. 관리자에게 문의바랍니다.'
+    order_paid_eos_account_creation_progressing: '결제가 완료되었고 계정 생성이 진행중입니다. 잠시후에 다시 확인해보세요.'
+    order_delivery_failed: '결제가 완료되었으나 계정 생성 요청이 실패했습니다. 관리자에게 문의바랍니다.'
   payment_results:
     invalid_payment_result_callback: '유효하지않은 결제 완료 콜백 요청입니다.'
   eos_ram_price_histores:

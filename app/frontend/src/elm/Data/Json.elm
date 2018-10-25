@@ -2,12 +2,12 @@
 
 
 module Data.Json exposing
-    ( CreateEosAccountResponse
+    ( CheckEosAccountCreatedResponse
     , Producer
     , Product
     , RequestPaymentResponse
     , VoteStat
-    , createEosAccountResponseDecoder
+    , checkEosAccountCreatedResponseDecoder
     , initProducer
     , initProduct
     , initVoteStat
@@ -164,14 +164,14 @@ productDecoder =
         |> required "ram" Decode.int
 
 
-type alias CreateEosAccountResponse =
+type alias CheckEosAccountCreatedResponse =
     { eosAccount : String
     , publicKey : String
     }
 
 
-createEosAccountResponseDecoder : Decoder CreateEosAccountResponse
-createEosAccountResponseDecoder =
-    decode CreateEosAccountResponse
+checkEosAccountCreatedResponseDecoder : Decoder CheckEosAccountCreatedResponse
+checkEosAccountCreatedResponseDecoder =
+    decode CheckEosAccountCreatedResponse
         |> required "eos_account" Decode.string
         |> required "public_key" Decode.string

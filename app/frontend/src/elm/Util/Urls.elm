@@ -1,6 +1,6 @@
 module Util.Urls exposing
-    ( confirmEmailUrl
-    , createEosAccountByOrderUrl
+    ( checkeEosAccountCreatedUrl
+    , confirmEmailUrl
     , createEosAccountUrl
     , eosAccountProductUrl
     , eosConstitutionUrl
@@ -57,9 +57,9 @@ requestPaymentUrl flags locale =
     eoshubHost flags ++ "/orders/request_payment?locale=" ++ locale
 
 
-createEosAccountByOrderUrl : Flags -> String -> String -> String
-createEosAccountByOrderUrl flags orderId locale =
-    eoshubHost flags ++ "/orders/" ++ orderId ++ "/create_eos_account?locale=" ++ locale
+checkeEosAccountCreatedUrl : Flags -> String -> String -> String
+checkeEosAccountCreatedUrl flags orderId locale =
+    eoshubHost flags ++ "/orders/" ++ orderId ++ "/check_eos_account_created?locale=" ++ locale
 
 
 getProducersUrl : Flags -> String

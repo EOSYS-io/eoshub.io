@@ -22,7 +22,7 @@ Rails.application.routes.draw do
     end
 
     member do
-      post :create_eos_account
+      get :check_eos_account_created
       get :show_error
     end
   end

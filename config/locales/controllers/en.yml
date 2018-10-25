@@ -23,6 +23,9 @@ en:
     order_already_delivered: "The account has already been created"
     payment_server_not_respond: "The billing server is not responding. Please try again later or contact your administrator."
     product_not_exist: "\"EOS Account\" product does not exist. Please contact the administrator."
+    order_delivered_but_eos_account_not_exist: 'payment and account creation request was successful, but your account creation was not completed. Please contact your administrator.'
+    order_paid_eos_account_creation_progressing: 'payment has been completed and your account creation is in progress. Please check back soon.'
+    order_delivery_failed: 'payment has been completed, but account creation request has failed. Please contact your administrator.'
   payment_results:
     invalid_payment_result_callback: 'Invalid payment result callback request'
   eos_ram_price_histores:
