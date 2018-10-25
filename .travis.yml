@@ -80,7 +80,7 @@ jobs:
         - docker push $SIDEKIQ_DOCKER_IMAGE
         # DB migration
         - export DB_MIGRATION_TASK=eoshub-db-migration-$DEPLOYMENT_ENV
-        - ecs-deploy -d $DB_MIGRATION_TASK -i EOSHUB_DOCKER_IMAGE
+        - ecs-deploy -d $DB_MIGRATION_TASK -i $EOSHUB_DOCKER_IMAGE
         - export OVERRIDES="{\"containerOverrides\":[{\"name\":\"$DB_MIGRATION_TASK\",\"command\":[\"bundle\",\"exec\",\"rake\",\"db:migrate\"]}]}"
         - aws ecs run-task --cluster eosys --task-definition $DB_MIGRATION_TASK --overrides "$OVERRIDES"
         # Deploy Rails app
