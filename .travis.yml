@@ -68,16 +68,13 @@ jobs:
         - export EOSHUB_DOCKER_IMAGE=$DOCKER_HUB_REPO-$DEPLOYMENT_ENV:$DOCKER_TAG
         - docker build -f deploy/$DEPLOYMENT_ENV/dockerfile -t $EOSHUB_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY .
         - docker push $EOSHUB_DOCKER_IMAGE
-        # DB migration docker build and push
-        - export DB_MIGRATION_DOCKER_IMAGE=$DOCKER_HUB_REPO_DB_MIGRATION-$DEPLOYMENT_ENV:latest
-        - docker build -f deploy/$DEPLOYMENT_ENV/Dockerfile.db_migration -t $DB_MIGRATION_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY --build-arg EOSHUB_DOCKER_IMAGE=$EOSHUB_DOCKER_IMAGE .
-        - docker push $DB_MIGRATION_DOCKER_IMAGE
         # Sidekiq docker build and push
         - export SIDEKIQ_DOCKER_IMAGE=$DOCKER_HUB_REPO_SIDEKIQ-$DEPLOYMENT_ENV:$DOCKER_TAG
         - docker build -f deploy/$DEPLOYMENT_ENV-sidekiq/dockerfile -t $SIDEKIQ_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY --build-arg EOSHUB_DOCKER_IMAGE=$EOSHUB_DOCKER_IMAGE .
         - docker push $SIDEKIQ_DOCKER_IMAGE
         # DB migration
-        - aws ecs run-task --cluster eosys --task-definition eoshub-db-migration-$DEPLOYMENT_ENV
+        - export OVERRIDES="{\"containerOverrides\": [{\"name\": \"eoshub-db-migration-$DEPLOYMENT_ENV\", \"image\": $EOSHUB_DOCKER_IMAGE, \"command\": [\"bundle\", \"exec\", \"rake\", \"db:migrate\"]}]}"
+        - aws ecs run-task --cluster eosys --task-definition eoshub-db-migration-$DEPLOYMENT_ENV --overrides "$OVERRIDES"
     - &deploy-stage
       stage: Deploy
       if: type != pull_request
