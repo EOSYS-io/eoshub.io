@@ -73,7 +73,7 @@ jobs:
         - docker build -f deploy/$DEPLOYMENT_ENV-sidekiq/dockerfile -t $SIDEKIQ_DOCKER_IMAGE --build-arg RAILS_MASTER_KEY=$RAILS_MASTER_KEY --build-arg EOSHUB_DOCKER_IMAGE=$EOSHUB_DOCKER_IMAGE .
         - docker push $SIDEKIQ_DOCKER_IMAGE
         # DB migration
-        - export OVERRIDES="{\"containerOverrides\": [{\"name\": \"eoshub-db-migration-$DEPLOYMENT_ENV\", \"image\": $EOSHUB_DOCKER_IMAGE, \"command\": [\"bundle\", \"exec\", \"rake\", \"db:migrate\"]}]}"
+        - "export OVERRIDES={\"containerOverrides\": [{\"name\": \"eoshub-db-migration-$DEPLOYMENT_ENV\", \"image\": $EOSHUB_DOCKER_IMAGE, \"command\": [\"bundle\", \"exec\", \"rake\", \"db:migrate\"]}]}"
         - aws ecs run-task --cluster eosys --task-definition eoshub-db-migration-$DEPLOYMENT_ENV --overrides "$OVERRIDES"
     - &deploy-stage
       stage: Deploy
