@@ -1,0 +1,5 @@
+ARG EOSHUB_DOCKER_IMAGE
+FROM $EOSHUB_DOCKER_IMAGE
+
+# Command
+CMD ["bundle", "exec", "rake", "db:migrate"]
