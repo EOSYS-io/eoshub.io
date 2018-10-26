@@ -84,9 +84,10 @@ app.ports.invalidateAccount.subscribe(async () => {
 
 app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
   try {
-    const { eosjsClient } = getScatter();
-    const contract = await eosjsClient.contract(account);
-    await contract[action](payload);
+    const scatter = getScatter();
+    const contract = await scatter.eosjsClient.contract(account);
+    const options = { authorization: [`${scatter.account}@${scatter.authority}`] };
+    await contract[action](payload, options);
     app.ports.receivePushActionResponse.send(createPushActionReponse(200, action));
   } catch (err) {
     if (err.isError && err.isError === true) {
