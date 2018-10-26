@@ -161,7 +161,7 @@ view language ({ transfer, accountValidation, quantityValidation, memoValidation
                     , em [] [ text tokenAmount ]
                     ]
                 , a [ onClick ToggleModal ]
-                    [ text (translate language SwitchTokens) ]
+                    [ text (translate language OtherTokens) ]
                 ]
             , Html.form []
                 [ ul []
@@ -313,11 +313,11 @@ tokenListSection language { modalOpened, tokenSearchInput } =
     section [ class ("tokenlist modal popup" ++ addedClass) ]
         [ div [ class "wrapper" ]
             [ h2 []
-                [ text "토큰 리스트" ]
+                [ text (translate language TokenList) ]
             , form []
                 [ input
                     [ class "search_token"
-                    , placeholder "토큰 검색하기"
+                    , placeholder (translate language TokenName)
                     , type_ "text"
                     , onInput <| SearchToken
                     ]
