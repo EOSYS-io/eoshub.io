@@ -36,7 +36,7 @@ ActiveAdmin.register Product do
     f.inputs do
       f.input :active
       f.input :event_activation
-      f.input :name
+      f.input :name, input_html: { readonly: params['action'] == 'edit' }
       f.input :price
       f.input :cpu, label: 'CPU(EOS)'
       f.input :net, label: 'NET(EOS)'
