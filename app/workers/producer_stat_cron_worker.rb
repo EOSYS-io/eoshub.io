@@ -3,7 +3,8 @@ class ProducerStatCronWorker
   include Sidekiq::Worker
 
   def perform(*args)
-    # From experiments, eosio table request returns up to 2500 rows.
+    further_request_needed = true
+    rows = []
     body = {
       code: "eosio",
       scope: "eosio",
@@ -11,23 +12,31 @@ class ProducerStatCronWorker
       json: true,
       limit: 2500
     }
-    response = nil
-    Rails.configuration.urls['eos_rpc_urls'].each do |host|
-      response = Typhoeus::Request.new(
-        host+Rails.configuration.urls['eos_get_table_url'],
-        method: :post,
-        headers: {'Content-Type'=> "application/json"},
-        body: JSON.generate(body),
-        timeout: 5
-      ).run
-      break if response.code == 200
+    while further_request_needed do
+      response = nil
+      Rails.configuration.urls['eos_rpc_urls'].each do |host|
+        response = Typhoeus::Request.new(
+          host+Rails.configuration.urls['eos_get_table_url'],
+          method: :post,
+          headers: {'Content-Type'=> "application/json"},
+          body: JSON.generate(body),
+          timeout: 5
+        ).run
+        break if response.code == 200
+      end
+
+      # All request fail.
+      return if response.code != 200
+
+      response_json = JSON.parse response.body
+      further_request_needed = response_json["more"]
+      rows = rows + response_json["rows"]
+      if further_request_needed
+        body[:lower_bound] = rows.pop["owner"]
+      end
     end
 
-    # All request fail.
-    return if response.code != 200
-
-    response_json = JSON.parse response.body
-    rows = response_json["rows"].sort_by{ |row| row["total_votes"].to_f }.reverse
+    rows = rows.sort_by{ |row| row["total_votes"].to_f }.reverse
 
     rows.each_with_index do |row, index|
       is_active = row["is_active"] == 1 ? true : false
