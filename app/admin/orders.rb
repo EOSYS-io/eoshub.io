@@ -3,6 +3,11 @@ ActiveAdmin.register Order do
   permit_params :state, :eos_account, :public_key
   actions :all, except: [:new, :create, :destroy]
 
+  preserve_default_filters!
+  filter :state, as: :select, collection: Order.states.map { |k, v| [k, v] }
+  filter :pgcode, as: :select, collection: Order.pgcodes.map { |k, v| [k, v] }
+  remove_filter :user, :amount, :product_name, :account_name, :bank_code, :expire_date, :return_code, :return_message, :tid, :payment_results
+
   index do
     selectable_column
     id_column
