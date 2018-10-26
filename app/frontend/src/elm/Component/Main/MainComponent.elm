@@ -62,6 +62,7 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
+import Set
 import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
@@ -579,6 +580,18 @@ update message ({ page, notification, header, sidebar } as model) flags =
             ( { model | notification = { notification | open = False } }
             , Navigation.newUrl ("/search?query=" ++ sidebar.account.accountName)
             )
+
+        ( SidebarMessage (Sidebar.OnFetchAccount (Ok ({ voterInfo } as data))), VotePage subModel ) ->
+            -- This is an exceptional case. The model on vote page needed to be updated
+            -- when an update of the account in sidebar occurs.
+            let
+                newSidebar =
+                    { sidebar | account = data }
+
+                newVoteModel =
+                    { subModel | producerNamesToVote = Set.fromList voterInfo.producers }
+            in
+            ( { model | sidebar = newSidebar, page = VotePage newVoteModel }, Cmd.none )
 
         ( SidebarMessage sidebarMessage, _ ) ->
             let
