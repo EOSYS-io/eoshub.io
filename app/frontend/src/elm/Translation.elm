@@ -276,6 +276,7 @@ type I18n
     | DoBuy
     | DoSell
     | EosConstitutionLink
+    | SwitchTokens
 
 
 translate : Language -> I18n -> String
@@ -914,11 +915,13 @@ getMessages i18n =
             , english = "Check again that you have made the deposit and click Finish Payment."
             , chinese = "请再次检查您是否已支付押金，然后单击“完成付款”。"
             }
+
         AccountCreationWaitPaymentMsg3 ->
             { korean = "브라우저 설정에서 팝업 차단을 해제해주세요."
             , english = "Please deactivate the Pop-up blocker in the browser settings"
             , chinese = "请在浏览器设置解除关闭弹出式窗口设置"
             }
+
         PaymentComplete ->
             { korean = "결제완료"
             , english = "Payment Complete"
@@ -1682,4 +1685,10 @@ getMessages i18n =
             { korean = "헌법 전문 보기"
             , english = "View the Constitution"
             , chinese = "查看宪法"
+            }
+
+        SwitchTokens ->
+            { korean = "토큰 바꾸기"
+            , english = "Switch tokens"
+            , chinese = "切换令牌"
             }

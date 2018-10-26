@@ -1,6 +1,6 @@
 ActiveAdmin.register Order do
   menu priority: 4
-  permit_params :state
+  permit_params :state, :eos_account
   actions :all, except: [:new, :create, :destroy]
 
   index do
@@ -57,9 +57,14 @@ ActiveAdmin.register Order do
     active_admin_comments
   end
 
+  action_item :create_eos_account_btn, only: :show do
+    link_to '계정 생성', create_eos_account_order_path(resource.order_no), method: :post if resource.paid?
+  end
+
   form do |f|
     f.inputs do
       f.input :state
+      f.input :eos_account
     end
     f.actions
   end

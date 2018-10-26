@@ -58,7 +58,7 @@ type alias Action =
 
 
 type ActionParameters
-    = Transfer TransferParameters
+    = Transfer String TransferParameters
     | Claimrewards ClaimrewardsParameters
     | Sellram SellramParameters
     | Buyram BuyramParameters
@@ -207,7 +207,7 @@ actionParametersDecoder =
 
 transferDecoder : Decoder ActionParameters
 transferDecoder =
-    Decode.map Transfer <|
+    Decode.map (Transfer "eosio.token") <|
         (decode
             TransferParameters
             |> required "from" Decode.string
@@ -313,7 +313,7 @@ refineAction accountName ({ contractAccount, actionName, data } as model) =
             case ( contractAccount, actionName ) of
                 ( "eosio.token", "transfer" ) ->
                     case actionParameters of
-                        Transfer params ->
+                        Transfer _ params ->
                             let
                                 actionTag =
                                     if accountName == params.to then
@@ -457,8 +457,8 @@ errorDecoder =
 encodeAction : ActionParameters -> Encode.Value
 encodeAction action =
     case action of
-        Transfer message ->
-            transferParametersToValue message
+        Transfer contractAccount message ->
+            transferParametersToValue contractAccount message
 
         Delegatebw message ->
             delegatebwParametersToValue message
@@ -479,17 +479,17 @@ encodeAction action =
             Encode.null
 
 
-transferParametersToValue : TransferParameters -> Encode.Value
-transferParametersToValue { from, to, quantity, memo } =
+transferParametersToValue : String -> TransferParameters -> Encode.Value
+transferParametersToValue contractAccount { from, to, quantity, memo } =
     -- Introduce form validation.
     Encode.object
-        [ ( "account", Encode.string "eosio.token" )
+        [ ( "account", Encode.string contractAccount )
         , ( "action", Encode.string "transfer" )
         , ( "payload"
           , Encode.object
                 [ ( "from", Encode.string from )
                 , ( "to", Encode.string to )
-                , ( "quantity", Encode.string (quantity |> formatAsset) )
+                , ( "quantity", Encode.string quantity )
                 , ( "memo", Encode.string memo )
                 ]
           )

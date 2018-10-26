@@ -3,10 +3,14 @@ module Util.Formatter exposing
     , assetSubtract
     , assetToFloat
     , deleteFromBack
+    , eosAdd
+    , eosSubtract
     , floatToAsset
     , formatAsset
     , formatWithUsLocale
+    , getDefaultAsset
     , getNow
+    , getSymbolFromAsset
     , larimerToEos
     , numberWithinDigitLimit
     , percentageConverter
@@ -19,11 +23,12 @@ module Util.Formatter exposing
 import Date.Extra as Date
 import FormatNumber exposing (format)
 import FormatNumber.Locales exposing (usLocale)
-import Regex exposing (contains, regex, replace)
+import Regex exposing (contains, regex)
 import Round
 import Task
 import Time exposing (Time)
-import Util.Constant exposing (day, giga, hour, kilo, mega, minute, millisec, second, tera)
+import Util.Constant exposing (day, giga, hour, kilo, mega, millisec, minute, second, tera)
+import Util.Token exposing (Token)
 
 
 larimerToEos : Int -> Float
@@ -31,44 +36,48 @@ larimerToEos valInt =
     toFloat valInt * 0.0001
 
 
-floatToAsset : Float -> String
-floatToAsset valFloat =
-    Round.round 4 valFloat ++ " EOS"
+floatToAsset : Int -> String -> Float -> String
+floatToAsset precision symbol val =
+    Round.round precision val ++ " " ++ symbol
 
 
 removeSymbolIfExists : String -> String
 removeSymbolIfExists asset =
-    asset |> replace Regex.All (regex " EOS") (\_ -> "")
+    asset
+        |> String.split " "
+        |> List.head
+        |> Maybe.withDefault ""
 
 
 assetToFloat : String -> Float
-assetToFloat str =
-    let
-        result =
-            str
-                |> removeSymbolIfExists
-                |> String.toFloat
-    in
-    case result of
-        Ok val ->
-            val
-
-        Err _ ->
-            0
+assetToFloat =
+    removeSymbolIfExists
+        >> String.toFloat
+        >> Result.withDefault 0
 
 
-assetAdd : String -> String -> String
-assetAdd a b =
+assetAdd : String -> String -> Int -> String -> String
+assetAdd a b precision symbol =
     assetToFloat a
         + assetToFloat b
-        |> floatToAsset
+        |> floatToAsset precision symbol
 
 
-assetSubtract : String -> String -> String
-assetSubtract a b =
+eosAdd : String -> String -> String
+eosAdd a b =
+    assetAdd a b 4 "EOS"
+
+
+assetSubtract : String -> String -> Int -> String -> String
+assetSubtract a b precision symbol =
     assetToFloat a
         - assetToFloat b
-        |> floatToAsset
+        |> floatToAsset precision symbol
+
+
+eosSubtract : String -> String -> String
+eosSubtract a b =
+    assetSubtract a b 4 "EOS"
 
 
 
@@ -107,7 +116,6 @@ resourceUnitConverter resourceType value =
                 unitConverterRound2 value tera ++ " TB"
 
         "cpu" ->
-            
             if value < millisec then
                 toString value ++ " us"
 
@@ -222,3 +230,21 @@ numberWithinDigitLimit digitLimit value =
 
     else
         True
+
+
+getDefaultAsset : Token -> String
+getDefaultAsset { symbol, precision } =
+    let
+        base =
+            if precision == 0 then
+                "0"
+
+            else
+                "0." ++ String.repeat precision "0"
+    in
+    base ++ " " ++ symbol
+
+
+getSymbolFromAsset : String -> Maybe String
+getSymbolFromAsset asset =
+    asset |> String.split " " |> List.drop 1 |> List.head

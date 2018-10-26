@@ -35,8 +35,8 @@ import Round
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
-        ( assetAdd
-        , assetToFloat
+        ( assetToFloat
+        , eosAdd
         , numberWithinDigitLimit
         )
 import Util.HttpRequest exposing (getAccount, getTableRows)
@@ -149,7 +149,7 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
             if numberWithinDigitLimit 4 value then
                 let
                     total =
-                        assetAdd value delegatebw.stakeNetQuantity
+                        eosAdd value delegatebw.stakeNetQuantity
 
                     newModel =
                         { model
@@ -170,7 +170,7 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
             if numberWithinDigitLimit 4 value then
                 let
                     total =
-                        assetAdd delegatebw.stakeCpuQuantity value
+                        eosAdd delegatebw.stakeCpuQuantity value
 
                     newModel =
                         { model
@@ -210,7 +210,7 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
                         |> Round.round 4
 
                 total =
-                    assetAdd value delegatebw.stakeNetQuantity
+                    eosAdd value delegatebw.stakeNetQuantity
 
                 newModel =
                     { model
@@ -235,7 +235,7 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
                         |> Round.round 4
 
                 total =
-                    assetAdd delegatebw.stakeCpuQuantity value
+                    eosAdd delegatebw.stakeCpuQuantity value
 
                 newModel =
                     { model

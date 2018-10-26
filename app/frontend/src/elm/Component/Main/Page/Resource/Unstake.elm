@@ -25,8 +25,8 @@ import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (minimumRequiredResources)
 import Util.Formatter
     exposing
-        ( assetSubtract
-        , assetToFloat
+        ( assetToFloat
+        , eosSubtract
         , numberWithinDigitLimit
         )
 import Util.Validation
@@ -314,7 +314,7 @@ getUnstakePossibleResource : String -> String -> String
 getUnstakePossibleResource selfDelegatedAmount minimum =
     let
         subtractResult =
-            assetSubtract selfDelegatedAmount minimum
+            eosSubtract selfDelegatedAmount minimum
     in
     if (subtractResult |> assetToFloat) >= 0 then
         subtractResult

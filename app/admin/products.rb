@@ -24,6 +24,8 @@ ActiveAdmin.register Product do
       number_row :cpu, as: :currency, unit: "EOS", precision: 4
       number_row :net, as: :currency, unit: "EOS", precision: 4
       number_row :ram, as: :human_size, locale: :en, precision: 3
+      row :creator_order
+      row :creator_event
       row :created_at
       row :updated_at
     end
@@ -39,6 +41,8 @@ ActiveAdmin.register Product do
       f.input :cpu, label: 'CPU(EOS)'
       f.input :net, label: 'NET(EOS)'
       f.input :ram, label: 'RAM(bytes)'
+      f.input :creator_order
+      f.input :creator_event
     end
     f.actions
   end

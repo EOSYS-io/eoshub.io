@@ -4,6 +4,7 @@ import Expect
 import Test exposing (..)
 import Util.Constant exposing (..)
 import Util.Formatter exposing (..)
+import Util.Token exposing (Token)
 
 
 tests : Test
@@ -17,7 +18,7 @@ tests =
         , describe "floatToAsset"
             [ test "0.1 -> \"0.1000 EOS\"" <|
                 \() ->
-                    Expect.equal "0.1000 EOS" (floatToAsset 0.1)
+                    Expect.equal "0.1000 EOS" (floatToAsset 4 "EOS" 0.1)
             ]
         , describe "removeSymbolIfExists"
             [ test "\"0.1000 EOS\" -> \"0.1000\"" <|
@@ -32,12 +33,12 @@ tests =
         , describe "assetAdd"
             [ test "\"0.5000 EOS\" + \"0.5000 EOS\"" <|
                 \() ->
-                    Expect.equal "1.0000 EOS" (assetAdd "0.5000 EOS" "0.5000 EOS")
+                    Expect.equal "1.0000 EOS" (assetAdd "0.5000 EOS" "0.5000 EOS" 4 "EOS")
             ]
         , describe "assetSubtract"
             [ test "\"1.0000 EOS\" - \"0.5000 EOS\"" <|
                 \() ->
-                    Expect.equal "0.5000 EOS" (assetSubtract "1.0000 EOS" "0.5000 EOS")
+                    Expect.equal "0.5000 EOS" (assetSubtract "1.0000 EOS" "0.5000 EOS" 4 "EOS")
             ]
         , describe "unitConverterRound2"
             [ test "1024 -> 1k" <|
@@ -83,4 +84,18 @@ tests =
                 \() -> Expect.equal False (numberWithinDigitLimit digitLimit "400.01243")
              ]
             )
+        , describe "getDefaultAsset"
+            [ test "BTC" <|
+                \() ->
+                    Expect.equal "0.00000000 BTC"
+                        (getDefaultAsset
+                            (Token "Bitcoin" "BTC" "" 8)
+                        )
+            ]
+        , describe "getSymbolFromAsset"
+            [ test "BTC" <|
+                \() -> Expect.equal "BTC" ("1.0000 BTC" |> getSymbolFromAsset |> Maybe.withDefault "")
+            , test "No symbol" <|
+                \() -> Expect.equal "" ("1.0000" |> getSymbolFromAsset |> Maybe.withDefault "")
+            ]
         ]

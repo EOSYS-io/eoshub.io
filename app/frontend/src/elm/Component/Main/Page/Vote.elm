@@ -130,8 +130,8 @@ type alias Model =
     }
 
 
-initModel : Model
-initModel =
+initModel : Account -> Model
+initModel { voterInfo } =
     { tab = VoteTab
     , globalTable = initGlobalFields
     , tokenStatTable = initTokenStatFields
@@ -141,7 +141,7 @@ initModel =
     , proxies = []
     , producersLimit = 100
     , searchInput = ""
-    , producerNamesToVote = Set.empty
+    , producerNamesToVote = Set.fromList voterInfo.producers
     }
 
 
@@ -349,13 +349,24 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
             producers
                 |> List.filter (\producer -> String.startsWith searchInput producer.owner)
 
+        eosysAddedProducers =
+            if String.isEmpty searchInput then
+                List.append
+                    (producers
+                        |> List.filter (\{ owner } -> owner == "eosyskoreabp")
+                    )
+                    filteredProducers
+
+            else
+                filteredProducers
+
         producersView =
-            filteredProducers
+            eosysAddedProducers
                 |> List.take producersLimit
                 |> List.map (producerTableRow totalVotePower (now |> Time.inSeconds) producerNamesToVote)
 
         viewMoreButton =
-            if List.length filteredProducers > producersLimit then
+            if List.length eosysAddedProducers > producersLimit then
                 div [ class "btn_area" ]
                     [ button [ type_ "button", class "view_more button", onClick ExpandProducers ]
                         [ text (translate language ShowMore) ]
@@ -436,7 +447,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
 
 
 producerTableRow : Float -> Float -> Set String -> Producer -> Html Message
-producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank } =
+producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, country, rank, prevRank, url } =
     let
         ( upDownClass, delta ) =
             if rank < prevRank then
@@ -485,7 +496,7 @@ producerTableRow totalVotedEos now producerNamesToVote { owner, totalVotes, coun
             [ span [ class ("bi bp-" ++ owner) ]
                 []
             , strong []
-                [ text owner ]
+                [ a [ href url, target "_blank" ] [ text owner ] ]
             , text country
             ]
         , td []

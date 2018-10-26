@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_22_013039) do
+ActiveRecord::Schema.define(version: 2018_10_24_043604) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -133,6 +133,8 @@ ActiveRecord::Schema.define(version: 2018_10_22_013039) do
     t.float "cpu", default: 0.0
     t.float "net", default: 0.0
     t.integer "ram", default: 0
+    t.string "creator_order", default: "", comment: "creator eos account when requested by order"
+    t.string "creator_event", default: "", comment: "creator eos account when requested by event"
     t.index ["name"], name: "index_products_on_name"
   end
 
