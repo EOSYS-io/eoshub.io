@@ -276,7 +276,9 @@ type I18n
     | DoBuy
     | DoSell
     | EosConstitutionLink
-    | SwitchTokens
+    | OtherTokens
+    | TokenList
+    | TokenName
 
 
 translate : Language -> I18n -> String
@@ -1687,8 +1689,20 @@ getMessages i18n =
             , chinese = "查看宪法"
             }
 
-        SwitchTokens ->
-            { korean = "토큰 바꾸기"
-            , english = "Switch tokens"
-            , chinese = "切换令牌"
+        OtherTokens ->
+            { korean = "토큰 선택"
+            , english = "Other tokens"
+            , chinese = "代币选择"
+            }
+
+        TokenList ->
+            { korean = "토큰 목록"
+            , english = "Token List"
+            , chinese = "代币目录"
+            }
+
+        TokenName ->
+            { korean = "토큰 이름"
+            , english = "Token name"
+            , chinese = "代币名称"
             }
