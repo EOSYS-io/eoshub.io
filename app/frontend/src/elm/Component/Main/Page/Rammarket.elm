@@ -27,6 +27,7 @@ import Html
         , a
         , button
         , div
+        , em
         , form
         , h2
         , h3
@@ -189,6 +190,7 @@ type Message
     | TypeBytesAmount String
     | ClickDistribution Distribution
     | SubmitAction String
+    | ChangeUrl String
 
 
 getActions : Cmd Message
@@ -414,6 +416,9 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                         Data.Action.SellramParameters accountName bytes
                 in
                 ( model, newParams |> Data.Action.Sellram |> encodeAction |> Port.pushAction )
+
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
 
 
 
@@ -758,7 +763,7 @@ actionToTableRow language { blockTime, data, trxId } =
             tr [ class actionClass ]
                 [ td [] [ text actionType ]
                 , td [] [ text quantity ]
-                , td [] [ text account ]
+                , td [] [ a [ onClick (ChangeUrl ("/search?query=" ++ account)) ] [ em [] [ text account ] ] ]
                 , td [] [ text formattedDateTime ]
                 , td [] [ text trxId ]
                 ]
