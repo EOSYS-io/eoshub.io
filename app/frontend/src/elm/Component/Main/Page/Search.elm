@@ -49,7 +49,6 @@ import Dict exposing (Dict)
 import Html
     exposing
         ( Html
-        , a
         , b
         , br
         , button
@@ -109,6 +108,8 @@ import Util.Formatter
         , timeFormatter
         )
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.Urls exposing (getAccountUrl, getPubKeyUrl)
+import View.Common exposing (addSearchLink)
 
 
 
@@ -141,11 +142,6 @@ type alias SelectedActionCategory =
 
 type alias OpenedActionSeq =
     Int
-
-
-type QueryType
-    = AccountQuery
-    | PublicKeyQuery
 
 
 
@@ -601,7 +597,9 @@ viewKeyPermSpan value =
     span []
         [ text
             ("+" ++ (value.weight |> toString) ++ " ")
-        , addSearchLink PublicKeyQuery value.key (text value.key)
+        , addSearchLink
+            (value.key |> getPubKeyUrl |> ChangeUrl)
+            (text value.key)
         , br [] []
         ]
 
@@ -628,7 +626,7 @@ viewActionList selectedActionCategory accountName openedActionSeq actions =
 
 
 viewAction : SelectedActionCategory -> String -> Int -> Action -> Html Message
-viewAction selectedActionCategory accountName openedActionSeq ({ trxId, accountActionSeq, blockTime, actionName, actionTag } as action) =
+viewAction selectedActionCategory _ openedActionSeq ({ trxId, blockTime, actionName, actionTag } as action) =
     tr [ hidden (actionHidden selectedActionCategory actionName) ]
         [ td [ title trxId ]
             [ text trxId ]
@@ -650,9 +648,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Transfer _ params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                [ addSearchLink
+                                    (params.from |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.from ])
                                 , text " -> "
-                                , addSearchLink AccountQuery params.to (em [] [ text params.to ])
+                                , addSearchLink
+                                    (params.to |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.to ])
                                 , text (" " ++ params.quantity)
                                 , span
                                     [ class
@@ -684,7 +686,9 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Sellram params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.account (em [] [ text params.account ])
+                                [ addSearchLink
+                                    (params.account |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.account ])
                                 , text (" sold " ++ toString params.bytes ++ " bytes RAM")
                                 ]
 
@@ -695,9 +699,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Buyram params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.payer (em [] [ text params.payer ])
+                                [ addSearchLink
+                                    (params.payer |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.payer ])
                                 , text (" bought " ++ params.quant ++ " RAM for ")
-                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                , addSearchLink
+                                    (params.receiver |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.receiver ])
                                 ]
 
                         _ ->
@@ -707,9 +715,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Buyrambytes params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.payer (em [] [ text params.payer ])
+                                [ addSearchLink
+                                    (params.payer |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.payer ])
                                 , text (" bought " ++ toString params.bytes ++ "bytes RAM for ")
-                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                , addSearchLink
+                                    (params.receiver |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.receiver ])
                                 ]
 
                         _ ->
@@ -719,9 +731,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Delegatebw params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                [ addSearchLink
+                                    (params.from |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.from ])
                                 , text " delegated to the account "
-                                , addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                , addSearchLink
+                                    (params.receiver |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.receiver ])
                                 , text
                                     (" "
                                         ++ params.stakeNetQuantity
@@ -744,9 +760,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Undelegatebw params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.receiver (em [] [ text params.receiver ])
+                                [ addSearchLink
+                                    (params.receiver |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.receiver ])
                                 , text " undelegated from the account "
-                                , addSearchLink AccountQuery params.from (em [] [ text params.from ])
+                                , addSearchLink
+                                    (params.from |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.from ])
                                 , text
                                     (" "
                                         ++ params.unstakeNetQuantity
@@ -763,7 +783,9 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Regproxy params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.proxy (em [] [ text params.proxy ])
+                                [ addSearchLink
+                                    (params.proxy |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.proxy ])
                                 , text
                                     (if params.isproxy == 1 then
                                         " registered as voting proxy"
@@ -780,7 +802,9 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                     case actionParameters of
                         Action.Voteproducer params ->
                             td [ class "info" ]
-                                [ addSearchLink AccountQuery params.voter (em [] [ text params.voter ])
+                                [ addSearchLink
+                                    (params.voter |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.voter ])
                                 , if String.length params.proxy == 0 then
                                     span []
                                         ([ text " voted for block producers " ]
@@ -790,7 +814,9 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                                   else
                                     span []
                                         [ text " voted through "
-                                        , addSearchLink AccountQuery params.proxy (text params.proxy)
+                                        , addSearchLink
+                                            (params.proxy |> getAccountUrl |> ChangeUrl)
+                                            (text params.proxy)
                                         ]
                                 ]
 
@@ -802,9 +828,13 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                         Action.Newaccount params ->
                             td [ class "info" ]
                                 [ text "New account "
-                                , addSearchLink AccountQuery params.name (em [] [ text params.name ])
+                                , addSearchLink
+                                    (params.name |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.name ])
                                 , text " was created by "
-                                , addSearchLink AccountQuery params.creator (em [] [ text params.creator ])
+                                , addSearchLink
+                                    (params.creator |> getAccountUrl |> ChangeUrl)
+                                    (em [] [ text params.creator ])
                                 ]
 
                         _ ->
@@ -822,21 +852,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
 
 addSearchLinkToBP : String -> Html Message
 addSearchLinkToBP bp =
-    addSearchLink AccountQuery bp (span [] [ em [] [ text bp ], text ", " ])
-
-
-addSearchLink : QueryType -> String -> Html Message -> Html Message
-addSearchLink queryType query contentHtml =
-    let
-        url =
-            case queryType of
-                AccountQuery ->
-                    "/search?query=" ++ query
-
-                PublicKeyQuery ->
-                    "/searchkey?query=" ++ query
-    in
-    a [ onClick (ChangeUrl url) ] [ contentHtml ]
+    addSearchLink (bp |> getAccountUrl |> ChangeUrl) (span [] [ em [] [ text bp ], text ", " ])
 
 
 actionHidden : SelectedActionCategory -> String -> Bool

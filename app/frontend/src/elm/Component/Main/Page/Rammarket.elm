@@ -68,6 +68,7 @@ import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, numberWithinDigitLimit, timeFormatter)
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.Urls exposing (getAccountUrl)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -76,6 +77,7 @@ import Util.Validation as Validation
         , validateAccount
         , validateQuantity
         )
+import View.Common exposing (addSearchLink)
 
 
 
@@ -756,7 +758,11 @@ actionToTableRow language { blockTime, data, trxId } =
             tr [ class actionClass ]
                 [ td [] [ text actionType ]
                 , td [] [ text quantity ]
-                , td [] [ a [ onClick (ChangeUrl ("/search?query=" ++ account)) ] [ em [] [ text account ] ] ]
+                , td []
+                    [ addSearchLink
+                        (account |> getAccountUrl |> ChangeUrl)
+                        (em [] [ text account ])
+                    ]
                 , td [] [ text formattedDateTime ]
                 , td [] [ text trxId ]
                 ]
