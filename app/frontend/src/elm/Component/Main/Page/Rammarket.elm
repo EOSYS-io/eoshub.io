@@ -59,6 +59,7 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as Encode
+import Navigation
 import Port
 import Round
 import Time
@@ -145,7 +146,6 @@ type alias Model =
     { actions : List Action
     , rammarketTable : RammarketFields
     , globalTable : GlobalFields
-    , expandActions : Bool
     , buyModel : BuyModel
     , sellModel : SellModel
     , modalOpen : Bool
@@ -158,7 +158,6 @@ initModel =
     { actions = []
     , rammarketTable = initRammarketFields
     , globalTable = initGlobalFields
-    , expandActions = False
     , modalOpen = False
     , buyModel = initBuyModel
     , sellModel = initSellModel
@@ -179,7 +178,6 @@ type Message
     = OnFetchActions (Result Http.Error (List Action))
     | OnFetchTableRows (Result Http.Error (List Row))
     | OnFetchAccountToVerify (Result Http.Error Account)
-    | ExpandActions
     | UpdateChainData Time.Time
     | SwitchTab
     | ToggleModal
@@ -276,9 +274,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                         Validation.Fail
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
-
-        ExpandActions ->
-            ( { model | expandActions = True }, Cmd.none )
 
         UpdateChainData _ ->
             ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
@@ -426,7 +421,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
+view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc ++ " :)") ]
@@ -456,18 +451,9 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                 ]
             , let
                 ( actionTableRows, viewMoreButton ) =
-                    if expandActions then
-                        ( actions |> List.map (actionToTableRow language)
-                        , div [] []
-                        )
-
-                    else
-                        ( actions |> List.take 2 |> List.map (actionToTableRow language)
-                        , div [ class "btn_area" ]
-                            [ button [ type_ "button", class "view_more button", onClick ExpandActions ]
-                                [ text (translate language ShowMore) ]
-                            ]
-                        )
+                    ( actions |> List.map (actionToTableRow language)
+                    , div [] []
+                    )
               in
               section [ class "history list" ]
                 [ table []
