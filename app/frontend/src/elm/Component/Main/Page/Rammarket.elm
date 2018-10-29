@@ -454,13 +454,7 @@ view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as 
                     , buySellTab language model account
                     ]
                 ]
-            , let
-                ( actionTableRows, viewMoreButton ) =
-                    ( actions |> List.map (actionToTableRow language)
-                    , div [] []
-                    )
-              in
-              section [ class "history list" ]
+            , section [ class "history list" ]
                 [ table []
                     [ thead []
                         [ tr []
@@ -476,9 +470,8 @@ view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as 
                                 [ text "Tx ID" ]
                             ]
                         ]
-                    , tbody [] actionTableRows
+                    , tbody [] (actions |> List.map (actionToTableRow language))
                     ]
-                , viewMoreButton
                 ]
             ]
         , let
