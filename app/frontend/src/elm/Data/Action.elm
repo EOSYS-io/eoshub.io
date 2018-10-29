@@ -207,6 +207,8 @@ actionParametersDecoder =
 
 transferDecoder : Decoder ActionParameters
 transferDecoder =
+    -- The contract account parameter of Transfer constructor is useless in this case cause
+    -- the paramaeter can be determined in decoding phase.
     Decode.map (Transfer "") <|
         (decode
             TransferParameters
