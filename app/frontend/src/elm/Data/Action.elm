@@ -207,7 +207,7 @@ actionParametersDecoder =
 
 transferDecoder : Decoder ActionParameters
 transferDecoder =
-    Decode.map (Transfer "eosio.token") <|
+    Decode.map (Transfer "") <|
         (decode
             TransferParameters
             |> required "from" Decode.string
