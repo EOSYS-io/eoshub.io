@@ -141,6 +141,7 @@ type Message
     | SidebarMessage Sidebar.Message
     | ChangeUrl String
     | UpdateLanguage Language
+    | InitLocale String
 
 
 type Query
@@ -168,7 +169,9 @@ initCmd : Location -> Flags -> Cmd Message
 initCmd location flags =
     Cmd.batch
         [ pageCmd location flags
-        , Cmd.map SidebarMessage Sidebar.initCmd
+        , Cmd.map SidebarMessage
+            Sidebar.initCmd
+        , Port.checkLocale ()
         ]
 
 
@@ -606,6 +609,24 @@ update message ({ page, notification, header, sidebar } as model) flags =
         ( UpdateLanguage language, _ ) ->
             ( { model | header = { header | language = language } }, Cmd.none )
 
+        ( InitLocale localeString, _ ) ->
+            let
+                locale =
+                    localeString |> String.split "-" |> List.head |> Maybe.withDefault "en"
+
+                language =
+                    case locale of
+                        "ko" ->
+                            Korean
+
+                        "zh" ->
+                            Chinese
+
+                        _ ->
+                            English
+            in
+            update (UpdateLanguage language) model flags
+
         ( _, _ ) ->
             ( model, Cmd.none )
 
@@ -642,6 +663,7 @@ subscriptions { page } =
 
             _ ->
                 Sub.none
+        , Port.receiveLocale InitLocale
         ]
 
 

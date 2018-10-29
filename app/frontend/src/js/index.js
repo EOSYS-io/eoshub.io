@@ -146,6 +146,10 @@ app.ports.openWindow.subscribe(async ({ url, width, height }) => {
   window.open(url, '_blank', specs);
 });
 
+app.ports.checkLocale.subscribe(() => {
+  app.ports.receiveLocale.send(navigator.language || navigator.userLanguage);
+});
+
 function initScatter() {
   // const ScatterJS = await System.import('scatterjs-core'); // eslint-disable-line no-undef
   ScatterJS.plugins(new ScatterEOS());
