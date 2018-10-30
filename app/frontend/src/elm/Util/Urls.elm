@@ -4,7 +4,9 @@ module Util.Urls exposing
     , createEosAccountUrl
     , eosAccountProductUrl
     , eosConstitutionUrl
+    , getAccountUrl
     , getProducersUrl
+    , getPubKeyUrl
     , getRecentVoteStatUrl
     , mainnetRpcUrl
     , requestPaymentUrl
@@ -87,3 +89,13 @@ mainnetRpcUrl =
 eosConstitutionUrl : String
 eosConstitutionUrl =
     "https://github.com/EOS-Mainnet/governance/blob/master/eosio.system/eosio.system-clause-constitution-rc.md"
+
+
+getAccountUrl : String -> String
+getAccountUrl query =
+    "/search?query=" ++ query
+
+
+getPubKeyUrl : String -> String
+getPubKeyUrl query =
+    "/searchkey?query=" ++ query

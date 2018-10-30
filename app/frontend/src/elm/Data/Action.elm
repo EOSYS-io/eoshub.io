@@ -207,7 +207,9 @@ actionParametersDecoder =
 
 transferDecoder : Decoder ActionParameters
 transferDecoder =
-    Decode.map (Transfer "eosio.token") <|
+    -- The contract account parameter of Transfer constructor is useless in this case cause
+    -- the paramaeter can be determined in former decoding phase.
+    Decode.map (Transfer "") <|
         (decode
             TransferParameters
             |> required "from" Decode.string
