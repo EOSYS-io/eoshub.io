@@ -17,7 +17,7 @@ module Component.Main.Page.Transfer exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
-import Data.Table exposing (AccountsFields, Row)
+import Data.Table exposing (Row)
 import Html
     exposing
         ( Html
@@ -27,7 +27,6 @@ import Html
         , em
         , form
         , h2
-        , img
         , input
         , li
         , main_
@@ -43,8 +42,6 @@ import Html.Attributes exposing (attribute, autofocus, class, disabled, placehol
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
-import Regex
-import Round
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
@@ -130,7 +127,7 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened, token, tokenBalance } as model) eosLiquidAmount =
+view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, token, tokenBalance } as model) eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
@@ -398,8 +395,8 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
             , newCmd
             )
 
-        SearchToken input ->
-            ( { model | tokenSearchInput = input }, Cmd.none )
+        SearchToken searchInput ->
+            ( { model | tokenSearchInput = searchInput }, Cmd.none )
 
         OnFetchTableRows (Ok rows) ->
             case rows of
