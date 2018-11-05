@@ -27,6 +27,7 @@ import Html
         , a
         , button
         , div
+        , em
         , form
         , h2
         , h3
@@ -59,6 +60,7 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as Encode
+import Navigation
 import Port
 import Round
 import Time
@@ -66,6 +68,7 @@ import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, numberWithinDigitLimit, timeFormatter)
 import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.Urls exposing (getAccountUrl)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -74,6 +77,7 @@ import Util.Validation as Validation
         , validateAccount
         , validateQuantity
         )
+import View.Common exposing (addSearchLink)
 
 
 
@@ -145,7 +149,6 @@ type alias Model =
     { actions : List Action
     , rammarketTable : RammarketFields
     , globalTable : GlobalFields
-    , expandActions : Bool
     , buyModel : BuyModel
     , sellModel : SellModel
     , modalOpen : Bool
@@ -158,7 +161,6 @@ initModel =
     { actions = []
     , rammarketTable = initRammarketFields
     , globalTable = initGlobalFields
-    , expandActions = False
     , modalOpen = False
     , buyModel = initBuyModel
     , sellModel = initSellModel
@@ -179,7 +181,6 @@ type Message
     = OnFetchActions (Result Http.Error (List Action))
     | OnFetchTableRows (Result Http.Error (List Row))
     | OnFetchAccountToVerify (Result Http.Error Account)
-    | ExpandActions
     | UpdateChainData Time.Time
     | SwitchTab
     | ToggleModal
@@ -191,6 +192,7 @@ type Message
     | TypeBytesAmount String
     | ClickDistribution Distribution
     | SubmitAction String
+    | ChangeUrl String
 
 
 getActions : Cmd Message
@@ -276,9 +278,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                         Validation.Fail
             in
             ( { model | buyModel = newBuyModel }, Cmd.none )
-
-        ExpandActions ->
-            ( { model | expandActions = True }, Cmd.none )
 
         UpdateChainData _ ->
             ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
@@ -420,13 +419,16 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                 in
                 ( model, newParams |> Data.Action.Sellram |> encodeAction |> Port.pushAction )
 
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
+
 
 
 -- VIEW
 
 
 view : Language -> Model -> Account -> Html Message
-view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
+view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as model) ({ ramQuota } as account) =
     main_ [ class "ram_market" ]
         [ h2 [] [ text (translate language RamMarket) ]
         , p [] [ text (translate language RamMarketDesc ++ " :)") ]
@@ -454,22 +456,7 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                     , buySellTab language model account
                     ]
                 ]
-            , let
-                ( actionTableRows, viewMoreButton ) =
-                    if expandActions then
-                        ( actions |> List.map (actionToTableRow language)
-                        , div [] []
-                        )
-
-                    else
-                        ( actions |> List.take 2 |> List.map (actionToTableRow language)
-                        , div [ class "btn_area" ]
-                            [ button [ type_ "button", class "view_more button", onClick ExpandActions ]
-                                [ text (translate language ShowMore) ]
-                            ]
-                        )
-              in
-              section [ class "history list" ]
+            , section [ class "history list" ]
                 [ table []
                     [ thead []
                         [ tr []
@@ -485,9 +472,8 @@ view language ({ actions, expandActions, rammarketTable, globalTable, modalOpen,
                                 [ text "Tx ID" ]
                             ]
                         ]
-                    , tbody [] actionTableRows
+                    , tbody [] (actions |> List.map (actionToTableRow language))
                     ]
-                , viewMoreButton
                 ]
             ]
         , let
@@ -772,7 +758,11 @@ actionToTableRow language { blockTime, data, trxId } =
             tr [ class actionClass ]
                 [ td [] [ text actionType ]
                 , td [] [ text quantity ]
-                , td [] [ text account ]
+                , td []
+                    [ addSearchLink
+                        (account |> getAccountUrl |> ChangeUrl)
+                        (em [] [ text account ])
+                    ]
                 , td [] [ text formattedDateTime ]
                 , td [] [ text trxId ]
                 ]

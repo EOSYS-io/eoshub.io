@@ -1,6 +1,7 @@
 port module Port exposing
     ( KeyPair
     , authenticateAccount
+    , checkLocale
     , checkWalletStatus
     , copy
     , generateKeys
@@ -9,6 +10,7 @@ port module Port exposing
     , openWindow
     , pushAction
     , receiveKeys
+    , receiveLocale
     , receivePushActionResponse
     , receiveWalletStatus
     )
@@ -79,3 +81,9 @@ port loadChart : () -> Cmd message
 
 
 port openWindow : JE.Value -> Cmd message
+
+
+port checkLocale : () -> Cmd message
+
+
+port receiveLocale : (String -> message) -> Sub message
