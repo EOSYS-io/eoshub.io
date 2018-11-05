@@ -6,11 +6,13 @@ module Test.Component.Main.Page.Transfer exposing
 
 import Component.Main.Page.Transfer exposing (..)
 import Data.Table
+import Dict
 import Expect
 import Http
 import Json.Encode as JE
 import Port
 import Test exposing (..)
+import Util.Token exposing (Token)
 import Util.Validation
     exposing
         ( AccountStatus(..)
@@ -18,6 +20,24 @@ import Util.Validation
         , QuantityStatus(..)
         , VerificationRequestStatus(..)
         )
+
+
+addToken : Token
+addToken =
+    { name = "ADD"
+    , symbol = "ADD"
+    , contractAccount = "testacc"
+    , precision = 4
+    }
+
+
+blackToken : Token
+blackToken =
+    { name = "eosBLACK"
+    , symbol = "BLACK"
+    , contractAccount = "eosblackteam"
+    , precision = 4
+    }
 
 
 model : Model
@@ -29,17 +49,17 @@ model =
     , transfer =
         { from = "from"
         , to = "to"
-        , quantity = "300"
+        , quantity = "3.0"
         , memo = "memo"
         }
-    , token =
-        { name = "SYS"
-        , symbol = "SYS"
-        , contractAccount = "eosio.token"
-        , precision = 4
-        }
+    , possessingTokens =
+        Dict.fromList
+            [ ( "ADD", ( addToken, "3.0123 ADD" ) )
+            ]
+    , token = addToken
     , modalOpened = True
-    , tokenBalance = "3.0123 SYS"
+    , tokensLoaded = False
+    , tokenBalance = "3.0123 ADD"
     , tokenSearchInput = ""
     }
 
@@ -56,13 +76,13 @@ tests =
             let
                 expectedJson =
                     JE.object
-                        [ ( "account", JE.string "eosio.token" )
+                        [ ( "account", JE.string "testacc" )
                         , ( "action", JE.string "transfer" )
                         , ( "payload"
                           , JE.object
                                 [ ( "from", JE.string "from" )
                                 , ( "to", JE.string "to" )
-                                , ( "quantity", JE.string "300.0000 SYS" )
+                                , ( "quantity", JE.string "3.0000 ADD" )
                                 , ( "memo", JE.string "memo" )
                                 ]
                           )
@@ -74,10 +94,10 @@ tests =
         switchTokenTest =
             let
                 newToken =
-                    { name = "BTC"
-                    , symbol = "BTC"
-                    , contractAccount = "bitcoinacc11"
-                    , precision = 8
+                    { name = "BLACK"
+                    , symbol = "BLACK"
+                    , contractAccount = "testblack"
+                    , precision = 4
                     }
             in
             test "SwitchToken" <|
@@ -89,12 +109,12 @@ tests =
                             , accountValidation = EmptyAccount
                             , quantityValidation = EmptyQuantity
                             , memoValidation = EmptyMemo
-                            , tokenBalance = "0.00000000 BTC"
+                            , tokenBalance = "40.0000 BLACK"
                             , token = newToken
                         }
                         (Tuple.first
                             (update
-                                (SwitchToken newToken)
+                                (SwitchToken ( newToken, "40.0000 BLACK" ))
                                 model
                                 "from"
                                 300.0
@@ -103,35 +123,34 @@ tests =
 
         onFetchTableRowsTest =
             let
-                defaultSysAmount =
-                    "0.0000 SYS"
+                blackBalance =
+                    Data.Table.Accounts { balance = "40.0000 BLACK" }
 
-                sysBalance =
-                    Data.Table.Accounts { balance = "4.0000 SYS" }
-
-                btcBalance =
-                    Data.Table.Accounts { balance = "1.00000000 BTC" }
+                bchBalance =
+                    Data.Table.Accounts { balance = "1.0000 BCH" }
             in
             describe "OnFetchTableRows"
                 [ test "Ok with empty rows" <|
                     \() ->
-                        Expect.equal ( { model | tokenBalance = defaultSysAmount }, Cmd.none )
+                        Expect.equal ( model, Cmd.none )
                             (update (OnFetchTableRows (Ok [])) model "from" 300.0)
-                , test "Ok with matched symbol at head" <|
+                , test "Ok with matched symbol" <|
                     \() ->
-                        Expect.equal ( { model | tokenBalance = "4.0000 SYS" }, Cmd.none )
-                            (update (OnFetchTableRows (Ok [ sysBalance, btcBalance ])) model "from" 300.0)
-                , test "Ok with matched symbol at tail" <|
-                    \() ->
-                        Expect.equal ( { model | tokenBalance = "4.0000 SYS" }, Cmd.none )
-                            (update (OnFetchTableRows (Ok [ btcBalance, sysBalance ])) model "from" 300.0)
+                        Expect.equal
+                            ( { model
+                                | possessingTokens =
+                                    Dict.insert "BLACK" ( blackToken, "40.0000 BLACK" ) model.possessingTokens
+                              }
+                            , Cmd.none
+                            )
+                            (update (OnFetchTableRows (Ok [ blackBalance ])) model "from" 300.0)
                 , test "Ok with no matched symbols" <|
                     \() ->
-                        Expect.equal ( { model | tokenBalance = "0.0000 SYS" }, Cmd.none )
-                            (update (OnFetchTableRows (Ok [ btcBalance, btcBalance ])) model "from" 300.0)
+                        Expect.equal ( model, Cmd.none )
+                            (update (OnFetchTableRows (Ok [ bchBalance ])) model "from" 300.0)
                 , test "Err" <|
                     \() ->
-                        Expect.equal ( { model | tokenBalance = "0.0000 SYS" }, Cmd.none )
+                        Expect.equal ( model, Cmd.none )
                             (update (OnFetchTableRows (Err Http.Timeout)) model "from" 300.0)
                 ]
     in
