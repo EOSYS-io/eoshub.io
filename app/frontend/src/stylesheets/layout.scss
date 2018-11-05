@@ -204,9 +204,9 @@ div.tab {
 	button {
 		flex:1 0 50%;
 		height:52px;
-		line-height:52px;
+		line-height:50px;
 		background-color:$xx-dark-gray;
-		box-sizing:border-box;
+		border-top:2px solid transparent;
 
 		padding:0 35px;
 
@@ -216,6 +216,7 @@ div.tab {
 		&.ing {
 			border-top:2px solid $pink;
 			background-color:$xxxx-dark-gray;
+			color:$white;
 		}
 	}
 }

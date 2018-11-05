@@ -767,13 +767,43 @@ a.button {
 		padding:0 40px;
 		height: 52px;
 		border-radius: 2px;
-		background-color: #161616;
+		background-color: $xxxx-dark-gray;
 		min-width:152px;
 	}
 
 	&.view_more {
+		transition:color 0.2s;
+
 		&:before {
 			content:'+ ';
+		}
+
+		&.loading {
+			position:relative;
+			color:$xxxx-dark-gray;
+			&:after {
+				content:'';
+				position:absolute;
+				width:24px;
+				height:24px;
+				top:50%;
+				left:50%;
+				margin:-12px 0 0 -12px;
+				border:3px solid $gray;
+				border-right-color:transparent;
+				border-radius:100%;
+				animation:rotation 1s linear infinite;
+				box-sizing:border-box;
+			}
+			@keyframes rotation {
+				0% {
+					transform:rotate(0deg);
+				}
+
+				100% {
+					transform:rotate(360deg);
+				}
+			}
 		}
 	}
 }
@@ -986,9 +1016,9 @@ div.tab {
 	button {
 		flex:1 0 50%;
 		height:52px;
-		line-height:52px;
+		line-height:50px;
 		background-color:$xx-dark-gray;
-		box-sizing:border-box;
+		border-top:2px solid transparent;
 
 		padding:0 35px;
 
@@ -998,6 +1028,7 @@ div.tab {
 		&.ing {
 			border-top:2px solid $pink;
 			background-color:$xxxx-dark-gray;
+			color:$white;
 		}
 	}
 }

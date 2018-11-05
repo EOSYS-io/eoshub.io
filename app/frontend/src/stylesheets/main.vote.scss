@@ -61,7 +61,8 @@ main.vote {
 			}
 
 			dt:after {
-				content:':';
+				content:' :';
+				margin-right:0.3em;
 			}
 		}
 
@@ -162,9 +163,11 @@ main.vote {
 
 		td strong {
 			font-size:$normal;
+			font-weight:$regular;
 			color:#fff;
-			font-weight:$light;
 			display:block;
+			letter-spacing:-0.03em;
+			margin-bottom:0.2em;
 		}
 
 		// set cell width
@@ -266,6 +269,7 @@ main.vote {
 
 			tr td:nth-of-type(3) {
 				overflow:hidden;
+				color:$gray;
 			}
 
 			// display grade
