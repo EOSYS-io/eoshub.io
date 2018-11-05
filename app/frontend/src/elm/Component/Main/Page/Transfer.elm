@@ -37,6 +37,7 @@ import Html
         , strong
         , text
         , ul
+        , i
         )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
@@ -294,6 +295,8 @@ generateTokenButton ({ name, symbol } as token) =
                 [ text symbol ]
             , text name
             ]
+            , i []
+                [ text "희재님 여기 토큰수량좀 입혀주세요" ]
         ]
 
 

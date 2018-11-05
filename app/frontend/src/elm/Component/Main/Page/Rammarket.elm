@@ -448,9 +448,9 @@ view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as 
                 , div [ class "my status" ]
                     [ div [ class "summary" ]
                         [ h3 []
-                            [ text (translate language MyRam)
-                            , span []
+                            [ span []
                                 [ text ((((ramQuota |> toFloat) / (kilo |> toFloat)) |> Round.floor 3) ++ " KB") ]
+                            , text (translate language MyRam)
                             ]
                         ]
                     , buySellTab language model account
@@ -773,7 +773,7 @@ actionToTableRow language { blockTime, data, trxId } =
 
 formatEosPrice : Float -> String
 formatEosPrice price =
-    (price |> Round.round 8) ++ " EOS/KB"
+    (price |> Round.round 8) ++ " EOS / KB"
 
 
 calculateEosRamPrice : RammarketFields -> Float
@@ -828,7 +828,7 @@ calculateEosRamYield { maxRamSize, totalRamBytesReserved } =
 
     else
         Round.round 2 (numerator / (giga |> toFloat))
-            ++ "/"
+            ++ " / "
             ++ Round.round 2 (denominator / (giga |> toFloat))
             ++ "GB ("
             ++ Round.round 2 ((numerator * 100) / denominator)
