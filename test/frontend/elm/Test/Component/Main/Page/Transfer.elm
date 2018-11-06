@@ -144,7 +144,7 @@ tests =
                             , Cmd.none
                             )
                             (update (OnFetchTableRows (Ok [ blackBalance ])) model "from" 300.0)
-                , test "Ok with no matched symbols" <|
+                , test "Ok with no matched symbol" <|
                     \() ->
                         Expect.equal ( model, Cmd.none )
                             (update (OnFetchTableRows (Ok [ bchBalance ])) model "from" 300.0)
