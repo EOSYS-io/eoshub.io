@@ -28,6 +28,7 @@ import Html
         , em
         , form
         , h2
+        , i
         , input
         , li
         , main_
@@ -37,7 +38,6 @@ import Html
         , strong
         , text
         , ul
-        , i
         )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
@@ -303,7 +303,9 @@ generateTokenButton eosLiquidAmount ( { name, symbol }, balance ) =
             [ strong []
                 [ text symbol ]
             , text name
-            , text
+            ]
+        , i []
+            [ text
                 (if symbol == "EOS" then
                     eosLiquidAmount
 
@@ -311,8 +313,6 @@ generateTokenButton eosLiquidAmount ( { name, symbol }, balance ) =
                     balance
                 )
             ]
-            , i []
-                [ text "희재님 여기 토큰수량좀 입혀주세요" ]
         ]
 
 
