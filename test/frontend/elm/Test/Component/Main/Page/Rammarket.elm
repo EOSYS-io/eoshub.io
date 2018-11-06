@@ -40,7 +40,7 @@ tests =
                             (calculateEosRamYield initGlobalFields)
                 , test "calculate ram yield." <|
                     \() ->
-                        Expect.equal "43.29/73.47GB (58.92%)"
+                        Expect.equal "43.29 / 73.47GB (58.92%)"
                             (calculateEosRamYield
                                 { initGlobalFields
                                     | maxRamSize = "78887812096"
