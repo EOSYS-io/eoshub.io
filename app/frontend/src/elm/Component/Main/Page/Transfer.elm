@@ -78,8 +78,7 @@ type alias Model =
     , modalOpened : Bool
     , tokensLoaded : Bool
     , possessingTokens : Dict String ( Token, String )
-    , token : Token
-    , tokenBalance : String
+    , currentSymbol : String
     , tokenSearchInput : String
     }
 
@@ -103,8 +102,7 @@ initModel =
     , modalOpened = False
     , tokensLoaded = False
     , possessingTokens = Dict.fromList [ ( "EOS", ( eosToken, "" ) ) ]
-    , token = eosToken
-    , tokenBalance = ""
+    , currentSymbol = "EOS"
     , tokenSearchInput = ""
     }
 
@@ -124,7 +122,7 @@ type Message
     | SubmitAction
     | OpenUnderConstruction
     | OnFetchAccountToVerify (Result Http.Error Account)
-    | SwitchToken ( Token, String )
+    | SwitchToken String
     | ToggleModal
     | SearchToken String
     | OnFetchTableRows (Result Http.Error (List Row))
@@ -135,7 +133,7 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, token, tokenBalance } as model) eosLiquidAmount =
+view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, currentSymbol, possessingTokens } as model) eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
@@ -153,12 +151,18 @@ view language ({ transfer, accountValidation, quantityValidation, memoValidation
                 memoWarningSpan memoValidation language
 
             tokenAmount =
-                case token.symbol of
+                case currentSymbol of
                     "EOS" ->
                         eosLiquidAmount
 
                     _ ->
-                        tokenBalance
+                        case possessingTokens |> Dict.get currentSymbol of
+                            Just ( _, balance ) ->
+                                balance
+
+                            Nothing ->
+                                -- This case should not happen!
+                                ""
           in
           div [ class "container" ]
             [ div [ class "wallet status" ]
@@ -289,11 +293,11 @@ memoWarningSpan memoStatus language =
 
 
 generateTokenButton : String -> ( Token, String ) -> Html Message
-generateTokenButton eosLiquidAmount ( { name, symbol } as token, balance ) =
+generateTokenButton eosLiquidAmount ( { name, symbol }, balance ) =
     button
         [ type_ "button"
         , class ("token bi " ++ symbol)
-        , onClick (SwitchToken ( token, balance ))
+        , onClick (SwitchToken symbol)
         ]
         [ span []
             [ strong []
@@ -355,7 +359,16 @@ tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eo
 
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
-update message ({ transfer, modalOpened, tokensLoaded, token } as model) accountName eosLiquidAmount =
+update message ({ transfer, modalOpened, tokensLoaded, possessingTokens, currentSymbol } as model) accountName eosLiquidAmount =
+    let
+        token =
+            case possessingTokens |> Dict.get currentSymbol of
+                Just ( foundToken, _ ) ->
+                    foundToken
+
+                Nothing ->
+                    eosToken
+    in
     case message of
         SubmitAction ->
             let
@@ -405,11 +418,10 @@ update message ({ transfer, modalOpened, tokensLoaded, token } as model) account
             in
             ( { model | modalOpened = not modalOpened, tokensLoaded = loaded }, newCmd )
 
-        SwitchToken ( newToken, balance ) ->
+        SwitchToken newSymbol ->
             -- Clear form.
             ( { model
-                | token = newToken
-                , tokenBalance = balance
+                | currentSymbol = newSymbol
                 , modalOpened = not modalOpened
                 , transfer = { from = "", to = "", quantity = "", memo = "" }
                 , accountValidation = EmptyAccount
@@ -423,11 +435,7 @@ update message ({ transfer, modalOpened, tokensLoaded, token } as model) account
             ( { model | tokenSearchInput = searchInput }, Cmd.none )
 
         OnFetchTableRows (Ok rows) ->
-            case rows of
-                -- Account not found on the table.
-                [] ->
-                    ( model, Cmd.none )
-
+            case Debug.log "token fetch" rows of
                 (Data.Table.Accounts { balance }) :: tail ->
                     let
                         symbol =
@@ -460,7 +468,16 @@ update message ({ transfer, modalOpened, tokensLoaded, token } as model) account
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
-setTransferMessageField field value ({ transfer, token, tokenBalance } as model) eosLiquidAmount =
+setTransferMessageField field value ({ transfer, possessingTokens, currentSymbol } as model) eosLiquidAmount =
+    let
+        ( token, tokenBalance ) =
+            case possessingTokens |> Dict.get currentSymbol of
+                Just ( foundToken, balance ) ->
+                    ( foundToken, balance )
+
+                Nothing ->
+                    ( eosToken, "" )
+    in
     case field of
         To ->
             validateToField { model | transfer = { transfer | to = value } } NotSent

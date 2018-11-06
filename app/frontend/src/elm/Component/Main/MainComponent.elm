@@ -30,6 +30,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
+import Dict
 import Html
     exposing
         ( Html
@@ -59,6 +60,7 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
 import Navigation exposing (Location)
 import Port
 import Route exposing (Route(..), parseLocation)
@@ -67,6 +69,7 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
+import Util.HttpRequest exposing (getTableRows)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -520,6 +523,29 @@ update message ({ page, notification, header, sidebar } as model) flags =
                         _ ->
                             ""
 
+                tokenRefreshCmd =
+                    case page of
+                        TransferPage { currentSymbol, possessingTokens } ->
+                            case currentSymbol of
+                                "EOS" ->
+                                    Cmd.none
+
+                                _ ->
+                                    let
+                                        cmd =
+                                            case possessingTokens |> Dict.get currentSymbol of
+                                                Just ( { contractAccount }, _ ) ->
+                                                    getTableRows (Debug.log "token refresh" contractAccount) sidebar.account.accountName "accounts" -1
+                                                        |> Http.send Transfer.OnFetchTableRows
+
+                                                Nothing ->
+                                                    Cmd.none
+                                    in
+                                    cmd
+
+                        _ ->
+                            Cmd.none
+
                 ( newSidebar, accoutRefreshCmd ) =
                     Sidebar.update (Sidebar.UpdateState sidebar.state) sidebar
             in
@@ -530,7 +556,7 @@ update message ({ page, notification, header, sidebar } as model) flags =
                     }
                 , sidebar = newSidebar
               }
-            , Cmd.map SidebarMessage accoutRefreshCmd
+            , Cmd.batch [ Cmd.map TransferMessage tokenRefreshCmd, Cmd.map SidebarMessage accoutRefreshCmd ]
             )
 
         ( OnLocationChange location newComponent, _ ) ->
