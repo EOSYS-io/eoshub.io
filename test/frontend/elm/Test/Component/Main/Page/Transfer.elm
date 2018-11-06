@@ -24,9 +24,9 @@ import Util.Validation
 
 addToken : Token
 addToken =
-    { name = "ADD"
+    { name = "AdderalCoin"
     , symbol = "ADD"
-    , contractAccount = "testacc"
+    , contractAccount = "eosadddddddd"
     , precision = 4
     }
 
@@ -56,10 +56,9 @@ model =
         Dict.fromList
             [ ( "ADD", ( addToken, "3.0123 ADD" ) )
             ]
-    , token = addToken
+    , currentSymbol = "ADD"
     , modalOpened = True
     , tokensLoaded = False
-    , tokenBalance = "3.0123 ADD"
     , tokenSearchInput = ""
     }
 
@@ -76,7 +75,7 @@ tests =
             let
                 expectedJson =
                     JE.object
-                        [ ( "account", JE.string "testacc" )
+                        [ ( "account", JE.string "eosadddddddd" )
                         , ( "action", JE.string "transfer" )
                         , ( "payload"
                           , JE.object
@@ -109,12 +108,11 @@ tests =
                             , accountValidation = EmptyAccount
                             , quantityValidation = EmptyQuantity
                             , memoValidation = EmptyMemo
-                            , tokenBalance = "40.0000 BLACK"
-                            , token = newToken
+                            , currentSymbol = "BLACK"
                         }
                         (Tuple.first
                             (update
-                                (SwitchToken ( newToken, "40.0000 BLACK" ))
+                                (SwitchToken "BLACK")
                                 model
                                 "from"
                                 300.0
@@ -123,6 +121,9 @@ tests =
 
         onFetchTableRowsTest =
             let
+                addBalance =
+                    Data.Table.Accounts { balance = "30.0000 ADD" }
+
                 blackBalance =
                     Data.Table.Accounts { balance = "40.0000 BLACK" }
 
@@ -144,6 +145,16 @@ tests =
                             , Cmd.none
                             )
                             (update (OnFetchTableRows (Ok [ blackBalance ])) model "from" 300.0)
+                , test "Ok with existing symbol" <|
+                    \() ->
+                        Expect.equal
+                            ( { model
+                                | possessingTokens =
+                                    Dict.insert "ADD" ( addToken, "30.0000 ADD" ) model.possessingTokens
+                              }
+                            , Cmd.none
+                            )
+                            (update (OnFetchTableRows (Ok [ addBalance ])) model "from" 300.0)
                 , test "Ok with no matched symbol" <|
                     \() ->
                         Expect.equal ( model, Cmd.none )
