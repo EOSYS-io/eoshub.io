@@ -126,6 +126,7 @@ type Message
     | ToggleModal
     | SearchToken String
     | OnFetchTableRows (Result Http.Error (List Row))
+    | UpdateToken
 
 
 
@@ -435,7 +436,7 @@ update message ({ transfer, modalOpened, tokensLoaded, possessingTokens, current
             ( { model | tokenSearchInput = searchInput }, Cmd.none )
 
         OnFetchTableRows (Ok rows) ->
-            case Debug.log "token fetch" rows of
+            case rows of
                 (Data.Table.Accounts { balance }) :: tail ->
                     let
                         symbol =
@@ -458,6 +459,19 @@ update message ({ transfer, modalOpened, tokensLoaded, possessingTokens, current
 
         OnFetchTableRows (Err _) ->
             ( model, Cmd.none )
+
+        UpdateToken ->
+            let
+                newCmd =
+                    case possessingTokens |> Dict.get currentSymbol of
+                        Just ( { contractAccount }, _ ) ->
+                            getTableRows contractAccount accountName "accounts" -1
+                                |> Http.send OnFetchTableRows
+
+                        Nothing ->
+                            Cmd.none
+            in
+            ( model, newCmd )
 
         _ ->
             ( model, Cmd.none )

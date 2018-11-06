@@ -63,8 +63,11 @@ import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Navigation exposing (Location)
 import Port
+import Process
 import Route exposing (Route(..), parseLocation)
 import Set
+import Task
+import Time
 import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
@@ -525,23 +528,15 @@ update message ({ page, notification, header, sidebar } as model) flags =
 
                 tokenRefreshCmd =
                     case page of
-                        TransferPage { currentSymbol, possessingTokens } ->
+                        TransferPage { currentSymbol } ->
                             case currentSymbol of
                                 "EOS" ->
                                     Cmd.none
 
                                 _ ->
-                                    let
-                                        cmd =
-                                            case possessingTokens |> Dict.get currentSymbol of
-                                                Just ( { contractAccount }, _ ) ->
-                                                    getTableRows (Debug.log "token refresh" contractAccount) sidebar.account.accountName "accounts" -1
-                                                        |> Http.send Transfer.OnFetchTableRows
-
-                                                Nothing ->
-                                                    Cmd.none
-                                    in
-                                    cmd
+                                    -- Wait one block confirmation time for accuracy.
+                                    Process.sleep (500 * Time.millisecond)
+                                        |> Task.perform (\_ -> Transfer.UpdateToken)
 
                         _ ->
                             Cmd.none
