@@ -30,7 +30,6 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Dict
 import Html
     exposing
         ( Html
@@ -60,7 +59,6 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Http
 import Navigation exposing (Location)
 import Port
 import Process
@@ -72,7 +70,6 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
-import Util.HttpRequest exposing (getTableRows)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -526,32 +523,36 @@ update message ({ page, notification, header, sidebar } as model) flags =
                         _ ->
                             ""
 
-                tokenRefreshCmd =
+                defer time msg =
+                    Process.sleep time |> Task.perform (\_ -> msg)
+
+                -- Wait one block confirmation time for accuracy.
+                accountRefreshCmd =
+                    defer (500 * Time.millisecond)
+                        (Sidebar.UpdateState sidebar.state)
+
+                refreshCmd =
                     case page of
                         TransferPage { currentSymbol } ->
                             case currentSymbol of
                                 "EOS" ->
-                                    Cmd.none
+                                    Cmd.map SidebarMessage accountRefreshCmd
 
                                 _ ->
                                     -- Wait one block confirmation time for accuracy.
-                                    Process.sleep (500 * Time.millisecond)
-                                        |> Task.perform (\_ -> Transfer.UpdateToken)
+                                    Cmd.map TransferMessage
+                                        (defer (500 * Time.millisecond) Transfer.UpdateToken)
 
                         _ ->
-                            Cmd.none
-
-                ( newSidebar, accoutRefreshCmd ) =
-                    Sidebar.update (Sidebar.UpdateState sidebar.state) sidebar
+                            Cmd.map SidebarMessage accountRefreshCmd
             in
             ( { model
                 | notification =
                     { content = decodePushActionResponse resp notificationParameter
                     , open = True
                     }
-                , sidebar = newSidebar
               }
-            , Cmd.batch [ Cmd.map TransferMessage tokenRefreshCmd, Cmd.map SidebarMessage accoutRefreshCmd ]
+            , Cmd.batch [ refreshCmd ]
             )
 
         ( OnLocationChange location newComponent, _ ) ->
