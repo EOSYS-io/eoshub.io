@@ -269,7 +269,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
                 biggestActionSeq =
                     -- NOTE(boseok): Set latestActionSeq once
-                    if pagination.latestActionSeq == 0 then
+                    if pagination.latestActionSeq == (initModel query).pagination.latestActionSeq then
                         List.foldl (\{ accountActionSeq } _ -> accountActionSeq) -1 actions
 
                     else
