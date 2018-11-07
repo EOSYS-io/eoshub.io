@@ -298,7 +298,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 -- NOTE(boseok): There're no more actions to load
                 ( { model
                     | actions = refinedActions ++ model.actions
-                    , pagination = { pagination | isEnd = True }
+                    , pagination = { pagination | isEnd = True, nextPos = 0, isLoading = False }
                   }
                 , Cmd.none
                 )
