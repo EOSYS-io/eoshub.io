@@ -511,7 +511,7 @@ getMessages i18n =
             }
 
         RamMarketDesc ->
-            { korean = "램을 사고 팔 수 있어요"
+            { korean = "RAM을 사고 팔 수 있어요."
             , english = "Buy or Sell RAM here"
             , chinese = "在这里可以自由地买卖RAM"
             }
@@ -673,7 +673,7 @@ getMessages i18n =
             }
 
         TransferableAmountDesc ->
-            { korean = "전송 가능 수량만큼 입력 가능합니다"
+            { korean = "전송 가능 수량만큼 입력할 수 있습니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "传送数量不可超过可传送数量"
             }
@@ -1285,7 +1285,7 @@ getMessages i18n =
             }
 
         BuyFeeCharged ->
-            { korean = "구매시 0.5%의 수수료가 발생합니다"
+            { korean = "구매 시, 0.5%의 수수료가 발생합니다"
             , english = "When buying, 0.5% fee is charged"
             , chinese = "购买时发生0.5%的手续费"
             }
@@ -1507,7 +1507,7 @@ getMessages i18n =
             }
 
         Undelegate ->
-            { korean = "임대취소하기"
+            { korean = "임대 취소하기"
             , english = "Undelegate"
             , chinese = "取消资源租借"
             }
@@ -1537,7 +1537,7 @@ getMessages i18n =
             }
 
         NeverExceedStakeAmount ->
-            { korean = "스테이크 가능 수량만큼 입력 가능합니다"
+            { korean = "스테이크 가능 수량만큼 입력할 수 있습니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "不可超过可stake数量"
             }
@@ -1618,7 +1618,7 @@ getMessages i18n =
             }
 
         NeverExceedDelegateAmount ->
-            { korean = "임대 가능 수량만큼 입력 가능합니다"
+            { korean = "임대 가능 수량만큼 입력할 수 있습니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "不可超过可租借数量"
             }
@@ -1636,7 +1636,7 @@ getMessages i18n =
             }
 
         TypeDelegateAmount ->
-            { korean = "임대 할 수량을 입력하세요"
+            { korean = "임대할 수량을 입력하세요"
             , english = "Enter amount to delegate"
             , chinese = "请输入要租借的数量"
             }
@@ -1666,7 +1666,7 @@ getMessages i18n =
             }
 
         SelectAccountToUndelegate ->
-            { korean = "임대를 취소할 계정명을 선택하세요"
+            { korean = "임대를 취소할 계정을 선택해주세요"
             , english = "Select account name to undelegate"
             , chinese = "请输入要取消资源租借的账户名"
             }
