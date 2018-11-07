@@ -24,7 +24,7 @@ isAccount query =
 
 isValidAccountToCreate : String -> Bool
 isValidAccountToCreate query =
-    contains (regex "^[a-z.1-5]{12}$") query
+    contains (regex "^[a-z1-5]{12}$") query
 
 
 isPublicKey : String -> Bool
