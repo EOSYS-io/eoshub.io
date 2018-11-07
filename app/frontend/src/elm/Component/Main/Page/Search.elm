@@ -161,7 +161,7 @@ initModel accountName =
         { latestActionSeq = 0
         , nextPos = -1
         , offset = -30
-        , isLoading = False
+        , isLoading = True
         , isEnd = False
         }
     , selectedActionCategory = "all"
