@@ -279,6 +279,8 @@ type I18n
     | OtherTokens
     | TokenList
     | TokenName
+    | LackCpu
+    | GotoFillCpu
 
 
 translate : Language -> I18n -> String
@@ -1705,4 +1707,16 @@ getMessages i18n =
             { korean = "토큰 이름"
             , english = "Token name"
             , chinese = "代币名称"
+            }
+
+        LackCpu ->
+            { korean = "계정에 스테이킹(Staking)된 CPU가 부족하여 전송에 실패했습니다"
+            , english = "Failed to transfer due to lacking staked CPU"
+            , chinese = "Staking不足传送失败"
+            }
+
+        GotoFillCpu ->
+            { korean = "CPU 충전하러 가기"
+            , english = "Go to stake CPU"
+            , chinese = "去充值CPU"
             }
