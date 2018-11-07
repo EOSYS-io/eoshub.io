@@ -114,13 +114,12 @@ tests =
                             , message = ""
                             , action = "transfer"
                             }
-
-                        newCmd =
-                            accountCmd sidebar.state wallet.account
                     in
                     Expect.equal
-                        ( expectedModel, Cmd.map SidebarMessage newCmd )
-                        (update (UpdatePushActionResponse pushActionResponse) model flags)
+                        expectedModel
+                        (update (UpdatePushActionResponse pushActionResponse) model flags
+                            |> Tuple.first
+                        )
             , test "UpdateLanguage" <|
                 \() ->
                     let

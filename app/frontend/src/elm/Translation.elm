@@ -1624,7 +1624,7 @@ getMessages i18n =
             }
 
         DelegatedList ->
-            { korean = "임대 받은 계정 리스트"
+            { korean = "임대 계정 리스트"
             , english = "List of delegated accounts"
             , chinese = "资源租借名单"
             }
@@ -1666,7 +1666,7 @@ getMessages i18n =
             }
 
         SelectAccountToUndelegate ->
-            { korean = "임대취소 할 계정명을 선택하세요"
+            { korean = "임대를 취소할 계정명을 선택하세요"
             , english = "Select account name to undelegate"
             , chinese = "请输入要取消资源租借的账户名"
             }

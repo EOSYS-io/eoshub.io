@@ -4,6 +4,8 @@
 
 module Util.Token exposing (Token, tokens)
 
+import Dict exposing (Dict)
+
 
 type alias Token =
     { name : String
@@ -13,8 +15,8 @@ type alias Token =
     }
 
 
-tokens : List Token
-tokens =
+tokenList : List Token
+tokenList =
     [ { name = "AdderalCoin"
       , symbol = "ADD"
       , contractAccount = "eosadddddddd"
@@ -221,3 +223,8 @@ tokens =
       , precision = 4
       }
     ]
+
+
+tokens : Dict String Token
+tokens =
+    List.foldl (\token dict -> Dict.insert token.symbol token dict) Dict.empty tokenList

@@ -15,9 +15,10 @@ module Component.Main.Page.Transfer exposing
     , view
     )
 
-import Data.Account exposing (Account)
+import Data.Account exposing (Account, defaultAccount)
 import Data.Action as Action exposing (TransferParameters, encodeAction)
-import Data.Table exposing (AccountsFields, Row)
+import Data.Table exposing (Row)
+import Dict exposing (Dict)
 import Html
     exposing
         ( Html
@@ -27,7 +28,7 @@ import Html
         , em
         , form
         , h2
-        , img
+        , i
         , input
         , li
         , main_
@@ -42,14 +43,11 @@ import Html.Attributes exposing (attribute, autofocus, class, disabled, placehol
 import Html.Events exposing (onClick, onInput)
 import Http
 import Port
-import Regex
-import Round
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
     exposing
         ( assetToFloat
         , floatToAsset
-        , getDefaultAsset
         , getSymbolFromAsset
         , numberWithinDigitLimit
         )
@@ -78,9 +76,19 @@ type alias Model =
     , memoValidation : MemoStatus
     , isFormValid : Bool
     , modalOpened : Bool
-    , token : Token
-    , tokenBalance : String
+    , tokensLoaded : Bool
+    , possessingTokens : Dict String ( Token, String )
+    , currentSymbol : String
     , tokenSearchInput : String
+    }
+
+
+eosToken : Token
+eosToken =
+    { name = "EOS"
+    , symbol = "EOS"
+    , contractAccount = "eosio.token"
+    , precision = 4
     }
 
 
@@ -92,13 +100,9 @@ initModel =
     , memoValidation = EmptyMemo
     , isFormValid = False
     , modalOpened = False
-    , token =
-        { name = "EOS"
-        , symbol = "EOS"
-        , contractAccount = "eosio.token"
-        , precision = 4
-        }
-    , tokenBalance = "0.0000 EOS"
+    , tokensLoaded = False
+    , possessingTokens = Dict.fromList [ ( "EOS", ( eosToken, "" ) ) ]
+    , currentSymbol = "EOS"
     , tokenSearchInput = ""
     }
 
@@ -118,10 +122,11 @@ type Message
     | SubmitAction
     | OpenUnderConstruction
     | OnFetchAccountToVerify (Result Http.Error Account)
-    | SwitchToken Token
+    | SwitchToken String
     | ToggleModal
     | SearchToken String
     | OnFetchTableRows (Result Http.Error (List Row))
+    | UpdateToken
 
 
 
@@ -129,7 +134,7 @@ type Message
 
 
 view : Language -> Model -> String -> Html Message
-view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, modalOpened, token, tokenBalance } as model) eosLiquidAmount =
+view language ({ transfer, accountValidation, quantityValidation, memoValidation, isFormValid, currentSymbol, possessingTokens } as model) eosLiquidAmount =
     main_ [ class "transfer" ]
         [ h2 [] [ text (translate language Transfer) ]
         , p [] [ text (translate language TransferDesc ++ " :)") ]
@@ -147,12 +152,18 @@ view language ({ transfer, accountValidation, quantityValidation, memoValidation
                 memoWarningSpan memoValidation language
 
             tokenAmount =
-                case token.symbol of
+                case currentSymbol of
                     "EOS" ->
                         eosLiquidAmount
 
                     _ ->
-                        tokenBalance
+                        case possessingTokens |> Dict.get currentSymbol of
+                            Just ( _, balance ) ->
+                                balance
+
+                            Nothing ->
+                                -- This case should not happen!
+                                ""
           in
           div [ class "container" ]
             [ div [ class "wallet status" ]
@@ -211,7 +222,7 @@ view language ({ transfer, accountValidation, quantityValidation, memoValidation
                     [ text (translate language Send) ]
                 ]
             ]
-        , tokenListSection language model
+        , tokenListSection language model eosLiquidAmount
         ]
 
 
@@ -282,23 +293,32 @@ memoWarningSpan memoStatus language =
         [ text textValue ]
 
 
-generateTokenButton : Token -> Html Message
-generateTokenButton ({ name, symbol } as token) =
+generateTokenButton : String -> ( Token, String ) -> Html Message
+generateTokenButton eosLiquidAmount ( { name, symbol }, balance ) =
     button
         [ type_ "button"
         , class ("token bi " ++ symbol)
-        , onClick (SwitchToken token)
+        , onClick (SwitchToken symbol)
         ]
         [ span []
             [ strong []
                 [ text symbol ]
             , text name
             ]
+        , i []
+            [ text
+                (if symbol == "EOS" then
+                    eosLiquidAmount
+
+                 else
+                    balance
+                )
+            ]
         ]
 
 
-tokenListSection : Language -> Model -> Html Message
-tokenListSection language { modalOpened, tokenSearchInput } =
+tokenListSection : Language -> Model -> String -> Html Message
+tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eosLiquidAmount =
     let
         addedClass =
             if modalOpened then
@@ -308,7 +328,7 @@ tokenListSection language { modalOpened, tokenSearchInput } =
                 ""
 
         filterWithSearchInput =
-            List.filter (\token -> String.startsWith (tokenSearchInput |> String.toUpper) token.symbol)
+            List.filter (\( { symbol }, _ ) -> String.startsWith (tokenSearchInput |> String.toUpper) symbol)
     in
     section [ class ("tokenlist modal popup" ++ addedClass) ]
         [ div [ class "wrapper" ]
@@ -326,7 +346,9 @@ tokenListSection language { modalOpened, tokenSearchInput } =
                     [ text (translate language Search) ]
                 ]
             , div [ class "result list" ]
-                (List.map generateTokenButton (filterWithSearchInput tokens))
+                (List.map (generateTokenButton eosLiquidAmount)
+                    (possessingTokens |> Dict.toList |> List.map Tuple.second |> filterWithSearchInput)
+                )
             , button [ class "close", type_ "button", onClick ToggleModal ]
                 [ text (translate language Close) ]
             ]
@@ -338,10 +360,15 @@ tokenListSection language { modalOpened, tokenSearchInput } =
 
 
 update : Message -> Model -> String -> Float -> ( Model, Cmd Message )
-update message ({ transfer, modalOpened, token } as model) accountName eosLiquidAmount =
+update message ({ transfer, modalOpened, tokensLoaded, possessingTokens, currentSymbol } as model) accountName eosLiquidAmount =
     let
-        defaultLiquidValue =
-            token |> getDefaultAsset
+        token =
+            case possessingTokens |> Dict.get currentSymbol of
+                Just ( foundToken, _ ) ->
+                    foundToken
+
+                Nothing ->
+                    eosToken
     in
     case message of
         SubmitAction ->
@@ -370,56 +397,81 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
             validateToField model Fail
 
         ToggleModal ->
-            ( { model | modalOpened = not modalOpened }, Cmd.none )
-
-        SwitchToken ({ symbol, contractAccount } as newToken) ->
             let
-                newCmd =
-                    if symbol == "EOS" then
-                        Cmd.none
+                ( loaded, newCmd ) =
+                    if accountName == "" || accountName == defaultAccount.accountName then
+                        ( False, Cmd.none )
+
+                    else if tokensLoaded then
+                        ( True, Cmd.none )
 
                     else
-                        getTableRows contractAccount accountName "accounts" -1
-                            |> Http.send OnFetchTableRows
+                        ( True
+                        , Cmd.batch
+                            (List.map
+                                (\{ contractAccount } ->
+                                    getTableRows contractAccount accountName "accounts" -1
+                                        |> Http.send OnFetchTableRows
+                                )
+                                (List.map Tuple.second (tokens |> Dict.remove "EOS" |> Dict.toList))
+                            )
+                        )
             in
+            ( { model | modalOpened = not modalOpened, tokensLoaded = loaded }, newCmd )
+
+        SwitchToken newSymbol ->
             -- Clear form.
             ( { model
-                | token = newToken
-                , tokenBalance = newToken |> getDefaultAsset
+                | currentSymbol = newSymbol
                 , modalOpened = not modalOpened
                 , transfer = { from = "", to = "", quantity = "", memo = "" }
                 , accountValidation = EmptyAccount
                 , quantityValidation = EmptyQuantity
                 , memoValidation = EmptyMemo
               }
-            , newCmd
+            , Cmd.none
             )
 
-        SearchToken input ->
-            ( { model | tokenSearchInput = input }, Cmd.none )
+        SearchToken searchInput ->
+            ( { model | tokenSearchInput = searchInput }, Cmd.none )
 
         OnFetchTableRows (Ok rows) ->
             case rows of
-                -- Account not found on the table.
-                [] ->
-                    ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
-
                 (Data.Table.Accounts { balance }) :: tail ->
                     let
                         symbol =
                             balance |> getSymbolFromAsset |> Maybe.withDefault ""
-                    in
-                    if symbol == token.symbol then
-                        ( { model | tokenBalance = balance }, Cmd.none )
 
-                    else
-                        update (OnFetchTableRows (Ok tail)) model accountName eosLiquidAmount
+                        newModel =
+                            case Dict.get symbol tokens of
+                                Just matchedToken ->
+                                    { model
+                                        | possessingTokens = Dict.insert symbol ( matchedToken, balance ) model.possessingTokens
+                                    }
+
+                                Nothing ->
+                                    model
+                    in
+                    update (OnFetchTableRows (Ok tail)) newModel accountName eosLiquidAmount
 
                 _ ->
                     ( model, Cmd.none )
 
         OnFetchTableRows (Err _) ->
-            ( { model | tokenBalance = defaultLiquidValue }, Cmd.none )
+            ( model, Cmd.none )
+
+        UpdateToken ->
+            let
+                newCmd =
+                    case possessingTokens |> Dict.get currentSymbol of
+                        Just ( { contractAccount }, _ ) ->
+                            getTableRows contractAccount accountName "accounts" -1
+                                |> Http.send OnFetchTableRows
+
+                        Nothing ->
+                            Cmd.none
+            in
+            ( model, newCmd )
 
         _ ->
             ( model, Cmd.none )
@@ -430,7 +482,16 @@ update message ({ transfer, modalOpened, token } as model) accountName eosLiquid
 
 
 setTransferMessageField : TransferMessageFormField -> String -> Model -> Float -> ( Model, Cmd Message )
-setTransferMessageField field value ({ transfer, token, tokenBalance } as model) eosLiquidAmount =
+setTransferMessageField field value ({ transfer, possessingTokens, currentSymbol } as model) eosLiquidAmount =
+    let
+        ( token, tokenBalance ) =
+            case possessingTokens |> Dict.get currentSymbol of
+                Just ( foundToken, balance ) ->
+                    ( foundToken, balance )
+
+                Nothing ->
+                    ( eosToken, "" )
+    in
     case field of
         To ->
             validateToField { model | transfer = { transfer | to = value } } NotSent

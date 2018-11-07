@@ -61,7 +61,7 @@ bundle exec sidekiq RAILS_ENV=<env>
 for voting page crawling
 ```
 redis-sever
-sidekiq RAILS_ENV=development &
+sidekiq RAILS_ENV=development
 ```
 
 

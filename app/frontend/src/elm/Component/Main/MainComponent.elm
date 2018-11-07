@@ -61,8 +61,11 @@ import Html.Attributes
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Navigation exposing (Location)
 import Port
+import Process
 import Route exposing (Route(..), parseLocation)
 import Set
+import Task
+import Time
 import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
@@ -520,17 +523,36 @@ update message ({ page, notification, header, sidebar } as model) flags =
                         _ ->
                             ""
 
-                ( newSidebar, accoutRefreshCmd ) =
-                    Sidebar.update (Sidebar.UpdateState sidebar.state) sidebar
+                defer time msg =
+                    Process.sleep time |> Task.perform (\_ -> msg)
+
+                -- Wait one block confirmation time for accuracy.
+                accountRefreshCmd =
+                    defer (500 * Time.millisecond)
+                        (Sidebar.UpdateState sidebar.state)
+
+                refreshCmd =
+                    case page of
+                        TransferPage { currentSymbol } ->
+                            case currentSymbol of
+                                "EOS" ->
+                                    Cmd.map SidebarMessage accountRefreshCmd
+
+                                _ ->
+                                    -- Wait one block confirmation time for accuracy.
+                                    Cmd.map TransferMessage
+                                        (defer (500 * Time.millisecond) Transfer.UpdateToken)
+
+                        _ ->
+                            Cmd.map SidebarMessage accountRefreshCmd
             in
             ( { model
                 | notification =
                     { content = decodePushActionResponse resp notificationParameter
                     , open = True
                     }
-                , sidebar = newSidebar
               }
-            , Cmd.map SidebarMessage accoutRefreshCmd
+            , Cmd.batch [ refreshCmd ]
             )
 
         ( OnLocationChange location newComponent, _ ) ->

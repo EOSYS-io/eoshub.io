@@ -8,10 +8,10 @@ main.ram_market {
 
 	h3 {
 		font-size: $normal;
+		font-weight:$regular;
 		color: #ffffff;
 
 		& + p {
-			margin:8px 0 0 0;
 			font-size:$small;
 		}
 	}
@@ -37,9 +37,25 @@ main.ram_market {
 				margin-left:8px;
 				padding:24px;
 				background-color:$xx-dark-gray;
+				display:flex;
+				flex-flow:column;
 
 				&:first-child {
 					margin:0;
+				}
+
+				p {
+					margin:0;
+					font-size:$normal;
+					font-weight:$regular;
+					color:$white;
+				}
+
+				h3 {
+					font-size:$small;
+					margin:8px 0 0 0;
+					color:$gray;
+					order:2;
 				}
 			}
 
@@ -67,10 +83,15 @@ main.ram_market {
 				box-sizing:border-box;
 				height:86px;
 
-				h3 span {
-					display:block;
-					margin-top:8px;
+				h3 {
 					font-size:$small;
+					color:$gray;
+					span {
+						color:$white;
+						display:block;
+						margin-bottom:8px;
+						font-size:$normal;
+					}
 				}
 
 				position:relative;
@@ -144,6 +165,7 @@ main.ram_market {
 
 				.tab,
 				.unit {
+					border-radius:0;
 					order:1;
 				}
 

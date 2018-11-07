@@ -590,7 +590,8 @@ body > .modal.popup.virtual_account_check {
 			text-align:left;
 			font-size:$x-small;
 			background-color:$xxx-dark-gray;
-			padding:20px 64px;
+			padding:20px;
+			padding-left:64px;
 			position:relative;
 			width:100%;
 			box-sizing:border-box;
@@ -598,16 +599,28 @@ body > .modal.popup.virtual_account_check {
 			&:last-child {
 				margin-bottom:0;
 			}
+			display:flex;
+			justify-content:space-between;
+			align-items:center;
 
 			span {
-				display:block;
-
 				strong {
 					font-size:$normal;
 					font-weight:400;
 					color:$white;
 					display:block;
 				}
+			}
+
+			i {
+				flex:1;
+				text-align:right;
+				line-height:1.45;
+				display:block;
+				padding-left:10px;
+				box-sizing:border-box;
+				word-break:break-all;
+				color:$white;
 			}
 
 			&.token:before {
