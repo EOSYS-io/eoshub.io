@@ -266,11 +266,30 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
                         Nothing ->
                             -1
+
+                biggestActionSeq =
+                    -- NOTE(boseok): Set latestActionSeq once
+                    if pagination.latestActionSeq == 0 then
+                        case List.foldl (Just >> always) Nothing actions of
+                            Just action ->
+                                action.accountActionSeq
+
+                            Nothing ->
+                                -1
+
+                    else
+                        pagination.latestActionSeq
             in
             if smallestActionSeq > 0 then
                 ( { model
                     | actions = refinedActions ++ model.actions
-                    , pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29, isLoading = False }
+                    , pagination =
+                        { pagination
+                            | latestActionSeq = biggestActionSeq
+                            , nextPos = smallestActionSeq - 1
+                            , offset = -29
+                            , isLoading = False
+                        }
                   }
                 , Cmd.none
                 )
@@ -462,22 +481,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now,
                     , tbody []
                         (viewActionList selectedActionCategory account.accountName openedActionSeq actions)
                     ]
-                , div [ class "btn_area" ]
-                    [ button
-                        [ type_ "button"
-                        , class
-                            ("view_more button"
-                                ++ (if pagination.isLoading then
-                                        " loading"
-
-                                    else
-                                        ""
-                                   )
-                            )
-                        , onClick ShowMore
-                        ]
-                        [ text (translate language Translation.ShowMore) ]
-                    ]
+                , viewShowMoreButton language pagination
                 ]
             ]
         ]
@@ -659,6 +663,41 @@ viewAction selectedActionCategory _ openedActionSeq ({ trxId, blockTime, actionN
         , td []
             [ text (timeFormatter blockTime) ]
         , viewActionInfo action openedActionSeq
+        ]
+
+
+viewShowMoreButton : Language -> Pagination -> Html Message
+viewShowMoreButton language pagination =
+    let
+        numberOfAllActions =
+            toString pagination.latestActionSeq
+
+        numberOfShowingActions =
+            toString (pagination.latestActionSeq - pagination.nextPos)
+    in
+    div [ class "btn_area" ]
+        [ button
+            [ type_ "button"
+            , class
+                ("view_more button"
+                    ++ (if pagination.isLoading then
+                            " loading"
+
+                        else
+                            ""
+                       )
+                )
+            , onClick ShowMore
+            ]
+            [ text
+                (translate language Translation.ShowMore
+                    ++ " ("
+                    ++ numberOfShowingActions
+                    ++ "/"
+                    ++ numberOfAllActions
+                    ++ ")"
+                )
+            ]
         ]
 
 
