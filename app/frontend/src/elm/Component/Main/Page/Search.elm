@@ -132,6 +132,7 @@ type alias Pagination =
     { latestActionSeq : Int
     , nextPos : Int
     , offset : Int
+    , isLoading : Bool
     , isEnd : Bool
     }
 
@@ -160,6 +161,7 @@ initModel accountName =
         { latestActionSeq = 0
         , nextPos = -1
         , offset = -30
+        , isLoading = False
         , isEnd = False
         }
     , selectedActionCategory = "all"
@@ -266,14 +268,24 @@ update message ({ query, pagination, openedActionSeq } as model) =
                             -1
             in
             if smallestActionSeq > 0 then
-                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+                ( { model
+                    | actions = refinedActions ++ model.actions
+                    , pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29, isLoading = False }
+                  }
+                , Cmd.none
+                )
 
             else
                 -- NOTE(boseok): There're no more actions to load
-                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+                ( { model
+                    | actions = refinedActions ++ model.actions
+                    , pagination = { pagination | isEnd = True }
+                  }
+                , Cmd.none
+                )
 
         OnFetchActions (Err _) ->
-            ( model, Cmd.none )
+            ( { model | pagination = { pagination | isLoading = False } }, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
             ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
@@ -284,7 +296,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                     getActions query pagination.nextPos pagination.offset
             in
             if not pagination.isEnd then
-                ( model, actionsCmd )
+                ( { model | pagination = { pagination | isLoading = True } }, actionsCmd )
 
             else
                 -- TODO(boseok): alert it is the end of records
@@ -313,7 +325,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, actions, selectedActionCategory, openedActionSeq, now } as model) =
+view language ({ account, actions, selectedActionCategory, openedActionSeq, now, pagination } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -451,7 +463,19 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now 
                         (viewActionList selectedActionCategory account.accountName openedActionSeq actions)
                     ]
                 , div [ class "btn_area" ]
-                    [ button [ type_ "button", class "view_more button", onClick ShowMore ]
+                    [ button
+                        [ type_ "button"
+                        , class
+                            ("view_more button"
+                                ++ (if pagination.isLoading then
+                                        " loading"
+
+                                    else
+                                        ""
+                                   )
+                            )
+                        , onClick ShowMore
+                        ]
                         [ text (translate language Translation.ShowMore) ]
                     ]
                 ]
