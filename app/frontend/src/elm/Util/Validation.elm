@@ -1,6 +1,7 @@
 module Util.Validation exposing
     ( AccountStatus(..)
     , MemoStatus(..)
+    , PublicKeyStatus(..)
     , QuantityStatus(..)
     , VerificationRequestStatus(..)
     , checkConfirmToken

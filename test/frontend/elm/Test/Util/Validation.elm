@@ -42,6 +42,8 @@ tests =
             , test "length 53 False" <|
                 \() ->
                     Expect.equal False (isAccount "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7")
+            , test "Contains invalid character - O" <|
+                \() -> Expect.equal False (isPublicKey "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7OSrZcBpunuuTxiYkKqb6d")
             ]
         , describe "validateAccount"
             [ test "EmptyAccount" <|
@@ -85,7 +87,7 @@ tests =
                             "299.9999"
                         )
             ]
-        , describe "memo"
+        , describe "validateMemo"
             [ test "EmptyMemo" <|
                 \() ->
                     Expect.equal
@@ -105,5 +107,17 @@ tests =
                     Expect.equal
                         MemoTooLong
                         (validateMemo "This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.This memo is over 256 bytes.")
+            ]
+        , describe "validatePublicKey"
+            [ test "EmptyPubKey" <|
+                \() -> Expect.equal EmptyPublicKey (validatePublicKey "")
+            , test "ValidPubKey" <|
+                \() ->
+                    Expect.equal ValidPublicKey
+                        (validatePublicKey
+                            "EOS5uxjV3FYZvwqyAM2StkFEvUvf43F7gSrZcBpunuuTxiYkKqb6d"
+                        )
+            , test "InvalidPubKey" <|
+                \() -> Expect.equal InvalidPublicKey (validatePublicKey "INVALID_KEY")
             ]
         ]
