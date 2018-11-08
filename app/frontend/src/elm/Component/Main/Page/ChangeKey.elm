@@ -1,11 +1,48 @@
-module Component.Main.Page.ChangeKey exposing (view)
+module Component.Main.Page.ChangeKey exposing (Message, Model, initModel, update, view)
 
-import Html exposing (Html, button, div, form, h2, h3, input, li, main_, p, span, strong, text, ul)
+import Html
+    exposing
+        ( Html
+        , button
+        , div
+        , form
+        , h2
+        , h3
+        , input
+        , li
+        , main_
+        , p
+        , span
+        , strong
+        , text
+        , ul
+        )
 import Html.Attributes exposing (class, disabled, placeholder, type_)
+import Translation exposing (I18n(..), Language(..), translate)
 
 
-view : Html message
-view =
+type Message
+    = None
+
+
+type alias Model =
+    {}
+
+
+initModel : Model
+initModel =
+    {}
+
+
+update : Message -> Model -> Model
+update message model =
+    case message of
+        None ->
+            model
+
+
+view : Language -> Model -> Html Message
+view _ _ =
     main_ [ class "change account key" ]
         [ h2 []
             [ text "계정 키 변경" ]
