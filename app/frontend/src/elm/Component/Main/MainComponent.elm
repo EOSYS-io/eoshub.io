@@ -284,7 +284,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
 
                 ChangeKeyPage subModel ->
-                    Html.map ChangeKeyMessage (ChangeKey.view language subModel)
+                    Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.account)
 
                 _ ->
                     NotFound.view language

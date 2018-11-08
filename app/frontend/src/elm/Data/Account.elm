@@ -110,7 +110,7 @@ type alias VoterInfo =
 
 defaultAccount : Account
 defaultAccount =
-    { accountName = "Loading..."
+    { accountName = ""
     , coreLiquidBalance = "0 EOS"
     , voterInfo =
         { staked = 0

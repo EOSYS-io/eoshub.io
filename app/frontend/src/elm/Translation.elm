@@ -69,6 +69,7 @@ type I18n
     | Attach
     | ChangeWallet
     | MyAccount
+    | MyAccountDefault
     | SignOut
     | TotalAmount
     | TransactionOptimal
@@ -293,6 +294,13 @@ type I18n
     | AnnouncementModalTitle
     | AnnouncementModalParagraph
     | ChangeKey
+    | ChangeKeyDetail
+    | Caution
+    | CautionDetail
+    | TypeOwnerKey
+    | TypeActiveKey
+    | ValidKey
+    | InvalidKey
 
 
 translate : Language -> I18n -> String
@@ -426,6 +434,12 @@ getMessages i18n =
             { korean = "내 계정 보기"
             , english = "My Account"
             , chinese = "查看我的账户"
+            }
+
+        MyAccountDefault ->
+            { korean = "내 계정"
+            , english = "My Account"
+            , chinese = "我的账户"
             }
 
         SignOut ->
@@ -1802,5 +1816,47 @@ getMessages i18n =
         ChangeKey ->
             { korean = "계정 키 변경"
             , english = "Change Account Keys"
-            , chinese = ""
+            , chinese = "变更账户密匙"
+            }
+
+        ChangeKeyDetail ->
+            { korean = "오너 키 변경은 오너 키의 권한으로만 가능하며, 오너와 액티브 키 중 하나만 변경할 수도 있습니다"
+            , english = "You can change the keys with owner key permission. You can choose to change only owner key or active key."
+            , chinese = "变更账户密匙"
+            }
+
+        Caution ->
+            { korean = "주의사항"
+            , english = "Caution"
+            , chinese = "注意"
+            }
+
+        CautionDetail ->
+            { korean = "아래에 입력한 퍼블릭 키와 연결된 프라이빗키를 따로 보관하였는지 반드시 확인하시기 바랍니다. 만약 프라이빗 키를 따로 보관하지 않은 경우, 계정에 대한 접근 권한을 잃게 됩니다. NOTE: 오너 키 변경을 위해서는, 지갑 로그인 시 @owner 권한으로 접속해야 합니다."
+            , english = "Please check if you save the private key safely.\nIf you don't have your private key, you will lose access to the account.\nNOTE: to change your owner key, log in with @owner permission."
+            , chinese = "请储存与以下公匙绑定的密匙。\n如果没有密匙将失去账号权限。\nNOTE：需要变更owner key时以@owner权限登入。"
+            }
+
+        TypeOwnerKey ->
+            { korean = "새로운 오너 키를 입력하세요"
+            , english = "Type in new owner key"
+            , chinese = "请输入owner key"
+            }
+
+        TypeActiveKey ->
+            { korean = "새로운 액티브 키를 입력하세요"
+            , english = "Type in new active key"
+            , chinese = "请输入active key"
+            }
+
+        ValidKey ->
+            { korean = "변경 가능한 키입니다."
+            , english = "Valid key"
+            , chinese = "有效"
+            }
+
+        InvalidKey ->
+            { korean = "변경 가능한 키가 아닙니다"
+            , english = "Invalid key"
+            , chinese = "无效"
             }
