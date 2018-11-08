@@ -96,6 +96,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Navigation
+import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
@@ -444,7 +445,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now,
                     , on "change" (Decode.map SelectActionCategory targetValue)
                     ]
                     [ option [ Html.Attributes.value "all" ]
-                        [ text (translate language All) ]
+                        [ text (translate language Translation.All) ]
                     , option [ Html.Attributes.value "transfer" ]
                         [ text (translate language Transfer) ]
                     , option [ Html.Attributes.value "claimrewards" ]
@@ -882,8 +883,56 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
 
         -- undefined actions in eoshub
         Err str ->
-            td [ class "info" ]
-                [ text (toString str) ]
+            td [ class "info" ] (viewActionData str)
+
+
+viewActionData : String -> List (Html Message)
+viewActionData data =
+    case String.left 1 data of
+        -- NOTE(boseok): When data is JSON
+        "{" ->
+            data
+                |> Debug.log "before"
+                |> replace Regex.All (regex "[{}]") (\_ -> "")
+                |> String.split "\""
+                |> List.tail
+                |> Maybe.withDefault []
+                |> concatByFour
+                |> Debug.log "after"
+
+        _ ->
+            [ text
+                (data |> replace Regex.All (regex "\"") (\_ -> ""))
+            ]
+
+
+concatByFour : List String -> List (Html Message)
+concatByFour list =
+    case list of
+        [] ->
+            []
+
+        _ ->
+            (list |> List.take 4 |> convertActionDataStringToHtml) ++ concatByFour (List.drop 4 list)
+
+
+convertActionDataStringToHtml : List String -> List (Html Message)
+convertActionDataStringToHtml splitedStringList =
+    List.indexedMap
+        (\i str ->
+            case i of
+                -- NOTE(boseok): key
+                0 ->
+                    b [] [ text str ]
+
+                -- NOTE(boseok): char ','
+                3 ->
+                    br [] []
+
+                _ ->
+                    text str
+        )
+        splitedStringList
 
 
 actionHidden : SelectedActionCategory -> String -> Bool
