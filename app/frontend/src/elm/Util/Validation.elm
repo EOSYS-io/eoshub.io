@@ -9,6 +9,7 @@ module Util.Validation exposing
     , validateAccount
     , validateAccountForCreation
     , validateMemo
+    , validatePublicKey
     , validateQuantity
     )
 
@@ -29,7 +30,8 @@ isValidAccountToCreate query =
 
 isPublicKey : String -> Bool
 isPublicKey query =
-    contains (regex "^EOS[\\w]{50}$") query
+    -- Base58 Bitcoin encoded format.
+    contains (regex "^EOS[123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz]{50}$") query
 
 
 checkConfirmToken : String -> Bool
@@ -66,6 +68,12 @@ type MemoStatus
     = MemoTooLong
     | EmptyMemo
     | ValidMemo
+
+
+type PublicKeyStatus
+    = EmptyPublicKey
+    | InvalidPublicKey
+    | ValidPublicKey
 
 
 validateAccount : String -> VerificationRequestStatus -> AccountStatus
@@ -146,3 +154,15 @@ validateMemo memo =
 
     else
         ValidMemo
+
+
+validatePublicKey : String -> PublicKeyStatus
+validatePublicKey pubkey =
+    if pubkey == "" then
+        EmptyPublicKey
+
+    else if isPublicKey pubkey then
+        ValidPublicKey
+
+    else
+        InvalidPublicKey
