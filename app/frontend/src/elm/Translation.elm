@@ -292,6 +292,7 @@ type I18n
     | ConfirmEmailDetail
     | AnnouncementModalTitle
     | AnnouncementModalParagraph
+    | ChangeKey
 
 
 translate : Language -> I18n -> String
@@ -1796,4 +1797,10 @@ getMessages i18n =
             { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트로 준비한 500 EOS가 모두 소진되어 이벤트를 종료합니다. 이오스 커뮤니티의 많은 관심과 참석 감사드리며, 다음에는 더 재미있는 이벤트로 찾아뵐 수 있도록 하겠습니다.\n\n감사합니다.\nEOSYS 드림"
             , english = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
             , chinese = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
+            }
+
+        ChangeKey ->
+            { korean = "계정 키 변경"
+            , english = "Change Account Keys"
+            , chinese = ""
             }
