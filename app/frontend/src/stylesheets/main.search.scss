@@ -47,9 +47,8 @@ main.search {
 
 			dd {
 				margin-top:6px;
-				font-weight:$light;
 				color:$white;
-				font-size:$large;
+				font-size:$x-large;
 			}
 
 			dt.id {
@@ -92,10 +91,11 @@ main.search {
 
 			strong {
 				color:#fff;
-				font-weight:$light;
+				font-weight:$regular;
 				display:block;
 				margin-top:6px;
-				font-size:$large;
+				font-size:$normal-x;
+				letter-spacing:-0.03em;
 			}
 
 			// i :: information
