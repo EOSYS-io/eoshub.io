@@ -90,7 +90,8 @@ app.ports.pushAction.subscribe(async ({ actionName, actions }) => {
     const contractNames = _.map(actions, ({ account }) => account);
     await scatter.eosjsClient.transaction(contractNames, (contracts) => {
       _.forEach(actions, ({ action, payload, account }) => {
-        contracts[account][action](payload, options);
+        const dotReplacedAccount = _.replace(account, '.', '_');
+        contracts[dotReplacedAccount][action](payload, options);
       });
     });
     app.ports.receivePushActionResponse.send(createPushActionReponse(200, actionName));
