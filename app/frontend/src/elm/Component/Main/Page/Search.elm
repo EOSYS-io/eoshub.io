@@ -14,6 +14,7 @@ module Component.Main.Page.Search exposing
     , view
     , viewAccountSpan
     , viewAction
+    , viewActionData
     , viewActionList
     , viewKeyAccountPermList
     , viewKeyPermSpan
@@ -886,7 +887,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
             td [ class "info" ] (viewActionData str)
 
 
-viewActionData : String -> List (Html Message)
+viewActionData : String -> List (Html msg)
 viewActionData data =
     case String.left 1 data of
         -- NOTE(boseok): When data is JSON
@@ -906,7 +907,7 @@ viewActionData data =
             ]
 
 
-concatByFour : List String -> List (Html Message)
+concatByFour : List String -> List (Html msg)
 concatByFour list =
     case list of
         [] ->
@@ -916,7 +917,7 @@ concatByFour list =
             (list |> List.take 4 |> convertActionDataStringToHtml) ++ concatByFour (List.drop 4 list)
 
 
-convertActionDataStringToHtml : List String -> List (Html Message)
+convertActionDataStringToHtml : List String -> List (Html msg)
 convertActionDataStringToHtml splitedStringList =
     List.indexedMap
         (\i str ->
