@@ -1,7 +1,13 @@
-module Component.Main.Page.ChangeKey exposing (Message, Model, initModel, update, view)
+module Component.Main.Page.ChangeKey exposing
+    ( Message
+    , Model
+    , initModel
+    , update
+    , validate
+    , view
+    )
 
-import Data.Account exposing (Account)
-import Data.Action exposing (UpdateauthParameters, encodeAction, updateauthParametersToValue)
+import Data.Action exposing (encodeAction)
 import Html
     exposing
         ( Html

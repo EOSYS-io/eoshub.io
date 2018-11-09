@@ -75,14 +75,21 @@ tests =
             let
                 expectedJson =
                     JE.object
-                        [ ( "account", JE.string "eosadddddddd" )
-                        , ( "action", JE.string "transfer" )
-                        , ( "payload"
-                          , JE.object
-                                [ ( "from", JE.string "from" )
-                                , ( "to", JE.string "to" )
-                                , ( "quantity", JE.string "3.0000 ADD" )
-                                , ( "memo", JE.string "memo" )
+                        [ ( "actionName", JE.string "transfer" )
+                        , ( "actions"
+                          , JE.list
+                                [ JE.object
+                                    [ ( "account", JE.string "eosadddddddd" )
+                                    , ( "action", JE.string "transfer" )
+                                    , ( "payload"
+                                      , JE.object
+                                            [ ( "from", JE.string "from" )
+                                            , ( "to", JE.string "to" )
+                                            , ( "quantity", JE.string "3.0000 ADD" )
+                                            , ( "memo", JE.string "memo" )
+                                            ]
+                                      )
+                                    ]
                                 ]
                           )
                         ]
