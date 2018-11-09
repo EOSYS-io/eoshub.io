@@ -24,6 +24,7 @@ import Html
         ( Html
         , a
         , article
+        , br
         , button
         , dd
         , div
@@ -63,32 +64,7 @@ import Port exposing (KeyPair)
 import Round
 import Translation
     exposing
-        ( I18n
-            ( AccountCreation
-            , AccountCreationAgreeEosConstitution
-            , AccountCreationAlreadyHaveAccount
-            , AccountCreationButton
-            , AccountCreationFailure
-            , AccountCreationInput
-            , AccountCreationKeypairCaution
-            , AccountCreationKeypairCopiedToClipboard
-            , AccountCreationKeypairGeneration
-            , AccountCreationKeypairRegenerate
-            , AccountCreationLoginLink
-            , AccountCreationNameAlreadyExist
-            , AccountCreationNameCondition
-            , AccountCreationNameInvalid
-            , AccountCreationNamePlaceholder
-            , AccountCreationNameValid
-            , AccountCreationPayment
-            , CopyAll
-            , EmptyMessage
-            , EosConstitutionLink
-            , PaymentTotalAmount
-            , PaymentVirtualAccount
-            , PrivateKey
-            , PublicKey
-            )
+        ( I18n(..)
         , Language
         , toLocale
         , translate
@@ -415,7 +391,18 @@ okButton { accountValidation, agreeEosConstitution, product } language =
 view : Model -> Language -> Html Message
 view ({ agreeEosConstitution, notification } as model) language =
     main_ [ class "join" ]
-        [ article []
+        [ div [ class "event disposable banner" ]
+            [ p []
+                [ text (translate language EoshubEosdaq) ]
+            , h2 []
+                [ text (translate language FreeEosAccountEvent) ]
+            , p []
+                [ text (translate language Until500Eos)
+                , br [] []
+                , text (translate language Around1000Account)
+                ]
+            ]
+        , article []
             [ h2 []
                 [ textViewI18n language AccountCreation ]
             , p []

@@ -9,6 +9,7 @@ module Component.Main.Page.Search exposing
     , getActions
     , initCmd
     , initModel
+    , removeQuatation
     , sumStakedToList
     , update
     , view
@@ -96,6 +97,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Navigation
+import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
@@ -132,6 +134,7 @@ type alias Pagination =
     { latestActionSeq : Int
     , nextPos : Int
     , offset : Int
+    , isLoading : Bool
     , isEnd : Bool
     }
 
@@ -160,6 +163,7 @@ initModel accountName =
         { latestActionSeq = 0
         , nextPos = -1
         , offset = -30
+        , isLoading = True
         , isEnd = False
         }
     , selectedActionCategory = "all"
@@ -264,16 +268,40 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
                         Nothing ->
                             -1
+
+                biggestActionSeq =
+                    -- NOTE(boseok): Set latestActionSeq once
+                    if pagination.latestActionSeq == (initModel query).pagination.latestActionSeq then
+                        List.foldl (\{ accountActionSeq } _ -> accountActionSeq) -1 actions
+
+                    else
+                        pagination.latestActionSeq
             in
             if smallestActionSeq > 0 then
-                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | nextPos = smallestActionSeq - 1, offset = -29 } }, Cmd.none )
+                ( { model
+                    | actions = refinedActions ++ model.actions
+                    , pagination =
+                        { pagination
+                            | latestActionSeq = biggestActionSeq
+                            , nextPos = smallestActionSeq - 1
+                            , offset = -29
+                            , isLoading = False
+                        }
+                  }
+                , Cmd.none
+                )
 
             else
                 -- NOTE(boseok): There're no more actions to load
-                ( { model | actions = refinedActions ++ model.actions, pagination = { pagination | isEnd = True } }, Cmd.none )
+                ( { model
+                    | actions = refinedActions ++ model.actions
+                    , pagination = { pagination | isEnd = True, nextPos = 0, isLoading = False }
+                  }
+                , Cmd.none
+                )
 
         OnFetchActions (Err _) ->
-            ( model, Cmd.none )
+            ( { model | pagination = { pagination | isLoading = False } }, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
             ( { model | selectedActionCategory = selectedActionCategory }, Cmd.none )
@@ -284,7 +312,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                     getActions query pagination.nextPos pagination.offset
             in
             if not pagination.isEnd then
-                ( model, actionsCmd )
+                ( { model | pagination = { pagination | isLoading = True } }, actionsCmd )
 
             else
                 -- TODO(boseok): alert it is the end of records
@@ -313,7 +341,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
 
 view : Language -> Model -> Html Message
-view language ({ account, actions, selectedActionCategory, openedActionSeq, now } as model) =
+view language ({ account, actions, selectedActionCategory, openedActionSeq, now, pagination } as model) =
     let
         totalAmount =
             getTotalAmount
@@ -418,7 +446,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now 
                     , on "change" (Decode.map SelectActionCategory targetValue)
                     ]
                     [ option [ Html.Attributes.value "all" ]
-                        [ text (translate language All) ]
+                        [ text (translate language Translation.All) ]
                     , option [ Html.Attributes.value "transfer" ]
                         [ text (translate language Transfer) ]
                     , option [ Html.Attributes.value "claimrewards" ]
@@ -450,10 +478,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now 
                     , tbody []
                         (viewActionList selectedActionCategory account.accountName openedActionSeq actions)
                     ]
-                , div [ class "btn_area" ]
-                    [ button [ type_ "button", class "view_more button", onClick ShowMore ]
-                        [ text (translate language Translation.ShowMore) ]
-                    ]
+                , viewShowMoreButton language pagination
                 ]
             ]
         ]
@@ -638,6 +663,41 @@ viewAction selectedActionCategory _ openedActionSeq ({ trxId, blockTime, actionN
         ]
 
 
+viewShowMoreButton : Language -> Pagination -> Html Message
+viewShowMoreButton language pagination =
+    let
+        numberOfAllActions =
+            toString pagination.latestActionSeq
+
+        numberOfShowingActions =
+            toString (pagination.latestActionSeq - pagination.nextPos)
+    in
+    div [ class "btn_area" ]
+        [ button
+            [ type_ "button"
+            , class
+                ("view_more button"
+                    ++ (if pagination.isLoading then
+                            " loading"
+
+                        else
+                            ""
+                       )
+                )
+            , onClick ShowMore
+            ]
+            [ text
+                (translate language Translation.ShowMore
+                    ++ " ("
+                    ++ numberOfShowingActions
+                    ++ "/"
+                    ++ numberOfAllActions
+                    ++ ")"
+                )
+            ]
+        ]
+
+
 viewAccountLink : String -> Html Message
 viewAccountLink query =
     addSearchLink (query |> getAccountUrl |> ChangeUrl) (em [] [ text query ])
@@ -661,7 +721,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                                 [ viewAccountLink params.from
                                 , text " -> "
                                 , viewAccountLink params.to
-                                , text (" " ++ params.quantity)
+                                , span [ class "asset" ] [ text (" " ++ params.quantity) ]
                                 , span
                                     [ class
                                         ("memo popup"
@@ -825,7 +885,14 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
         -- undefined actions in eoshub
         Err str ->
             td [ class "info" ]
-                [ text (toString str) ]
+                [ text (removeQuatation str) ]
+
+
+removeQuatation : String -> String
+removeQuatation str =
+    str
+        |> replace Regex.All (regex "([\\\\][\\\"])") (\_ -> "'")
+        |> replace Regex.All (regex "\"") (\_ -> "")
 
 
 actionHidden : SelectedActionCategory -> String -> Bool

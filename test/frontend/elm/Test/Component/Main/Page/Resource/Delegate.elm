@@ -3,7 +3,7 @@ module Test.Component.Main.Page.Resource.Delegate exposing (tests)
 import Component.Main.Page.Resource.Delegate exposing (..)
 import Expect
 import Test exposing (..)
-import Translation exposing (Language(..))
+import Translation exposing (I18n(..), Language(..), translate)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -160,7 +160,6 @@ tests =
             ]
 
         -- TODO(boseok):validateEach test
-        -- TODO(boseok):translation
         , describe "validateText"
             [ describe "accountValidation Valid"
                 [ test "both EmptyQuantity" <|
@@ -170,7 +169,7 @@ tests =
                                 initModel
 
                             expected =
-                                ( "임대 가능 수량만큼 입력 가능합니다", "" )
+                                ( translate Korean NeverExceedDelegateAmount, "" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity" <|
@@ -185,7 +184,7 @@ tests =
                                 }
 
                             expected =
-                                ( "임대 받을 계정명을 입력하세요", " false" )
+                                ( translate Korean TypeAccountToDelegate, " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 ]
@@ -199,7 +198,7 @@ tests =
                                 }
 
                             expected =
-                                ( "CPU의 수량입력이 잘못되었습니다", " false" )
+                                ( translate Korean (InvalidQuantityInput "CPU"), " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu EmptyQuantity, net OverValidQuantity" <|
@@ -211,7 +210,7 @@ tests =
                                 }
 
                             expected =
-                                ( "NET의 수량입력이 잘못되었습니다", " false" )
+                                ( translate Korean (InvalidQuantityInput "NET"), " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu OverValidQuantity, net OverValidQuantity" <|
@@ -224,7 +223,7 @@ tests =
                                 }
 
                             expected =
-                                ( "CPU, NET의 수량입력이 잘못되었습니다", " false" )
+                                ( translate Korean (InvalidQuantityInput "CPU, NET"), " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity, total OverValidQuantity" <|
@@ -238,7 +237,7 @@ tests =
                                 }
 
                             expected =
-                                ( "임대 가능 수량을 초과했습니다", " false" )
+                                ( translate Korean ExceedDelegateAmount, " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 , test "cpu ValidQuantity, net ValidQuantity, total ValidQuantity" <|
@@ -252,7 +251,7 @@ tests =
                                 }
 
                             expected =
-                                ( "임대 받을 계정명을 입력하세요", " false" )
+                                ( translate Korean TypeAccountToDelegate, " false" )
                         in
                         Expect.equal expected (validateText Korean defaultModel)
                 ]
