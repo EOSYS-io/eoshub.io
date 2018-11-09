@@ -719,7 +719,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                                 [ viewAccountLink params.from
                                 , text " -> "
                                 , viewAccountLink params.to
-                                , text (" " ++ params.quantity)
+                                , span [ class "asset" ] [ text (" " ++ params.quantity) ]
                                 , span
                                     [ class
                                         ("memo popup"
