@@ -9,6 +9,7 @@ module Component.Main.Page.Search exposing
     , getActions
     , initCmd
     , initModel
+    , removeQuatation
     , sumStakedToList
     , update
     , view
@@ -96,6 +97,7 @@ import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Navigation
+import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
 import Util.Formatter
@@ -444,7 +446,7 @@ view language ({ account, actions, selectedActionCategory, openedActionSeq, now,
                     , on "change" (Decode.map SelectActionCategory targetValue)
                     ]
                     [ option [ Html.Attributes.value "all" ]
-                        [ text (translate language All) ]
+                        [ text (translate language Translation.All) ]
                     , option [ Html.Attributes.value "transfer" ]
                         [ text (translate language Transfer) ]
                     , option [ Html.Attributes.value "claimrewards" ]
@@ -883,7 +885,14 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
         -- undefined actions in eoshub
         Err str ->
             td [ class "info" ]
-                [ text (toString str) ]
+                [ text (removeQuatation str) ]
+
+
+removeQuatation : String -> String
+removeQuatation str =
+    str
+        |> replace Regex.All (regex "([\\\\][\\\"])") (\_ -> "'")
+        |> replace Regex.All (regex "\"") (\_ -> "")
 
 
 actionHidden : SelectedActionCategory -> String -> Bool
