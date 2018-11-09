@@ -1,7 +1,7 @@
 module Component.Account.Page.Created exposing (Message(..), Model, initModel, update, view)
 
 import Html exposing (Html, a, article, br, dd, div, dl, dt, h2, main_, p, text)
-import Html.Attributes exposing (attribute, class)
+import Html.Attributes exposing (attribute, class, href, target)
 import Html.Events exposing (onClick)
 import Navigation
 import Translation
@@ -97,6 +97,12 @@ view { eosAccount, publicKey } language =
             , div [ class "btn_area" ]
                 [ a [ class "go main button", onClick Home ]
                     [ textViewI18n language AccountCreationGoHome ]
+                ]
+            ,div [ class "event disposable banner" ]
+                [ p []
+                    [ a [ href "https://eosdaq.com/", target "_blank" ]
+                        [ text "무료 계정생성 이벤트는 EOSDAQ과 함께 하고 있습니다." ]
+                    ]
                 ]
             ]
         ]

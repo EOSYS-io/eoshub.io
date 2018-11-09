@@ -341,6 +341,70 @@ main.join {
 		word-wrap: normal !important;
 	}
 
+	//  한번 쓰고 버리는 일회용 배너
+	> .event.disposable.banner {
+		// top:$header_height;
+		$area:151.5px;
+		background:#244af6;
+		display:flex;
+		flex-flow:column;
+		height:286px;
+		width:calc(460px + #{$area} * 2); //763
+		box-sizing:border-box;
+		margin-left:calc(-#{$area} + 40px);
+		margin-right:calc(-#{$area} - 40px);
+		justify-content:center;
+		position:relative;
+		color:$white;
+		background:url('../image/bnr_event_free@2x.png') right center no-repeat;
+		background-size:398px 158px;
+
+		&:before,
+		&:after {
+			background:#244af6;
+			display:block;
+			content:'';
+			top:0;
+			bottom:0;
+			position:absolute;
+			z-index:-1;
+		}
+
+		&:before {
+			left:-200%;
+			right:0;
+		}
+
+		&:after {
+			left:0;
+			right:-200%;
+		}
+
+		h2 {
+			font-size:$xx-large;
+			font-weight:300;
+		}
+
+		p {
+			font-size:$small;
+		}
+
+		p:first-child {
+			@include ir();
+			background:url('../image/bnr-hubdaq@2x.png') center center no-repeat;
+			background-size:cover;
+			width:197px;
+			height:20px;
+			margin:0;
+
+			+ h2 {
+				margin-top:24px;
+				+ p {
+					margin:8px 0 0;
+				}
+			}
+		}
+	}
 }
 
 
@@ -382,8 +446,28 @@ main.join {
 
 		.button {
 			flex:1;
+
 			&:last-child {
 				margin-left:4px;
+			}
+
+			&:nth-of-type(1) {
+				margin-left:0;
+			}
+		}
+
+		.event.disposable.banner {
+			margin-top:12px;
+			position:relative;
+
+			p {
+				font-size: $x-small;
+				font-weight: 400;
+				box-sizing: border-box;
+				border-radius: 4px;
+				color:$gray;
+				text-shadow:0 0 3px rgba(255,255,255,0.2);
+				text-align:center;
 			}
 		}
 	}

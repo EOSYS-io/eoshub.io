@@ -40,6 +40,7 @@ import Html
         , strong
         , text
         , textarea
+        , br
         )
 import Html.Attributes
     exposing
@@ -415,7 +416,19 @@ okButton { accountValidation, agreeEosConstitution, product } language =
 view : Model -> Language -> Html Message
 view ({ agreeEosConstitution, notification } as model) language =
     main_ [ class "join" ]
-        [ article []
+        [
+            div [ class "event disposable banner" ]
+            [ p []
+                [ text "이오스허브와 이오스닥이 함께하는" ]
+                , h2 []
+                [ text "무료계정 생성 이벤트" ]
+                , p []
+                [ text "500EOS 소진시까지 "
+                , br [] []
+                , text "선착순 약 1,000명"
+                ]
+            ]
+            ,article []
             [ h2 []
                 [ textViewI18n language AccountCreation ]
             , p []
