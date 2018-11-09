@@ -281,6 +281,11 @@ type I18n
     | TokenName
     | LackCpu
     | GotoFillCpu
+    | EoshubEosdaq
+    | FreeEosAccountEvent
+    | Until500Eos
+    | Around1000Account
+    | GotoEosdaq
 
 
 translate : Language -> I18n -> String
@@ -1719,4 +1724,34 @@ getMessages i18n =
             { korean = "CPU 충전하러 가기"
             , english = "Go to stake CPU"
             , chinese = "去充值CPU"
+            }
+
+        EoshubEosdaq ->
+            { korean = "이오스허브 X 이오스닥"
+            , english = "eoshub X EOSDAQ"
+            , chinese = "eoshub X EOSDAQ"
+            }
+
+        FreeEosAccountEvent ->
+            { korean = "무료 계정 생성 이벤\x1C트"
+            , english = "Free EOS Account Event!"
+            , chinese = "免费创建账号活动"
+            }
+
+        Until500Eos ->
+            { korean = "500 EOS 소진 시까지"
+            , english = "Until 500 EOS is used up"
+            , chinese = "直到消尽500EOS为止"
+            }
+
+        Around1000Account ->
+            { korean = "선착순 약 1,000명"
+            , english = "First come, first served / around 1,000 account"
+            , chinese = "最多1,000人"
+            }
+
+        GotoEosdaq ->
+            { korean = "이오스닥 바로가기"
+            , english = "Go to EOSDAQ"
+            , chinese = "Go to EOSDAQ"
             }

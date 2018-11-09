@@ -12,6 +12,7 @@ import Translation
             , AccountCreationGoHome
             , AccountCreationWelcome
             , AccountCreationYouCanSignIn
+            , GotoEosdaq
             , PublicKey
             )
         , Language
@@ -98,10 +99,10 @@ view { eosAccount, publicKey } language =
                 [ a [ class "go main button", onClick Home ]
                     [ textViewI18n language AccountCreationGoHome ]
                 ]
-            ,div [ class "event disposable banner" ]
+            , div [ class "event disposable banner" ]
                 [ p []
                     [ a [ href "https://eosdaq.com/", target "_blank" ]
-                        [ text "무료 계정생성 이벤트는 EOSDAQ과 함께 하고 있습니다." ]
+                        [ textViewI18n language GotoEosdaq ]
                     ]
                 ]
             ]
