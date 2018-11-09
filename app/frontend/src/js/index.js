@@ -83,19 +83,17 @@ app.ports.invalidateAccount.subscribe(async () => {
   app.ports.receiveWalletStatus.send(createResponseStatus());
 });
 
-app.ports.pushAction.subscribe(async (actions) => {
-  let actionStr = '';
+app.ports.pushAction.subscribe(async ({ actionName, actions }) => {
   try {
     const scatter = getScatter();
     const options = { authorization: [`${scatter.account}@${scatter.authority}`] };
     const contractNames = _.map(actions, ({ account }) => account);
     await scatter.eosjsClient.transaction(contractNames, (contracts) => {
       _.forEach(actions, ({ action, payload, account }) => {
-        actionStr = action;
         contracts[account][action](payload, options);
       });
     });
-    app.ports.receivePushActionResponse.send(createPushActionReponse(200, actionStr));
+    app.ports.receivePushActionResponse.send(createPushActionReponse(200, actionName));
   } catch (err) {
     if (err.isError && err.isError === true) {
       // Deal with scatter error.
@@ -103,7 +101,7 @@ app.ports.pushAction.subscribe(async (actions) => {
       if (type === 'signature_rejected') { return; }
 
       app.ports.receivePushActionResponse.send(
-        createPushActionReponse(code, actionStr, type, message),
+        createPushActionReponse(code, actionName, type, message),
       );
       return;
     }
@@ -114,7 +112,7 @@ app.ports.pushAction.subscribe(async (actions) => {
       if (errObject.code === 500 && errObject.error) {
         const { name, code, what } = errObject.error;
         app.ports.receivePushActionResponse.send(
-          createPushActionReponse(code, actionStr, name, what),
+          createPushActionReponse(code, actionName, name, what),
         );
       }
     } catch (e) {

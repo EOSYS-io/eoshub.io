@@ -459,30 +459,33 @@ errorDecoder =
 encodeAction : ActionParameters -> Encode.Value
 encodeAction action =
     let
-        contents =
+        ( actionName, contents ) =
             case action of
                 Transfer contractAccount message ->
-                    [ transferParametersToValue contractAccount message ]
+                    ( "transfer", [ transferParametersToValue contractAccount message ] )
 
                 Delegatebw message ->
-                    [ delegatebwParametersToValue message ]
+                    ( "delegatebw", [ delegatebwParametersToValue message ] )
 
                 Undelegatebw message ->
-                    [ undelegatebwParametersToValue message ]
+                    ( "undelegatebw", [ undelegatebwParametersToValue message ] )
 
                 Buyram message ->
-                    [ buyramParametersToValue message ]
+                    ( "buyram", [ buyramParametersToValue message ] )
 
                 Sellram message ->
-                    [ sellramParametersToValue message ]
+                    ( "sellram", [ sellramParametersToValue message ] )
 
                 Voteproducer message ->
-                    [ voteproducersParametersToValue message ]
+                    ( "voteproducer", [ voteproducersParametersToValue message ] )
 
                 _ ->
-                    [ Encode.null ]
+                    ( "", [ Encode.null ] )
     in
-    Encode.list contents
+    Encode.object
+        [ ( "actionName", Encode.string actionName )
+        , ( "actions", Encode.list contents )
+        ]
 
 
 transferParametersToValue : String -> TransferParameters -> Encode.Value
