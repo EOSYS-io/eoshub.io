@@ -3,7 +3,7 @@ module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, text)
 import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick)
-import Translation exposing (I18n(..), Language, translate)
+import Translation exposing (I18n(..), Language, toLocale, translate)
 
 
 
@@ -30,10 +30,9 @@ view language =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                        , p []
-                        [
-                          a []
-                            [text "무료 신규계정 만들러 가기"]
+                    , p []
+                        [ a [ onClick (ChangeUrl ("/account/create?locale=" ++ toLocale language)) ]
+                            [ text (translate language MakeYourAccount) ]
                         ]
                     ]
                 , a

@@ -286,6 +286,7 @@ type I18n
     | Until500Eos
     | Around1000Account
     | GotoEosdaq
+    | MakeYourAccount
 
 
 translate : Language -> I18n -> String
@@ -1754,4 +1755,10 @@ getMessages i18n =
             { korean = "이오스닥 바로가기"
             , english = "Go to EOSDAQ"
             , chinese = "Go to EOSDAQ"
+            }
+
+        MakeYourAccount ->
+            { korean = "무료 신규계정 만들러 가기"
+            , english = "Make your account now"
+            , chinese = "去免费创建账号"
             }
