@@ -145,6 +145,32 @@ main.index .menu_area .container {
 		}
 
 	}
+
+
+	// 한번만 사용 :: for event
+	.greeting.event_free {
+		background-color:#244af6;
+		background-image:url('../image/bnr-event-index.svg');
+		background-position:top center;
+		background-repeat:no-repeat;
+		background-size:contain;
+		display:flex;
+		flex-direction:column;
+		align-items:center;
+		justify-content:flex-end;
+
+		h3 {
+			text-align:center;
+			font-weight:300;
+		}
+
+		a {
+			color:$white;
+			&:after {
+				content:' >';
+			}
+		}
+	}
 }
 
 

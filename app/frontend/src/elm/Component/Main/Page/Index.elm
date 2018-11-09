@@ -24,11 +24,16 @@ view language =
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
             , div [ class "container" ]
-                [ div [ class "greeting" ]
+                [ div [ class "greeting event_free" ]
                     [ h3 []
                         [ text (translate language Hello)
                         , br [] []
                         , text (translate language WelcomeEosHub)
+                        ]
+                        , p []
+                        [
+                          a []
+                            [text "무료 신규계정 만들러 가기"]
                         ]
                     ]
                 , a
