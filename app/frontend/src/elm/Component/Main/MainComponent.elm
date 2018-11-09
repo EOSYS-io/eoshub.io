@@ -284,7 +284,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
 
                 ChangeKeyPage subModel ->
-                    Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.account)
+                    Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.wallet)
 
                 _ ->
                     NotFound.view language
@@ -501,10 +501,10 @@ update message ({ page, notification, header, sidebar, productionState } as mode
 
         ( ChangeKeyMessage subMessage, ChangeKeyPage subModel ) ->
             let
-                newPage =
+                ( newPage, subCmd ) =
                     ChangeKey.update subMessage subModel
             in
-            ( { model | page = newPage |> ChangeKeyPage }, Cmd.none )
+            ( { model | page = newPage |> ChangeKeyPage }, Cmd.map ChangeKeyMessage subCmd )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let

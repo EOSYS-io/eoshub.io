@@ -1820,9 +1820,9 @@ getMessages i18n =
             }
 
         ChangeKeyDetail ->
-            { korean = "오너 키 변경은 오너 키의 권한으로만 가능하며, 오너와 액티브 키 중 하나만 변경할 수도 있습니다"
-            , english = "You can change the keys with owner key permission. You can choose to change only owner key or active key."
-            , chinese = "变更账户密匙"
+            { korean = "@active 권한으로는 액티브 키만 변경 가능하며, @owner 권한으로는 두 가지 키 모두 변경 가능합니다."
+            , english = "You can only change your active key with @active permission, and change both with @owner permission."
+            , chinese = "以@active权限只能更改active key，以@owner权限两个key都可以更改。"
             }
 
         Caution ->
