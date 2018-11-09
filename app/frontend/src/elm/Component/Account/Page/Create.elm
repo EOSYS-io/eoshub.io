@@ -64,32 +64,7 @@ import Port exposing (KeyPair)
 import Round
 import Translation
     exposing
-        ( I18n
-            ( AccountCreation
-            , AccountCreationAgreeEosConstitution
-            , AccountCreationAlreadyHaveAccount
-            , AccountCreationButton
-            , AccountCreationFailure
-            , AccountCreationInput
-            , AccountCreationKeypairCaution
-            , AccountCreationKeypairCopiedToClipboard
-            , AccountCreationKeypairGeneration
-            , AccountCreationKeypairRegenerate
-            , AccountCreationLoginLink
-            , AccountCreationNameAlreadyExist
-            , AccountCreationNameCondition
-            , AccountCreationNameInvalid
-            , AccountCreationNamePlaceholder
-            , AccountCreationNameValid
-            , AccountCreationPayment
-            , CopyAll
-            , EmptyMessage
-            , EosConstitutionLink
-            , PaymentTotalAmount
-            , PaymentVirtualAccount
-            , PrivateKey
-            , PublicKey
-            )
+        ( I18n(..)
         , Language
         , toLocale
         , translate
