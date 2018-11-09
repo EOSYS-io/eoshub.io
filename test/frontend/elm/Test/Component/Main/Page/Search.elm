@@ -7,9 +7,17 @@ import Component.Main.Page.Search
         , filterDelbandWithAccountName
         , initModel
         , sumStakedToList
+        , viewActionData
         )
 import Data.Table exposing (..)
 import Expect
+import Html
+    exposing
+        ( b
+        , br
+        , td
+        , text
+        )
 import Test exposing (..)
 
 
@@ -132,6 +140,45 @@ tests =
                 , test "newaccount, hidden True" <|
                     \() ->
                         Expect.equal True (actionHidden "newaccount" "not newaccount")
+                ]
+            ]
+        , describe "view"
+            [ describe "viewActionData"
+                [ test "json, without \\\"" <|
+                    \_ ->
+                        let
+                            data =
+                                "{\"message\":\"BetDice Telegram Reward Round 2 has begun! Play, submit your transaction(TX) on Telegram, and receive free DICE based on your wager! t.me/betdice\"}"
+
+                            expected =
+                                [ b []
+                                    [ text "message: " ]
+                                , text "BetDice Telegram Reward Round 2 has begun! Play, submit your transaction(TX) on Telegram, and receive free DICE based on your wager! t.me/betdice\""
+                                , br []
+                                    []
+                                ]
+                        in
+                        Expect.equal (toString expected) (toString (viewActionData data))
+                , test "json, with \\\"" <|
+                    \_ ->
+                        let
+                            data =
+                                "{\"u\":\"eosyskoreabp\",\"msg\":\"✏ The XPET version of the WORLD CONQUEST \\\"X hegemony\\\" was already live, there is no loser game, the ultimate award + bancor token + pet dividends, each territory is extremely valuable, challenge the final conqueror, take away the 1000eos ancestor beast.  https://www.xpet.io/xmap.html\"}"
+
+                            expected =
+                                [ b []
+                                    [ text "u: " ]
+                                , text "eosyskoreabp"
+                                , br []
+                                    []
+                                , b []
+                                    [ text "msg: " ]
+                                , text "✏ The XPET version of the WORLD CONQUEST \\\"X hegemony\\\" was already live, there is no loser game, the ultimate award + bancor token + pet dividends, each territory is extremely valuable, challenge the final conqueror, take away the 1000eos ancestor beast.  https://www.xpet.io/xmap.html\""
+                                , br []
+                                    []
+                                ]
+                        in
+                        Expect.equal (toString expected) (toString (viewActionData data))
                 ]
             ]
         ]
