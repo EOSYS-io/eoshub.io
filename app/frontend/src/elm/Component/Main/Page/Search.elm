@@ -893,13 +893,9 @@ viewActionData data =
         -- NOTE(boseok): When data is JSON
         "{" ->
             data
-                |> Debug.log "before"
                 |> replace Regex.All (regex "[{}]") (\_ -> "")
-                |> String.split "\""
-                |> List.tail
-                |> Maybe.withDefault []
-                |> concatByFour
-                |> Debug.log "after"
+                |> String.split "\",\""
+                |> separateKeyValue
 
         _ ->
             [ text
@@ -907,33 +903,36 @@ viewActionData data =
             ]
 
 
-concatByFour : List String -> List (Html msg)
-concatByFour list =
-    case list of
-        [] ->
-            []
+separateKeyValue : List String -> List (Html msg)
+separateKeyValue keyValueStringList =
+    let
+        keyValueList =
+            List.map (\str -> String.split "\":\"" str) keyValueStringList
+    in
+    List.foldr convertActionDataStringToHtml [] keyValueList
 
-        _ ->
-            (list |> List.take 4 |> convertActionDataStringToHtml) ++ concatByFour (List.drop 4 list)
 
+convertActionDataStringToHtml : List String -> List (Html msg) -> List (Html msg)
+convertActionDataStringToHtml keyValueList foldedList =
+    let
+        newHtmlList =
+            List.indexedMap
+                (\i str ->
+                    case i of
+                        -- NOTE(boseok): key
+                        0 ->
+                            let
+                                trimedKey =
+                                    str |> replace (Regex.AtMost 1) (regex "\"") (\_ -> "")
+                            in
+                            b [] [ text (trimedKey ++ ": ") ]
 
-convertActionDataStringToHtml : List String -> List (Html msg)
-convertActionDataStringToHtml splitedStringList =
-    List.indexedMap
-        (\i str ->
-            case i of
-                -- NOTE(boseok): key
-                0 ->
-                    b [] [ text str ]
-
-                -- NOTE(boseok): char ','
-                3 ->
-                    br [] []
-
-                _ ->
-                    text str
-        )
-        splitedStringList
+                        _ ->
+                            text str
+                )
+                keyValueList
+    in
+    newHtmlList ++ [ br [] [] ] ++ foldedList
 
 
 actionHidden : SelectedActionCategory -> String -> Bool
