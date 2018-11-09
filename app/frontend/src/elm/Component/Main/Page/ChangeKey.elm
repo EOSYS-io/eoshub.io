@@ -1,6 +1,7 @@
 module Component.Main.Page.ChangeKey exposing (Message, Model, initModel, update, view)
 
 import Data.Account exposing (Account)
+import Data.Action exposing (UpdateauthParameters, encodeAction, updateauthParametersToValue)
 import Html
     exposing
         ( Html
@@ -19,7 +20,8 @@ import Html
         , ul
         )
 import Html.Attributes exposing (attribute, class, disabled, placeholder, type_)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
+import Port
 import Translation exposing (I18n(..), Language(..), translate)
 import Util.Validation exposing (PublicKeyStatus(..), validatePublicKey)
 import Util.WalletDecoder exposing (Wallet)
@@ -28,6 +30,7 @@ import Util.WalletDecoder exposing (Wallet)
 type Message
     = InputActiveKey String
     | InputOwnerKey String
+    | PushAction
 
 
 type alias Model =
@@ -49,14 +52,52 @@ initModel =
     }
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update message model =
+update : Message -> Model -> Wallet -> ( Model, Cmd Message )
+update message ({ activeKey, activeKeyValidation, ownerKey, ownerKeyValidation } as model) { account } =
     case message of
         InputActiveKey inputKey ->
             ( validate { model | activeKey = inputKey }, Cmd.none )
 
         InputOwnerKey inputKey ->
             ( validate { model | ownerKey = inputKey }, Cmd.none )
+
+        PushAction ->
+            let
+                getAuth key =
+                    { threshold = 1
+                    , keys = [ { key = key, weight = 1 } ]
+                    , accounts = []
+                    , waits = []
+                    }
+
+                activeParams =
+                    { account = account
+                    , permission = "active"
+                    , parent = "owner"
+                    , auth = getAuth activeKey
+                    }
+
+                ownerParams =
+                    { account = account
+                    , permission = "owner"
+                    , parent = ""
+                    , auth = getAuth ownerKey
+                    }
+
+                values =
+                    if activeKeyValidation == ValidPublicKey && ownerKeyValidation == ValidPublicKey then
+                        [ ownerParams, activeParams ]
+
+                    else if activeKeyValidation == ValidPublicKey then
+                        [ activeParams ]
+
+                    else
+                        [ ownerParams ]
+
+                cmd =
+                    values |> Data.Action.Updateauth |> encodeAction |> Port.pushAction
+            in
+            ( model, cmd )
 
 
 view : Language -> Model -> Wallet -> Html Message
@@ -132,7 +173,12 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                     ]
                 ]
             , div [ class "btn_area align right" ]
-                [ button [ class "ok button", disabled (not isValid), type_ "button" ]
+                [ button
+                    [ class "ok button"
+                    , disabled (account == "" || not isValid)
+                    , type_ "button"
+                    , onClick PushAction
+                    ]
                     [ text (translate language Confirm) ]
                 ]
             ]

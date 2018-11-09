@@ -13,6 +13,8 @@ import Translation
         ( I18n
             ( BuyramFailed
             , BuyramSucceeded
+            , ChangeKeyFailed
+            , ChangeKeySucceeded
             , CheckDetail
             , CheckError
             , DebugMessage
@@ -75,6 +77,7 @@ actionSuccessMessages =
         , ( "buyram", BuyramSucceeded )
         , ( "sellram", SellramSucceeded )
         , ( "voteproducer", VoteSucceeded )
+        , ( "changekey", ChangeKeySucceeded )
         ]
 
 
@@ -87,6 +90,7 @@ actionFailMessages =
         , ( "buyram", BuyramFailed )
         , ( "sellram", SellramFailed )
         , ( "voteproducer", VoteFailed )
+        , ( "changekey", ChangeKeyFailed )
         ]
 
 

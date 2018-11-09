@@ -301,6 +301,8 @@ type I18n
     | TypeActiveKey
     | ValidKey
     | InvalidKey
+    | ChangeKeySucceeded String
+    | ChangeKeyFailed String
 
 
 translate : Language -> I18n -> String
@@ -1859,4 +1861,16 @@ getMessages i18n =
             { korean = "변경 가능한 키가 아닙니다"
             , english = "Invalid key"
             , chinese = "无效"
+            }
+
+        ChangeKeySucceeded _ ->
+            { korean = "계정 키 변경에 성공했습니다"
+            , english = "Successfully changed the account key"
+            , chinese = "账户密匙变更成功"
+            }
+
+        ChangeKeyFailed code ->
+            { korean = code ++ " 코드오류로 키 변경 실패"
+            , english = "Failed with error code " ++ code
+            , chinese = code ++ "编码有误key变更失败"
             }

@@ -502,7 +502,7 @@ update message ({ page, notification, header, sidebar, productionState } as mode
         ( ChangeKeyMessage subMessage, ChangeKeyPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    ChangeKey.update subMessage subModel
+                    ChangeKey.update subMessage subModel sidebar.wallet
             in
             ( { model | page = newPage |> ChangeKeyPage }, Cmd.map ChangeKeyMessage subCmd )
 
