@@ -68,7 +68,45 @@ import Navigation
 import Port exposing (KeyPair)
 import Translation
     exposing
-        ( I18n(..)
+        ( I18n
+            ( AccountCreation
+            , AccountCreationAgreeEosConstitution
+            , AccountCreationAlreadyHaveAccount
+            , AccountCreationButton
+            , AccountCreationConfirmEmail
+            , AccountCreationEmailConfirmFailure
+            , AccountCreationEmailConfirmed
+            , AccountCreationEmailInvalid
+            , AccountCreationEmailValid
+            , AccountCreationEnterEmail
+            , AccountCreationEnterVerificationCode
+            , AccountCreationFailure
+            , AccountCreationInput
+            , AccountCreationKeypairCaution
+            , AccountCreationKeypairCopiedToClipboard
+            , AccountCreationKeypairGeneration
+            , AccountCreationKeypairRegenerate
+            , AccountCreationLoginLink
+            , AccountCreationNameAlreadyExist
+            , AccountCreationNameCondition
+            , AccountCreationNameInvalid
+            , AccountCreationNamePlaceholder
+            , AccountCreationNameValid
+            , AccountCreationProgressCreateNew
+            , AccountCreationProgressEmail
+            , AccountCreationProgressKeypair
+            , AccountCreationSendEmail
+            , Confirm
+            , ConfirmEmailSent
+            , CopyAll
+            , DebugMessage
+            , EmptyMessage
+            , EosConstitutionLink
+            , Next
+            , PrivateKey
+            , PublicKey
+            , UnknownError
+            )
         , Language
         , toLocale
         , translate
@@ -453,18 +491,7 @@ okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstituti
 view : Model -> Language -> Html Message
 view ({ agreeEosConstitution, notification } as model) language =
     main_ [ class "join" ]
-        [ div [ class "event disposable banner" ]
-            [ p []
-                [ text (translate language EoshubEosdaq) ]
-            , h2 []
-                [ text (translate language FreeEosAccountEvent) ]
-            , p []
-                [ text (translate language Until500Eos)
-                , br [] []
-                , text (translate language Around1000Account)
-                ]
-            ]
-        , article []
+        [ article []
             [ h2 []
                 [ textViewI18n language AccountCreation ]
             , p []

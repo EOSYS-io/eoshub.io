@@ -606,11 +606,6 @@ update message ({ page, notification, header, sidebar } as model) flags =
             , Navigation.newUrl ("/search?query=" ++ sidebar.account.accountName)
             )
 
-        ( NotificationMessage Notification.MoveToCpunetPage, _ ) ->
-            ( { model | notification = { notification | open = False } }
-            , Navigation.newUrl "/resource"
-            )
-
         ( SidebarMessage (Sidebar.OnFetchAccount (Ok ({ voterInfo } as data))), VotePage subModel ) ->
             -- This is an exceptional case. The model on vote page needed to be updated
             -- when an update of the account in sidebar occurs.

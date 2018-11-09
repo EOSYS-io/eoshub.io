@@ -3,7 +3,7 @@ module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, text)
 import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick)
-import Translation exposing (I18n(..), Language, toLocale, translate)
+import Translation exposing (I18n(..), Language, translate)
 
 
 
@@ -24,15 +24,11 @@ view language =
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
             , div [ class "container" ]
-                [ div [ class "greeting event_free" ]
+                [ div [ class "greeting" ]
                     [ h3 []
                         [ text (translate language Hello)
                         , br [] []
                         , text (translate language WelcomeEosHub)
-                        ]
-                    , p []
-                        [ a [ onClick (ChangeUrl ("/account/create?locale=" ++ toLocale language)) ]
-                            [ text (translate language MakeYourAccount) ]
                         ]
                     ]
                 , a

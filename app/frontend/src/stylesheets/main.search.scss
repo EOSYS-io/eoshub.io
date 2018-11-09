@@ -47,8 +47,9 @@ main.search {
 
 			dd {
 				margin-top:6px;
+				font-weight:$light;
 				color:$white;
-				font-size:$x-large;
+				font-size:$large;
 			}
 
 			dt.id {
@@ -91,11 +92,10 @@ main.search {
 
 			strong {
 				color:#fff;
-				font-weight:$regular;
+				font-weight:$light;
 				display:block;
 				margin-top:6px;
-				font-size:$normal-x;
-				letter-spacing:-0.03em;
+				font-size:$large;
 			}
 
 			// i :: information
@@ -392,10 +392,6 @@ main.search {
 				position:relative;
 				padding-right:60px;
 				word-break:break-all;
-
-				span.asset {
-					color:#fff;
-				}
 
 				span.memo.popup {
 					$padding:20px;

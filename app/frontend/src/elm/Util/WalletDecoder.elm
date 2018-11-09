@@ -18,8 +18,6 @@ import Translation
             , DebugMessage
             , DelegatebwFailed
             , DelegatebwSucceeded
-            , GotoFillCpu
-            , LackCpu
             , SellramFailed
             , SellramSucceeded
             , TransferFailed
@@ -111,13 +109,6 @@ decodePushActionResponse { code, type_, message, action } i18nParam =
                         { message = UnknownError
                         , detail = CheckError
                         }
-
-        -- CPU lack.
-        3080004 ->
-            Notification.Error
-                { message = LackCpu
-                , detail = GotoFillCpu
-                }
 
         _ ->
             let

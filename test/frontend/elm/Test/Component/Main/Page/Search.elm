@@ -6,7 +6,6 @@ import Component.Main.Page.Search
         , actionHidden
         , filterDelbandWithAccountName
         , initModel
-        , removeQuatation
         , sumStakedToList
         )
 import Data.Table exposing (..)
@@ -133,18 +132,6 @@ tests =
                 , test "newaccount, hidden True" <|
                     \() ->
                         Expect.equal True (actionHidden "newaccount" "not newaccount")
-                ]
-            , describe "removeQuatation"
-                [ test "newaccount, hidden True" <|
-                    \() ->
-                        let
-                            rawString =
-                                "{\"value1\":\"abc\\\"string\\\"abc\"}"
-
-                            expected =
-                                "{value1:abc'string'abc}"
-                        in
-                        Expect.equal expected (removeQuatation rawString)
                 ]
             ]
         ]
