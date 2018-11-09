@@ -279,14 +279,6 @@ type I18n
     | OtherTokens
     | TokenList
     | TokenName
-    | LackCpu
-    | GotoFillCpu
-    | EoshubEosdaq
-    | FreeEosAccountEvent
-    | Until500Eos
-    | Around1000Account
-    | GotoEosdaq
-    | MakeYourAccount
 
 
 translate : Language -> I18n -> String
@@ -519,7 +511,7 @@ getMessages i18n =
             }
 
         RamMarketDesc ->
-            { korean = "RAM을 사고 팔 수 있어요."
+            { korean = "램을 사고 팔 수 있어요"
             , english = "Buy or Sell RAM here"
             , chinese = "在这里可以自由地买卖RAM"
             }
@@ -681,7 +673,7 @@ getMessages i18n =
             }
 
         TransferableAmountDesc ->
-            { korean = "전송 가능 수량만큼 입력할 수 있습니다"
+            { korean = "전송 가능 수량만큼 입력 가능합니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "传送数量不可超过可传送数量"
             }
@@ -1293,7 +1285,7 @@ getMessages i18n =
             }
 
         BuyFeeCharged ->
-            { korean = "구매 시, 0.5%의 수수료가 발생합니다"
+            { korean = "구매시 0.5%의 수수료가 발생합니다"
             , english = "When buying, 0.5% fee is charged"
             , chinese = "购买时发生0.5%的手续费"
             }
@@ -1515,7 +1507,7 @@ getMessages i18n =
             }
 
         Undelegate ->
-            { korean = "임대 취소하기"
+            { korean = "임대취소하기"
             , english = "Undelegate"
             , chinese = "取消资源租借"
             }
@@ -1545,7 +1537,7 @@ getMessages i18n =
             }
 
         NeverExceedStakeAmount ->
-            { korean = "스테이크 가능 수량만큼 입력할 수 있습니다"
+            { korean = "스테이크 가능 수량만큼 입력 가능합니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "不可超过可stake数量"
             }
@@ -1626,7 +1618,7 @@ getMessages i18n =
             }
 
         NeverExceedDelegateAmount ->
-            { korean = "임대 가능 수량만큼 입력할 수 있습니다"
+            { korean = "임대 가능 수량만큼 입력 가능합니다"
             , english = "The input cannot exceed the available balance"
             , chinese = "不可超过可租借数量"
             }
@@ -1644,7 +1636,7 @@ getMessages i18n =
             }
 
         TypeDelegateAmount ->
-            { korean = "임대할 수량을 입력하세요"
+            { korean = "임대 할 수량을 입력하세요"
             , english = "Enter amount to delegate"
             , chinese = "请输入要租借的数量"
             }
@@ -1674,7 +1666,7 @@ getMessages i18n =
             }
 
         SelectAccountToUndelegate ->
-            { korean = "임대를 취소할 계정을 선택해주세요"
+            { korean = "임대를 취소할 계정명을 선택하세요"
             , english = "Select account name to undelegate"
             , chinese = "请输入要取消资源租借的账户名"
             }
@@ -1713,52 +1705,4 @@ getMessages i18n =
             { korean = "토큰 이름"
             , english = "Token name"
             , chinese = "代币名称"
-            }
-
-        LackCpu ->
-            { korean = "계정에 스테이킹(Staking)된 CPU가 부족하여 전송에 실패했습니다"
-            , english = "Failed to transfer due to lacking staked CPU"
-            , chinese = "Staking不足传送失败"
-            }
-
-        GotoFillCpu ->
-            { korean = "CPU 충전하러 가기"
-            , english = "Go to stake CPU"
-            , chinese = "去充值CPU"
-            }
-
-        EoshubEosdaq ->
-            { korean = "이오스허브 X 이오스닥"
-            , english = "eoshub X EOSDAQ"
-            , chinese = "eoshub X EOSDAQ"
-            }
-
-        FreeEosAccountEvent ->
-            { korean = "무료 계정 생성 이벤\x1C트"
-            , english = "Free EOS Account Event!"
-            , chinese = "免费创建账号活动"
-            }
-
-        Until500Eos ->
-            { korean = "500 EOS 소진 시까지"
-            , english = "Until 500 EOS is used up"
-            , chinese = "直到消尽500EOS为止"
-            }
-
-        Around1000Account ->
-            { korean = "선착순 약 1,000명"
-            , english = "First come, first served / around 1,000 account"
-            , chinese = "最多1,000人"
-            }
-
-        GotoEosdaq ->
-            { korean = "이오스닥 바로가기"
-            , english = "Go to EOSDAQ"
-            , chinese = "Go to EOSDAQ"
-            }
-
-        MakeYourAccount ->
-            { korean = "무료 신규계정 만들러 가기"
-            , english = "Make your account now"
-            , chinese = "去免费创建账号"
             }

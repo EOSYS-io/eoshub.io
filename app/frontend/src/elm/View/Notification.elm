@@ -23,7 +23,6 @@ import Translation exposing (I18n(Close), Language, translate)
 type Message
     = CloseNotification
     | MoveToAccountPage
-    | MoveToCpunetPage
 
 
 
@@ -68,26 +67,22 @@ initModel =
 view : Model -> Language -> Html Message
 view { content, open } language =
     let
-        ( texts, isError ) =
+        texts =
             case content of
                 Ok { message, detail } ->
-                    ( ( translate language message
-                      , "view success"
-                      , translate language detail
-                      )
-                    , False
+                    ( translate language message
+                    , "view success"
+                    , translate language detail
                     )
 
                 Error { message, detail } ->
-                    ( ( translate language message
-                      , "view fail"
-                      , translate language detail
-                      )
-                    , True
+                    ( translate language message
+                    , "view fail"
+                    , translate language detail
                     )
 
                 _ ->
-                    ( ( "", "", "" ), False )
+                    ( "", "", "" )
 
         viewing =
             if open then
@@ -100,11 +95,11 @@ view { content, open } language =
         [ id "notification"
         , class ("notification panel" ++ viewing)
         ]
-        [ messageBox texts language isError ]
+        [ messageBox texts language ]
 
 
-messageBox : ( String, String, String ) -> Language -> Bool -> Html Message
-messageBox ( mainText, classText, detailText ) language isError =
+messageBox : ( String, String, String ) -> Language -> Html Message
+messageBox ( mainText, classText, detailText ) language =
     div [ class classText ]
         (if String.isEmpty detailText then
             [ messageBoxMainText mainText
@@ -113,7 +108,7 @@ messageBox ( mainText, classText, detailText ) language isError =
 
          else
             [ messageBoxMainText mainText
-            , messageBoxDetailText detailText isError
+            , messageBoxDetailText detailText
             , messageBoxButton language
             ]
         )
@@ -124,23 +119,9 @@ messageBoxMainText mainText =
     p [] [ text mainText ]
 
 
-
--- NOTE(heejae): Currently, it routes to resource page when error occurs.
--- Consider refactoring error messages to receive msg as parameter to handle other cases.
-
-
-messageBoxDetailText : String -> Bool -> Html Message
-messageBoxDetailText detailText isError =
-    a
-        [ onClick
-            (if isError then
-                MoveToCpunetPage
-
-             else
-                MoveToAccountPage
-            )
-        ]
-        [ text detailText ]
+messageBoxDetailText : String -> Html Message
+messageBoxDetailText detailText =
+    a [ onClick MoveToAccountPage ] [ text detailText ]
 
 
 messageBoxButton : Language -> Html Message
