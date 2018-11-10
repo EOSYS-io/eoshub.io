@@ -82,7 +82,7 @@ view language =
         , node "script"
             []
             [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
-        , section [ attribute "aria-live" "true", class "notice modal popup viewing", id "popup", attribute "role" "alert" ]
+        , section [ attribute "aria-live" "true", class "notice modal popup", id "popup", attribute "role" "alert" ]
             [ div [ class "wrapper" ]
                 [ h2 []
                     [ text (translate language SorryModalTitle) ]
@@ -94,5 +94,5 @@ view language =
             ]
         , node "script"
             []
-            [ text "(function () {var button = document.querySelector('#popup button.close');var popup = document.getElementById('popup');button.addEventListener('click',function () {popup.classList.remove('viewing');});})();" ]
+            [ text "!function(){var e=document.querySelector('#popup button.close'),t=document.getElementById('popup');e.addEventListener('click',function(){t.classList.remove('viewing')}),document.querySelector('.notice.modal.popup').classList.add('viewing')}();" ]
         ]
