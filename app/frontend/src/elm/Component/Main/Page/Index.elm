@@ -1,7 +1,7 @@
 module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, text)
-import Html.Attributes exposing (attribute, class, href, target, type_)
+import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, translate)
 
@@ -82,4 +82,17 @@ view language =
         , node "script"
             []
             [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
+        , section [ attribute "aria-live" "true", class "notice modal popup viewing", id "popup", attribute "role" "alert" ]
+            [ div [ class "wrapper" ]
+                [ h2 []
+                    [ text (translate language SorryModalTitle) ]
+                , p []
+                    [ text (translate language SorryModalParagraph) ]
+                , button [ class "close", id "closePopup", type_ "button" ]
+                    [ text "닫기" ]
+                ]
+            ]
+        , node "script"
+            []
+            [ text "(function () {var button = document.querySelector('#popup button.close');var popup = document.getElementById('popup');button.addEventListener('click',function () {popup.classList.remove('viewing');});})();" ]
         ]
