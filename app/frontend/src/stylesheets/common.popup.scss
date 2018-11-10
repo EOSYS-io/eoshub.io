@@ -674,6 +674,37 @@ body > .modal.popup.virtual_account_check {
 	}
 }
 
+// 사과공지
+
+.modal.popup.notice {
+	z-index:10;
+
+	.wrapper{
+		width:550px;
+		max-width:none;
+		background-color:$xx-dark-gray;
+	}
+
+	h2 {
+		margin-top:-5px;
+		margin-bottom:30px;
+	}
+
+	p {
+		font-size:rem(14);
+		margin-left:32px;
+		margin-right:32px;
+		margin-top:1em;
+		margin-bottom:1em;
+		white-space:pre-line;
+
+		&.sign {
+			margin-top:30px;
+			text-align:right;
+		}
+	}
+}
+
 
 // bp name list
 
