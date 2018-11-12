@@ -70,7 +70,7 @@ import Translation
         , translate
         )
 import Util.Flags exposing (Flags)
-import Util.HttpRequest exposing (getAccount)
+import Util.HttpRequest exposing (getAccount, getEosAccountProduct)
 import Util.Urls as Urls
 import Util.Validation
     exposing
@@ -114,7 +114,7 @@ initCmd : Model -> Flags -> Language -> Cmd Message
 initCmd model flags language =
     Cmd.batch
         [ Port.generateKeys ()
-        , requestEosAccountProduct model flags language
+        , getEosAccountProduct flags language |> Http.send ResultEosAccountProduct
         ]
 
 
@@ -458,20 +458,6 @@ requestPayment model flags language =
     Http.send ResultRequestPayment <| postRequestPayment model flags language
 
 
-getEosAccountProduct : Model -> Flags -> Language -> Http.Request Product
-getEosAccountProduct model flags language =
-    let
-        url =
-            Urls.eosAccountProductUrl flags (toLocale language)
-    in
-    Http.get url productDecoder
-
-
-requestEosAccountProduct : Model -> Flags -> Language -> Cmd Message
-requestEosAccountProduct model flags language =
-    Http.send ResultEosAccountProduct <| getEosAccountProduct model flags language
-
-
 
 -- Util
 
@@ -498,6 +484,6 @@ validateAccountName ({ accountName } as model) requestStatus =
 -- SUBSCRIPTIONS
 
 
-subscriptions : Sub Message
-subscriptions =
+subscriptions : Model -> Sub Message
+subscriptions _ =
     Port.receiveKeys UpdateKeys

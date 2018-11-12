@@ -98,4 +98,12 @@ tests =
             , test "No symbol" <|
                 \() -> Expect.equal "" ("1.0000" |> getSymbolFromAsset |> Maybe.withDefault "")
             ]
+        , describe "formatSeconds"
+            [ test "Over 1 hour" <| \() -> Expect.equal "00:00" (formatSeconds 3601)
+            , test "Negative input" <| \() -> Expect.equal "00:00" (formatSeconds -1)
+            , test "Valid input with one digit" <|
+                \() -> Expect.equal "03:04" (formatSeconds 184)
+            , test "Valid input with two digits" <|
+                \() -> Expect.equal "59:59" (formatSeconds 3599)
+            ]
         ]

@@ -287,6 +287,7 @@ type I18n
     | Around1000Account
     | GotoEosdaq
     | MakeYourAccount
+    | FreeAccountCreation
 
 
 translate : Language -> I18n -> String
@@ -1761,4 +1762,10 @@ getMessages i18n =
             { korean = "무료 신규계정 만들러 가기"
             , english = "Make your account now"
             , chinese = "去免费创建账号"
+            }
+
+        FreeAccountCreation ->
+            { korean = "무료 계정 생성"
+            , english = "Create Free Account"
+            , chinese = "免费创建账号"
             }

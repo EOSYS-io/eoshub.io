@@ -1,11 +1,20 @@
-module Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+module Util.HttpRequest exposing
+    ( getAccount
+    , getEosAccountProduct
+    , getFullPath
+    , getTableRows
+    , post
+    )
 
 import Data.Account exposing (Account, accountDecoder)
+import Data.Json exposing (Product, productDecoder)
 import Data.Table exposing (Row, rowsDecoder)
 import Http
 import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
-import Util.Urls exposing (mainnetRpcUrl)
+import Translation exposing (Language, toLocale)
+import Util.Flags exposing (Flags)
+import Util.Urls exposing (eosAccountProductUrl, mainnetRpcUrl)
 
 
 getFullPath : String -> String
@@ -55,3 +64,12 @@ getTableRows code scope table limit =
                 |> Http.jsonBody
     in
     post ("/v1/chain/get_table_rows" |> getFullPath) requestBody rowsDecoder
+
+
+getEosAccountProduct : Flags -> Language -> Http.Request Product
+getEosAccountProduct flags language =
+    let
+        url =
+            eosAccountProductUrl flags (toLocale language)
+    in
+    Http.get url productDecoder

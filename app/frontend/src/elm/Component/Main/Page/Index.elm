@@ -31,7 +31,7 @@ view language =
                         , text (translate language WelcomeEosHub)
                         ]
                     , p []
-                        [ a [ onClick (ChangeUrl ("/account/create?locale=" ++ toLocale language)) ]
+                        [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
                             [ text (translate language MakeYourAccount) ]
                         ]
                     ]

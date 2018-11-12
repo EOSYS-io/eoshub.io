@@ -24,6 +24,7 @@ model =
     , emailConfirmed = False
     , agreeEosConstitution = False
     , notification = Notification.initModel
+    , secondsLeft = 0
     }
 
 

@@ -178,6 +178,10 @@ main.join {
 				border-color:transparent;
 			}
 		}
+
+		button.action.button[disabled]:nth-of-type(1) {
+			color:$white;
+		}
 	}
 
 	dl {
