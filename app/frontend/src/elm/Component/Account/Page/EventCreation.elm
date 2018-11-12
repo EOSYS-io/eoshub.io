@@ -100,7 +100,6 @@ type alias Model =
     , accountRequestSuccess : Bool
     , keys : KeyPair
     , email : String
-    , emailRequested : Bool
     , emailValid : Bool
     , confirmToken : String
     , confirmTokenValid : Bool
@@ -108,7 +107,7 @@ type alias Model =
     , emailConfirmed : Bool
     , agreeEosConstitution : Bool
     , notification : Notification.Model
-    , secondsLeft : Int
+    , emailValidationSecondsLeft : Int
     }
 
 
@@ -119,7 +118,6 @@ initModel =
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "" }
     , email = ""
-    , emailRequested = False
     , emailValid = False
     , confirmToken = ""
     , confirmTokenValid = False
@@ -127,7 +125,7 @@ initModel =
     , emailConfirmed = False
     , agreeEosConstitution = False
     , notification = Notification.initModel
-    , secondsLeft = 0
+    , emailValidationSecondsLeft = 0
     }
 
 
@@ -161,7 +159,7 @@ type Message
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
-update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as model) flags language =
+update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as model) flags language =
     case msg of
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -228,15 +226,15 @@ update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as 
             ( { newModel | emailValid = emailValid }, Cmd.none )
 
         SendCode ->
-            ( { model | emailRequested = True }, sendCodeRequest model flags language )
+            ( model, sendCodeRequest model flags language )
 
         SendCodeResponse (Ok res) ->
             ( { model
                 | notification =
-                    { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
+                    { content = Notification.Ok { message = ConfirmEmailSent, detail = ConfirmEmailDetail }
                     , open = True
                     }
-                , secondsLeft = 180
+                , emailValidationSecondsLeft = 180
               }
             , Cmd.none
             )
@@ -247,13 +245,13 @@ update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as 
                     handleRailsErrorResponse error UnknownError
             in
             ( { model
-                | emailRequested = False
-                , notification =
+                | notification =
                     { content =
                         Notification.Error
                             { message = errorMessage, detail = errorDetail }
                     , open = True
                     }
+                , emailValidationSecondsLeft = 0
               }
             , Cmd.none
             )
@@ -266,15 +264,19 @@ update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as 
 
         EmailConfirmationResponse response ->
             let
-                ( emailConfirmed, newEmailRequested ) =
+                ( emailConfirmed, newSecondsLeft ) =
                     case response of
                         Ok _ ->
-                            ( True, False )
+                            ( True, 0 )
 
                         Err _ ->
-                            ( False, emailRequested )
+                            ( False, emailValidationSecondsLeft )
             in
-            ( { model | emailConfirmationRequested = True, emailConfirmed = emailConfirmed, emailRequested = newEmailRequested }
+            ( { model
+                | emailConfirmationRequested = True
+                , emailConfirmed = emailConfirmed
+                , emailValidationSecondsLeft = newSecondsLeft
+              }
             , Cmd.none
             )
 
@@ -293,11 +295,11 @@ update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as 
             ( model, Navigation.newUrl url )
 
         Tick _ ->
-            if secondsLeft == 0 then
-                ( { model | emailRequested = False }, Cmd.none )
+            if emailValidationSecondsLeft <= 0 then
+                ( model, Cmd.none )
 
             else
-                ( { model | secondsLeft = secondsLeft - 1 }, Cmd.none )
+                ( { model | emailValidationSecondsLeft = emailValidationSecondsLeft - 1 }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -371,7 +373,7 @@ keypairGenerationViews { keys } language =
 
 
 emailConfirmSection : Model -> Language -> Html Message
-emailConfirmSection { emailValid, confirmTokenValid, emailRequested, secondsLeft } language =
+emailConfirmSection { emailValid, confirmTokenValid, emailValidationSecondsLeft } language =
     section [ class "email verification" ]
         [ input
             [ name ""
@@ -384,10 +386,10 @@ emailConfirmSection { emailValid, confirmTokenValid, emailRequested, secondsLeft
             [ class "action button"
             , type_ "button"
             , onClick SendCode
-            , disabled (not emailValid || emailRequested)
+            , disabled (not emailValid || emailValidationSecondsLeft > 0)
             ]
-            [ if emailRequested then
-                text (formatSeconds secondsLeft)
+            [ if emailValidationSecondsLeft > 0 then
+                text (formatSeconds emailValidationSecondsLeft)
 
               else
                 textViewI18n language AccountCreationSendEmail
@@ -594,12 +596,12 @@ validateAccountNameInput ({ accountName } as model) requestStatus =
 
 
 subscriptions : Model -> Sub Message
-subscriptions { emailRequested } =
+subscriptions { emailValidationSecondsLeft } =
     let
         receiveKeySub =
             Port.receiveKeys UpdateKeys
     in
-    if emailRequested then
+    if emailValidationSecondsLeft > 0 then
         Sub.batch [ Time.every Time.second Tick, receiveKeySub ]
 
     else

@@ -16,7 +16,6 @@ model =
     , accountRequestSuccess = False
     , keys = { privateKey = "", publicKey = "12o9347512f1oh923" }
     , email = "test@chain.partners"
-    , emailRequested = False
     , emailValid = False
     , confirmToken = ""
     , confirmTokenValid = False
@@ -24,7 +23,7 @@ model =
     , emailConfirmed = False
     , agreeEosConstitution = False
     , notification = Notification.initModel
-    , secondsLeft = 0
+    , emailValidationSecondsLeft = 0
     }
 
 
