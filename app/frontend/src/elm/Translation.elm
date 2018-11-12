@@ -1710,13 +1710,13 @@ getMessages i18n =
             }
 
         SorryModalTitle ->
-            { korean = "무료 계정 이벤트 관련 안내"
-            , english = "Announcement of apologies for the event delay"
-            , chinese = "Announcement of apologies for the event delay"
+            { korean = "무료 계정 생성 이벤트 재공지 - 11월 13일 오후 5시"
+            , english = "Free EOS account creation event restart on 13th Nov"
+            , chinese = "再次公告免费生成账号活动 - 11月 13日下午5点"
             }
 
         SorryModalParagraph ->
-            { korean = "안녕하세요, EOSYS입니다. \n\n11월 9일 금요일 저녁 5시에 예정 되어있던 무료 계정 생성 이벤트와 관련해 불편함을 드려 정말 죄송합니다.\n\n이메일 발송이 되지 않았던 원인은 저희가 사용중인 SendGrid에서 일시적으로 신청자가 몰려 전송이 지연된 것으로 확인되었습니다. 따라서 일시적으로 이벤트를 중지하였으며, 운영이 미숙했던 저희의 잘못이 큽니다.\n\n무료 계정 발급 이벤트는 내부적으로 신중히 검토한 후, 다음주 월요일에 추후 일정에 대해서 다시 말씀 드리겠습니다.\n\n또한 이미 소모된 EOS의 경우 저희 EOSYS 팀에서 전적으로 부담하며 이벤트 재 진행 시 500 EOS부터 다시 시작하도록 하겠습니다.\n\n다시 한번 죄송하다는 말씀을 드리며, 더 좋은 모습으로 다시 찾아뵙도록 하겠습니다.\n\n감사합니다.\nEOSYS 팀 드림"
-            , english = "Hello EOS community,\n\nWe opened the free account creation event on last Friday. However, due to the error with SendGrid emailing service that we use to send email verification codes, we stopped the free account creation service for a while.\n\nToo many simultaneous trials made delays. Apologies for wasting your time, we will announce further next Monday.\n\nThe event will restart fresh from 500 EOS NEXT WEEK. We will be in charge of used amount.\n\nSorry for all users who have waited so long, we will be back after this weekend.\n\nThank you.\nEOSYS"
-            , chinese = "Hello EOS community,\n\nWe opened the free account creation event on last Friday. However, due to the error with SendGrid emailing service that we use to send email verification codes, we stopped the free account creation service for a while.\n\nToo many simultaneous trials made delays. Apologies for wasting your time, we will announce further next Monday.\n\nThe event will restart fresh from 500 EOS NEXT WEEK. We will be in charge of used amount.\n\nSorry for all users who have waited so long, we will be back after this weekend.\n\nThank you.\nEOSYS"
+            { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트를 다시 진행합니다.\n 다시 한번 지난주 금요일 불편함을 드린 것에 대해 죄송하며 내일 진행하는 이벤트에서는 원활히 참여하실 수 있도록 하겠습니다. 자세한 내용은 다음과 같습니다.\n\n일시: 2018년 11월 13일 오후 5시 한국 시간 기준\n장소: https://eoshub.io\n방법:\n1) eoshub 홈페이지 접속\n2) 메인 페이지에서 '무료 계정 만들기' 버튼 클릭\n3) 계정명 입력 / 키 생성 및 저장 / 이메일 인증 / EOS 헌법 동의\n4) 위 절차 완료 후 '계정 만들기' 버튼 클릭\n5) 무료 계정 생성 완료\n\n기한은 지난번과 마찬가지로 500 EOS가 모두 소모될 때 까지이며 함께 후원을 해주신 EOSDAQ에 감사의 말씀을 전합니다. 많은 참여 부탁드립니다.\n\n감사합니다.\nEOSYS 드림"
+            , english = "Hello, EOS Community!,\n\nWe are going to restart the free EOS account creation event tomorrow.\nAgain, we apologize for the inconvenience that you had last Friday. The details are shown below.\n\nTime: UTC 8 AM on 13th November\nLocation: https://eoshub.io\nSteps:\n1) Go to eoshub website\n2) Click 'Create Free Account' button on the main page\n3)\n- Enter account name\n- Create and save key pairs\n- Verify Email addres\n- Agree to the EOS constitution\n4) Continue with 'Create Account' button\n5) Now you have your own EOS account\n\nTomorrow event will also continue until 500 EOS is used up. (First come, first served) Thanks to EOSDAQ for supporting together.\n\nThank you.\nEOSYS"
+            , chinese = "大家好！我们是EOSYS。\n\n首先非常抱歉上周五进行活动时给大家带来的不便。由此我们将再次进行免费生成账号的活动。\n\n详细内容为：\n时间: 2018年 11月 13日 下午5点（韩国时间）\n网址: https://eoshub.io\n方法:\n1) 进入eoshub网站\n2) 主页点击\"免费生成账号\"\n3) 输入账号名 / 生成Key并储存 / 邮件认证 / 同意EOS宪法\n4) 点击\"生成账号\"\n5) 免费生成账号完毕\n\n该活动的期限为消尽500EOS为止。非常感谢赞助本此活动的EOSDAQ。\n\n谢谢。\nEOSYS"
             }
