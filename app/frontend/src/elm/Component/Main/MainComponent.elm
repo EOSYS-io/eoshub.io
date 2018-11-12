@@ -275,7 +275,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view language productionState.isEvent)
+                    Html.map IndexMessage (Index.view language productionState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -669,7 +669,7 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                         | isEvent = eventActivation
 
                         -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        , isAnnouncement = (not eventActivation)
+                        , isAnnouncement = not eventActivation
                     }
               }
             , Cmd.none

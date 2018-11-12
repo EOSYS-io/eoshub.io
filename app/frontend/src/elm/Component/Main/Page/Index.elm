@@ -1,5 +1,6 @@
 module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
+import Data.Json exposing (ProductionState)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick)
@@ -18,8 +19,8 @@ type Message
 -- VIEW --
 
 
-view : Language -> Bool -> Html Message
-view language isEvent =
+view : Language -> ProductionState -> Html Message
+view language productionState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -27,7 +28,7 @@ view language isEvent =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (case isEvent of
+                            ++ (case productionState.isEvent of
                                     True ->
                                         " event_free"
 
@@ -41,7 +42,7 @@ view language isEvent =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , viewEventClickButton language isEvent
+                    , viewEventClickButton language productionState.isEvent
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -97,18 +98,28 @@ view language isEvent =
         , node "script"
             []
             [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
-        , viewAnnouncementSection language isEvent
+        , viewAnnouncementSection language productionState
         ]
 
 
-viewAnnouncementSection : Language -> Bool -> Html Message
-viewAnnouncementSection language isEvent =
-    -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
+viewEventClickButton : Language -> Bool -> Html Message
+viewEventClickButton language isEvent =
     case isEvent of
         True ->
-            span [] []
+            p []
+                [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
+                    [ text (translate language MakeYourAccount) ]
+                ]
 
         False ->
+            span [] []
+
+
+viewAnnouncementSection : Language -> ProductionState -> Html Message
+viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
+    -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
+    case isAnnouncement && isAnnouncementCached of
+        True ->
             section [ attribute "aria-live" "true", class "notice modal popup", id "popup", attribute "role" "alert" ]
                 [ div [ class "wrapper" ]
                     [ h2 []
@@ -123,16 +134,6 @@ viewAnnouncementSection language isEvent =
                 , node "script"
                     []
                     [ text "!function(){var e=document.querySelector('#popup button.close'),t=document.getElementById('popup');e.addEventListener('click',function(){t.classList.remove('viewing')}),document.querySelector('.notice.modal.popup').classList.add('viewing')}();" ]
-                ]
-
-
-viewEventClickButton : Language -> Bool -> Html Message
-viewEventClickButton language isEvent =
-    case isEvent of
-        True ->
-            p []
-                [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
-                    [ text (translate language MakeYourAccount) ]
                 ]
 
         False ->
