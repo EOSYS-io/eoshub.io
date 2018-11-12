@@ -392,18 +392,7 @@ okButton { accountValidation, agreeEosConstitution, product } language =
 view : Model -> Language -> Html Message
 view ({ agreeEosConstitution, notification } as model) language =
     main_ [ class "join" ]
-        [ div [ class "event disposable banner" ]
-            [ p []
-                [ text (translate language EoshubEosdaq) ]
-            , h2 []
-                [ text (translate language FreeEosAccountEvent) ]
-            , p []
-                [ text (translate language Until500Eos)
-                , br [] []
-                , text (translate language Around1000Account)
-                ]
-            ]
-        , article []
+        [ article []
             [ h2 []
                 [ textViewI18n language AccountCreation ]
             , p []
