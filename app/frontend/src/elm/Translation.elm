@@ -1784,6 +1784,8 @@ getMessages i18n =
             { korean = "만약 3분이 지나도 이메일이 도착하지 않을 경우, '코드 전송' 버튼을 다시 한 번 눌러주시기 바랍니다."
             , english = "If the email doesn't arrive after 3 minutes, hit 'Send' again."
             , chinese = "如果过了3分钟没有收到邮件的话请再次点击“编码传送”"
+            }
+
         AccouncementModalTitle ->
             { korean = "무료 계정 생성 이벤트 재공지 - 11월 13일 오후 5시"
             , english = "Free EOS account creation event restart on 13th Nov"
