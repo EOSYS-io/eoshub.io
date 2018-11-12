@@ -478,8 +478,13 @@ update message ({ page, notification, header, sidebar, productionState } as mode
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
-        ( IndexMessage (Index.ChangeUrl url), _ ) ->
-            ( model, Navigation.newUrl url )
+        ( IndexMessage subMessage, _ ) ->
+            case subMessage of
+                Index.ChangeUrl url ->
+                    ( model, Navigation.newUrl url )
+
+                Index.CloseModal ->
+                    ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let

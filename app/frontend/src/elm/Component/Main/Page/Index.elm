@@ -1,4 +1,4 @@
-module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
+module Component.Main.Page.Index exposing (Message(..), view)
 
 import Data.Json exposing (ProductionState)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
@@ -13,6 +13,7 @@ import Translation exposing (I18n(..), Language, toLocale, translate)
 
 type Message
     = ChangeUrl String
+    | CloseModal
 
 
 
@@ -118,23 +119,31 @@ viewEventClickButton language isEvent =
 viewAnnouncementSection : Language -> ProductionState -> Html Message
 viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
-    case isAnnouncement && isAnnouncementCached of
-        True ->
-            section [ attribute "aria-live" "true", class "notice modal popup", id "popup", attribute "role" "alert" ]
-                [ div [ class "wrapper" ]
-                    [ h2 []
-                        [ text (translate language AccouncementModalTitle) ]
-                    , p []
-                        [ text (translate language AccouncementModalParagraph) ]
-                    , button [ class "close", id "closePopup", type_ "button" ]
-                        [ text "닫기" ]
-                    ]
+    let
+        isAnnouncementModalOpen =
+            isAnnouncement && isAnnouncementCached
+    in
+    section
+        [ attribute "aria-live" "true"
+        , class
+            ("notice modal popup"
+                ++ (case isAnnouncementModalOpen of
+                        True ->
+                            " viewing"
 
-                -- TODO(boseok): Change js code to Elm
-                , node "script"
-                    []
-                    [ text "!function(){var e=document.querySelector('#popup button.close'),t=document.getElementById('popup');e.addEventListener('click',function(){t.classList.remove('viewing')}),document.querySelector('.notice.modal.popup').classList.add('viewing')}();" ]
-                ]
-
-        False ->
-            span [] []
+                        False ->
+                            ""
+                   )
+            )
+        , id "popup"
+        , attribute "role" "alert"
+        ]
+        [ div [ class "wrapper" ]
+            [ h2 []
+                [ text (translate language AccouncementModalTitle) ]
+            , p []
+                [ text (translate language AccouncementModalParagraph) ]
+            , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
+                [ text "닫기" ]
+            ]
+        ]
