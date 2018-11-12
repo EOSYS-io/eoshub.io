@@ -226,7 +226,14 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             ( { newModel | emailValid = emailValid }, Cmd.none )
 
         SendCode ->
-            ( { model | emailConfirmed = False }, sendCodeRequest model flags language )
+            ( { model
+                | emailConfirmed = False
+
+                -- NOTE(heejae): When it is negative, it means the client is waiting for the response.
+                , emailValidationSecondsLeft = -1
+              }
+            , sendCodeRequest model flags language
+            )
 
         SendCodeResponse (Ok res) ->
             ( { model
@@ -386,7 +393,7 @@ emailConfirmSection { emailValid, confirmTokenValid, emailValidationSecondsLeft 
             [ class "action button"
             , type_ "button"
             , onClick SendCode
-            , disabled (not emailValid || emailValidationSecondsLeft > 0)
+            , disabled (not emailValid || emailValidationSecondsLeft /= 0)
             ]
             [ if emailValidationSecondsLeft > 0 then
                 text (formatSeconds emailValidationSecondsLeft)
