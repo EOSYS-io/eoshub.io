@@ -66,6 +66,7 @@ import Http
 import Json.Encode as Encode
 import Navigation
 import Port exposing (KeyPair)
+import Time
 import Translation
     exposing
         ( I18n(..)
@@ -74,6 +75,7 @@ import Translation
         , translate
         )
 import Util.Flags exposing (Flags)
+import Util.Formatter exposing (formatSeconds)
 import Util.HttpRequest exposing (getAccount)
 import Util.Urls as Urls
 import Util.Validation
@@ -106,6 +108,7 @@ type alias Model =
     , emailConfirmed : Bool
     , agreeEosConstitution : Bool
     , notification : Notification.Model
+    , secondsLeft : Int
     }
 
 
@@ -124,6 +127,7 @@ initModel =
     , emailConfirmed = False
     , agreeEosConstitution = False
     , notification = Notification.initModel
+    , secondsLeft = 0
     }
 
 
@@ -153,10 +157,11 @@ type Message
     | ToggleAgreeEosConstitution
     | NotificationMessage Notification.Message
     | ChangeUrl String
+    | Tick Time.Time
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
-update msg ({ accountName, keys, notification } as model) flags language =
+update msg ({ accountName, keys, notification, secondsLeft, emailRequested } as model) flags language =
     case msg of
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -231,6 +236,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
                     { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
                     , open = True
                     }
+                , secondsLeft = 180
               }
             , Cmd.none
             )
@@ -260,15 +266,15 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         EmailConfirmationResponse response ->
             let
-                emailConfirmed =
+                ( emailConfirmed, newEmailRequested ) =
                     case response of
-                        Ok res ->
-                            True
+                        Ok _ ->
+                            ( True, False )
 
-                        Err error ->
-                            False
+                        Err _ ->
+                            ( False, emailRequested )
             in
-            ( { model | emailConfirmationRequested = True, emailConfirmed = emailConfirmed }
+            ( { model | emailConfirmationRequested = True, emailConfirmed = emailConfirmed, emailRequested = newEmailRequested }
             , Cmd.none
             )
 
@@ -285,6 +291,13 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
+
+        Tick _ ->
+            if secondsLeft == 0 then
+                ( { model | emailRequested = False }, Cmd.none )
+
+            else
+                ( { model | secondsLeft = secondsLeft - 1 }, Cmd.none )
 
         _ ->
             ( model, Cmd.none )
@@ -358,7 +371,7 @@ keypairGenerationViews { keys } language =
 
 
 emailConfirmSection : Model -> Language -> Html Message
-emailConfirmSection { emailValid, confirmTokenValid } language =
+emailConfirmSection { emailValid, confirmTokenValid, emailRequested, secondsLeft } language =
     section [ class "email verification" ]
         [ input
             [ name ""
@@ -371,9 +384,14 @@ emailConfirmSection { emailValid, confirmTokenValid } language =
             [ class "action button"
             , type_ "button"
             , onClick SendCode
-            , disabled (not emailValid)
+            , disabled (not emailValid || emailRequested)
             ]
-            [ textViewI18n language AccountCreationSendEmail ]
+            [ if emailRequested then
+                formatSeconds secondsLeft
+
+              else
+                textViewI18n language AccountCreationSendEmail
+            ]
         , input
             [ placeholder (translate language AccountCreationEnterVerificationCode)
             , type_ "text"
@@ -434,7 +452,7 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
 
 
 okButton : Model -> Language -> Html Message
-okButton { accountValidation, emailRequested, emailConfirmed, agreeEosConstitution } language =
+okButton { accountValidation, emailConfirmed, agreeEosConstitution } language =
     let
         enabled =
             (accountValidation == InexistentAccount)
@@ -576,5 +594,13 @@ validateAccountNameInput ({ accountName } as model) requestStatus =
 
 
 subscriptions : Model -> Sub Message
-subscriptions _ =
-    Port.receiveKeys UpdateKeys
+subscriptions { emailRequested } =
+    let
+        receiveKeySub =
+            Port.receiveKeys UpdateKeys
+    in
+    if emailRequested then
+        Sub.batch [ Time.every Time.second Tick, receiveKeySub ]
+
+    else
+        receiveKeySub

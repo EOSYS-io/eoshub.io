@@ -7,6 +7,7 @@ module Util.Formatter exposing
     , eosSubtract
     , floatToAsset
     , formatAsset
+    , formatSeconds
     , formatWithUsLocale
     , getDefaultAsset
     , getNow
@@ -248,3 +249,19 @@ getDefaultAsset { symbol, precision } =
 getSymbolFromAsset : String -> Maybe String
 getSymbolFromAsset asset =
     asset |> String.split " " |> List.drop 1 |> List.head
+
+
+formatSeconds : Int -> String
+formatSeconds seconds =
+    if seconds > 3600 || seconds < 0 then
+        "00:00"
+
+    else
+        let
+            minuteStr =
+                rem seconds 60 |> toString
+
+            secondStr =
+                (seconds % 60) |> toString
+        in
+        minuteStr ++ ":" ++ secondStr
