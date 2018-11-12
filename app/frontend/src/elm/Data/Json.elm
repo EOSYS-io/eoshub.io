@@ -5,11 +5,13 @@ module Data.Json exposing
     ( CreateEosAccountResponse
     , Producer
     , Product
+    , ProductionState
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
     , initProducer
     , initProduct
+    , initProductionState
     , initVoteStat
     , producerDecoder
     , producersDecoder
@@ -148,6 +150,21 @@ initProduct =
     , cpu = 0.0
     , net = 0.0
     , ram = 0
+    }
+
+
+type alias ProductionState =
+    { isEvent : Bool
+    , isAnnouncement : Bool
+    , isAnnouncementCached : Bool
+    }
+
+
+initProductionState : ProductionState
+initProductionState =
+    { isEvent = False
+    , isAnnouncement = False
+    , isAnnouncementCached = True
     }
 
 

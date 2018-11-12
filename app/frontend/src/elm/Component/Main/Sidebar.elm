@@ -138,13 +138,13 @@ accountCmd state accountName =
 -- VIEW
 
 
-view : Model -> Language -> Html Message
-view ({ state, fold } as model) language =
+view : Model -> Language -> Bool -> Html Message
+view ({ state, fold } as model) language isEvent =
     let
         ( baseClass, htmlContent ) =
             case state of
                 SignIn ->
-                    ( "log off", signInView model language )
+                    ( "log off", signInView language isEvent )
 
                 PairWallet ->
                     ( "log unsync", pairWalletView language )
@@ -165,8 +165,8 @@ view ({ state, fold } as model) language =
     aside [ class sidebarClass ] htmlContent
 
 
-signInView : Model -> Language -> List (Html Message)
-signInView { isEvent } language =
+signInView : Language -> Bool -> List (Html Message)
+signInView language isEvent =
     let
         ( createAccountUrl, createAccountText ) =
             if isEvent then
