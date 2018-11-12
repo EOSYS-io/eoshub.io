@@ -231,7 +231,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
         SendCodeResponse (Ok res) ->
             ( { model
                 | notification =
-                    { content = Notification.Ok { message = ConfirmEmailSent, detail = EmptyMessage }
+                    { content = Notification.Ok { message = ConfirmEmailSent, detail = ConfirmEmailDetail }
                     , open = True
                     }
                 , emailValidationSecondsLeft = 180
