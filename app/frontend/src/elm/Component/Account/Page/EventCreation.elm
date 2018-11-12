@@ -575,6 +575,6 @@ validateAccountNameInput ({ accountName } as model) requestStatus =
 -- SUBSCRIPTIONS
 
 
-subscriptions : Sub Message
-subscriptions =
+subscriptions : Model -> Sub Message
+subscriptions _ =
     Port.receiveKeys UpdateKeys

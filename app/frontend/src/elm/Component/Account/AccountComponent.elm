@@ -238,11 +238,16 @@ update message ({ page, language, flags } as model) =
 
 
 subscriptions : Model -> Sub Message
-subscriptions _ =
-    Sub.batch
-        [ Sub.map CreateMessage Create.subscriptions
-        , Sub.map EventCreationMessage EventCreation.subscriptions
-        ]
+subscriptions { page } =
+    case page of
+        CreatePage subModel ->
+            Sub.map CreateMessage (Create.subscriptions subModel)
+
+        EventCreationPage subModel ->
+            Sub.map EventCreationMessage (EventCreation.subscriptions subModel)
+
+        _ ->
+            Sub.none
 
 
 
