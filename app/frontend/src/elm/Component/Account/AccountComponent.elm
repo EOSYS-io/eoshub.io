@@ -5,13 +5,16 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
+import Data.Json exposing (Product)
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
+import Http
 import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language(..))
 import Util.Flags exposing (Flags)
+import Util.HttpRequest exposing (getEosAccountProduct)
 
 
 
@@ -26,10 +29,16 @@ type Page
     | NotFoundPage
 
 
+type alias ProductionState =
+    { isEvent : Bool
+    }
+
+
 type alias Model =
     { page : Page
     , language : Language
     , flags : Flags
+    , productionState : ProductionState
     }
 
 
@@ -66,6 +75,9 @@ initModel location flags =
     { page = page
     , language = language
     , flags = flags
+    , productionState =
+        { isEvent = False
+        }
     }
 
 
@@ -81,27 +93,36 @@ type Message
     | OnLocationChange Location
     | ChangeUrl String
     | UpdateLanguage Language
+    | OnFetchProduct (Result Http.Error Product)
 
 
 initCmd : Model -> Cmd Message
 initCmd { page, flags, language } =
-    case page of
-        CreatePage subModel ->
-            let
-                subCmd =
-                    Create.initCmd subModel flags language
-            in
-            Cmd.map CreateMessage subCmd
+    let
+        pageCmd =
+            case page of
+                CreatePage subModel ->
+                    let
+                        subCmd =
+                            Create.initCmd subModel flags language
+                    in
+                    Cmd.map CreateMessage subCmd
 
-        EventCreationPage subModel ->
-            let
-                subCmd =
-                    EventCreation.initCmd
-            in
-            Cmd.map EventCreationMessage subCmd
+                EventCreationPage subModel ->
+                    let
+                        subCmd =
+                            EventCreation.initCmd
+                    in
+                    Cmd.map EventCreationMessage subCmd
 
-        _ ->
-            Cmd.none
+                _ ->
+                    Cmd.none
+    in
+    Cmd.batch
+        [ pageCmd
+        , getEosAccountProduct flags Translation.Korean
+            |> Http.send OnFetchProduct
+        ]
 
 
 
@@ -149,7 +170,7 @@ headerView language =
 
 
 view : Model -> Html Message
-view { language, page } =
+view { language, page, productionState } =
     let
         newContentHtml =
             case page of
@@ -160,7 +181,7 @@ view { language, page } =
                     Html.map WaitPaymentMessage (WaitPayment.view subModel language)
 
                 CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel language)
+                    Html.map CreatedMessage (Created.view subModel language productionState.isEvent)
 
                 EventCreationPage subModel ->
                     Html.map EventCreationMessage (EventCreation.view subModel language)
@@ -228,6 +249,12 @@ update message ({ page, language, flags } as model) =
 
         ( UpdateLanguage language, _ ) ->
             ( { model | language = language }, Cmd.none )
+
+        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
+            ( { model | productionState = { isEvent = eventActivation } }, Cmd.none )
+
+        ( OnFetchProduct (Err _), _ ) ->
+            ( model, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
