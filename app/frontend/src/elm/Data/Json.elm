@@ -164,7 +164,7 @@ initProductionState : ProductionState
 initProductionState =
     { isEvent = False
     , isAnnouncement = False
-    , isAnnouncementCached = False
+    , isAnnouncementCached = True
     }
 
 
