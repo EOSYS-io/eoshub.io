@@ -387,7 +387,7 @@ emailConfirmSection { emailValid, confirmTokenValid, emailRequested, secondsLeft
             , disabled (not emailValid || emailRequested)
             ]
             [ if emailRequested then
-                formatSeconds secondsLeft
+                text (formatSeconds secondsLeft)
 
               else
                 textViewI18n language AccountCreationSendEmail
