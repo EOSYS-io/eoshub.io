@@ -173,7 +173,7 @@ initCmd location flags =
     Cmd.batch
         [ pageCmd location flags
         , Cmd.map SidebarMessage
-            Sidebar.initCmd
+            (Sidebar.initCmd flags)
         , Port.checkLocale ()
         ]
 
