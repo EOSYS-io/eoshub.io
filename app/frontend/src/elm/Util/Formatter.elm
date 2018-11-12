@@ -258,10 +258,17 @@ formatSeconds seconds =
 
     else
         let
+            addZero str =
+                if String.length str == 1 then
+                    "0" ++ str
+
+                else
+                    str
+
             minuteStr =
-                rem seconds 60 |> toString
+                seconds // 60 |> toString |> addZero
 
             secondStr =
-                (seconds % 60) |> toString
+                (seconds % 60) |> toString |> addZero
         in
         minuteStr ++ ":" ++ secondStr
