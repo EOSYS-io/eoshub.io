@@ -290,6 +290,8 @@ type I18n
     | MakeYourAccount
     | FreeAccountCreation
     | ConfirmEmailDetail
+    | AccouncementModalTitle
+    | AccouncementModalParagraph
 
 
 translate : Language -> I18n -> String
@@ -1774,7 +1776,7 @@ getMessages i18n =
 
         FreeAccountCreation ->
             { korean = "무료 계정 생성"
-            , english = "Create Free Account"
+            , english = "Free Account"
             , chinese = "免费创建账号"
             }
 
@@ -1782,4 +1784,14 @@ getMessages i18n =
             { korean = "만약 3분이 지나도 이메일이 도착하지 않을 경우, '코드 전송' 버튼을 다시 한 번 눌러주시기 바랍니다."
             , english = "If the email doesn't arrive after 3 minutes, hit 'Send' again."
             , chinese = "如果过了3分钟没有收到邮件的话请再次点击“编码传送”"
+        AccouncementModalTitle ->
+            { korean = "무료 계정 이벤트 관련 안내"
+            , english = "Announcement of apologies for the event delay"
+            , chinese = "Announcement of apologies for the event delay"
+            }
+
+        AccouncementModalParagraph ->
+            { korean = "안녕하세요, EOSYS입니다. \n\n11월 9일 금요일 저녁 5시에 예정 되어있던 무료 계정 생성 이벤트와 관련해 불편함을 드려 정말 죄송합니다.\n\n이메일 발송이 되지 않았던 원인은 저희가 사용중인 SendGrid에서 일시적으로 신청자가 몰려 전송이 지연된 것으로 확인되었습니다. 따라서 일시적으로 이벤트를 중지하였으며, 운영이 미숙했던 저희의 잘못이 큽니다.\n\n무료 계정 발급 이벤트는 내부적으로 신중히 검토한 후, 다음주 월요일에 추후 일정에 대해서 다시 말씀 드리겠습니다.\n\n또한 이미 소모된 EOS의 경우 저희 EOSYS 팀에서 전적으로 부담하며 이벤트 재 진행 시 500 EOS부터 다시 시작하도록 하겠습니다.\n\n다시 한번 죄송하다는 말씀을 드리며, 더 좋은 모습으로 다시 찾아뵙도록 하겠습니다.\n\n감사합니다.\nEOSYS 팀 드림"
+            , english = "Hello EOS community,\n\nWe opened the free account creation event on last Friday. However, due to the error with SendGrid emailing service that we use to send email verification codes, we stopped the free account creation service for a while.\n\nToo many simultaneous trials made delays. Apologies for wasting your time, we will announce further next Monday.\n\nThe event will restart fresh from 500 EOS NEXT WEEK. We will be in charge of used amount.\n\nSorry for all users who have waited so long, we will be back after this weekend.\n\nThank you.\nEOSYS"
+            , chinese = "Hello EOS community,\n\nWe opened the free account creation event on last Friday. However, due to the error with SendGrid emailing service that we use to send email verification codes, we stopped the free account creation service for a while.\n\nToo many simultaneous trials made delays. Apologies for wasting your time, we will announce further next Monday.\n\nThe event will restart fresh from 500 EOS NEXT WEEK. We will be in charge of used amount.\n\nSorry for all users who have waited so long, we will be back after this weekend.\n\nThank you.\nEOSYS"
             }

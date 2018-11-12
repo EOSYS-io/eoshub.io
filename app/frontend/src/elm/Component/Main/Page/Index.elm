@@ -1,7 +1,7 @@
 module Component.Main.Page.Index exposing (Message(ChangeUrl), view)
 
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
-import Html.Attributes exposing (attribute, class, href, target, type_)
+import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick)
 import Translation exposing (I18n(..), Language, toLocale, translate)
 
@@ -97,7 +97,33 @@ view language isEvent =
         , node "script"
             []
             [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
+        , viewAnnouncementSection language isEvent
         ]
+
+
+viewAnnouncementSection : Language -> Bool -> Html Message
+viewAnnouncementSection language isEvent =
+    -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
+    case isEvent of
+        True ->
+            span [] []
+
+        False ->
+            section [ attribute "aria-live" "true", class "notice modal popup", id "popup", attribute "role" "alert" ]
+                [ div [ class "wrapper" ]
+                    [ h2 []
+                        [ text (translate language AccouncementModalTitle) ]
+                    , p []
+                        [ text (translate language AccouncementModalParagraph) ]
+                    , button [ class "close", id "closePopup", type_ "button" ]
+                        [ text "닫기" ]
+                    ]
+
+                -- TODO(boseok): Change js code to Elm
+                , node "script"
+                    []
+                    [ text "!function(){var e=document.querySelector('#popup button.close'),t=document.getElementById('popup');e.addEventListener('click',function(){t.classList.remove('viewing')}),document.querySelector('.notice.modal.popup').classList.add('viewing')}();" ]
+                ]
 
 
 viewEventClickButton : Language -> Bool -> Html Message
