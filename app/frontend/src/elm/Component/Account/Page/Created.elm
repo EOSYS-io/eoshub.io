@@ -65,8 +65,8 @@ update msg model =
 -- VIEW
 
 
-view : Model -> Language -> Html Message
-view { eosAccount, publicKey } language =
+view : Model -> Language -> Bool -> Html Message
+view { eosAccount, publicKey } language isEvent =
     main_ [ class "join" ]
         [ article [ attribute "data-step" "done" ]
             [ h2 []
@@ -91,7 +91,16 @@ view { eosAccount, publicKey } language =
                 [ a [ class "go main button", onClick Home ]
                     [ textViewI18n language AccountCreationGoHome ]
                 ]
-            , div [ class "event disposable banner" ]
+            , viewEventDiv language isEvent
+            ]
+        ]
+
+
+viewEventDiv : Language -> Bool -> Html Message
+viewEventDiv language isEvent =
+    case isEvent of
+        True ->
+            div [ class "event disposable banner" ]
                 [ p []
                     [ textViewI18n language CoSponsoredByEosdaq ]
                 , p []
@@ -99,5 +108,6 @@ view { eosAccount, publicKey } language =
                         [ textViewI18n language GotoEosdaq ]
                     ]
                 ]
-            ]
-        ]
+
+        False ->
+            div [] []
