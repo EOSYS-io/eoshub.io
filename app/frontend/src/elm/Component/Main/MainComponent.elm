@@ -30,6 +30,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
+import Data.Json exposing (Product)
 import Html
     exposing
         ( Html
@@ -59,6 +60,7 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
 import Navigation exposing (Location)
 import Port
 import Process
@@ -70,6 +72,7 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
+import Util.HttpRequest exposing (getEosAccountProduct)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -99,12 +102,18 @@ type alias Header =
     }
 
 
+type alias ProductionState =
+    { isEvent : Bool
+    }
+
+
 type alias Model =
     { page : Page
     , notification : Notification.Model
     , header : Header
     , sidebar : Sidebar.Model
     , selectedNav : SelectedNav
+    , productionState : ProductionState
     }
 
 
@@ -121,6 +130,9 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
+    , productionState =
+        { isEvent = False
+        }
     }
 
 
@@ -145,6 +157,7 @@ type Message
     | ChangeUrl String
     | UpdateLanguage Language
     | InitLocale String
+    | OnFetchProduct (Result Http.Error Product)
 
 
 type Query
@@ -175,6 +188,8 @@ initCmd location flags =
         , Cmd.map SidebarMessage
             (Sidebar.initCmd flags)
         , Port.checkLocale ()
+        , getEosAccountProduct flags Translation.Korean
+            |> Http.send OnFetchProduct
         ]
 
 
@@ -229,7 +244,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, selectedNav } =
+view { page, header, notification, sidebar, selectedNav, productionState } =
     let
         { language } =
             header
@@ -267,7 +282,7 @@ view { page, header, notification, sidebar, selectedNav } =
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view language)
+                    Html.map IndexMessage (Index.view language productionState.isEvent)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -409,7 +424,7 @@ view { page, header, notification, sidebar, selectedNav } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language productionState.isEvent)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -653,6 +668,12 @@ update message ({ page, notification, header, sidebar } as model) flags =
                             English
             in
             update (UpdateLanguage language) model flags
+
+        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
+            ( { model | productionState = { isEvent = eventActivation } }, Cmd.none )
+
+        ( OnFetchProduct (Err _), _ ) ->
+            ( model, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
