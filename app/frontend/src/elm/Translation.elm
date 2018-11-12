@@ -1773,6 +1773,6 @@ getMessages i18n =
 
         ConfirmEmailDetail ->
             { korean = "만약 3분이 지나도 이메일이 도착하지 않을 경우, '코드 전송' 버튼을 다시 한 번 눌러주시기 바랍니다."
-            , english = "If the email doesn't arrive after 3 minutes, hit 'send' again. "
-            , chinese = "If the email doesn't arrive after 3 minutes, hit 'send' again. "
+            , english = "If the email doesn't arrive after 3 minutes, hit 'Send' again."
+            , chinese = "如果过了3分钟没有收到邮件的话请再次点击“编码传送”"
             }
