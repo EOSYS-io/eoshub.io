@@ -5,7 +5,7 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
-import Data.Json exposing (Product)
+import Data.Json exposing (Product, ProductionState, initProductionState)
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
@@ -27,11 +27,6 @@ type Page
     | CreatedPage Created.Model
     | EventCreationPage EventCreation.Model
     | NotFoundPage
-
-
-type alias ProductionState =
-    { isEvent : Bool
-    }
 
 
 type alias Model =
@@ -75,9 +70,7 @@ initModel location flags =
     { page = page
     , language = language
     , flags = flags
-    , productionState =
-        { isEvent = False
-        }
+    , productionState = initProductionState
     }
 
 
@@ -201,7 +194,7 @@ view { language, page, productionState } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ page, language, flags } as model) =
+update message ({ page, language, flags, productionState } as model) =
     case ( message, page ) of
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
@@ -251,7 +244,17 @@ update message ({ page, language, flags } as model) =
             ( { model | language = language }, Cmd.none )
 
         ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model | productionState = { isEvent = eventActivation } }, Cmd.none )
+            ( { model
+                | productionState =
+                    { productionState
+                        | isEvent = eventActivation
+
+                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
+                        , isAnnouncement = not eventActivation
+                    }
+              }
+            , Cmd.none
+            )
 
         ( OnFetchProduct (Err _), _ ) ->
             ( model, Cmd.none )

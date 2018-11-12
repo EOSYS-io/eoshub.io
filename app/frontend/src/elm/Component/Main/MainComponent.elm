@@ -30,7 +30,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Data.Json exposing (Product)
+import Data.Json exposing (Product, ProductionState, initProductionState)
 import Html
     exposing
         ( Html
@@ -102,11 +102,6 @@ type alias Header =
     }
 
 
-type alias ProductionState =
-    { isEvent : Bool
-    }
-
-
 type alias Model =
     { page : Page
     , notification : Notification.Model
@@ -130,9 +125,7 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
-    , productionState =
-        { isEvent = False
-        }
+    , productionState = initProductionState
     }
 
 
@@ -441,7 +434,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar } as model) flags =
+update message ({ page, notification, header, sidebar, productionState } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -670,7 +663,17 @@ update message ({ page, notification, header, sidebar } as model) flags =
             update (UpdateLanguage language) model flags
 
         ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model | productionState = { isEvent = eventActivation } }, Cmd.none )
+            ( { model
+                | productionState =
+                    { productionState
+                        | isEvent = eventActivation
+
+                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
+                        , isAnnouncement = (not eventActivation)
+                    }
+              }
+            , Cmd.none
+            )
 
         ( OnFetchProduct (Err _), _ ) ->
             ( model, Cmd.none )
