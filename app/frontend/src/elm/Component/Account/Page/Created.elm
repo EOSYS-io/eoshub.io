@@ -6,15 +6,7 @@ import Html.Events exposing (onClick)
 import Navigation
 import Translation
     exposing
-        ( I18n
-            ( Account
-            , AccountCreationCongratulation
-            , AccountCreationGoHome
-            , AccountCreationWelcome
-            , AccountCreationYouCanSignIn
-            , GotoEosdaq
-            , PublicKey
-            )
+        ( I18n(..)
         , Language
         )
 import View.I18nViews exposing (textViewI18n)
@@ -101,6 +93,8 @@ view { eosAccount, publicKey } language =
                 ]
             , div [ class "event disposable banner" ]
                 [ p []
+                    [ textViewI18n language CoSponsoredByEosdaq ]
+                , p []
                     [ a [ href "https://eosdaq.com/", target "_blank" ]
                         [ textViewI18n language GotoEosdaq ]
                     ]

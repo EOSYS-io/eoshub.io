@@ -285,6 +285,7 @@ type I18n
     | FreeEosAccountEvent
     | Until500Eos
     | Around1000Account
+    | CoSponsoredByEosdaq
     | GotoEosdaq
     | MakeYourAccount
     | FreeAccountCreation
@@ -1751,6 +1752,12 @@ getMessages i18n =
             { korean = "선착순 약 1,000명"
             , english = "First come, first served / around 1,000 account"
             , chinese = "最多1,000人"
+            }
+
+        CoSponsoredByEosdaq ->
+            { korean = "무료 계정 생성 이벤트는 탈중앙화 거래소 EOSDAQ 과 함께하고 있습니다."
+            , english = "This free account creation event is co-sponsored by EOSDAQ, \na decentralized exchange."
+            , chinese = "This free account creation event is co-sponsored by EOSDAQ, \na decentralized exchange."
             }
 
         GotoEosdaq ->
