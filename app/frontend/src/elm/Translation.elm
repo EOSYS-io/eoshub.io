@@ -1711,7 +1711,7 @@ getMessages i18n =
 
         SorryModalTitle ->
             { korean = "무료 계정 생성 이벤트 재공지 - 11월 13일 오후 5시"
-            , english = "Free EOS account creation event restart on 13th Nov"
+            , english = "Free EOS account event restart on 13th Nov"
             , chinese = "再次公告免费生成账号活动 - 11月 13日下午5点"
             }
 
