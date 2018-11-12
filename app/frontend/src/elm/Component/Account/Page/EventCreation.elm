@@ -226,7 +226,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             ( { newModel | emailValid = emailValid }, Cmd.none )
 
         SendCode ->
-            ( model, sendCodeRequest model flags language )
+            ( { model | emailConfirmed = False }, sendCodeRequest model flags language )
 
         SendCodeResponse (Ok res) ->
             ( { model
