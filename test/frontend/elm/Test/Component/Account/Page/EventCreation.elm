@@ -4,7 +4,6 @@ import Component.Account.Page.EventCreation exposing (..)
 import Expect
 import Http
 import Test exposing (..)
-import Translation exposing (I18n(EmptyMessage))
 import Util.Validation exposing (AccountStatus(..))
 import View.Notification as Notification
 
@@ -13,7 +12,7 @@ model : Model
 model =
     { accountName = "testtesttest"
     , accountValidation = EmptyAccount
-    , accountRequestSuccess = False
+    , createAccountRequestStatus = NoRequest
     , keys = { privateKey = "", publicKey = "12o9347512f1oh923" }
     , email = "test@chain.partners"
     , emailValid = False
