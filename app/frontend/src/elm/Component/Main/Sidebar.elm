@@ -24,6 +24,7 @@ import Data.Account
         , getTotalAmount
         , getUnstakingAmount
         )
+import Data.Json exposing (Product)
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
 import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)
@@ -32,6 +33,7 @@ import Navigation
 import Port
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language(..), toLocale, translate)
+import Util.Flags exposing (Flags)
 import Util.Formatter
     exposing
         ( deleteFromBack
@@ -39,7 +41,7 @@ import Util.Formatter
         , getNow
         , larimerToEos
         )
-import Util.HttpRequest exposing (getAccount)
+import Util.HttpRequest exposing (getAccount, getEosAccountProduct)
 import Util.WalletDecoder
     exposing
         ( Wallet
@@ -67,6 +69,7 @@ type alias Model =
     , configPanelOpen : Bool
     , account : Account
     , now : Time
+    , isEvent : Bool
     }
 
 
@@ -82,6 +85,7 @@ initModel =
     , configPanelOpen = False
     , account = defaultAccount
     , now = 0
+    , isEvent = False
     }
 
 
@@ -101,17 +105,20 @@ type Message
     | AndThen Message Message
     | OnFetchAccount (Result Http.Error Account)
     | OnTime Time.Time
+    | OnFetchProduct (Result Http.Error Product)
 
 
 
 -- Cmd
 
 
-initCmd : Cmd Message
-initCmd =
+initCmd : Flags -> Cmd Message
+initCmd flags =
     Cmd.batch
         [ Port.checkWalletStatus ()
         , getNow OnTime
+        , getEosAccountProduct flags Translation.Korean
+            |> Http.send OnFetchProduct
         ]
 
 
@@ -131,13 +138,13 @@ accountCmd state accountName =
 -- VIEW
 
 
-view : Model -> Language -> Html Message
-view ({ state, fold } as model) language =
+view : Model -> Language -> Bool -> Html Message
+view ({ state, fold } as model) language isEvent =
     let
         ( baseClass, htmlContent ) =
             case state of
                 SignIn ->
-                    ( "log off", signInView language )
+                    ( "log off", signInView language isEvent )
 
                 PairWallet ->
                     ( "log unsync", pairWalletView language )
@@ -158,8 +165,20 @@ view ({ state, fold } as model) language =
     aside [ class sidebarClass ] htmlContent
 
 
-signInView : Language -> List (Html Message)
-signInView language =
+signInView : Language -> Bool -> List (Html Message)
+signInView language isEvent =
+    let
+        ( createAccountUrl, createAccountText ) =
+            if isEvent then
+                ( "/account/event_creation?locale=" ++ toLocale language
+                , translate language FreeAccountCreation
+                )
+
+            else
+                ( "/account/create?locale=" ++ toLocale language
+                , translate language NewAccount
+                )
+    in
     [ h2 []
         [ text (translate language Hello)
         , br [] []
@@ -178,9 +197,9 @@ signInView language =
             [ text (translate language Login) ]
         , a
             [ class "join button"
-            , onClick (ChangeUrl ("/account/create?locale=" ++ toLocale language))
+            , onClick (ChangeUrl createAccountUrl)
             ]
-            [ text (translate language NewAccount) ]
+            [ text createAccountText ]
         ]
     ]
 
@@ -397,6 +416,12 @@ update message ({ fold, wallet } as model) =
             ( { model | account = data }, Cmd.none )
 
         OnFetchAccount (Err _) ->
+            ( model, Cmd.none )
+
+        OnFetchProduct (Ok { eventActivation }) ->
+            ( { model | isEvent = eventActivation }, Cmd.none )
+
+        OnFetchProduct (Err _) ->
             ( model, Cmd.none )
 
         OnTime now ->

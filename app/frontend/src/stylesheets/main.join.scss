@@ -468,6 +468,15 @@ main.join {
 				color:$gray;
 				text-shadow:0 0 3px rgba(255,255,255,0.2);
 				text-align:center;
+				white-space:pre-line;
+
+				a {
+					transition:color 0.4s;
+					text-decoration:underline;
+					&:hover {
+						color:$white;
+					}
+				}
 			}
 		}
 	}

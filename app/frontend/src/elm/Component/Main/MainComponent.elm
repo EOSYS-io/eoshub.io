@@ -30,6 +30,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
+import Data.Json exposing (Product, ProductionState, initProductionState)
 import Html
     exposing
         ( Html
@@ -59,6 +60,7 @@ import Html.Attributes
         , type_
         )
 import Html.Events exposing (onClick, onInput, onSubmit)
+import Http
 import Navigation exposing (Location)
 import Port
 import Process
@@ -70,6 +72,7 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
+import Util.HttpRequest exposing (getEosAccountProduct)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -105,6 +108,7 @@ type alias Model =
     , header : Header
     , sidebar : Sidebar.Model
     , selectedNav : SelectedNav
+    , productionState : ProductionState
     }
 
 
@@ -121,6 +125,7 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
+    , productionState = initProductionState
     }
 
 
@@ -145,6 +150,7 @@ type Message
     | ChangeUrl String
     | UpdateLanguage Language
     | InitLocale String
+    | OnFetchProduct (Result Http.Error Product)
 
 
 type Query
@@ -173,8 +179,10 @@ initCmd location flags =
     Cmd.batch
         [ pageCmd location flags
         , Cmd.map SidebarMessage
-            Sidebar.initCmd
+            (Sidebar.initCmd flags)
         , Port.checkLocale ()
+        , getEosAccountProduct flags Translation.Korean
+            |> Http.send OnFetchProduct
         ]
 
 
@@ -229,7 +237,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, selectedNav } =
+view { page, header, notification, sidebar, selectedNav, productionState } =
     let
         { language } =
             header
@@ -267,7 +275,7 @@ view { page, header, notification, sidebar, selectedNav } =
                         )
 
                 IndexPage ->
-                    Html.map IndexMessage (Index.view language)
+                    Html.map IndexMessage (Index.view language productionState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -409,7 +417,7 @@ view { page, header, notification, sidebar, selectedNav } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language productionState.isEvent)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -426,7 +434,7 @@ view { page, header, notification, sidebar, selectedNav } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar } as model) flags =
+update message ({ page, notification, header, sidebar, productionState } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -470,8 +478,13 @@ update message ({ page, notification, header, sidebar } as model) flags =
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
-        ( IndexMessage (Index.ChangeUrl url), _ ) ->
-            ( model, Navigation.newUrl url )
+        ( IndexMessage subMessage, _ ) ->
+            case subMessage of
+                Index.ChangeUrl url ->
+                    ( model, Navigation.newUrl url )
+
+                Index.CloseModal ->
+                    ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
@@ -653,6 +666,22 @@ update message ({ page, notification, header, sidebar } as model) flags =
                             English
             in
             update (UpdateLanguage language) model flags
+
+        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
+            ( { model
+                | productionState =
+                    { productionState
+                        | isEvent = eventActivation
+
+                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
+                        , isAnnouncement = not eventActivation
+                    }
+              }
+            , Cmd.none
+            )
+
+        ( OnFetchProduct (Err _), _ ) ->
+            ( model, Cmd.none )
 
         ( _, _ ) ->
             ( model, Cmd.none )
