@@ -1787,13 +1787,13 @@ getMessages i18n =
             }
 
         AnnouncementModalTitle ->
-            { korean = "무료 계정 생성 이벤트 재공지 - 11월 13일 오후 5시"
-            , english = "Free EOS account event restart on 13th Nov"
-            , chinese = "再次公告免费生成账号活动 - 11月 13日下午5点"
+            { korean = "EOS 무료 계정 생성 이벤트 종료"
+            , english = "EOS Free Account Creation Event End"
+            , chinese = "EOS Free Account Creation Event End"
             }
 
         AnnouncementModalParagraph ->
-            { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트를 다시 진행합니다.\n 다시 한번 지난주 금요일 불편함을 드린 것에 대해 죄송하며 내일 진행하는 이벤트에서는 원활히 참여하실 수 있도록 하겠습니다. 자세한 내용은 다음과 같습니다.\n\n일시: 2018년 11월 13일 오후 5시 한국 시간 기준\n장소: https://eoshub.io\n방법:\n1) eoshub 홈페이지 접속\n2) 메인 페이지에서 '무료 계정 만들기' 버튼 클릭\n3) 계정명 입력 / 키 생성 및 저장 / 이메일 인증 / EOS 헌법 동의\n4) 위 절차 완료 후 '계정 만들기' 버튼 클릭\n5) 무료 계정 생성 완료\n\n기한은 지난번과 마찬가지로 500 EOS가 모두 소모될 때 까지이며 함께 후원을 해주신 EOSDAQ에 감사의 말씀을 전합니다. 많은 참여 부탁드립니다.\n\n감사합니다.\nEOSYS 드림"
-            , english = "Hello, EOS Community!,\n\nWe are going to restart the free EOS account creation event tomorrow.\nAgain, we apologize for the inconvenience that you had last Friday. The details are shown below.\n\nTime: UTC 8 AM on 13th November\nLocation: https://eoshub.io\nSteps:\n1) Go to eoshub website\n2) Click 'Create Free Account' button on the main page\n3)\n- Enter account name\n- Create and save key pairs\n- Verify Email addres\n- Agree to the EOS constitution\n4) Continue with 'Create Account' button\n5) Now you have your own EOS account\n\nTomorrow event will also continue until 500 EOS is used up. (First come, first served) Thanks to EOSDAQ for supporting together.\n\nThank you.\nEOSYS"
-            , chinese = "大家好！我们是EOSYS。\n\n首先非常抱歉上周五进行活动时给大家带来的不便。由此我们将再次进行免费生成账号的活动。\n\n详细内容为：\n时间: 2018年 11月 13日 下午5点（韩国时间）\n网址: https://eoshub.io\n方法:\n1) 进入eoshub网站\n2) 主页点击\"免费生成账号\"\n3) 输入账号名 / 生成Key并储存 / 邮件认证 / 同意EOS宪法\n4) 点击\"生成账号\"\n5) 免费生成账号完毕\n\n该活动的期限为消尽500EOS为止。非常感谢赞助本此活动的EOSDAQ。\n\n谢谢。\nEOSYS"
+            { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트로 준비한 500 EOS가 모두 소진되어 이벤트를 종료합니다. 이오스 커뮤니티의 많은 관심과 참석 감사드리며, 다음에는 더 재미있는 이벤트로 찾아뵐 수 있도록 하겠습니다.\n\n감사합니다.\nEOSYS 드림"
+            , english = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
+            , chinese = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
             }
