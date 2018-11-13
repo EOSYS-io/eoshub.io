@@ -674,7 +674,7 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                         | isEvent = eventActivation
 
                         -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        , isAnnouncement = not eventActivation
+                        -- , isAnnouncement = not eventActivation
                     }
               }
             , Cmd.none
