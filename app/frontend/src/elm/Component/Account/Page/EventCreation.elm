@@ -1,5 +1,6 @@
 module Component.Account.Page.EventCreation exposing
-    ( Message(..)
+    ( CreateAccountRequestStatus(..)
+    , Message(..)
     , Model
     , createEosAccountBodyParams
     , initCmd
@@ -97,7 +98,7 @@ import View.Notification as Notification
 type alias Model =
     { accountName : String
     , accountValidation : AccountStatus
-    , accountRequestSuccess : Bool
+    , createAccountRequestStatus : CreateAccountRequestStatus
     , keys : KeyPair
     , email : String
     , emailValid : Bool
@@ -111,11 +112,18 @@ type alias Model =
     }
 
 
+type CreateAccountRequestStatus
+    = Pending
+    | Succeded
+    | Failed
+    | NoRequest
+
+
 initModel : Model
 initModel =
     { accountName = ""
     , accountValidation = EmptyAccount
-    , accountRequestSuccess = False
+    , createAccountRequestStatus = NoRequest
     , keys = { privateKey = "", publicKey = "" }
     , email = ""
     , emailValid = False
@@ -191,10 +199,12 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             validateAccountNameInput model Fail
 
         CreateEosAccount ->
-            ( model, createEosAccountRequest model flags language )
+            ( { model | createAccountRequestStatus = Pending }
+            , createEosAccountRequest model flags language
+            )
 
         NewEosAccount (Ok res) ->
-            ( { model | accountRequestSuccess = True }
+            ( { model | createAccountRequestStatus = Succeded }
             , Navigation.newUrl ("/account/created?eos_account=" ++ accountName ++ "&public_key=" ++ keys.publicKey)
             )
 
@@ -204,7 +214,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
                     handleRailsErrorResponse error AccountCreationFailure
             in
             ( { model
-                | accountRequestSuccess = False
+                | createAccountRequestStatus = Failed
                 , notification =
                     { content =
                         Notification.Error
@@ -461,7 +471,7 @@ agreeEosConstitutionSection { agreeEosConstitution } language =
 
 
 okButton : Model -> Language -> Html Message
-okButton { accountValidation, emailConfirmed, agreeEosConstitution } language =
+okButton { accountValidation, emailConfirmed, agreeEosConstitution, createAccountRequestStatus } language =
     let
         enabled =
             (accountValidation == InexistentAccount)
@@ -470,7 +480,7 @@ okButton { accountValidation, emailConfirmed, agreeEosConstitution } language =
     in
     button
         [ class "ok button"
-        , disabled (not enabled)
+        , disabled (not enabled || createAccountRequestStatus == Pending)
         , type_ "button"
         , onClick CreateEosAccount
         ]
