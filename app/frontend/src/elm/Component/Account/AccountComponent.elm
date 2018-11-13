@@ -250,7 +250,7 @@ update message ({ page, language, flags, productionState } as model) =
                         | isEvent = eventActivation
 
                         -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        , isAnnouncement = not eventActivation
+                        -- , isAnnouncement = not eventActivation
                     }
               }
             , Cmd.none
