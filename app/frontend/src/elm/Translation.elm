@@ -299,8 +299,10 @@ type I18n
     | CautionDetail
     | TypeOwnerKey
     | TypeNewOwnerKey
+    | TypeOwnerKeyDesc
     | TypeActiveKey
     | TypeNewActiveKey
+    | TypeActiveKeyDesc
     | ValidKey
     | InvalidKey
     | ChangeKeySucceeded String
@@ -1856,6 +1858,12 @@ getMessages i18n =
             , chinese = "请输入owner key"
             }
 
+        TypeOwnerKeyDesc ->
+            { korean = "오너 키는 계정의 마스터 키입니다. 오너 키와 액티브 키를 변경할 때 필요합니다"
+            , english = "An owner key is a master key for an account. It can be used to change the owner key or active key."
+            , chinese = "owner key是账号的万能钥匙。变更owner key或active key时都需要它。"
+            }
+
         TypeActiveKey ->
             { korean = "액티브 키를 입력하세요"
             , english = "Put in active key"
@@ -1866,6 +1874,12 @@ getMessages i18n =
             { korean = "새로운 액티브 키를 입력하세요"
             , english = "Type in new active key"
             , chinese = "请输入active key"
+            }
+
+        TypeActiveKeyDesc ->
+            { korean = "액티브 키는 DApp을 사용하거나, 토큰 전송 시 필요한 활동 권한을 가진 키입니다"
+            , english = "An active key gives permission to activities such as using DApps or transferring tokens."
+            , chinese = "使用DApp或传送代币时需要Active key"
             }
 
         ValidKey ->
