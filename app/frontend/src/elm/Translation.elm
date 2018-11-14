@@ -303,6 +303,7 @@ type I18n
     | InvalidKey
     | ChangeKeySucceeded String
     | ChangeKeyFailed String
+    | CreateAccount
 
 
 translate : Language -> I18n -> String
@@ -1873,4 +1874,10 @@ getMessages i18n =
             { korean = code ++ " 코드오류로 키 변경 실패"
             , english = "Failed with error code " ++ code
             , chinese = code ++ "编码有误key变更失败"
+            }
+
+        CreateAccount ->
+            { korean = "계정 생성"
+            , english = "Create Account"
+            , chinese = "注册"
             }

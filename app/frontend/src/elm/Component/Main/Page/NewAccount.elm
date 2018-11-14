@@ -1,5 +1,6 @@
-module Component.Main.Page.ChangeKey exposing (Message, Model, initModel, update, view)
+module Component.Main.Page.NewAccount exposing (Message, Model, initModel, update, view)
 
+import Data.Account exposing (Account)
 import Html
     exposing
         ( Html
@@ -29,6 +30,7 @@ import Html
         , ul
         )
 import Html.Attributes exposing (attribute, class, id, placeholder, scope, step, type_)
+import Translation exposing (Language)
 
 
 type Message
@@ -44,13 +46,13 @@ initModel =
     {}
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update _ model =
+update : Message -> Model -> Account -> ( Model, Cmd Message )
+update _ model _ =
     ( model, Cmd.none )
 
 
-view : Model -> Html msg
-view _ =
+view : Language -> Model -> Account -> Html Message
+view _ _ _ =
     main_ [ class "create account" ]
         [ h2 []
             [ text "계정생성" ]
