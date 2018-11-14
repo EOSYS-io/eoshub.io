@@ -91,14 +91,18 @@ update message ({ activeKey, activeKeyValidation, ownerKey, ownerKeyValidation }
                     }
 
                 values =
-                    if activeKeyValidation == ValidPublicKey && ownerKeyValidation == ValidPublicKey then
-                        [ ownerParams, activeParams ]
+                    case ( activeKeyValidation, ownerKeyValidation ) of
+                        ( ValidPublicKey, ValidPublicKey ) ->
+                            [ ownerParams, activeParams ]
 
-                    else if activeKeyValidation == ValidPublicKey then
-                        [ activeParams ]
+                        ( ValidPublicKey, EmptyPublicKey ) ->
+                            [ activeParams ]
 
-                    else
-                        [ ownerParams ]
+                        ( EmptyPublicKey, ValidPublicKey ) ->
+                            [ ownerParams ]
+
+                        ( _, _ ) ->
+                            []
 
                 cmd =
                     values |> Data.Action.Updateauth |> encodeAction |> Port.pushAction
