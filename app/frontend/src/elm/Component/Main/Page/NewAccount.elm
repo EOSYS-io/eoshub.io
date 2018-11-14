@@ -1,4 +1,4 @@
-module Component.Main.Page.ChangeKey exposing (view)
+module Component.Main.Page.ChangeKey exposing (Message, Model, initModel, update, view)
 
 import Html
     exposing
@@ -31,8 +31,26 @@ import Html
 import Html.Attributes exposing (attribute, class, id, placeholder, scope, step, type_)
 
 
-view : Html msg
-view =
+type Message
+    = None
+
+
+type alias Model =
+    {}
+
+
+initModel : Model
+initModel =
+    {}
+
+
+update : Message -> Model -> ( Model, Cmd Message )
+update _ model =
+    ( model, Cmd.none )
+
+
+view : Model -> Html msg
+view _ =
     main_ [ class "create account" ]
         [ h2 []
             [ text "계정생성" ]
