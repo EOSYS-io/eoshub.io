@@ -20,6 +20,7 @@ module Component.Main.MainComponent exposing
     , view
     )
 
+import Component.Main.Page.ChangeKey as ChangeKey
 import Component.Main.Page.Index as Index
 import Component.Main.Page.NotFound as NotFound
 import Component.Main.Page.Rammarket as Rammarket
@@ -91,6 +92,7 @@ type Page
     | VotePage Vote.Model
     | RammarketPage Rammarket.Model
     | NotFoundPage
+    | ChangeKeyPage ChangeKey.Model
 
 
 type alias Header =
@@ -141,6 +143,7 @@ type Message
     | ResourceMessage Resource.Message
     | IndexMessage Index.Message
     | RammarketMessage Rammarket.Message
+    | ChangeKeyMessage ChangeKey.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
@@ -279,6 +282,9 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
+
+                ChangeKeyPage subModel ->
+                    Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.wallet)
 
                 _ ->
                     NotFound.view language
@@ -492,6 +498,13 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                     Rammarket.update subMessage subModel sidebar.account
             in
             ( { model | page = newPage |> RammarketPage }, Cmd.map RammarketMessage subCmd )
+
+        ( ChangeKeyMessage subMessage, ChangeKeyPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    ChangeKey.update subMessage subModel sidebar.wallet
+            in
+            ( { model | page = newPage |> ChangeKeyPage }, Cmd.map ChangeKeyMessage subCmd )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let
@@ -769,6 +782,9 @@ getPage account location =
 
         NotFoundRoute ->
             NotFoundPage
+
+        ChangeKeyRoute ->
+            ChangeKeyPage ChangeKey.initModel
 
         _ ->
             NotFoundPage

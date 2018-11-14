@@ -69,6 +69,7 @@ type I18n
     | Attach
     | ChangeWallet
     | MyAccount
+    | MyAccountDefault
     | SignOut
     | TotalAmount
     | TransactionOptimal
@@ -292,6 +293,16 @@ type I18n
     | ConfirmEmailDetail
     | AnnouncementModalTitle
     | AnnouncementModalParagraph
+    | ChangeKey
+    | ChangeKeyDetail
+    | Caution
+    | CautionDetail
+    | TypeOwnerKey
+    | TypeActiveKey
+    | ValidKey
+    | InvalidKey
+    | ChangeKeySucceeded String
+    | ChangeKeyFailed String
 
 
 translate : Language -> I18n -> String
@@ -425,6 +436,12 @@ getMessages i18n =
             { korean = "내 계정 보기"
             , english = "My Account"
             , chinese = "查看我的账户"
+            }
+
+        MyAccountDefault ->
+            { korean = "내 계정"
+            , english = "My Account"
+            , chinese = "我的账户"
             }
 
         SignOut ->
@@ -1796,4 +1813,64 @@ getMessages i18n =
             { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트로 준비한 500 EOS가 모두 소진되어 이벤트를 종료합니다. 이오스 커뮤니티의 많은 관심과 참석 감사드리며, 다음에는 더 재미있는 이벤트로 찾아뵐 수 있도록 하겠습니다.\n\n감사합니다.\nEOSYS 드림"
             , english = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
             , chinese = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
+            }
+
+        ChangeKey ->
+            { korean = "계정 키 변경"
+            , english = "Change Account Keys"
+            , chinese = "变更账户密匙"
+            }
+
+        ChangeKeyDetail ->
+            { korean = "@active 권한으로는 액티브 키만 변경 가능하며, @owner 권한으로는 두 가지 키 모두 변경 가능합니다."
+            , english = "You can only change your active key with @active permission, and change both with @owner permission."
+            , chinese = "以@active权限只能更改active key，以@owner权限两个key都可以更改。"
+            }
+
+        Caution ->
+            { korean = "주의사항"
+            , english = "Caution"
+            , chinese = "注意"
+            }
+
+        CautionDetail ->
+            { korean = "아래에 입력한 퍼블릭 키와 연결된 프라이빗키를 따로 보관하였는지 반드시 확인하시기 바랍니다. 만약 프라이빗 키를 따로 보관하지 않은 경우, 계정에 대한 접근 권한을 잃게 됩니다. NOTE: 오너 키 변경을 위해서는, 지갑 로그인 시 @owner 권한으로 접속해야 합니다."
+            , english = "Please check if you save the private key safely.\nIf you don't have your private key, you will lose access to the account.\nNOTE: to change your owner key, log in with @owner permission."
+            , chinese = "请储存与以下公匙绑定的密匙。\n如果没有密匙将失去账号权限。\nNOTE：需要变更owner key时以@owner权限登入。"
+            }
+
+        TypeOwnerKey ->
+            { korean = "새로운 오너 키를 입력하세요"
+            , english = "Type in new owner key"
+            , chinese = "请输入owner key"
+            }
+
+        TypeActiveKey ->
+            { korean = "새로운 액티브 키를 입력하세요"
+            , english = "Type in new active key"
+            , chinese = "请输入active key"
+            }
+
+        ValidKey ->
+            { korean = "변경 가능한 키입니다."
+            , english = "Valid key"
+            , chinese = "有效"
+            }
+
+        InvalidKey ->
+            { korean = "변경 가능한 키가 아닙니다"
+            , english = "Invalid key"
+            , chinese = "无效"
+            }
+
+        ChangeKeySucceeded _ ->
+            { korean = "계정 키 변경에 성공했습니다"
+            , english = "Successfully changed the account key"
+            , chinese = "账户密匙变更成功"
+            }
+
+        ChangeKeyFailed code ->
+            { korean = code ++ " 코드오류로 키 변경 실패"
+            , english = "Failed with error code " ++ code
+            , chinese = code ++ "编码有误key变更失败"
             }

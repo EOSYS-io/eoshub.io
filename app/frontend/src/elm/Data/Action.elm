@@ -10,6 +10,7 @@ module Data.Action exposing
     , SellramParameters
     , TransferParameters
     , UndelegatebwParameters
+    , UpdateauthParameters
     , VoteproducerParameters
     , actionParametersDecoder
     , actionsDecoder
@@ -29,6 +30,7 @@ module Data.Action exposing
     , transferDecoder
     , transferParametersToValue
     , undelegatebwDecoder
+    , updateauthParametersToValue
     , voteproducerDecoder
     )
 
@@ -68,6 +70,7 @@ type ActionParameters
     | Regproxy RegproxyParameters
     | Voteproducer VoteproducerParameters
     | Newaccount NewaccountParameters
+    | Updateauth (List UpdateauthParameters)
 
 
 type alias TransferParameters =
@@ -115,6 +118,25 @@ type alias BuyrambytesParameters =
     { payer : String
     , receiver : String
     , bytes : Int
+    }
+
+
+type alias Key =
+    { key : String
+    , weight : Int
+    }
+
+
+type alias UpdateauthParameters =
+    { account : String
+    , permission : String
+    , parent : String
+    , auth :
+        { threshold : Int
+        , keys : List Key
+        , accounts : List String
+        , waits : List String
+        }
     }
 
 
@@ -458,27 +480,37 @@ errorDecoder =
 
 encodeAction : ActionParameters -> Encode.Value
 encodeAction action =
-    case action of
-        Transfer contractAccount message ->
-            transferParametersToValue contractAccount message
+    let
+        ( actionName, contents ) =
+            case action of
+                Transfer contractAccount message ->
+                    ( "transfer", [ transferParametersToValue contractAccount message ] )
 
-        Delegatebw message ->
-            delegatebwParametersToValue message
+                Delegatebw message ->
+                    ( "delegatebw", [ delegatebwParametersToValue message ] )
 
-        Undelegatebw message ->
-            undelegatebwParametersToValue message
+                Undelegatebw message ->
+                    ( "undelegatebw", [ undelegatebwParametersToValue message ] )
 
-        Buyram message ->
-            buyramParametersToValue message
+                Buyram message ->
+                    ( "buyram", [ buyramParametersToValue message ] )
 
-        Sellram message ->
-            sellramParametersToValue message
+                Sellram message ->
+                    ( "sellram", [ sellramParametersToValue message ] )
 
-        Voteproducer message ->
-            voteproducersParametersToValue message
+                Voteproducer message ->
+                    ( "voteproducer", [ voteproducersParametersToValue message ] )
 
-        _ ->
-            Encode.null
+                Updateauth messages ->
+                    ( "changekey", List.map updateauthParametersToValue messages )
+
+                _ ->
+                    ( "", [ Encode.null ] )
+    in
+    Encode.object
+        [ ( "actionName", Encode.string actionName )
+        , ( "actions", Encode.list contents )
+        ]
 
 
 transferParametersToValue : String -> TransferParameters -> Encode.Value
@@ -574,6 +606,40 @@ voteproducersParametersToValue { voter, producers, proxy } =
                 [ ( "voter", Encode.string voter )
                 , ( "proxy", Encode.string proxy )
                 , ( "producers", Encode.list (List.map Encode.string producers) )
+                ]
+          )
+        ]
+
+
+updateauthParametersToValue : UpdateauthParameters -> Encode.Value
+updateauthParametersToValue { account, permission, parent, auth } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "updateauth" )
+        , ( "payload"
+          , Encode.object
+                [ ( "account", Encode.string account )
+                , ( "permission", Encode.string permission )
+                , ( "parent", Encode.string parent )
+                , ( "auth"
+                  , Encode.object
+                        [ ( "accounts", Encode.list (List.map Encode.string auth.accounts) )
+                        , ( "threshold", Encode.int auth.threshold )
+                        , ( "waits", Encode.list (List.map Encode.string auth.waits) )
+                        , ( "keys"
+                          , Encode.list
+                                (List.map
+                                    (\{ key, weight } ->
+                                        Encode.object
+                                            [ ( "key", Encode.string key )
+                                            , ( "weight", Encode.int weight )
+                                            ]
+                                    )
+                                    auth.keys
+                                )
+                          )
+                        ]
+                  )
                 ]
           )
         ]

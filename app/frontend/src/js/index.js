@@ -6,6 +6,7 @@ import ScatterJS from 'scatterjs-core';
 import ScatterEOS from 'scatterjs-plugin-eosjs';
 import eos from 'eosjs';
 import ecc from 'eosjs-ecc';
+import _ from 'lodash';
 
 import loadTV from './TradingView/loader';
 
@@ -82,13 +83,18 @@ app.ports.invalidateAccount.subscribe(async () => {
   app.ports.receiveWalletStatus.send(createResponseStatus());
 });
 
-app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
+app.ports.pushAction.subscribe(async ({ actionName, actions }) => {
   try {
     const scatter = getScatter();
-    const contract = await scatter.eosjsClient.contract(account);
     const options = { authorization: [`${scatter.account}@${scatter.authority}`] };
-    await contract[action](payload, options);
-    app.ports.receivePushActionResponse.send(createPushActionReponse(200, action));
+    const contractNames = _.map(actions, ({ account }) => account);
+    await scatter.eosjsClient.transaction(contractNames, (contracts) => {
+      _.forEach(actions, ({ action, payload, account }) => {
+        const dotReplacedAccount = _.replace(account, '.', '_');
+        contracts[dotReplacedAccount][action](payload, options);
+      });
+    });
+    app.ports.receivePushActionResponse.send(createPushActionReponse(200, actionName));
   } catch (err) {
     if (err.isError && err.isError === true) {
       // Deal with scatter error.
@@ -96,7 +102,7 @@ app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
       if (type === 'signature_rejected') { return; }
 
       app.ports.receivePushActionResponse.send(
-        createPushActionReponse(code, action, type, message),
+        createPushActionReponse(code, actionName, type, message),
       );
       return;
     }
@@ -104,11 +110,10 @@ app.ports.pushAction.subscribe(async ({ account, action, payload }) => {
     try {
       // Handle blockchain errors.
       const errObject = JSON.parse(err);
-      console.log(errObject);
       if (errObject.code === 500 && errObject.error) {
         const { name, code, what } = errObject.error;
         app.ports.receivePushActionResponse.send(
-          createPushActionReponse(code, action, name, what),
+          createPushActionReponse(code, actionName, name, what),
         );
       }
     } catch (e) {

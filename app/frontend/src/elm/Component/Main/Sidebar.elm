@@ -300,16 +300,18 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
             [ text "option" ]
         , div [ class "menu_list" ]
             [ a
-                [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
-                ]
-                [ text (translate language ChangeWallet) ]
-            , a
                 [ onClick
                     (AndThen (OpenConfigPanel False)
                         (ChangeUrl ("search?query=" ++ wallet.account))
                     )
                 ]
                 [ text (translate language MyAccount) ]
+            , a [ onClick (AndThen (OpenConfigPanel False) (ChangeUrl "changekey")) ]
+                [ text (translate language ChangeKey) ]
+            , a
+                [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
+                ]
+                [ text (translate language ChangeWallet) ]
             , a
                 [ onClick (AndThen (OpenConfigPanel False) InvalidateAccount)
                 ]
