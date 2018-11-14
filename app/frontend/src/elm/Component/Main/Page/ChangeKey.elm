@@ -156,7 +156,7 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                 [ ul []
                     [ li []
                         [ input
-                            [ placeholder (translate language TypeActiveKey)
+                            [ placeholder (translate language TypeNewActiveKey)
                             , type_ "text"
                             , onInput <| InputActiveKey
                             , attribute "maxlength" "53"
@@ -169,7 +169,7 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                         ]
                     , li []
                         [ input
-                            [ placeholder (translate language TypeOwnerKey)
+                            [ placeholder (translate language TypeNewOwnerKey)
                             , type_ "text"
                             , onInput <| InputOwnerKey
                             , attribute "maxlength" "53"

@@ -298,12 +298,16 @@ type I18n
     | Caution
     | CautionDetail
     | TypeOwnerKey
+    | TypeNewOwnerKey
     | TypeActiveKey
+    | TypeNewActiveKey
     | ValidKey
     | InvalidKey
     | ChangeKeySucceeded String
     | ChangeKeyFailed String
     | CreateAccount
+    | CreateAccountDetail
+    | AccountPlaceholder
 
 
 translate : Language -> I18n -> String
@@ -680,7 +684,7 @@ getMessages i18n =
             }
 
         AccountExample ->
-            { korean = "계정명 예시: eoshuby12345"
+            { korean = "계정이름 예시: eoshuby12345"
             , english = "ex) eoshuby12345"
             , chinese = "账户名例：eoshuby12345"
             }
@@ -1841,12 +1845,24 @@ getMessages i18n =
             }
 
         TypeOwnerKey ->
+            { korean = "오너 키를 입력하세요"
+            , english = "Put in owner key"
+            , chinese = "请输入owner key"
+            }
+
+        TypeNewOwnerKey ->
             { korean = "새로운 오너 키를 입력하세요"
             , english = "Type in new owner key"
             , chinese = "请输入owner key"
             }
 
         TypeActiveKey ->
+            { korean = "액티브 키를 입력하세요"
+            , english = "Put in active key"
+            , chinese = "请输入active key"
+            }
+
+        TypeNewActiveKey ->
             { korean = "새로운 액티브 키를 입력하세요"
             , english = "Type in new active key"
             , chinese = "请输入active key"
@@ -1880,4 +1896,16 @@ getMessages i18n =
             { korean = "계정 생성"
             , english = "Create Account"
             , chinese = "注册"
+            }
+
+        CreateAccountDetail ->
+            { korean = "기존 계정으로 새로운 EOS 계정을 만들 수 있습니다"
+            , english = "Create new EOS account with an old account"
+            , chinese = "以已有账号可以注册新的账号"
+            }
+
+        AccountPlaceholder ->
+            { korean = "새로 만들 계정의 이름을 입력하세요"
+            , english = "Type in the account name"
+            , chinese = "请输入账户名"
             }
