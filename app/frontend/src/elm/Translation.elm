@@ -309,6 +309,7 @@ type I18n
     | ChangeKeyFailed String
     | CreateAccount
     | CreateAccountDetail
+    | CreateAccountDesc Bool
     | AccountPlaceholder
 
 
@@ -1883,13 +1884,13 @@ getMessages i18n =
             }
 
         ValidKey ->
-            { korean = "변경 가능한 키입니다."
+            { korean = "가능한 키입니다."
             , english = "Valid key"
             , chinese = "有效"
             }
 
         InvalidKey ->
-            { korean = "변경 가능한 키가 아닙니다"
+            { korean = "가능한 키가 아닙니다"
             , english = "Invalid key"
             , chinese = "无效"
             }
@@ -1909,13 +1910,43 @@ getMessages i18n =
         CreateAccount ->
             { korean = "계정 생성"
             , english = "Create Account"
-            , chinese = "注册"
+            , chinese = "生成账号"
             }
 
         CreateAccountDetail ->
             { korean = "기존 계정으로 새로운 EOS 계정을 만들 수 있습니다"
             , english = "Create new EOS account with an old account"
             , chinese = "以已有账号可以注册新的账号"
+            }
+
+        CreateAccountDesc isDelegate ->
+            { korean =
+                "현재 로그인 된 계정에서 아래에 표시된 토큰 수량만큼 새로운 계정으로 "
+                    ++ (if isDelegate then
+                            "임대"
+
+                        else
+                            "전송"
+                       )
+                    ++ "됩니다."
+            , english =
+                "The amount will be "
+                    ++ (if isDelegate then
+                            "delegated"
+
+                        else
+                            "transferred"
+                       )
+                    ++ " to the new account."
+            , chinese =
+                "能够"
+                    ++ (if isDelegate then
+                            "租借"
+
+                        else
+                            "传送"
+                       )
+                    ++ "以下数量"
             }
 
         AccountPlaceholder ->

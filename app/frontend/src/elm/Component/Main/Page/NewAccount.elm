@@ -24,14 +24,15 @@ import Html
         )
 import Html.Attributes
     exposing
-        ( autofocus
+        ( attribute
+        , autofocus
         , class
         , disabled
         , id
         , placeholder
         , type_
         )
-import Html.Events exposing (onInput)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Translation exposing (I18n(..), Language, translate)
 import Util.HttpRequest exposing (getAccount)
@@ -50,6 +51,9 @@ type Message
     | InputOwnerKey String
     | InputAccountName String
     | OnFetchAccountToVerify (Result Http.Error Account)
+    | ToggleModal
+    | SetIsDelegate Bool
+    | PushAction
 
 
 type alias Model =
@@ -60,6 +64,8 @@ type alias Model =
     , account : String
     , accountValidation : AccountStatus
     , isValid : Bool
+    , modalOpened : Bool
+    , isDelegate : Bool
     }
 
 
@@ -72,11 +78,13 @@ initModel =
     , account = ""
     , accountValidation = EmptyAccount
     , isValid = False
+    , modalOpened = False
+    , isDelegate = True
     }
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message model _ =
+update message ({ modalOpened } as model) _ =
     case message of
         InputActiveKey inputKey ->
             ( validateKey { model | activeKey = inputKey }, Cmd.none )
@@ -93,9 +101,18 @@ update message model _ =
         OnFetchAccountToVerify (Err _) ->
             validateAccountName model Fail
 
+        ToggleModal ->
+            ( { model | modalOpened = not modalOpened }, Cmd.none )
+
+        SetIsDelegate isDelegate ->
+            ( { model | isDelegate = isDelegate }, Cmd.none )
+
+        PushAction ->
+            ( { model | modalOpened = not modalOpened }, Cmd.none )
+
 
 view : Language -> Model -> Account -> Html Message
-view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid } { accountName } =
+view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid, modalOpened, isDelegate } { accountName } =
     main_ [ class "create account" ]
         [ h2 []
             [ text (translate language CreateAccount) ]
@@ -159,6 +176,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                             , type_ "text"
                             , Html.Attributes.value account
                             , onInput <| InputAccountName
+                            , attribute "maxlength" "12"
                             ]
                             []
                         , span [ class ("validate description" ++ addedClass) ]
@@ -170,6 +188,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                             , type_ "text"
                             , Html.Attributes.value activeKey
                             , onInput <| InputActiveKey
+                            , attribute "maxlength" "53"
                             ]
                             []
                         , span [ class ("validate description" ++ activeKeyAddedClass) ]
@@ -181,6 +200,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                             , type_ "text"
                             , Html.Attributes.value ownerKey
                             , onInput <| InputOwnerKey
+                            , attribute "maxlength" "53"
                             ]
                             []
                         , span [ class ("validate description" ++ ownerKeyAddedClass) ]
@@ -189,16 +209,31 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     ]
                 ]
             , div [ class "btn_area align right" ]
-                [ button [ class "ok button", disabled (not isValid), type_ "button" ]
+                [ button
+                    [ class "ok button"
+                    , disabled (not isValid)
+                    , type_ "button"
+                    , onClick ToggleModal
+                    ]
                     [ text (translate language Confirm) ]
                 ]
             ]
-        , section [ class "create_account modal popup", id "popup" ]
+        , section
+            [ class
+                ("create_account modal popup"
+                    ++ (if modalOpened then
+                            " viewing"
+
+                        else
+                            ""
+                       )
+                )
+            ]
             [ div [ class "wrapper" ]
                 [ h2 []
                     [ text (translate language CreateAccount) ]
                 , p []
-                    [ text "현재 계정에서 보유한 토큰 수량중 아래에 명시된 수량만큼 새롭게 생성되는 계정으로 전송됩니다. " ]
+                    [ text (translate language (CreateAccountDesc isDelegate)) ]
                 , dl []
                     [ dt []
                         [ text "CPU" ]
@@ -213,17 +248,42 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     , dd []
                         [ text "4 KB (4096 bytes)" ]
                     ]
-                , div [ class "btn_area choice" ]
-                    [ button [ class "rent choice button", type_ "button" ]
-                        [ text "임대해주기" ]
-                    , button [ class "send choice button", type_ "button" ]
-                        [ text "전송하기" ]
+                , let
+                    ( delegateButtonClass, transferButtonClass ) =
+                        if isDelegate then
+                            ( "rent choice button ing", "send choice button" )
+
+                        else
+                            ( "rent choice button", "send choice button ing" )
+                  in
+                  div [ class "btn_area choice" ]
+                    [ button
+                        [ class delegateButtonClass
+                        , type_ "button"
+                        , onClick (SetIsDelegate True)
+                        ]
+                        [ text (translate language Delegate) ]
+                    , button
+                        [ class transferButtonClass
+                        , type_ "button"
+                        , onClick (SetIsDelegate False)
+                        ]
+                        [ text (translate language Transfer) ]
                     ]
                 , div [ class "btn_area" ]
-                    [ button [ class "ok button", disabled True, type_ "button" ]
+                    [ button
+                        [ class "ok button"
+                        , type_ "button"
+                        , onClick PushAction
+                        ]
                         [ text (translate language Confirm) ]
                     ]
-                , button [ class "close", id "closePopup", type_ "button" ]
+                , button
+                    [ class "close"
+                    , id "closePopup"
+                    , type_ "button"
+                    , onClick ToggleModal
+                    ]
                     [ text (translate language Close) ]
                 ]
             ]
@@ -239,7 +299,11 @@ validateKey ({ activeKey, ownerKey } as model) =
         activeKeyValidation =
             validatePublicKey activeKey
     in
-    validateForm { model | activeKeyValidation = activeKeyValidation, ownerKeyValidation = ownerKeyValidation }
+    validateForm
+        { model
+            | activeKeyValidation = activeKeyValidation
+            , ownerKeyValidation = ownerKeyValidation
+        }
 
 
 validateAccountName : Model -> VerificationRequestStatus -> ( Model, Cmd Message )
