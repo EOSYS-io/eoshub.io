@@ -156,19 +156,6 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                 [ ul []
                     [ li []
                         [ input
-                            [ placeholder (translate language TypeOwnerKey)
-                            , type_ "text"
-                            , onInput <| InputOwnerKey
-                            , attribute "maxlength" "53"
-                            , Html.Attributes.value ownerKey
-                            , disabled (authority /= "owner")
-                            ]
-                            []
-                        , span [ class ownerClass ]
-                            [ text ownerText ]
-                        ]
-                    , li []
-                        [ input
                             [ placeholder (translate language TypeActiveKey)
                             , type_ "text"
                             , onInput <| InputActiveKey
@@ -179,6 +166,19 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                             []
                         , span [ class activeClass ]
                             [ text activeText ]
+                        ]
+                    , li []
+                        [ input
+                            [ placeholder (translate language TypeOwnerKey)
+                            , type_ "text"
+                            , onInput <| InputOwnerKey
+                            , attribute "maxlength" "53"
+                            , Html.Attributes.value ownerKey
+                            , disabled (authority /= "owner")
+                            ]
+                            []
+                        , span [ class ownerClass ]
+                            [ text ownerText ]
                         ]
                     ]
                 ]
