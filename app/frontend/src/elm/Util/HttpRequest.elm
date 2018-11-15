@@ -1,6 +1,5 @@
 module Util.HttpRequest exposing
-    ( get
-    , getAccount
+    ( getAccount
     , getActions
     , getEosAccountProduct
     , getFullPath
@@ -38,19 +37,6 @@ post url body decoder =
         }
 
 
-get : String -> Decoder a -> Http.Request a
-get url decoder =
-    Http.request
-        { method = "GET"
-        , headers = []
-        , url = url
-        , body = Http.emptyBody
-        , expect = Http.expectJson decoder
-        , timeout = Nothing
-        , withCredentials = False
-        }
-
-
 getAccount : String -> Http.Request Account
 getAccount accountName =
     let
@@ -64,7 +50,7 @@ getAccount accountName =
 
 getActions : String -> Int -> Int -> Http.Request (List Action)
 getActions query skip limit =
-    get
+    Http.get
         (mainnetHistoryUrl
             ++ "/v1/history/get_actions/"
             ++ query

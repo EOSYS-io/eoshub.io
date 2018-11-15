@@ -96,6 +96,7 @@ import Navigation
 import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
+import Util.Constant exposing (historyApiLimit)
 import Util.Formatter
     exposing
         ( eosAdd
@@ -127,8 +128,7 @@ type alias Model =
 
 
 type alias Pagination =
-    { skip : Int
-    , limit : Int
+    { base : Int
     , isLoading : Bool
     , isEnd : Bool
     }
@@ -149,8 +149,7 @@ initModel accountName =
     , delbandTable = []
     , actions = []
     , pagination =
-        { skip = 0
-        , limit = 100
+        { base = 0
         , isLoading = True
         , isEnd = False
         }
@@ -182,7 +181,7 @@ initCmd query { pagination } =
                 |> Http.send OnFetchAccount
 
         actionsCmd =
-            getActions query pagination.skip pagination.limit
+            getActions query pagination.base historyApiLimit
                 |> Http.send OnFetchActions
 
         delbandCmd =
@@ -237,7 +236,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
                     | actions = refinedActions ++ model.actions
                     , pagination =
                         { pagination
-                            | skip = pagination.skip + pagination.limit
+                            | base = pagination.base + historyApiLimit
                             , isLoading = False
                         }
                   }
@@ -248,12 +247,12 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 -- NOTE(boseok): There're no more actions to load
                 ( { model
                     | actions = refinedActions ++ model.actions
-                    , pagination = { pagination | isEnd = True, skip = 0, isLoading = False }
+                    , pagination = { pagination | isEnd = True, isLoading = False }
                   }
                 , Cmd.none
                 )
 
-        OnFetchActions (Err str) ->
+        OnFetchActions (Err _) ->
             ( { model | pagination = { pagination | isLoading = False } }, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
@@ -262,7 +261,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
         ShowMore ->
             let
                 actionsCmd =
-                    getActions query pagination.skip pagination.limit
+                    getActions query pagination.base historyApiLimit
                         |> Http.send OnFetchActions
             in
             if not pagination.isEnd then
