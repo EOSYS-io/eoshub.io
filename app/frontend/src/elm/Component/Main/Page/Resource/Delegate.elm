@@ -24,7 +24,7 @@ import Component.Main.Page.Resource.Modal.DelegateList as DelegateList
 import Component.Main.Page.Resource.Stake exposing (modalValidateAttr)
 import Component.Main.Page.Transfer exposing (accountWarningSpan)
 import Data.Account exposing (Account)
-import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
+import Data.Action as Action exposing (DelegatebwParameters, encodeAction, encodeActions)
 import Data.Table exposing (Row)
 import Html exposing (Html, a, button, div, h3, input, label, p, section, span, strong, text)
 import Html.Attributes exposing (attribute, class, disabled, for, id, placeholder, step, type_)
@@ -255,6 +255,8 @@ update message ({ delegatebw, delegateListModal } as model) { coreLiquidBalance,
                     { delegatebw | from = accountName }
                         |> Action.Delegatebw
                         |> encodeAction
+                        |> List.singleton
+                        |> encodeActions "delegatebw"
                         |> Port.pushAction
             in
             ( { model | delegatebw = { delegatebw | from = accountName } }, cmd )

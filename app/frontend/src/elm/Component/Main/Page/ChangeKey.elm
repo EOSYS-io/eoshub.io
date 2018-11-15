@@ -7,7 +7,7 @@ module Component.Main.Page.ChangeKey exposing
     , view
     )
 
-import Data.Action exposing (encodeAction)
+import Data.Action exposing (encodeAction, encodeActions)
 import Html
     exposing
         ( Html
@@ -105,7 +105,15 @@ update message ({ activeKey, activeKeyValidation, ownerKey, ownerKeyValidation }
                             []
 
                 cmd =
-                    values |> Data.Action.Updateauth |> encodeAction |> Port.pushAction
+                    if List.isEmpty values then
+                        Cmd.none
+
+                    else
+                        values
+                            |> List.map Data.Action.Updateauth
+                            |> List.map encodeAction
+                            |> encodeActions "changekey"
+                            |> Port.pushAction
             in
             ( model, cmd )
 

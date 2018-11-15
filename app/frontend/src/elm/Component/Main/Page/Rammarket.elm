@@ -17,6 +17,7 @@ import Data.Action
         , BuyramParameters
         , actionsDecoder
         , encodeAction
+        , encodeActions
         , initBuyramParameters
         , removeDuplicated
         )
@@ -407,7 +408,14 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                         else
                             { params | payer = accountName, receiver = accountName }
                 in
-                ( model, newParams |> Data.Action.Buyram |> encodeAction |> Port.pushAction )
+                ( model
+                , newParams
+                    |> Data.Action.Buyram
+                    |> encodeAction
+                    |> List.singleton
+                    |> encodeActions "buyram"
+                    |> Port.pushAction
+                )
 
             else
                 let
@@ -417,7 +425,14 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                     newParams =
                         Data.Action.SellramParameters accountName bytes
                 in
-                ( model, newParams |> Data.Action.Sellram |> encodeAction |> Port.pushAction )
+                ( model
+                , newParams
+                    |> Data.Action.Sellram
+                    |> encodeAction
+                    |> List.singleton
+                    |> encodeActions "sellram"
+                    |> Port.pushAction
+                )
 
         ChangeUrl url ->
             ( model, Navigation.newUrl url )

@@ -15,7 +15,7 @@ module Component.Main.Page.Resource.Unstake exposing
     )
 
 import Data.Account exposing (Account)
-import Data.Action as Action exposing (UndelegatebwParameters, encodeAction)
+import Data.Action as Action exposing (UndelegatebwParameters, encodeAction, encodeActions)
 import Html exposing (Html, button, div, h3, input, label, p, section, span, strong, text)
 import Html.Attributes exposing (attribute, class, disabled, for, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
@@ -179,6 +179,8 @@ update message ({ undelegatebw } as model) { accountName, selfDelegatedBandwidth
                     { undelegatebw | from = accountName, receiver = accountName }
                         |> Action.Undelegatebw
                         |> encodeAction
+                        |> List.singleton
+                        |> encodeActions "undelegatebw"
                         |> Port.pushAction
             in
             ( { model | undelegatebw = { undelegatebw | from = accountName, receiver = accountName } }, cmd )

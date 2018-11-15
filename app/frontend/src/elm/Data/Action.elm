@@ -6,6 +6,8 @@ module Data.Action exposing
     , ClaimrewardsParameters
     , DelegatebwParameters
     , NewaccountParameters
+    , PermissionLevel
+    , PermissionLevelWeight
     , RegproxyParameters
     , SellramParameters
     , TransferParameters
@@ -19,10 +21,12 @@ module Data.Action exposing
     , claimrewardsDecoder
     , delegatebwDecoder
     , encodeAction
+    , encodeActions
     , errorDecoder
     , initBuyramParameters
     , initSellramParameters
     , newaccountDecoder
+    , newaccountParametersToValue
     , refineAction
     , regproxyDecoder
     , removeDuplicated
@@ -70,7 +74,7 @@ type ActionParameters
     | Regproxy RegproxyParameters
     | Voteproducer VoteproducerParameters
     | Newaccount NewaccountParameters
-    | Updateauth (List UpdateauthParameters)
+    | Updateauth UpdateauthParameters
 
 
 type alias TransferParameters =
@@ -121,9 +125,40 @@ type alias BuyrambytesParameters =
     }
 
 
-type alias Key =
+
+-- NOTE(heejae): See details of eosio native data types on
+-- https://github.com/EOSIO/eos/blob/905e7c85714aee4286fa180ce946f15ceb4ce73c/libraries/chain/eosio_contract_abi.cpp
+
+
+type alias PermissionLevel =
+    { actor : String
+    , permission : String
+    }
+
+
+type alias PermissionLevelWeight =
+    { permission : PermissionLevel
+    , weight : Int
+    }
+
+
+type alias WaitWeight =
+    { waitSec : Int
+    , weight : Int
+    }
+
+
+type alias KeyWeight =
     { key : String
     , weight : Int
+    }
+
+
+type alias Auth =
+    { threshold : Int
+    , keys : List KeyWeight
+    , accounts : List PermissionLevelWeight
+    , waits : List WaitWeight
     }
 
 
@@ -131,12 +166,7 @@ type alias UpdateauthParameters =
     { account : String
     , permission : String
     , parent : String
-    , auth :
-        { threshold : Int
-        , keys : List Key
-        , accounts : List String
-        , waits : List String
-        }
+    , auth : Auth
     }
 
 
@@ -181,6 +211,8 @@ type alias VoteproducerParameters =
 type alias NewaccountParameters =
     { creator : String
     , name : String
+    , owner : Auth
+    , active : Auth
     }
 
 
@@ -320,12 +352,45 @@ voteproducerDecoder =
         )
 
 
+authDecoder : Decoder Auth
+authDecoder =
+    decode Auth
+        |> required "threshold" Decode.int
+        |> required "keys"
+            (Decode.list
+                (decode KeyWeight
+                    |> required "key" Decode.string
+                    |> required "weight" Decode.int
+                )
+            )
+        |> required "accounts"
+            (Decode.list
+                (decode PermissionLevelWeight
+                    |> required "permission"
+                        (decode PermissionLevel
+                            |> required "permission" Decode.string
+                            |> required "actor" Decode.string
+                        )
+                    |> required "weight" Decode.int
+                )
+            )
+        |> required "waits"
+            (Decode.list
+                (decode WaitWeight
+                    |> required "wait_sec" Decode.int
+                    |> required "weight" Decode.int
+                )
+            )
+
+
 newaccountDecoder : Decoder ActionParameters
 newaccountDecoder =
     Decode.map Newaccount <|
         (decode NewaccountParameters
             |> required "creator" Decode.string
             |> required "name" Decode.string
+            |> required "owner" authDecoder
+            |> required "active" authDecoder
         )
 
 
@@ -478,39 +543,40 @@ errorDecoder =
 -- encoder part
 
 
-encodeAction : ActionParameters -> Encode.Value
-encodeAction action =
-    let
-        ( actionName, contents ) =
-            case action of
-                Transfer contractAccount message ->
-                    ( "transfer", [ transferParametersToValue contractAccount message ] )
-
-                Delegatebw message ->
-                    ( "delegatebw", [ delegatebwParametersToValue message ] )
-
-                Undelegatebw message ->
-                    ( "undelegatebw", [ undelegatebwParametersToValue message ] )
-
-                Buyram message ->
-                    ( "buyram", [ buyramParametersToValue message ] )
-
-                Sellram message ->
-                    ( "sellram", [ sellramParametersToValue message ] )
-
-                Voteproducer message ->
-                    ( "voteproducer", [ voteproducersParametersToValue message ] )
-
-                Updateauth messages ->
-                    ( "changekey", List.map updateauthParametersToValue messages )
-
-                _ ->
-                    ( "", [ Encode.null ] )
-    in
+encodeActions : String -> List Encode.Value -> Encode.Value
+encodeActions actionName actions =
     Encode.object
         [ ( "actionName", Encode.string actionName )
-        , ( "actions", Encode.list contents )
+        , ( "actions", Encode.list actions )
         ]
+
+
+encodeAction : ActionParameters -> Encode.Value
+encodeAction action =
+    case action of
+        Transfer contractAccount message ->
+            transferParametersToValue contractAccount message
+
+        Delegatebw message ->
+            delegatebwParametersToValue message
+
+        Undelegatebw message ->
+            undelegatebwParametersToValue message
+
+        Buyram message ->
+            buyramParametersToValue message
+
+        Sellram message ->
+            sellramParametersToValue message
+
+        Voteproducer message ->
+            voteproducersParametersToValue message
+
+        Updateauth messages ->
+            updateauthParametersToValue messages
+
+        _ ->
+            Encode.null
 
 
 transferParametersToValue : String -> TransferParameters -> Encode.Value
@@ -611,6 +677,58 @@ voteproducersParametersToValue { voter, producers, proxy } =
         ]
 
 
+encodeAuth : Auth -> Encode.Value
+encodeAuth auth =
+    Encode.object
+        [ ( "accounts"
+          , Encode.list
+                (List.map
+                    (\permLevel ->
+                        Encode.object
+                            [ ( "permission"
+                              , Encode.object
+                                    [ ( "permission"
+                                      , Encode.string permLevel.permission.permission
+                                      )
+                                    , ( "actor"
+                                      , Encode.string permLevel.permission.actor
+                                      )
+                                    ]
+                              )
+                            , ( "weight", Encode.int permLevel.weight )
+                            ]
+                    )
+                    auth.accounts
+                )
+          )
+        , ( "threshold", Encode.int auth.threshold )
+        , ( "waits"
+          , Encode.list
+                (List.map
+                    (\{ waitSec, weight } ->
+                        Encode.object
+                            [ ( "wait_sec", Encode.int waitSec )
+                            , ( "weight", Encode.int weight )
+                            ]
+                    )
+                    auth.waits
+                )
+          )
+        , ( "keys"
+          , Encode.list
+                (List.map
+                    (\{ key, weight } ->
+                        Encode.object
+                            [ ( "key", Encode.string key )
+                            , ( "weight", Encode.int weight )
+                            ]
+                    )
+                    auth.keys
+                )
+          )
+        ]
+
+
 updateauthParametersToValue : UpdateauthParameters -> Encode.Value
 updateauthParametersToValue { account, permission, parent, auth } =
     Encode.object
@@ -621,25 +739,23 @@ updateauthParametersToValue { account, permission, parent, auth } =
                 [ ( "account", Encode.string account )
                 , ( "permission", Encode.string permission )
                 , ( "parent", Encode.string parent )
-                , ( "auth"
-                  , Encode.object
-                        [ ( "accounts", Encode.list (List.map Encode.string auth.accounts) )
-                        , ( "threshold", Encode.int auth.threshold )
-                        , ( "waits", Encode.list (List.map Encode.string auth.waits) )
-                        , ( "keys"
-                          , Encode.list
-                                (List.map
-                                    (\{ key, weight } ->
-                                        Encode.object
-                                            [ ( "key", Encode.string key )
-                                            , ( "weight", Encode.int weight )
-                                            ]
-                                    )
-                                    auth.keys
-                                )
-                          )
-                        ]
-                  )
+                , ( "auth", encodeAuth auth )
+                ]
+          )
+        ]
+
+
+newaccountParametersToValue : NewaccountParameters -> Encode.Value
+newaccountParametersToValue { creator, name, owner, active } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "newaccount" )
+        , ( "payload"
+          , Encode.object
+                [ ( "creator", Encode.string creator )
+                , ( "name", Encode.string name )
+                , ( "owner", encodeAuth owner )
+                , ( "active", encodeAuth active )
                 ]
           )
         ]
