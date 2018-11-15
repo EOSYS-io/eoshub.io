@@ -6,8 +6,6 @@ module Data.Action exposing
     , ClaimrewardsParameters
     , DelegatebwParameters
     , NewaccountParameters
-    , PermissionLevel
-    , PermissionLevelWeight
     , RegproxyParameters
     , SellramParameters
     , TransferParameters
@@ -26,15 +24,12 @@ module Data.Action exposing
     , initBuyramParameters
     , initSellramParameters
     , newaccountDecoder
-    , newaccountParametersToValue
     , refineAction
     , regproxyDecoder
     , removeDuplicated
     , sellramDecoder
     , transferDecoder
-    , transferParametersToValue
     , undelegatebwDecoder
-    , updateauthParametersToValue
     , voteproducerDecoder
     )
 
