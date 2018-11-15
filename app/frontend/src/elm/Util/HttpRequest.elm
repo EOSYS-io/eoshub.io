@@ -17,7 +17,7 @@ import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
 import Translation exposing (Language, toLocale)
 import Util.Flags exposing (Flags)
-import Util.Urls exposing (eosAccountProductUrl, mainnetRpcUrl)
+import Util.Urls exposing (eosAccountProductUrl, mainnetHistoryUrl, mainnetRpcUrl)
 
 
 getFullPath : String -> String
@@ -65,7 +65,8 @@ getAccount accountName =
 getActions : String -> Int -> Int -> Http.Request (List Action)
 getActions query skip limit =
     get
-        ("https://history.cryptolions.io/v1/history/get_actions/"
+        (mainnetHistoryUrl
+            ++ "/v1/history/get_actions/"
             ++ query
             ++ "?skip="
             ++ toString skip

@@ -105,7 +105,7 @@ import Util.Formatter
         , larimerToEos
         , timeFormatter
         )
-import Util.HttpRequest exposing (getAccount, getActions, getFullPath, getTableRows)
+import Util.HttpRequest exposing (getAccount, getActions, getTableRows)
 import Util.Urls exposing (getAccountUrl, getPubKeyUrl)
 import View.Common exposing (addSearchLink)
 

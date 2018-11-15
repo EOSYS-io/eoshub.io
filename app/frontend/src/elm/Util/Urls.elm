@@ -8,6 +8,7 @@ module Util.Urls exposing
     , getProducersUrl
     , getPubKeyUrl
     , getRecentVoteStatUrl
+    , mainnetHistoryUrl
     , mainnetRpcUrl
     , requestPaymentUrl
     , usersApiUrl
@@ -82,8 +83,9 @@ mainnetRpcUrl =
     "https://eos.greymass.com"
 
 
-
---"https://api.eosnewyork.io"
+mainnetHistoryUrl : String
+mainnetHistoryUrl =
+    "https://history.cryptolions.io"
 
 
 eosConstitutionUrl : String

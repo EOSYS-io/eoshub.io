@@ -59,7 +59,6 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Encode as Encode
 import Navigation
 import Port
 import Round
@@ -67,7 +66,7 @@ import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, numberWithinDigitLimit, timeFormatter)
-import Util.HttpRequest exposing (getAccount, getActions, getFullPath, getTableRows)
+import Util.HttpRequest exposing (getAccount, getActions, getTableRows)
 import Util.Urls exposing (getAccountUrl)
 import Util.Validation as Validation
     exposing
