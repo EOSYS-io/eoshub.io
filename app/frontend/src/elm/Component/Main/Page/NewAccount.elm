@@ -1,4 +1,12 @@
-module Component.Main.Page.NewAccount exposing (Message, Model, initModel, update, view)
+module Component.Main.Page.NewAccount exposing
+    ( Message
+    , Model
+    , initModel
+    , update
+    , validateAccountName
+    , validateKey
+    , view
+    )
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (encodeActions)
