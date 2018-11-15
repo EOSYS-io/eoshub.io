@@ -1,6 +1,7 @@
 module Util.HttpRequest exposing
     ( get
     , getAccount
+    , getActions
     , getEosAccountProduct
     , getFullPath
     , getTableRows
@@ -8,6 +9,7 @@ module Util.HttpRequest exposing
     )
 
 import Data.Account exposing (Account, accountDecoder)
+import Data.Action exposing (Action, actionsDecoder)
 import Data.Json exposing (Product, productDecoder)
 import Data.Table exposing (Row, rowsDecoder)
 import Http
@@ -58,6 +60,19 @@ getAccount accountName =
                 |> Http.jsonBody
     in
     post (getFullPath "/v1/chain/get_account") body accountDecoder
+
+
+getActions : String -> Int -> Int -> Http.Request (List Action)
+getActions query skip limit =
+    get
+        ("https://history.cryptolions.io/v1/history/get_actions/"
+            ++ query
+            ++ "?skip="
+            ++ toString skip
+            ++ "&limit="
+            ++ toString limit
+        )
+        actionsDecoder
 
 
 

@@ -6,7 +6,6 @@ module Component.Main.Page.Search exposing
     , actionCategory
     , actionHidden
     , filterDelbandWithAccountName
-    , getActions
     , initCmd
     , initModel
     , removeQuatation
@@ -106,7 +105,7 @@ import Util.Formatter
         , larimerToEos
         , timeFormatter
         )
-import Util.HttpRequest exposing (get, getAccount, getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getAccount, getActions, getFullPath, getTableRows)
 import Util.Urls exposing (getAccountUrl, getPubKeyUrl)
 import View.Common exposing (addSearchLink)
 
@@ -184,6 +183,7 @@ initCmd query { pagination } =
 
         actionsCmd =
             getActions query pagination.skip pagination.limit
+                |> Http.send OnFetchActions
 
         delbandCmd =
             getTableRows "eosio" query "delband" -1
@@ -195,24 +195,6 @@ initCmd query { pagination } =
         , delbandCmd
         , getNow OnTime
         ]
-
-
-getActions : String -> Int -> Int -> Cmd Message
-getActions query skip limit =
-    get
-        ("https://history.cryptolions.io/v1/history/get_actions/"
-            ++ query
-            ++ "?skip="
-            ++ toString skip
-            ++ "&limit="
-            ++ toString limit
-        )
-        actionsDecoder
-        |> Http.send OnFetchActions
-
-
-
--- UPDATE
 
 
 type Message
@@ -281,6 +263,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
             let
                 actionsCmd =
                     getActions query pagination.skip pagination.limit
+                        |> Http.send OnFetchActions
             in
             if not pagination.isEnd then
                 ( { model | pagination = { pagination | isLoading = True } }, actionsCmd )
