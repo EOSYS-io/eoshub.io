@@ -7,6 +7,7 @@ main.create.account,
 main.change.account.key {
 	.container {
 		margin-top:32px;
+		padding-bottom:32px;
 		background-color:$xx-dark-gray;
 	}
 
@@ -103,7 +104,7 @@ main.change.account.key {
 
 	.account.list {
 		margin-top:32px;
-		padding:32px;
+		padding:32px 32px 0 32px;
 
 		h3 {
 			padding-bottom:24px;
