@@ -1,6 +1,7 @@
 module Component.Main.Page.NewAccount exposing (Message, Model, initModel, update, view)
 
 import Data.Account exposing (Account)
+import Data.Action as Action exposing (encodeAction, encodeActions)
 import Html
     exposing
         ( Html
@@ -34,6 +35,7 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Http
+import Port
 import Translation exposing (I18n(..), Language, translate)
 import Util.HttpRequest exposing (getAccount)
 import Util.Validation
@@ -84,7 +86,7 @@ initModel =
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ modalOpened } as model) _ =
+update message ({ account, activeKey, ownerKey, modalOpened, isDelegate } as model) { accountName } =
     case message of
         InputActiveKey inputKey ->
             ( validateKey { model | activeKey = inputKey }, Cmd.none )
@@ -104,11 +106,54 @@ update message ({ modalOpened } as model) _ =
         ToggleModal ->
             ( { model | modalOpened = not modalOpened }, Cmd.none )
 
-        SetIsDelegate isDelegate ->
-            ( { model | isDelegate = isDelegate }, Cmd.none )
+        SetIsDelegate newIsDelegate ->
+            ( { model | isDelegate = newIsDelegate }, Cmd.none )
 
         PushAction ->
-            ( { model | modalOpened = not modalOpened }, Cmd.none )
+            let
+                getAuth key =
+                    { threshold = 1
+                    , keys = [ { key = key, weight = 1 } ]
+                    , accounts = []
+                    , waits = []
+                    }
+
+                newaccountParams =
+                    { creator = accountName
+                    , name = account
+                    , active = getAuth activeKey
+                    , owner = getAuth ownerKey
+                    }
+
+                buyrambytesParams =
+                    { payer = accountName
+                    , receiver = account
+                    , bytes = 3072
+                    }
+
+                delegatebwParams =
+                    { from = accountName
+                    , receiver = account
+                    , stakeNetQuantity = "0.1"
+                    , stakeCpuQuantity = "0.1"
+                    , transfer =
+                        if isDelegate then
+                            0
+
+                        else
+                            1
+                    }
+
+                actions =
+                    [ newaccountParams |> Action.Newaccount |> encodeAction
+                    , buyrambytesParams |> Action.Buyrambytes |> encodeAction
+                    , delegatebwParams |> Action.Delegatebw |> encodeAction
+                    ]
+
+                cmd =
+                    actions |> encodeActions "newaccount" |> Port.pushAction
+            in
+            ( { model | modalOpened = not modalOpened }, cmd )
 
 
 view : Language -> Model -> Account -> Html Message

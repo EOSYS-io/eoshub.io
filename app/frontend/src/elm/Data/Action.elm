@@ -572,8 +572,14 @@ encodeAction action =
         Voteproducer message ->
             voteproducersParametersToValue message
 
-        Updateauth messages ->
-            updateauthParametersToValue messages
+        Updateauth message ->
+            updateauthParametersToValue message
+
+        Newaccount message ->
+            newaccountParametersToValue message
+
+        Buyrambytes message ->
+            buyrambytesParametersToValue message
 
         _ ->
             Encode.null
@@ -642,6 +648,22 @@ buyramParametersToValue { payer, receiver, quant } =
                 [ ( "payer", Encode.string payer )
                 , ( "receiver", Encode.string receiver )
                 , ( "quant", Encode.string (quant |> formatAsset) )
+                ]
+          )
+        ]
+
+
+buyrambytesParametersToValue : BuyrambytesParameters -> Encode.Value
+buyrambytesParametersToValue { payer, receiver, bytes } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "buyrambytes" )
+        , ( "payload"
+          , Encode.object
+                [ ( "payer", Encode.string payer )
+                , ( "receiver", Encode.string receiver )
+                , ( "bytes", Encode.int bytes )
                 ]
           )
         ]
