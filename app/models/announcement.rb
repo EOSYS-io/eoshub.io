@@ -17,4 +17,10 @@
 #
 
 class Announcement < ApplicationRecord
+  validates :title_ko, presence: true
+  validates :title_en, presence: true
+  validates :title_cn, presence: true
+  validates :body_ko, presence: true
+  validates :body_en, presence: true
+  validates :body_cn, presence: true
 end
