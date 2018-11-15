@@ -54,7 +54,7 @@ type Message
     | InputAccountName String
     | OnFetchAccountToVerify (Result Http.Error Account)
     | ToggleModal
-    | SetIsDelegate Bool
+    | SetIsTransfer Bool
     | PushAction
 
 
@@ -67,7 +67,7 @@ type alias Model =
     , accountValidation : AccountStatus
     , isValid : Bool
     , modalOpened : Bool
-    , isDelegate : Bool
+    , isTransfer : Bool
     }
 
 
@@ -81,12 +81,12 @@ initModel =
     , accountValidation = EmptyAccount
     , isValid = False
     , modalOpened = False
-    , isDelegate = True
+    , isTransfer = False
     }
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ account, activeKey, ownerKey, modalOpened, isDelegate } as model) { accountName } =
+update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as model) { accountName } =
     case message of
         InputActiveKey inputKey ->
             ( validateKey { model | activeKey = inputKey }, Cmd.none )
@@ -106,8 +106,8 @@ update message ({ account, activeKey, ownerKey, modalOpened, isDelegate } as mod
         ToggleModal ->
             ( { model | modalOpened = not modalOpened }, Cmd.none )
 
-        SetIsDelegate newIsDelegate ->
-            ( { model | isDelegate = newIsDelegate }, Cmd.none )
+        SetIsTransfer newIsTransfer ->
+            ( { model | isTransfer = newIsTransfer }, Cmd.none )
 
         PushAction ->
             let
@@ -137,11 +137,11 @@ update message ({ account, activeKey, ownerKey, modalOpened, isDelegate } as mod
                     , stakeNetQuantity = "0.1"
                     , stakeCpuQuantity = "0.1"
                     , transfer =
-                        if isDelegate then
-                            0
+                        if isTransfer then
+                            1
 
                         else
-                            1
+                            0
                     }
 
                 actions =
@@ -157,7 +157,7 @@ update message ({ account, activeKey, ownerKey, modalOpened, isDelegate } as mod
 
 
 view : Language -> Model -> Account -> Html Message
-view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid, modalOpened, isDelegate } { accountName } =
+view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid, modalOpened, isTransfer } { accountName } =
     main_ [ class "create account" ]
         [ h2 []
             [ text (translate language CreateAccount) ]
@@ -192,24 +192,24 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                 getPublicKeyAttrs pubKeyValidation isActive =
                     case pubKeyValidation of
                         EmptyPublicKey ->
-                            ( ""
-                            , if isActive then
+                            ( if isActive then
                                 TypeActiveKeyDesc
 
                               else
                                 TypeOwnerKeyDesc
+                            , ""
                             )
 
                         ValidPublicKey ->
-                            ( " true", ValidKey )
+                            ( ValidKey, " true" )
 
                         InvalidPublicKey ->
-                            ( " false", InvalidKey )
+                            ( InvalidKey, " false" )
 
-                ( activeKeyAddedClass, activeKeyI18n ) =
+                ( activeKeyI18n, activeKeyAddedClass ) =
                     getPublicKeyAttrs activeKeyValidation True
 
-                ( ownerKeyAddedClass, ownerKeyI18n ) =
+                ( ownerKeyI18n, ownerKeyAddedClass ) =
                     getPublicKeyAttrs ownerKeyValidation False
               in
               form []
@@ -278,7 +278,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                 [ h2 []
                     [ text (translate language CreateAccount) ]
                 , p []
-                    [ text (translate language (CreateAccountDesc isDelegate)) ]
+                    [ text (translate language (CreateAccountDesc isTransfer)) ]
                 , dl []
                     [ dt []
                         [ text "CPU" ]
@@ -295,23 +295,23 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     ]
                 , let
                     ( delegateButtonClass, transferButtonClass ) =
-                        if isDelegate then
-                            ( "rent choice button ing", "send choice button" )
+                        if isTransfer then
+                            ( "rent choice button", "send choice button ing" )
 
                         else
-                            ( "rent choice button", "send choice button ing" )
+                            ( "rent choice button ing", "send choice button" )
                   in
                   div [ class "btn_area choice" ]
                     [ button
                         [ class delegateButtonClass
                         , type_ "button"
-                        , onClick (SetIsDelegate True)
+                        , onClick (SetIsTransfer False)
                         ]
                         [ text (translate language Delegate) ]
                     , button
                         [ class transferButtonClass
                         , type_ "button"
-                        , onClick (SetIsDelegate False)
+                        , onClick (SetIsTransfer True)
                         ]
                         [ text (translate language Transfer) ]
                     ]

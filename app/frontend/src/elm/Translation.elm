@@ -1933,32 +1933,32 @@ getMessages i18n =
             , chinese = "以已有账号可以注册新的账号"
             }
 
-        CreateAccountDesc isDelegate ->
+        CreateAccountDesc isTransfer ->
             { korean =
                 "현재 로그인 된 계정에서 아래에 표시된 토큰 수량만큼 새로운 계정으로 "
-                    ++ (if isDelegate then
-                            "임대"
+                    ++ (if isTransfer then
+                            "전송"
 
                         else
-                            "전송"
+                            "임대"
                        )
                     ++ "됩니다."
             , english =
                 "The amount will be "
-                    ++ (if isDelegate then
-                            "delegated"
+                    ++ (if isTransfer then
+                            "transferred"
 
                         else
-                            "transferred"
+                            "delegated"
                        )
                     ++ " to the new account."
             , chinese =
                 "能够"
-                    ++ (if isDelegate then
-                            "租借"
+                    ++ (if isTransfer then
+                            "传送"
 
                         else
-                            "传送"
+                            "租借"
                        )
                     ++ "以下数量"
             }

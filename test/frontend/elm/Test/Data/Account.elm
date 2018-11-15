@@ -1,6 +1,7 @@
 module Test.Data.Account exposing (tests)
 
 import Data.Account exposing (..)
+import Data.Common exposing (Authority, KeyWeight, PermissionLevel, PermissionLevelWeight)
 import Expect
 import Json.Decode as JD
 import Test exposing (..)
@@ -28,17 +29,19 @@ tests =
                                 [ Permission
                                     "active"
                                     "owner"
-                                    (RequiredAuth
+                                    (Authority
                                         1
-                                        [ KeyPerm "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        [ KeyWeight "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        []
                                         []
                                     )
                                 , Permission
                                     "owner"
                                     ""
-                                    (RequiredAuth
+                                    (Authority
                                         1
-                                        [ KeyPerm "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        [ KeyWeight "EOS7hctUrtLvTBR2W1aHbTpDV7py5DGSvsqXasr3eSY9vmjonJCpE" 1 ]
+                                        []
                                         []
                                     )
                                 ]
@@ -67,17 +70,19 @@ tests =
                                 [ Permission
                                     "active"
                                     "owner"
-                                    (RequiredAuth
+                                    (Authority
                                         1
-                                        [ KeyPerm "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ]
+                                        [ KeyWeight "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ]
+                                        []
                                         []
                                     )
                                 , Permission
                                     "owner"
                                     ""
-                                    (RequiredAuth
+                                    (Authority
                                         1
-                                        [ KeyPerm "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ]
+                                        [ KeyWeight "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ]
+                                        []
                                         []
                                     )
                                 ]
@@ -106,18 +111,26 @@ tests =
                                 [ Permission
                                     "active"
                                     "owner"
-                                    (RequiredAuth
+                                    (Authority
                                         1
                                         []
-                                        [ AccountPerm (PermissionShortened "eosio.prods" "active") 1 ]
+                                        [ PermissionLevelWeight
+                                            (PermissionLevel "eosio.prods" "active")
+                                            1
+                                        ]
+                                        []
                                     )
                                 , Permission
                                     "owner"
                                     ""
-                                    (RequiredAuth
+                                    (Authority
                                         1
                                         []
-                                        [ AccountPerm (PermissionShortened "eosio.prods" "active") 1 ]
+                                        [ PermissionLevelWeight
+                                            (PermissionLevel "eosio.prods" "active")
+                                            1
+                                        ]
+                                        []
                                     )
                                 ]
                                 (ResourceInEos "0 EOS" "0 EOS" 0)
@@ -145,11 +158,20 @@ tests =
                                 [ Permission
                                     "active"
                                     "owner"
-                                    (RequiredAuth 1 [ KeyPerm "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ] [])
+                                    (Authority
+                                        1
+                                        [ KeyWeight "EOS6eFyNhE7d387tnKpQEKXR9MQ1c9hsJ28Ddyi5Cism1JHJiDauX" 1 ]
+                                        []
+                                        []
+                                    )
                                 , Permission
                                     "owner"
                                     ""
-                                    (RequiredAuth 1 [ KeyPerm "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ] [])
+                                    (Authority 1
+                                        [ KeyWeight "EOS5pBCbpmN3raABMhUa36CxXWBP3rty9wioCNTCtr3zmC5z7rwYk" 1 ]
+                                        []
+                                        []
+                                    )
                                 ]
                                 (ResourceInEos "1419.9066 EOS" "1419.9066 EOS" 3012341234)
                                 (ResourceInEos "1416.9066 EOS" "1416.9066 EOS" 0)

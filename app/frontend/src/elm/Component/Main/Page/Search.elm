@@ -16,8 +16,8 @@ module Component.Main.Page.Search exposing
     , viewAccountSpan
     , viewAction
     , viewActionList
-    , viewKeyAccountPermList
-    , viewKeyPermSpan
+    , viewKeyPermissionLevelWeightList
+    , viewKeyWeightSpan
     , viewPermission
     , viewPermissionSection
     , viewStakedDetail
@@ -26,10 +26,7 @@ module Component.Main.Page.Search exposing
 import Data.Account
     exposing
         ( Account
-        , AccountPerm
-        , KeyPerm
         , Permission
-        , RequiredAuth
         , defaultAccount
         , getResource
         , getResourceColorClass
@@ -43,6 +40,7 @@ import Data.Action as Action
         , refineAction
         , removeDuplicated
         )
+import Data.Common exposing (Authority, KeyWeight, PermissionLevelWeight)
 import Data.Table exposing (Row(..))
 import Date
 import Date.Extra as Date exposing (Interval(..))
@@ -601,35 +599,35 @@ viewPermission accountName { permName, requiredAuth } =
         , td []
             [ text (requiredAuth.threshold |> toString) ]
         , td []
-            (viewKeyAccountPermList requiredAuth)
+            (viewKeyPermissionLevelWeightList requiredAuth)
         ]
 
 
-viewKeyAccountPermList : RequiredAuth -> List (Html Message)
-viewKeyAccountPermList requiredAuth =
+viewKeyPermissionLevelWeightList : Authority -> List (Html Message)
+viewKeyPermissionLevelWeightList authority =
     let
         keyList =
-            List.map viewKeyPermSpan requiredAuth.keys
+            List.map viewKeyWeightSpan authority.keys
 
         accountList =
-            List.map viewAccountSpan requiredAuth.accounts
+            List.map viewAccountSpan authority.accounts
     in
     List.append keyList accountList
 
 
-viewKeyPermSpan : KeyPerm -> Html Message
-viewKeyPermSpan value =
+viewKeyWeightSpan : KeyWeight -> Html Message
+viewKeyWeightSpan { key, weight } =
     span []
         [ text
-            ("+" ++ (value.weight |> toString) ++ " ")
+            ("+" ++ (weight |> toString) ++ " ")
         , addSearchLink
-            (value.key |> getPubKeyUrl |> ChangeUrl)
-            (text value.key)
+            (key |> getPubKeyUrl |> ChangeUrl)
+            (text key)
         , br [] []
         ]
 
 
-viewAccountSpan : AccountPerm -> Html Message
+viewAccountSpan : PermissionLevelWeight -> Html Message
 viewAccountSpan value =
     span []
         [ text
