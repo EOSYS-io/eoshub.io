@@ -18,7 +18,6 @@ module Data.Action exposing
     , buyrambytesDecoder
     , claimrewardsDecoder
     , delegatebwDecoder
-    , encodeAction
     , encodeActions
     , errorDecoder
     , initBuyramParameters
@@ -476,11 +475,11 @@ errorDecoder =
 -- encoder part
 
 
-encodeActions : String -> List Encode.Value -> Encode.Value
+encodeActions : String -> List ActionParameters -> Encode.Value
 encodeActions actionName actions =
     Encode.object
         [ ( "actionName", Encode.string actionName )
-        , ( "actions", Encode.list actions )
+        , ( "actions", Encode.list (List.map encodeAction actions) )
         ]
 
 

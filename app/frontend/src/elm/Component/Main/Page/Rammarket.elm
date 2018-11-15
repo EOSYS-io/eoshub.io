@@ -16,7 +16,6 @@ import Data.Action
         ( Action
         , BuyramParameters
         , actionsDecoder
-        , encodeAction
         , encodeActions
         , initBuyramParameters
         , removeDuplicated
@@ -411,7 +410,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                 ( model
                 , newParams
                     |> Data.Action.Buyram
-                    |> encodeAction
                     |> List.singleton
                     |> encodeActions "buyram"
                     |> Port.pushAction
@@ -428,7 +426,6 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
                 ( model
                 , newParams
                     |> Data.Action.Sellram
-                    |> encodeAction
                     |> List.singleton
                     |> encodeActions "sellram"
                     |> Port.pushAction

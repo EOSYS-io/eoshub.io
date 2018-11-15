@@ -1,7 +1,7 @@
 module Component.Main.Page.NewAccount exposing (Message, Model, initModel, update, view)
 
 import Data.Account exposing (Account)
-import Data.Action as Action exposing (encodeAction, encodeActions)
+import Data.Action as Action exposing (encodeActions)
 import Html
     exposing
         ( Html
@@ -145,9 +145,9 @@ update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as mod
                     }
 
                 actions =
-                    [ newaccountParams |> Action.Newaccount |> encodeAction
-                    , buyrambytesParams |> Action.Buyrambytes |> encodeAction
-                    , delegatebwParams |> Action.Delegatebw |> encodeAction
+                    [ newaccountParams |> Action.Newaccount
+                    , buyrambytesParams |> Action.Buyrambytes
+                    , delegatebwParams |> Action.Delegatebw
                     ]
 
                 cmd =

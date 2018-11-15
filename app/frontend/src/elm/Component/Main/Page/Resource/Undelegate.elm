@@ -18,7 +18,7 @@ module Component.Main.Page.Resource.Undelegate exposing
 
 import Component.Main.Page.Resource.Modal.DelegateList as DelegateList exposing (Message(..))
 import Data.Account exposing (Account)
-import Data.Action as Action exposing (UndelegatebwParameters, encodeAction, encodeActions)
+import Data.Action as Action exposing (UndelegatebwParameters, encodeActions)
 import Data.Table exposing (Row)
 import Html exposing (Html, button, div, h3, input, label, p, section, span, strong, text)
 import Html.Attributes
@@ -219,7 +219,6 @@ update message ({ undelegatebw, delegateListModal, unstakePossibleCpu, unstakePo
                 cmd =
                     { undelegatebw | from = accountName }
                         |> Action.Undelegatebw
-                        |> encodeAction
                         |> List.singleton
                         |> encodeActions "undelegatebw"
                         |> Port.pushAction
