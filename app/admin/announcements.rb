@@ -42,8 +42,8 @@ ActiveAdmin.register Announcement do
       f.input :body_cn
     end
     f.inputs '기간 설정' do
-      f.input :published_at
-      f.input :ended_at
+      f.input :published_at, as: :date_time_picker
+      f.input :ended_at, as: :date_time_picker
     end
     f.actions
   end
