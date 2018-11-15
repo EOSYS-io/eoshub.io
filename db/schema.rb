@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_26_054048) do
+ActiveRecord::Schema.define(version: 2018_11_15_041723) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,20 @@ ActiveRecord::Schema.define(version: 2018_10_26_054048) do
     t.index ["confirmation_token"], name: "index_admin_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_admin_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true
+  end
+
+  create_table "announcements", force: :cascade do |t|
+    t.string "title_ko", null: false
+    t.string "title_en", null: false
+    t.string "title_cn", null: false
+    t.text "body_ko", null: false
+    t.text "body_en", null: false
+    t.text "body_cn", null: false
+    t.boolean "active", default: false, null: false
+    t.datetime "published_at"
+    t.datetime "ended_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "eos_ram_price_histories", force: :cascade do |t|
