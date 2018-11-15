@@ -791,4 +791,4 @@ removeDuplicated actionList =
                 ++ toString action.actionName
                 ++ toString action.data
     in
-    List.uniqueBy getActionIdentifier actionList
+    uniqueBy getActionIdentifier actionList

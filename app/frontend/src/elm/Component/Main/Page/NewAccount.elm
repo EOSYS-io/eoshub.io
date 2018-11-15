@@ -291,7 +291,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     , dt []
                         [ text "RAM" ]
                     , dd []
-                        [ text "4 KB (4096 bytes)" ]
+                        [ text "3 KB (3072 bytes)" ]
                     ]
                 , let
                     ( delegateButtonClass, transferButtonClass ) =
