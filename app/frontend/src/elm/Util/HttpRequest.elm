@@ -1,5 +1,6 @@
 module Util.HttpRequest exposing
-    ( getAccount
+    ( get
+    , getAccount
     , getEosAccountProduct
     , getFullPath
     , getTableRows
@@ -29,6 +30,19 @@ post url body decoder =
         , headers = []
         , url = url
         , body = body
+        , expect = Http.expectJson decoder
+        , timeout = Nothing
+        , withCredentials = False
+        }
+
+
+get : String -> Decoder a -> Http.Request a
+get url decoder =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = url
+        , body = Http.emptyBody
         , expect = Http.expectJson decoder
         , timeout = Nothing
         , withCredentials = False

@@ -52,7 +52,7 @@ import Util.Formatter exposing (formatAsset)
 
 
 type alias Action =
-    { accountActionSeq : Int
+    { globalSequence : Int
     , blockNum : Int
     , blockTime : String
     , contractAccount : String
@@ -193,13 +193,13 @@ actionsDecoder =
         (Decode.list
             (decode
                 Action
-                |> required "account_action_seq" Decode.int
+                |> requiredAt [ "receipt", "global_sequence" ] Decode.int
                 |> required "block_num" Decode.int
                 |> required "block_time" Decode.string
-                |> requiredAt [ "action_trace", "act", "account" ] Decode.string
-                |> requiredAt [ "action_trace", "act", "name" ] Decode.string
-                |> requiredAt [ "action_trace", "act", "data" ] actionParametersDecoder
-                |> requiredAt [ "action_trace", "trx_id" ] Decode.string
+                |> requiredAt [ "act", "account" ] Decode.string
+                |> requiredAt [ "act", "name" ] Decode.string
+                |> requiredAt [ "act", "data" ] actionParametersDecoder
+                |> required "trx_id" Decode.string
                 |> hardcoded ""
             )
         )

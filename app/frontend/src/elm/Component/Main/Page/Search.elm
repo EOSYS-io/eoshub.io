@@ -93,7 +93,6 @@ import Html.Attributes
 import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Decode
-import Json.Encode as Encode
 import Navigation
 import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
@@ -107,7 +106,7 @@ import Util.Formatter
         , larimerToEos
         , timeFormatter
         )
-import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (get, getAccount, getFullPath, getTableRows, post)
 import Util.Urls exposing (getAccountUrl, getPubKeyUrl)
 import View.Common exposing (addSearchLink)
 
@@ -129,9 +128,8 @@ type alias Model =
 
 
 type alias Pagination =
-    { latestActionSeq : Int
-    , nextPos : Int
-    , offset : Int
+    { skip : Int
+    , limit : Int
     , isLoading : Bool
     , isEnd : Bool
     }
@@ -145,12 +143,6 @@ type alias OpenedActionSeq =
     Int
 
 
-
--- Note(boseok): (EOSIO bug) when only pos = -1, it gets the 'offset' number of actions (intended),
--- otherwise it gets the 'offset+1' number of actions (not intended)
--- it's different from get_actions --help
-
-
 initModel : String -> Model
 initModel accountName =
     { query = accountName
@@ -158,9 +150,8 @@ initModel accountName =
     , delbandTable = []
     , actions = []
     , pagination =
-        { latestActionSeq = 0
-        , nextPos = -1
-        , offset = -30
+        { skip = 0
+        , limit = 100
         , isLoading = True
         , isEnd = False
         }
@@ -192,7 +183,7 @@ initCmd query { pagination } =
                 |> Http.send OnFetchAccount
 
         actionsCmd =
-            getActions query pagination.nextPos pagination.offset
+            getActions query pagination.skip pagination.limit
 
         delbandCmd =
             getTableRows "eosio" query "delband" -1
@@ -207,17 +198,16 @@ initCmd query { pagination } =
 
 
 getActions : String -> Int -> Int -> Cmd Message
-getActions query nextPos offset =
-    let
-        body =
-            Encode.object
-                [ ( "account_name", Encode.string query )
-                , ( "pos", Encode.int nextPos )
-                , ( "offset", Encode.int offset )
-                ]
-                |> Http.jsonBody
-    in
-    post (getFullPath "/v1/history/get_actions") body actionsDecoder
+getActions query skip limit =
+    get
+        ("https://history.cryptolions.io/v1/history/get_actions/"
+            ++ query
+            ++ "?skip="
+            ++ toString skip
+            ++ "&limit="
+            ++ toString limit
+        )
+        actionsDecoder
         |> Http.send OnFetchActions
 
 
@@ -258,31 +248,14 @@ update message ({ query, pagination, openedActionSeq } as model) =
 
                 refinedActions =
                     List.map (refineAction query) uniqueActions
-
-                smallestActionSeq =
-                    case List.head actions of
-                        Just action ->
-                            action.accountActionSeq
-
-                        Nothing ->
-                            -1
-
-                biggestActionSeq =
-                    -- NOTE(boseok): Set latestActionSeq once
-                    if pagination.latestActionSeq == (initModel query).pagination.latestActionSeq then
-                        List.foldl (\{ accountActionSeq } _ -> accountActionSeq) -1 actions
-
-                    else
-                        pagination.latestActionSeq
+                        |> List.reverse
             in
-            if smallestActionSeq > 0 then
+            if List.length actions > 0 then
                 ( { model
                     | actions = refinedActions ++ model.actions
                     , pagination =
                         { pagination
-                            | latestActionSeq = biggestActionSeq
-                            , nextPos = smallestActionSeq - 1
-                            , offset = -29
+                            | skip = pagination.skip + pagination.limit
                             , isLoading = False
                         }
                   }
@@ -293,12 +266,12 @@ update message ({ query, pagination, openedActionSeq } as model) =
                 -- NOTE(boseok): There're no more actions to load
                 ( { model
                     | actions = refinedActions ++ model.actions
-                    , pagination = { pagination | isEnd = True, nextPos = 0, isLoading = False }
+                    , pagination = { pagination | isEnd = True, skip = 0, isLoading = False }
                   }
                 , Cmd.none
                 )
 
-        OnFetchActions (Err _) ->
+        OnFetchActions (Err str) ->
             ( { model | pagination = { pagination | isLoading = False } }, Cmd.none )
 
         SelectActionCategory selectedActionCategory ->
@@ -307,7 +280,7 @@ update message ({ query, pagination, openedActionSeq } as model) =
         ShowMore ->
             let
                 actionsCmd =
-                    getActions query pagination.nextPos pagination.offset
+                    getActions query pagination.skip pagination.limit
             in
             if not pagination.isEnd then
                 ( { model | pagination = { pagination | isLoading = True } }, actionsCmd )
@@ -663,13 +636,6 @@ viewAction selectedActionCategory _ openedActionSeq ({ trxId, blockTime, actionN
 
 viewShowMoreButton : Language -> Pagination -> Html Message
 viewShowMoreButton language pagination =
-    let
-        numberOfAllActions =
-            toString pagination.latestActionSeq
-
-        numberOfShowingActions =
-            toString (pagination.latestActionSeq - pagination.nextPos)
-    in
     div [ class "btn_area" ]
         [ button
             [ type_ "button"
@@ -684,15 +650,7 @@ viewShowMoreButton language pagination =
                 )
             , onClick ShowMore
             ]
-            [ text
-                (translate language Translation.ShowMore
-                    ++ " ("
-                    ++ numberOfShowingActions
-                    ++ "/"
-                    ++ numberOfAllActions
-                    ++ ")"
-                )
-            ]
+            [ text (translate language Translation.ShowMore) ]
         ]
 
 
@@ -707,7 +665,7 @@ viewBpAccountLink bp =
 
 
 viewActionInfo : Action -> Int -> Html Message
-viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedActionSeq =
+viewActionInfo { globalSequence, contractAccount, actionName, data } openedActionSeq =
     case data of
         -- controlled actions
         Ok actionParameters ->
@@ -723,7 +681,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                                 , span
                                     [ class
                                         ("memo popup"
-                                            ++ (if accountActionSeq == openedActionSeq then
+                                            ++ (if globalSequence == openedActionSeq then
                                                     " viewing"
 
                                                 else
@@ -737,7 +695,7 @@ viewActionInfo { accountActionSeq, contractAccount, actionName, data } openedAct
                                             [ text "메모" ]
                                         , span [ class "description" ]
                                             [ text params.memo ]
-                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo accountActionSeq) ]
+                                        , button [ class "icon view button", type_ "button", onClick (ShowMemo globalSequence) ]
                                             [ text "열기/닫기" ]
                                         ]
                                     ]
