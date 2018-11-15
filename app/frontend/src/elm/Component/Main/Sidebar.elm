@@ -308,6 +308,8 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
                 [ text (translate language MyAccount) ]
             , a [ onClick (AndThen (OpenConfigPanel False) (ChangeUrl "changekey")) ]
                 [ text (translate language ChangeKey) ]
+            , a [ onClick (AndThen (OpenConfigPanel False) (ChangeUrl "newaccount")) ]
+                [ text (translate language NewAccount) ]
             , a
                 [ onClick (AndThen (OpenConfigPanel False) (UpdateState PairWallet))
                 ]

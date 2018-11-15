@@ -18,7 +18,7 @@ module Data.Action exposing
     , buyrambytesDecoder
     , claimrewardsDecoder
     , delegatebwDecoder
-    , encodeAction
+    , encodeActions
     , errorDecoder
     , initBuyramParameters
     , initSellramParameters
@@ -28,12 +28,16 @@ module Data.Action exposing
     , removeDuplicated
     , sellramDecoder
     , transferDecoder
-    , transferParametersToValue
     , undelegatebwDecoder
-    , updateauthParametersToValue
     , voteproducerDecoder
     )
 
+import Data.Common
+    exposing
+        ( Authority
+        , authorityDecoder
+        , encodeAuthority
+        )
 import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
@@ -70,7 +74,7 @@ type ActionParameters
     | Regproxy RegproxyParameters
     | Voteproducer VoteproducerParameters
     | Newaccount NewaccountParameters
-    | Updateauth (List UpdateauthParameters)
+    | Updateauth UpdateauthParameters
 
 
 type alias TransferParameters =
@@ -121,22 +125,11 @@ type alias BuyrambytesParameters =
     }
 
 
-type alias Key =
-    { key : String
-    , weight : Int
-    }
-
-
 type alias UpdateauthParameters =
     { account : String
     , permission : String
     , parent : String
-    , auth :
-        { threshold : Int
-        , keys : List Key
-        , accounts : List String
-        , waits : List String
-        }
+    , auth : Authority
     }
 
 
@@ -181,6 +174,8 @@ type alias VoteproducerParameters =
 type alias NewaccountParameters =
     { creator : String
     , name : String
+    , owner : Authority
+    , active : Authority
     }
 
 
@@ -326,6 +321,8 @@ newaccountDecoder =
         (decode NewaccountParameters
             |> required "creator" Decode.string
             |> required "name" Decode.string
+            |> required "owner" authorityDecoder
+            |> required "active" authorityDecoder
         )
 
 
@@ -478,39 +475,46 @@ errorDecoder =
 -- encoder part
 
 
-encodeAction : ActionParameters -> Encode.Value
-encodeAction action =
-    let
-        ( actionName, contents ) =
-            case action of
-                Transfer contractAccount message ->
-                    ( "transfer", [ transferParametersToValue contractAccount message ] )
-
-                Delegatebw message ->
-                    ( "delegatebw", [ delegatebwParametersToValue message ] )
-
-                Undelegatebw message ->
-                    ( "undelegatebw", [ undelegatebwParametersToValue message ] )
-
-                Buyram message ->
-                    ( "buyram", [ buyramParametersToValue message ] )
-
-                Sellram message ->
-                    ( "sellram", [ sellramParametersToValue message ] )
-
-                Voteproducer message ->
-                    ( "voteproducer", [ voteproducersParametersToValue message ] )
-
-                Updateauth messages ->
-                    ( "changekey", List.map updateauthParametersToValue messages )
-
-                _ ->
-                    ( "", [ Encode.null ] )
-    in
+encodeActions : String -> List ActionParameters -> Encode.Value
+encodeActions actionName actions =
     Encode.object
         [ ( "actionName", Encode.string actionName )
-        , ( "actions", Encode.list contents )
+        , ( "actions", Encode.list (List.map encodeAction actions) )
         ]
+
+
+encodeAction : ActionParameters -> Encode.Value
+encodeAction action =
+    case action of
+        Transfer contractAccount message ->
+            transferParametersToValue contractAccount message
+
+        Delegatebw message ->
+            delegatebwParametersToValue message
+
+        Undelegatebw message ->
+            undelegatebwParametersToValue message
+
+        Buyram message ->
+            buyramParametersToValue message
+
+        Sellram message ->
+            sellramParametersToValue message
+
+        Voteproducer message ->
+            voteproducersParametersToValue message
+
+        Updateauth message ->
+            updateauthParametersToValue message
+
+        Newaccount message ->
+            newaccountParametersToValue message
+
+        Buyrambytes message ->
+            buyrambytesParametersToValue message
+
+        _ ->
+            Encode.null
 
 
 transferParametersToValue : String -> TransferParameters -> Encode.Value
@@ -581,6 +585,22 @@ buyramParametersToValue { payer, receiver, quant } =
         ]
 
 
+buyrambytesParametersToValue : BuyrambytesParameters -> Encode.Value
+buyrambytesParametersToValue { payer, receiver, bytes } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "buyrambytes" )
+        , ( "payload"
+          , Encode.object
+                [ ( "payer", Encode.string payer )
+                , ( "receiver", Encode.string receiver )
+                , ( "bytes", Encode.int bytes )
+                ]
+          )
+        ]
+
+
 sellramParametersToValue : SellramParameters -> Encode.Value
 sellramParametersToValue { account, bytes } =
     -- Introduce form validation.
@@ -621,25 +641,23 @@ updateauthParametersToValue { account, permission, parent, auth } =
                 [ ( "account", Encode.string account )
                 , ( "permission", Encode.string permission )
                 , ( "parent", Encode.string parent )
-                , ( "auth"
-                  , Encode.object
-                        [ ( "accounts", Encode.list (List.map Encode.string auth.accounts) )
-                        , ( "threshold", Encode.int auth.threshold )
-                        , ( "waits", Encode.list (List.map Encode.string auth.waits) )
-                        , ( "keys"
-                          , Encode.list
-                                (List.map
-                                    (\{ key, weight } ->
-                                        Encode.object
-                                            [ ( "key", Encode.string key )
-                                            , ( "weight", Encode.int weight )
-                                            ]
-                                    )
-                                    auth.keys
-                                )
-                          )
-                        ]
-                  )
+                , ( "auth", encodeAuthority auth )
+                ]
+          )
+        ]
+
+
+newaccountParametersToValue : NewaccountParameters -> Encode.Value
+newaccountParametersToValue { creator, name, owner, active } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "newaccount" )
+        , ( "payload"
+          , Encode.object
+                [ ( "creator", Encode.string creator )
+                , ( "name", Encode.string name )
+                , ( "owner", encodeAuthority owner )
+                , ( "active", encodeAuthority active )
                 ]
           )
         ]
@@ -658,4 +676,4 @@ removeDuplicated actionList =
                 ++ toString action.actionName
                 ++ toString action.data
     in
-    List.uniqueBy getActionIdentifier actionList
+    uniqueBy getActionIdentifier actionList

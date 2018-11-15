@@ -298,11 +298,21 @@ type I18n
     | Caution
     | CautionDetail
     | TypeOwnerKey
+    | TypeNewOwnerKey
+    | TypeOwnerKeyDesc
     | TypeActiveKey
+    | TypeNewActiveKey
+    | TypeActiveKeyDesc
     | ValidKey
     | InvalidKey
     | ChangeKeySucceeded String
     | ChangeKeyFailed String
+    | NewAccountSucceeded String
+    | NewAccountFailed String
+    | CreateAccount
+    | CreateAccountDetail
+    | CreateAccountDesc Bool
+    | AccountPlaceholder
 
 
 translate : Language -> I18n -> String
@@ -679,7 +689,7 @@ getMessages i18n =
             }
 
         AccountExample ->
-            { korean = "계정명 예시: eoshuby12345"
+            { korean = "계정이름 예시: eoshuby12345"
             , english = "ex) eoshuby12345"
             , chinese = "账户名例：eoshuby12345"
             }
@@ -1840,25 +1850,49 @@ getMessages i18n =
             }
 
         TypeOwnerKey ->
+            { korean = "오너 키를 입력하세요"
+            , english = "Put in owner key"
+            , chinese = "请输入owner key"
+            }
+
+        TypeNewOwnerKey ->
             { korean = "새로운 오너 키를 입력하세요"
             , english = "Type in new owner key"
             , chinese = "请输入owner key"
             }
 
+        TypeOwnerKeyDesc ->
+            { korean = "오너 키는 계정의 마스터 키입니다. 오너 키와 액티브 키를 변경할 때 필요합니다"
+            , english = "An owner key is a master key for an account. It can be used to change the owner key or active key."
+            , chinese = "owner key是账号的万能钥匙。变更owner key或active key时都需要它。"
+            }
+
         TypeActiveKey ->
+            { korean = "액티브 키를 입력하세요"
+            , english = "Put in active key"
+            , chinese = "请输入active key"
+            }
+
+        TypeNewActiveKey ->
             { korean = "새로운 액티브 키를 입력하세요"
             , english = "Type in new active key"
             , chinese = "请输入active key"
             }
 
+        TypeActiveKeyDesc ->
+            { korean = "액티브 키는 DApp을 사용하거나, 토큰 전송 시 필요한 활동 권한을 가진 키입니다"
+            , english = "An active key gives permission to activities such as using DApps or transferring tokens."
+            , chinese = "使用DApp或传送代币时需要Active key"
+            }
+
         ValidKey ->
-            { korean = "변경 가능한 키입니다."
+            { korean = "가능한 키입니다."
             , english = "Valid key"
             , chinese = "有效"
             }
 
         InvalidKey ->
-            { korean = "변경 가능한 키가 아닙니다"
+            { korean = "가능한 키가 아닙니다"
             , english = "Invalid key"
             , chinese = "无效"
             }
@@ -1873,4 +1907,64 @@ getMessages i18n =
             { korean = code ++ " 코드오류로 키 변경 실패"
             , english = "Failed with error code " ++ code
             , chinese = code ++ "编码有误key变更失败"
+            }
+
+        NewAccountSucceeded _ ->
+            { korean = "계정 생성에 성공했습니다"
+            , english = "Successfully created the account"
+            , chinese = "注册成功"
+            }
+
+        NewAccountFailed code ->
+            { korean = code ++ " 코드오류로 계정 생성 실패"
+            , english = "Failed with error code " ++ code
+            , chinese = code ++ "代码错误帐户创建失败"
+            }
+
+        CreateAccount ->
+            { korean = "계정 생성"
+            , english = "Create Account"
+            , chinese = "生成账号"
+            }
+
+        CreateAccountDetail ->
+            { korean = "기존 계정으로 새로운 EOS 계정을 만들 수 있습니다"
+            , english = "Create new EOS account with an old account"
+            , chinese = "以已有账号可以注册新的账号"
+            }
+
+        CreateAccountDesc isTransfer ->
+            { korean =
+                "현재 로그인 된 계정에서 아래에 표시된 토큰 수량만큼 새로운 계정으로 "
+                    ++ (if isTransfer then
+                            "전송"
+
+                        else
+                            "임대"
+                       )
+                    ++ "됩니다."
+            , english =
+                "The amount will be "
+                    ++ (if isTransfer then
+                            "transferred"
+
+                        else
+                            "delegated"
+                       )
+                    ++ " to the new account."
+            , chinese =
+                "能够"
+                    ++ (if isTransfer then
+                            "传送"
+
+                        else
+                            "租借"
+                       )
+                    ++ "以下数量"
+            }
+
+        AccountPlaceholder ->
+            { korean = "새로 만들 계정의 이름을 입력하세요"
+            , english = "Type in the account name"
+            , chinese = "请输入账户名"
             }

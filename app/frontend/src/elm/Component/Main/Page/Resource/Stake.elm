@@ -18,7 +18,7 @@ module Component.Main.Page.Resource.Stake exposing
     )
 
 import Data.Account exposing (Account)
-import Data.Action as Action exposing (DelegatebwParameters, encodeAction)
+import Data.Action as Action exposing (DelegatebwParameters, encodeActions)
 import Html exposing (Html, a, button, div, em, h2, h3, input, label, p, section, span, strong, text)
 import Html.Attributes
     exposing
@@ -204,7 +204,8 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
                 cmd =
                     { delegatebw | from = accountName, receiver = accountName }
                         |> Action.Delegatebw
-                        |> encodeAction
+                        |> List.singleton
+                        |> encodeActions "delegatebw"
                         |> Port.pushAction
             in
             ( { model | delegatebw = { delegatebw | from = accountName, receiver = accountName } }, cmd )

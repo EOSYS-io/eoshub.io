@@ -10,7 +10,7 @@ module Component.Main.Page.Vote exposing
     )
 
 import Data.Account exposing (Account, defaultAccount)
-import Data.Action exposing (encodeAction)
+import Data.Action exposing (encodeActions)
 import Data.Json
     exposing
         ( Producer
@@ -245,7 +245,8 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
             ( model
             , params
                 |> Data.Action.Voteproducer
-                |> encodeAction
+                |> List.singleton
+                |> encodeActions "voteproducer"
                 |> Port.pushAction
             )
 
@@ -257,7 +258,8 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
             ( model
             , params
                 |> Data.Action.Voteproducer
-                |> encodeAction
+                |> List.singleton
+                |> encodeActions "voteproducer"
                 |> Port.pushAction
             )
 

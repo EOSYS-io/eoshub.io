@@ -7,7 +7,7 @@ module Component.Main.Page.ChangeKey exposing
     , view
     )
 
-import Data.Action exposing (encodeAction)
+import Data.Action exposing (encodeActions)
 import Html
     exposing
         ( Html
@@ -105,7 +105,14 @@ update message ({ activeKey, activeKeyValidation, ownerKey, ownerKeyValidation }
                             []
 
                 cmd =
-                    values |> Data.Action.Updateauth |> encodeAction |> Port.pushAction
+                    if List.isEmpty values then
+                        Cmd.none
+
+                    else
+                        values
+                            |> List.map Data.Action.Updateauth
+                            |> encodeActions "changekey"
+                            |> Port.pushAction
             in
             ( model, cmd )
 
@@ -156,20 +163,7 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                 [ ul []
                     [ li []
                         [ input
-                            [ placeholder (translate language TypeOwnerKey)
-                            , type_ "text"
-                            , onInput <| InputOwnerKey
-                            , attribute "maxlength" "53"
-                            , Html.Attributes.value ownerKey
-                            , disabled (authority /= "owner")
-                            ]
-                            []
-                        , span [ class ownerClass ]
-                            [ text ownerText ]
-                        ]
-                    , li []
-                        [ input
-                            [ placeholder (translate language TypeActiveKey)
+                            [ placeholder (translate language TypeNewActiveKey)
                             , type_ "text"
                             , onInput <| InputActiveKey
                             , attribute "maxlength" "53"
@@ -179,6 +173,19 @@ view language { activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, is
                             []
                         , span [ class activeClass ]
                             [ text activeText ]
+                        ]
+                    , li []
+                        [ input
+                            [ placeholder (translate language TypeNewOwnerKey)
+                            , type_ "text"
+                            , onInput <| InputOwnerKey
+                            , attribute "maxlength" "53"
+                            , Html.Attributes.value ownerKey
+                            , disabled (authority /= "owner")
+                            ]
+                            []
+                        , span [ class ownerClass ]
+                            [ text ownerText ]
                         ]
                     ]
                 ]

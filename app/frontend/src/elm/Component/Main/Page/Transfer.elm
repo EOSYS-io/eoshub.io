@@ -16,7 +16,7 @@ module Component.Main.Page.Transfer exposing
     )
 
 import Data.Account exposing (Account, defaultAccount)
-import Data.Action as Action exposing (TransferParameters, encodeAction)
+import Data.Action as Action exposing (TransferParameters, encodeActions)
 import Data.Table exposing (Row)
 import Dict exposing (Dict)
 import Html
@@ -382,7 +382,8 @@ update message ({ transfer, modalOpened, tokensLoaded, possessingTokens, current
                                 |> floatToAsset token.precision token.symbol
                     }
                         |> Action.Transfer token.contractAccount
-                        |> encodeAction
+                        |> List.singleton
+                        |> encodeActions "transfer"
                         |> Port.pushAction
             in
             ( model, cmd )

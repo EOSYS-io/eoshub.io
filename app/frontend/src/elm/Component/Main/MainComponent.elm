@@ -22,6 +22,7 @@ module Component.Main.MainComponent exposing
 
 import Component.Main.Page.ChangeKey as ChangeKey
 import Component.Main.Page.Index as Index
+import Component.Main.Page.NewAccount as NewAccount
 import Component.Main.Page.NotFound as NotFound
 import Component.Main.Page.Rammarket as Rammarket
 import Component.Main.Page.Resource as Resource
@@ -93,6 +94,7 @@ type Page
     | RammarketPage Rammarket.Model
     | NotFoundPage
     | ChangeKeyPage ChangeKey.Model
+    | NewAccountPage NewAccount.Model
 
 
 type alias Header =
@@ -144,6 +146,7 @@ type Message
     | IndexMessage Index.Message
     | RammarketMessage Rammarket.Message
     | ChangeKeyMessage ChangeKey.Message
+    | NewAccountMessage NewAccount.Message
     | InputSearch String
     | UpdatePushActionResponse PushActionResponse
     | CheckSearchQuery String
@@ -285,6 +288,9 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
 
                 ChangeKeyPage subModel ->
                     Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.wallet)
+
+                NewAccountPage subModel ->
+                    Html.map NewAccountMessage (NewAccount.view language subModel sidebar.account)
 
                 _ ->
                     NotFound.view language
@@ -505,6 +511,13 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                     ChangeKey.update subMessage subModel sidebar.wallet
             in
             ( { model | page = newPage |> ChangeKeyPage }, Cmd.map ChangeKeyMessage subCmd )
+
+        ( NewAccountMessage subMessage, NewAccountPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    NewAccount.update subMessage subModel sidebar.account
+            in
+            ( { model | page = newPage |> NewAccountPage }, Cmd.map NewAccountMessage subCmd )
 
         ( UpdatePushActionResponse resp, _ ) ->
             let
@@ -785,6 +798,9 @@ getPage account location =
 
         ChangeKeyRoute ->
             ChangeKeyPage ChangeKey.initModel
+
+        NewAccountRoute ->
+            NewAccountPage NewAccount.initModel
 
         _ ->
             NotFoundPage
