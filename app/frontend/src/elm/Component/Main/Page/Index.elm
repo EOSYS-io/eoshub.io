@@ -1,11 +1,45 @@
-module Component.Main.Page.Index exposing (Message(..), view)
+module Component.Main.Page.Index exposing 
+    (Message(..)
+    , Model
+    , initModel
+    , update
+    , view
+    , subscriptions
+    )
 
 import Data.Json exposing (ProductionState)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
-import Html.Events exposing (onClick)
+import Html.Events exposing (onClick, onMouseOver, onMouseOut)
 import Translation exposing (I18n(..), Language, toLocale, translate)
+import Time
 
+
+
+-- MODEL --
+
+
+type alias Model =
+    { bannerIndex : Int
+    , bannerSecondsLeft : Int
+    , isTimerOn : Bool
+    }
+
+
+initModel : Model
+initModel =
+    { bannerIndex = 1
+    , bannerSecondsLeft = intervalValue
+    , isTimerOn = True
+    }
+
+
+intervalValue : Int
+intervalValue = 7
+
+
+bannerMaxCount : Int
+bannerMaxCount = 3
 
 
 -- MESSAGE --
@@ -14,14 +48,68 @@ import Translation exposing (I18n(..), Language, toLocale, translate)
 type Message
     = ChangeUrl String
     | CloseModal
+    | ChangeBanner Int
+    | Tick Time.Time
+    | ToggleBannerTimer Bool
 
+
+update : Message -> Model -> ( Model, Cmd Message )
+update msg model =
+    case msg of
+        ChangeBanner index ->
+            ( { model
+                | bannerSecondsLeft = intervalValue
+                , bannerIndex = index
+                , isTimerOn = False
+              }
+            , Cmd.none 
+            )
+
+        Tick _ ->
+            let
+                secondsLeft = 
+                    model.bannerSecondsLeft - 1
+
+                newIndex =
+                    if model.bannerIndex + 1 > bannerMaxCount then
+                            1
+
+                    else
+                        model.bannerIndex + 1
+
+            in
+            if secondsLeft <= 0 then
+                ( { model
+                    | bannerSecondsLeft = intervalValue
+                    , bannerIndex = newIndex
+                  }
+                , Cmd.none 
+                )
+            else
+                ( { model | bannerSecondsLeft = secondsLeft }, Cmd.none )
+
+        ToggleBannerTimer on ->
+            let
+                resetInterval =
+                    case on of
+                        True ->
+                            model.bannerSecondsLeft
+                    
+                        False ->
+                            intervalValue
+                        
+            in
+            ( { model | isTimerOn = on, bannerSecondsLeft = resetInterval }, Cmd.none )
+    
+        _ ->
+            ( model, Cmd.none )
 
 
 -- VIEW --
 
 
-view : Language -> ProductionState -> Html Message
-view language productionState =
+view : Model -> Language -> ProductionState -> Html Message
+view model language productionState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -75,30 +163,23 @@ view language productionState =
                     ]
                 ]
             ]
-        , section [ class "promotion", attribute "data-display" "1", attribute "data-max" "3" ]
+        , section [ class "promotion"
+            , attribute "data-display" (bannerDataDisplayIndex model)
+            , attribute "data-max" (toString (bannerMaxCount)) 
+            ]
             [ h3 []
                 [ text "AD" ]
             , div [ class "rolling banner" ]
-                [ a [ class "eosdaq", href "https://eosdaq.com/", target "_blank" ] [ text "A New Standard of DEX" ]
-                , a [ class "dapp", href (translate language DappContestLink), target "_blank" ]
-                    [ text "Dapp contest" ]
-                , a [ class "nova", href "http://eosnova.io/", target "_blank" ]
-                    [ text "Yout first EOS wallet,NOVA Wallet" ]
+                [ viewBanner "eosdaq" "https://eosdaq.com/" "A New Standard of DEX"
+                , viewBanner "dapp" (translate language DappContestLink) "Dapp contest"
+                , viewBanner "nova" "http://eosnova.io/" "Yout first EOS wallet,NOVA Wallet"
                 ]
             , div [ class "banner handler" ]
-                [ button [ class "rotate banner circle button", type_ "button" ]
-                    [ text "EOSDAQ free account event" ]
-                , button [ class "rotate banner circle button", type_ "button" ]
-                    [ text "Dapp contest banner" ]
-                , button [ class "rotate banner circle button", type_ "button" ]
-                    [ text "Nova wallet" ]
+                [ viewBannerButton "EOSDAQ free account event" 1
+                , viewBannerButton "Dapp contest banner" 2
+                , viewBannerButton "Nova wallet" 3
                 ]
             ]
-
-        -- TODO(boseok): Change js code to Elm
-        , node "script"
-            []
-            [ text "!function(){var e=document.querySelectorAll('.promotion .banner.handler button'),t=document.querySelectorAll('.promotion .rolling.banner a'),n=document.querySelector('.promotion'),o=document.querySelector('.promotion').dataset.max;function a(){n.dataset.display>=o?n.dataset.display=1:n.dataset.display++}for(var r=setInterval(a,7e3),l=0;l<e.length;l++)!function(e,n,o){t[o].addEventListener('mouseover',function(){clearInterval(r)}),t[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)}),e[o].addEventListener('mouseover',function(){clearInterval(r),n.dataset.display=o+1}),e[o].addEventListener('mouseout',function(){r=setInterval(a,7e3)})}(e,n,l)}();" ]
         , viewAnnouncementSection language productionState
         ]
 
@@ -147,3 +228,42 @@ viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
                 [ text "닫기" ]
             ]
         ]
+
+
+bannerDataDisplayIndex : Model -> String
+bannerDataDisplayIndex { bannerIndex } =
+    toString bannerIndex
+
+
+viewBanner : String -> String -> String -> Html Message
+viewBanner cls url str =
+    a [ class cls
+        , href url
+        , target "_blank" 
+        , onMouseOver (ToggleBannerTimer False)
+        , onMouseOut (ToggleBannerTimer True)
+        ] 
+        [ text str ]
+
+
+viewBannerButton : String -> Int -> Html Message
+viewBannerButton str index =
+    button [ class "rotate banner circle button"
+        , type_ "button" 
+        , onMouseOver (ChangeBanner index)
+        , onMouseOut (ToggleBannerTimer True)
+        ]
+        [ text str ]
+
+
+-- SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Message
+subscriptions model =
+    case model.isTimerOn of
+        True ->
+            Time.every Time.second Tick
+    
+        False ->
+            Sub.none
