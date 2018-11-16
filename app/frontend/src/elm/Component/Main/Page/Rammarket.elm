@@ -59,7 +59,6 @@ import Html.Attributes
         )
 import Html.Events exposing (onClick, onInput)
 import Http
-import Json.Encode as Encode
 import Navigation
 import Port
 import Round
@@ -67,7 +66,7 @@ import Time
 import Translation exposing (I18n(..), Language, translate)
 import Util.Constant exposing (giga, kilo)
 import Util.Formatter exposing (assetToFloat, deleteFromBack, numberWithinDigitLimit, timeFormatter)
-import Util.HttpRequest exposing (getAccount, getFullPath, getTableRows, post)
+import Util.HttpRequest exposing (getAccount, getActions, getTableRows)
 import Util.Urls exposing (getAccountUrl)
 import Util.Validation as Validation
     exposing
@@ -195,18 +194,9 @@ type Message
     | ChangeUrl String
 
 
-getActions : Cmd Message
-getActions =
-    let
-        requestBody =
-            [ ( "account_name", "eosio.ram" |> Encode.string )
-            , ( "pos", -1 |> Encode.int )
-            , ( "offset", -80 |> Encode.int )
-            ]
-                |> Encode.object
-                |> Http.jsonBody
-    in
-    post ("/v1/history/get_actions" |> getFullPath) requestBody actionsDecoder
+getRammarketActions : Cmd Message
+getRammarketActions =
+    getActions "eosio.ram" 0 80
         |> Http.send OnFetchActions
 
 
@@ -224,7 +214,7 @@ getGlobalTable =
 
 initCmd : Cmd Message
 initCmd =
-    Cmd.batch [ Port.loadChart (), getActions, getRammarketTable, getGlobalTable ]
+    Cmd.batch [ Port.loadChart (), getRammarketActions, getRammarketTable, getGlobalTable ]
 
 
 
@@ -242,7 +232,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
     in
     case message of
         OnFetchActions (Ok actions) ->
-            ( { model | actions = actions |> removeDuplicated |> List.reverse }, Cmd.none )
+            ( { model | actions = actions |> removeDuplicated }, Cmd.none )
 
         OnFetchActions (Err _) ->
             ( model, Cmd.none )
@@ -280,7 +270,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
             ( { model | buyModel = newBuyModel }, Cmd.none )
 
         UpdateChainData _ ->
-            ( model, Cmd.batch [ getActions, getRammarketTable, getGlobalTable ] )
+            ( model, Cmd.batch [ getRammarketActions, getRammarketTable, getGlobalTable ] )
 
         SwitchTab ->
             ( { model | isBuyTab = not isBuyTab }, Cmd.none )
