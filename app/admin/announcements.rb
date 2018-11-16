@@ -1,6 +1,6 @@
 ActiveAdmin.register Announcement do
   menu priority: 7
-  permit_params :title_ko, :title_en, :title_cn, :body_ko, :body_en, :body_cn, :published_at, :ended_at
+  permit_params :title_ko, :title_en, :title_cn, :active, :body_ko, :body_en, :body_cn, :published_at, :ended_at
   
   index do
     selectable_column
@@ -28,7 +28,7 @@ ActiveAdmin.register Announcement do
     end
     active_admin_comments
   end
-  
+
   form do |f|
     f.inputs '제목' do
       f.input :title_ko
