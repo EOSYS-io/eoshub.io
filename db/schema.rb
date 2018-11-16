@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_15_041723) do
+ActiveRecord::Schema.define(version: 2018_11_16_050800) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -148,6 +148,18 @@ ActiveRecord::Schema.define(version: 2018_11_15_041723) do
     t.string "creator_order", default: "", comment: "creator eos account when requested by order"
     t.string "creator_event", default: "", comment: "creator eos account when requested by event"
     t.index ["name"], name: "index_products_on_name"
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.float "new_account_cpu", null: false
+    t.float "new_account_net", null: false
+    t.integer "new_account_ram", null: false
+    t.float "minimum_required_cpu", null: false
+    t.float "minimum_required_net", null: false
+    t.integer "history_api_limit", null: false
+    t.string "eosys_proxy_account", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
