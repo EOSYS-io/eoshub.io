@@ -91,12 +91,11 @@ update msg model =
         ToggleBannerTimer on ->
             let
                 resetInterval =
-                    case on of
-                        True ->
-                            model.bannerSecondsLeft
-                    
-                        False ->
-                            intervalValue
+                    if on then
+                        model.bannerSecondsLeft
+                            
+                    else
+                        intervalValue
                         
             in
             ( { model | isTimerOn = on, bannerSecondsLeft = resetInterval }, Cmd.none )
@@ -164,7 +163,7 @@ view model language productionState =
                 ]
             ]
         , section [ class "promotion"
-            , attribute "data-display" (bannerDataDisplayIndex model)
+            , attribute "data-display" (toString model.bannerIndex)
             , attribute "data-max" (toString (bannerMaxCount)) 
             ]
             [ h3 []
@@ -230,11 +229,6 @@ viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
         ]
 
 
-bannerDataDisplayIndex : Model -> String
-bannerDataDisplayIndex { bannerIndex } =
-    toString bannerIndex
-
-
 viewBanner : String -> String -> String -> Html Message
 viewBanner cls url str =
     a [ class cls
@@ -261,9 +255,8 @@ viewBannerButton str index =
 
 subscriptions : Model -> Sub Message
 subscriptions model =
-    case model.isTimerOn of
-        True ->
-            Time.every Time.second Tick
-    
-        False ->
-            Sub.none
+    if model.isTimerOn then
+        Time.every Time.second Tick
+            
+    else
+        Sub.none
