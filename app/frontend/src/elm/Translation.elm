@@ -1827,7 +1827,7 @@ getMessages i18n =
 
         ChangeKey ->
             { korean = "계정 키 변경"
-            , english = "Change Account Keys"
+            , english = "Change Keys"
             , chinese = "变更账户密匙"
             }
 
