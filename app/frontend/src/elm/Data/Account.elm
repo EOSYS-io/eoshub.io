@@ -1,11 +1,7 @@
 module Data.Account exposing
     ( Account
-    , AccountPerm
-    , KeyPerm
     , Permission
-    , PermissionShortened
     , Refund
-    , RequiredAuth
     , Resource
     , ResourceInEos
     , VoterInfo
@@ -20,6 +16,7 @@ module Data.Account exposing
     , keyAccountsDecoder
     )
 
+import Data.Common exposing (Authority, authorityDecoder)
 import Json.Decode as JD exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, optional, required)
 import Round
@@ -65,32 +62,7 @@ type alias Resource =
 type alias Permission =
     { permName : String
     , parent : String
-    , requiredAuth : RequiredAuth
-    }
-
-
-type alias RequiredAuth =
-    { threshold : Int
-    , keys : List KeyPerm
-    , accounts : List AccountPerm
-    }
-
-
-type alias KeyPerm =
-    { key : String
-    , weight : Int
-    }
-
-
-type alias AccountPerm =
-    { permission : PermissionShortened
-    , weight : Int
-    }
-
-
-type alias PermissionShortened =
-    { actor : String
-    , permission : String
+    , requiredAuth : Authority
     }
 
 
@@ -110,7 +82,7 @@ type alias VoterInfo =
 
 defaultAccount : Account
 defaultAccount =
-    { accountName = "Loading..."
+    { accountName = ""
     , coreLiquidBalance = "0 EOS"
     , voterInfo =
         { staked = 0
@@ -172,28 +144,7 @@ accountDecoder =
                 (decode Permission
                     |> required "perm_name" JD.string
                     |> required "parent" JD.string
-                    |> required "required_auth"
-                        (decode RequiredAuth
-                            |> required "threshold" JD.int
-                            |> required "keys"
-                                (JD.list
-                                    (decode KeyPerm
-                                        |> required "key" JD.string
-                                        |> required "weight" JD.int
-                                    )
-                                )
-                            |> required "accounts"
-                                (JD.list
-                                    (decode AccountPerm
-                                        |> required "permission"
-                                            (decode PermissionShortened
-                                                |> required "actor" JD.string
-                                                |> required "permission" JD.string
-                                            )
-                                        |> required "weight" JD.int
-                                    )
-                                )
-                        )
+                    |> required "required_auth" authorityDecoder
                 )
             )
         |> optional "total_resources"

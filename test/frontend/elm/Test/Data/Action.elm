@@ -10,7 +10,7 @@ tests : Test
 tests =
     let
         defaultActions =
-            [ { accountActionSeq = 1380
+            [ { globalSequence = 1380
               , blockNum = 20277073
               , blockTime = "2018-10-07T03:16:10.500"
               , contractAccount = "eosio"
@@ -24,7 +24,7 @@ tests =
               , trxId = "8a982d35c204c68ca2a6e3e16b94e4be980283bcc8923422dc52988868488f70"
               , actionTag = ""
               }
-            , { accountActionSeq = 1381
+            , { globalSequence = 1381
               , blockNum = 20277073
               , blockTime = "2018-10-07T03:16:10.500"
               , contractAccount = "eosio.token"
@@ -41,7 +41,7 @@ tests =
               , trxId = "8a982d35c204c68ca2a6e3e16b94e4be980283bcc8923422dc52988868488f70"
               , actionTag = ""
               }
-            , { accountActionSeq = 1382
+            , { globalSequence = 1382
               , blockNum = 20277073
               , blockTime = "2018-10-07T03:16:10.500"
               , contractAccount = "eosio.token"
@@ -58,7 +58,7 @@ tests =
               , trxId = "8a982d35c204c68ca2a6e3e16b94e4be980283bcc8923422dc52988868488f70"
               , actionTag = ""
               }
-            , { accountActionSeq = 1383
+            , { globalSequence = 1383
               , blockNum = 20277073
               , blockTime = "2018-10-07T03:16:10.500"
               , contractAccount = "eosio.token"
@@ -83,7 +83,7 @@ tests =
                 \() ->
                     let
                         expected =
-                            [ { accountActionSeq = 1380
+                            [ { globalSequence = 1380
                               , blockNum = 20277073
                               , blockTime = "2018-10-07T03:16:10.500"
                               , contractAccount = "eosio"
@@ -97,7 +97,7 @@ tests =
                               , trxId = "8a982d35c204c68ca2a6e3e16b94e4be980283bcc8923422dc52988868488f70"
                               , actionTag = ""
                               }
-                            , { accountActionSeq = 1381
+                            , { globalSequence = 1381
                               , blockNum = 20277073
                               , blockTime = "2018-10-07T03:16:10.500"
                               , contractAccount = "eosio.token"

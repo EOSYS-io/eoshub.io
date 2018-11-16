@@ -10,6 +10,7 @@ module Data.Action exposing
     , SellramParameters
     , TransferParameters
     , UndelegatebwParameters
+    , UpdateauthParameters
     , VoteproducerParameters
     , actionParametersDecoder
     , actionsDecoder
@@ -17,7 +18,7 @@ module Data.Action exposing
     , buyrambytesDecoder
     , claimrewardsDecoder
     , delegatebwDecoder
-    , encodeAction
+    , encodeActions
     , errorDecoder
     , initBuyramParameters
     , initSellramParameters
@@ -27,11 +28,16 @@ module Data.Action exposing
     , removeDuplicated
     , sellramDecoder
     , transferDecoder
-    , transferParametersToValue
     , undelegatebwDecoder
     , voteproducerDecoder
     )
 
+import Data.Common
+    exposing
+        ( Authority
+        , authorityDecoder
+        , encodeAuthority
+        )
 import Json.Decode as Decode exposing (Decoder, oneOf)
 import Json.Decode.Pipeline exposing (decode, hardcoded, required, requiredAt)
 import Json.Encode as Encode exposing (encode)
@@ -46,7 +52,7 @@ import Util.Formatter exposing (formatAsset)
 
 
 type alias Action =
-    { accountActionSeq : Int
+    { globalSequence : Int
     , blockNum : Int
     , blockTime : String
     , contractAccount : String
@@ -68,6 +74,7 @@ type ActionParameters
     | Regproxy RegproxyParameters
     | Voteproducer VoteproducerParameters
     | Newaccount NewaccountParameters
+    | Updateauth UpdateauthParameters
 
 
 type alias TransferParameters =
@@ -118,6 +125,14 @@ type alias BuyrambytesParameters =
     }
 
 
+type alias UpdateauthParameters =
+    { account : String
+    , permission : String
+    , parent : String
+    , auth : Authority
+    }
+
+
 
 -- transfer type is bool but eosio pass the value as 0 or 1. so it should be Int in Elm
 
@@ -159,6 +174,8 @@ type alias VoteproducerParameters =
 type alias NewaccountParameters =
     { creator : String
     , name : String
+    , owner : Authority
+    , active : Authority
     }
 
 
@@ -176,13 +193,13 @@ actionsDecoder =
         (Decode.list
             (decode
                 Action
-                |> required "account_action_seq" Decode.int
+                |> requiredAt [ "receipt", "global_sequence" ] Decode.int
                 |> required "block_num" Decode.int
                 |> required "block_time" Decode.string
-                |> requiredAt [ "action_trace", "act", "account" ] Decode.string
-                |> requiredAt [ "action_trace", "act", "name" ] Decode.string
-                |> requiredAt [ "action_trace", "act", "data" ] actionParametersDecoder
-                |> requiredAt [ "action_trace", "trx_id" ] Decode.string
+                |> requiredAt [ "act", "account" ] Decode.string
+                |> requiredAt [ "act", "name" ] Decode.string
+                |> requiredAt [ "act", "data" ] actionParametersDecoder
+                |> required "trx_id" Decode.string
                 |> hardcoded ""
             )
         )
@@ -304,6 +321,8 @@ newaccountDecoder =
         (decode NewaccountParameters
             |> required "creator" Decode.string
             |> required "name" Decode.string
+            |> required "owner" authorityDecoder
+            |> required "active" authorityDecoder
         )
 
 
@@ -456,6 +475,14 @@ errorDecoder =
 -- encoder part
 
 
+encodeActions : String -> List ActionParameters -> Encode.Value
+encodeActions actionName actions =
+    Encode.object
+        [ ( "actionName", Encode.string actionName )
+        , ( "actions", Encode.list (List.map encodeAction actions) )
+        ]
+
+
 encodeAction : ActionParameters -> Encode.Value
 encodeAction action =
     case action of
@@ -476,6 +503,15 @@ encodeAction action =
 
         Voteproducer message ->
             voteproducersParametersToValue message
+
+        Updateauth message ->
+            updateauthParametersToValue message
+
+        Newaccount message ->
+            newaccountParametersToValue message
+
+        Buyrambytes message ->
+            buyrambytesParametersToValue message
 
         _ ->
             Encode.null
@@ -549,6 +585,22 @@ buyramParametersToValue { payer, receiver, quant } =
         ]
 
 
+buyrambytesParametersToValue : BuyrambytesParameters -> Encode.Value
+buyrambytesParametersToValue { payer, receiver, bytes } =
+    -- Introduce form validation.
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "buyrambytes" )
+        , ( "payload"
+          , Encode.object
+                [ ( "payer", Encode.string payer )
+                , ( "receiver", Encode.string receiver )
+                , ( "bytes", Encode.int bytes )
+                ]
+          )
+        ]
+
+
 sellramParametersToValue : SellramParameters -> Encode.Value
 sellramParametersToValue { account, bytes } =
     -- Introduce form validation.
@@ -579,6 +631,38 @@ voteproducersParametersToValue { voter, producers, proxy } =
         ]
 
 
+updateauthParametersToValue : UpdateauthParameters -> Encode.Value
+updateauthParametersToValue { account, permission, parent, auth } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "updateauth" )
+        , ( "payload"
+          , Encode.object
+                [ ( "account", Encode.string account )
+                , ( "permission", Encode.string permission )
+                , ( "parent", Encode.string parent )
+                , ( "auth", encodeAuthority auth )
+                ]
+          )
+        ]
+
+
+newaccountParametersToValue : NewaccountParameters -> Encode.Value
+newaccountParametersToValue { creator, name, owner, active } =
+    Encode.object
+        [ ( "account", Encode.string "eosio" )
+        , ( "action", Encode.string "newaccount" )
+        , ( "payload"
+          , Encode.object
+                [ ( "creator", Encode.string creator )
+                , ( "name", Encode.string name )
+                , ( "owner", encodeAuthority owner )
+                , ( "active", encodeAuthority active )
+                ]
+          )
+        ]
+
+
 
 -- Utility
 
@@ -592,4 +676,4 @@ removeDuplicated actionList =
                 ++ toString action.actionName
                 ++ toString action.data
     in
-    List.uniqueBy getActionIdentifier actionList
+    uniqueBy getActionIdentifier actionList

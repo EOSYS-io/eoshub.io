@@ -8,29 +8,7 @@ module Util.WalletDecoder exposing
     )
 
 import Dict exposing (Dict, fromList)
-import Translation
-    exposing
-        ( I18n
-            ( BuyramFailed
-            , BuyramSucceeded
-            , CheckDetail
-            , CheckError
-            , DebugMessage
-            , DelegatebwFailed
-            , DelegatebwSucceeded
-            , GotoFillCpu
-            , LackCpu
-            , SellramFailed
-            , SellramSucceeded
-            , TransferFailed
-            , TransferSucceeded
-            , UndelegatebwFailed
-            , UndelegatebwSucceeded
-            , UnknownError
-            , VoteFailed
-            , VoteSucceeded
-            )
-        )
+import Translation exposing (I18n(..))
 import View.Notification as Notification
 
 
@@ -75,6 +53,8 @@ actionSuccessMessages =
         , ( "buyram", BuyramSucceeded )
         , ( "sellram", SellramSucceeded )
         , ( "voteproducer", VoteSucceeded )
+        , ( "changekey", ChangeKeySucceeded )
+        , ( "newaccount", NewAccountSucceeded )
         ]
 
 
@@ -87,6 +67,8 @@ actionFailMessages =
         , ( "buyram", BuyramFailed )
         , ( "sellram", SellramFailed )
         , ( "voteproducer", VoteFailed )
+        , ( "changekey", ChangeKeyFailed )
+        , ( "newaccount", NewAccountFailed )
         ]
 
 

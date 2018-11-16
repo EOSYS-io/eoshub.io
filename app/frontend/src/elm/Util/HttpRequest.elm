@@ -1,5 +1,6 @@
 module Util.HttpRequest exposing
     ( getAccount
+    , getActions
     , getEosAccountProduct
     , getFullPath
     , getTableRows
@@ -7,6 +8,7 @@ module Util.HttpRequest exposing
     )
 
 import Data.Account exposing (Account, accountDecoder)
+import Data.Action exposing (Action, actionsDecoder)
 import Data.Json exposing (Product, productDecoder)
 import Data.Table exposing (Row, rowsDecoder)
 import Http
@@ -14,7 +16,7 @@ import Json.Decode exposing (Decoder)
 import Json.Encode as Encode
 import Translation exposing (Language, toLocale)
 import Util.Flags exposing (Flags)
-import Util.Urls exposing (eosAccountProductUrl, mainnetRpcUrl)
+import Util.Urls exposing (eosAccountProductUrl, mainnetHistoryUrl, mainnetRpcUrl)
 
 
 getFullPath : String -> String
@@ -44,6 +46,20 @@ getAccount accountName =
                 |> Http.jsonBody
     in
     post (getFullPath "/v1/chain/get_account") body accountDecoder
+
+
+getActions : String -> Int -> Int -> Http.Request (List Action)
+getActions query skip limit =
+    Http.get
+        (mainnetHistoryUrl
+            ++ "/v1/history/get_actions/"
+            ++ query
+            ++ "?skip="
+            ++ toString skip
+            ++ "&limit="
+            ++ toString limit
+        )
+        actionsDecoder
 
 
 

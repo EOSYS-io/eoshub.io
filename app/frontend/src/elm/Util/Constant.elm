@@ -2,12 +2,13 @@ module Util.Constant exposing
     ( day
     , eosysProxyAccount
     , giga
+    , historyApiLimit
     , hour
     , kilo
     , mega
+    , millisec
     , minimumRequiredResources
     , minute
-    , millisec
     , second
     , tera
     )
@@ -80,3 +81,8 @@ minimumRequiredResources :
     }
 minimumRequiredResources =
     { cpu = "0.8 EOS", net = "0.2 EOS" }
+
+
+historyApiLimit : Int
+historyApiLimit =
+    100

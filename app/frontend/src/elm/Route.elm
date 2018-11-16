@@ -17,6 +17,8 @@ type Route
     | ResourceRoute
     | NotFoundRoute
     | RammarketRoute
+    | ChangeKeyRoute
+    | NewAccountRoute
 
 
 matchRoute : Parser (Route -> a) a
@@ -33,6 +35,8 @@ matchRoute =
         , map TransferRoute (s "transfer")
         , map ResourceRoute (s "resource")
         , map RammarketRoute (s "rammarket")
+        , map ChangeKeyRoute (s "changekey")
+        , map NewAccountRoute (s "newaccount")
         ]
 
 
