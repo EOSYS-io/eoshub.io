@@ -19,7 +19,7 @@ module Component.Main.Page.Resource.Stake exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (DelegatebwParameters, encodeActions)
-import Html exposing (Html, a, button, div, em, h2, h3, input, label, p, section, span, strong, text)
+import Html exposing (Html, a, button, div, em, h3, input, label, p, section, span, strong, text)
 import Html.Attributes
     exposing
         ( action

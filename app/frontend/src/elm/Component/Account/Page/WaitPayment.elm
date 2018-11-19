@@ -11,7 +11,7 @@ import Data.Json
         ( CreateEosAccountResponse
         , createEosAccountResponseDecoder
         )
-import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
+import Data.RailsResponse exposing (handleRailsErrorResponse)
 import Html
     exposing
         ( Html
@@ -21,7 +21,6 @@ import Html
         , h2
         , main_
         , p
-        , text
         )
 import Html.Attributes
     exposing
@@ -29,7 +28,7 @@ import Html.Attributes
         , class
         , type_
         )
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick)
 import Http
 import Navigation
 import Translation
@@ -39,13 +38,10 @@ import Translation
             , AccountCreationWaitPaymentMsg1
             , AccountCreationWaitPaymentMsg2
             , AccountCreationWaitPaymentMsg3
-            , DebugMessage
-            , EmptyMessage
             , PaymentComplete
             )
         , Language
         , toLocale
-        , translate
         )
 import Util.Flags exposing (Flags)
 import Util.Urls as Urls
@@ -139,7 +135,7 @@ view { notification } language =
                 [ textViewI18n language AccountCreationWaitPaymentMsg1 ]
             , p []
                 [ textViewI18n language AccountCreationWaitPaymentMsg2 ]
-            , p [ class "important description"]
+            , p [ class "important description" ]
                 [ textViewI18n language AccountCreationWaitPaymentMsg3 ]
             , div [ class "btn_area" ]
                 [ button [ class "ok button", type_ "button", onClick CreateEosAccount ]
@@ -155,7 +151,7 @@ view { notification } language =
 
 
 postCreateEosAccount : Model -> Flags -> Language -> Http.Request CreateEosAccountResponse
-postCreateEosAccount ({ orderNo } as model) flags language =
+postCreateEosAccount { orderNo } flags language =
     let
         url =
             Urls.createEosAccountByOrderUrl flags orderNo (toLocale language)

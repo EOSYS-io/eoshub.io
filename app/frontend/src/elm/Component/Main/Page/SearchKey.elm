@@ -10,7 +10,7 @@ module Component.Main.Page.SearchKey exposing
     )
 
 import Data.Account exposing (keyAccountsDecoder)
-import Html exposing (Html, button, dd, div, dt, h2, main_, p, span, strong, text)
+import Html exposing (Html, dd, div, dt, h2, main_, p, span, strong, text)
 import Html.Attributes exposing (class, title, type_)
 import Html.Events exposing (onClick)
 import Http
@@ -107,11 +107,11 @@ view language { accounts, publickey } =
 
 viewAccountCardList : Language -> List String -> List (Html Message)
 viewAccountCardList language accounts =
-    List.indexedMap (viewAccountCard language) accounts
+    List.map (viewAccountCard language) accounts
 
 
-viewAccountCard : Language -> Int -> String -> Html Message
-viewAccountCard language index account =
+viewAccountCard : Language -> String -> Html Message
+viewAccountCard language account =
     div [ type_ "button", onClick (ChangeUrl ("/search?query=" ++ account)) ]
         [ span [] [ text <| translate language Translation.Account ]
         , strong

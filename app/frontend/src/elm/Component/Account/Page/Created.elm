@@ -98,16 +98,15 @@ view { eosAccount, publicKey } language isEvent =
 
 viewEventDiv : Language -> Bool -> Html Message
 viewEventDiv language isEvent =
-    case isEvent of
-        True ->
-            div [ class "event disposable banner" ]
-                [ p []
-                    [ textViewI18n language CoSponsoredByEosdaq ]
-                , p []
-                    [ a [ href "https://eosdaq.com/", target "_blank" ]
-                        [ textViewI18n language GotoEosdaq ]
-                    ]
+    if isEvent then
+        div [ class "event disposable banner" ]
+            [ p []
+                [ textViewI18n language CoSponsoredByEosdaq ]
+            , p []
+                [ a [ href "https://eosdaq.com/", target "_blank" ]
+                    [ textViewI18n language GotoEosdaq ]
                 ]
+            ]
 
-        False ->
-            div [] []
+    else
+        div [] []

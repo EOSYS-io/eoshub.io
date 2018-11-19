@@ -183,10 +183,6 @@ type alias NewaccountParameters =
 -- UPDATE
 
 
-type alias OpenedActionSeq =
-    Int
-
-
 actionsDecoder : Decoder (List Action)
 actionsDecoder =
     Decode.field "actions"

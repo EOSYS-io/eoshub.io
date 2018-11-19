@@ -174,6 +174,7 @@ type alias AccountsFields =
     { balance : String }
 
 
+initAccountsFields : AccountsFields
 initAccountsFields =
     { balance = "0.0000 EOS" }
 

@@ -15,7 +15,6 @@ import Data.Action
     exposing
         ( Action
         , BuyramParameters
-        , actionsDecoder
         , encodeActions
         , initBuyramParameters
         , removeDuplicated
