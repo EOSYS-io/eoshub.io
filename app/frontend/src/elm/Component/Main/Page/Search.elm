@@ -35,7 +35,6 @@ import Data.Account
 import Data.Action as Action
     exposing
         ( Action
-        , actionsDecoder
         , refineAction
         , removeDuplicated
         )
@@ -789,8 +788,8 @@ viewActionInfo { globalSequence, contractAccount, actionName, data } openedActio
                                 [ viewAccountLink params.voter
                                 , if String.length params.proxy == 0 then
                                     span []
-                                        ([ text " voted for block producers " ]
-                                            ++ List.map viewBpAccountLink params.producers
+                                        (text " voted for block producers "
+                                            :: List.map viewBpAccountLink params.producers
                                         )
 
                                   else

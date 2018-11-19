@@ -19,10 +19,7 @@ import Data.Account
     exposing
         ( Account
         , defaultAccount
-        , getResource
-        , getResourceColorClass
         , getTotalAmount
-        , getUnstakingAmount
         )
 import Data.Json exposing (Product)
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
@@ -245,7 +242,7 @@ pairWalletView language =
 
 
 accountInfoView : Model -> Language -> List (Html Message)
-accountInfoView { wallet, account, configPanelOpen, now } language =
+accountInfoView { wallet, account, configPanelOpen } language =
     let
         { coreLiquidBalance, voterInfo, refundRequest } =
             account
@@ -256,9 +253,6 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
                 voterInfo.staked
                 refundRequest.netAmount
                 refundRequest.cpuAmount
-
-        unstakingAmount =
-            getUnstakingAmount refundRequest.netAmount refundRequest.cpuAmount
 
         stakedAmount =
             floatToAsset 4 "EOS" <| larimerToEos <| voterInfo.staked
@@ -273,15 +267,6 @@ accountInfoView { wallet, account, configPanelOpen, now } language =
                             ""
                        )
                 )
-
-        ( _, _, _, _, cpuColorCode ) =
-            getResource "cpu" account.cpuLimit.used account.cpuLimit.available account.cpuLimit.max
-
-        ( _, _, _, _, netColorCode ) =
-            getResource "net" account.netLimit.used account.netLimit.available account.netLimit.max
-
-        resourceStatusCode =
-            Basics.min cpuColorCode netColorCode
     in
     [ h2 []
         [ text wallet.account

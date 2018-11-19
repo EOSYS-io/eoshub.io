@@ -14,17 +14,15 @@ import Data.Json
         ( Product
         , RequestPaymentResponse
         , initProduct
-        , productDecoder
         , requestPaymentResposeDecoder
         )
-import Data.RailsResponse exposing (RailsResponse, handleRailsErrorResponse, railsResponseDecoder)
+import Data.RailsResponse exposing (handleRailsErrorResponse)
 import Data.WindowOpen as WindowOpen
 import Html
     exposing
         ( Html
         , a
         , article
-        , br
         , button
         , dd
         , div
@@ -56,7 +54,7 @@ import Html.Attributes
         , target
         , type_
         )
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as Encode
 import Navigation
@@ -76,7 +74,6 @@ import Util.Validation
     exposing
         ( AccountStatus(..)
         , VerificationRequestStatus(..)
-        , checkConfirmToken
         , validateAccountForCreation
         )
 import View.I18nViews exposing (textViewI18n)
@@ -110,8 +107,8 @@ initModel =
     }
 
 
-initCmd : Model -> Flags -> Language -> Cmd Message
-initCmd model flags language =
+initCmd : Flags -> Language -> Cmd Message
+initCmd flags language =
     Cmd.batch
         [ Port.generateKeys ()
         , getEosAccountProduct flags language |> Http.send ResultEosAccountProduct
@@ -138,7 +135,7 @@ type Message
 
 
 update : Message -> Model -> Flags -> Language -> ( Model, Cmd Message )
-update msg ({ accountName, keys, notification } as model) flags language =
+update msg ({ notification } as model) flags language =
     case msg of
         GenerateKeys ->
             ( model, Port.generateKeys () )
@@ -248,7 +245,7 @@ update msg ({ accountName, keys, notification } as model) flags language =
 
 
 accountInputViews : Model -> Language -> List (Html Message)
-accountInputViews { accountName, accountValidation } language =
+accountInputViews { accountValidation } language =
     let
         ( accountValidationMsg, visibility, classAttr ) =
             case accountValidation of
@@ -390,7 +387,7 @@ okButton { accountValidation, agreeEosConstitution, product } language =
 
 
 view : Model -> Language -> Html Message
-view ({ agreeEosConstitution, notification } as model) language =
+view ({ notification } as model) language =
     main_ [ class "join" ]
         [ article []
             [ h2 []

@@ -1,19 +1,19 @@
-module Component.Main.Page.Index exposing 
-    (Message(..)
+module Component.Main.Page.Index exposing
+    ( Message(..)
     , Model
     , initModel
+    , subscriptions
     , update
     , view
-    , subscriptions
     )
 
 import Data.Json exposing (ProductionState)
-import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
+import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
-import Html.Events exposing (onClick, onMouseOver, onMouseOut)
+import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
-import Translation exposing (I18n(..), Language, toLocale, translate)
 import Time
+import Translation exposing (I18n(..), Language, toLocale, translate)
 
 
 
@@ -36,11 +36,14 @@ initModel =
 
 
 bannerRollingInterval : Int
-bannerRollingInterval = 7
+bannerRollingInterval =
+    7
 
 
 bannerMaxCount : Int
-bannerMaxCount = 3
+bannerMaxCount =
+    3
+
 
 
 -- MESSAGE --
@@ -66,29 +69,29 @@ update msg model =
                 , bannerIndex = index
                 , isTimerOn = False
               }
-            , Cmd.none 
+            , Cmd.none
             )
 
         Tick _ ->
             let
-                secondsLeft = 
+                secondsLeft =
                     model.bannerSecondsLeft - 1
 
                 newIndex =
                     if model.bannerIndex + 1 > bannerMaxCount then
-                            1
+                        1
 
                     else
                         model.bannerIndex + 1
-
             in
             if secondsLeft <= 0 then
                 ( { model
                     | bannerSecondsLeft = bannerRollingInterval
                     , bannerIndex = newIndex
                   }
-                , Cmd.none 
+                , Cmd.none
                 )
+
             else
                 ( { model | bannerSecondsLeft = secondsLeft }, Cmd.none )
 
@@ -97,15 +100,15 @@ update msg model =
                 resetInterval =
                     if on then
                         model.bannerSecondsLeft
-                            
+
                     else
                         bannerRollingInterval
-                        
             in
             ( { model | isTimerOn = on, bannerSecondsLeft = resetInterval }, Cmd.none )
-    
+
         _ ->
             ( model, Cmd.none )
+
 
 
 -- VIEW --
@@ -120,12 +123,11 @@ view { bannerIndex } language productionState =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (case productionState.isEvent of
-                                    True ->
-                                        " event_free"
+                            ++ (if productionState.isEvent then
+                                    " event_free"
 
-                                    False ->
-                                        ""
+                                else
+                                    ""
                                )
                         )
                     ]
@@ -166,9 +168,10 @@ view { bannerIndex } language productionState =
                     ]
                 ]
             ]
-        , section [ class "promotion"
+        , section
+            [ class "promotion"
             , attribute "data-display" (toString bannerIndex)
-            , attribute "data-max" (toString (bannerMaxCount)) 
+            , attribute "data-max" (toString bannerMaxCount)
             ]
             [ h3 []
                 [ text "AD" ]
@@ -189,15 +192,14 @@ view { bannerIndex } language productionState =
 
 viewEventClickButton : Language -> Bool -> Html Message
 viewEventClickButton language isEvent =
-    case isEvent of
-        True ->
-            p []
-                [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
-                    [ text (translate language MakeYourAccount) ]
-                ]
+    if isEvent then
+        p []
+            [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
+                [ text (translate language MakeYourAccount) ]
+            ]
 
-        False ->
-            span [] []
+    else
+        span [] []
 
 
 viewAnnouncementSection : Language -> ProductionState -> Html Message
@@ -211,12 +213,11 @@ viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
         [ attribute "aria-live" "true"
         , class
             ("notice modal popup"
-                ++ (case isAnnouncementModalOpen of
-                        True ->
-                            " viewing"
+                ++ (if isAnnouncementModalOpen then
+                        " viewing"
 
-                        False ->
-                            ""
+                    else
+                        ""
                    )
             )
         , id "popup"
@@ -235,23 +236,26 @@ viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
 
 viewBanner : String -> String -> String -> Html Message
 viewBanner cls url str =
-    a [ class cls
+    a
+        [ class cls
         , href url
-        , target "_blank" 
+        , target "_blank"
         , onMouseOver (ToggleBannerTimer False)
         , onMouseOut (ToggleBannerTimer True)
-        ] 
+        ]
         [ text str ]
 
 
 viewBannerButton : String -> Int -> Html Message
 viewBannerButton str index =
-    button [ class "rotate banner circle button"
-        , type_ "button" 
+    button
+        [ class "rotate banner circle button"
+        , type_ "button"
         , onMouseOver (ChangeBanner index)
         , onMouseOut (ToggleBannerTimer True)
         ]
         [ text str ]
+
 
 
 -- SUBSCRIPTIONS
@@ -261,6 +265,6 @@ subscriptions : Model -> Sub Message
 subscriptions { isTimerOn } =
     if isTimerOn then
         Time.every Time.second Tick
-            
+
     else
         Sub.none

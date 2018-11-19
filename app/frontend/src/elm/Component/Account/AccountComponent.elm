@@ -94,14 +94,14 @@ initCmd { page, flags, language } =
     let
         pageCmd =
             case page of
-                CreatePage subModel ->
+                CreatePage _ ->
                     let
                         subCmd =
-                            Create.initCmd subModel flags language
+                            Create.initCmd flags language
                     in
                     Cmd.map CreateMessage subCmd
 
-                EventCreationPage subModel ->
+                EventCreationPage _ ->
                     let
                         subCmd =
                             EventCreation.initCmd
@@ -240,8 +240,8 @@ update message ({ page, language, flags, productionState } as model) =
         ( ChangeUrl url, _ ) ->
             ( model, Navigation.newUrl url )
 
-        ( UpdateLanguage language, _ ) ->
-            ( { model | language = language }, Cmd.none )
+        ( UpdateLanguage newLanguage, _ ) ->
+            ( { model | language = newLanguage }, Cmd.none )
 
         ( OnFetchProduct (Ok { eventActivation }), _ ) ->
             ( { model
