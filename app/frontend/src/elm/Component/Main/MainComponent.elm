@@ -480,9 +480,6 @@ update message ({ page, notification, header, sidebar, productionState } as mode
 
         ( IndexMessage subMessage, IndexPage subModel ) ->
             case subMessage of
-                Index.ChangeUrl url ->
-                    ( model, Navigation.newUrl url )
-
                 Index.CloseModal ->
                     ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
 

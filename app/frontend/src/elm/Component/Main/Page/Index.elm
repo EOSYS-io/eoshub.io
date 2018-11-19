@@ -11,6 +11,7 @@ import Data.Json exposing (ProductionState)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOver, onMouseOut)
+import Navigation
 import Translation exposing (I18n(..), Language, toLocale, translate)
 import Time
 
@@ -29,13 +30,13 @@ type alias Model =
 initModel : Model
 initModel =
     { bannerIndex = 1
-    , bannerSecondsLeft = intervalValue
+    , bannerSecondsLeft = bannerRollingInterval
     , isTimerOn = True
     }
 
 
-intervalValue : Int
-intervalValue = 7
+bannerRollingInterval : Int
+bannerRollingInterval = 7
 
 
 bannerMaxCount : Int
@@ -56,9 +57,12 @@ type Message
 update : Message -> Model -> ( Model, Cmd Message )
 update msg model =
     case msg of
+        ChangeUrl url ->
+            ( model, Navigation.newUrl url )
+
         ChangeBanner index ->
             ( { model
-                | bannerSecondsLeft = intervalValue
+                | bannerSecondsLeft = bannerRollingInterval
                 , bannerIndex = index
                 , isTimerOn = False
               }
@@ -80,7 +84,7 @@ update msg model =
             in
             if secondsLeft <= 0 then
                 ( { model
-                    | bannerSecondsLeft = intervalValue
+                    | bannerSecondsLeft = bannerRollingInterval
                     , bannerIndex = newIndex
                   }
                 , Cmd.none 
@@ -95,7 +99,7 @@ update msg model =
                         model.bannerSecondsLeft
                             
                     else
-                        intervalValue
+                        bannerRollingInterval
                         
             in
             ( { model | isTimerOn = on, bannerSecondsLeft = resetInterval }, Cmd.none )
@@ -108,7 +112,7 @@ update msg model =
 
 
 view : Model -> Language -> ProductionState -> Html Message
-view model language productionState =
+view { bannerIndex } language productionState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -163,7 +167,7 @@ view model language productionState =
                 ]
             ]
         , section [ class "promotion"
-            , attribute "data-display" (toString model.bannerIndex)
+            , attribute "data-display" (toString bannerIndex)
             , attribute "data-max" (toString (bannerMaxCount)) 
             ]
             [ h3 []
@@ -254,8 +258,8 @@ viewBannerButton str index =
 
 
 subscriptions : Model -> Sub Message
-subscriptions model =
-    if model.isTimerOn then
+subscriptions { isTimerOn } =
+    if isTimerOn then
         Time.every Time.second Tick
             
     else
