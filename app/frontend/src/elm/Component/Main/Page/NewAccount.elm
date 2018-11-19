@@ -264,7 +264,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
             , div [ class "btn_area align right" ]
                 [ button
                     [ class "ok button"
-                    , disabled (not isValid)
+                    , disabled (accountName == "" || not isValid)
                     , type_ "button"
                     , onClick ToggleModal
                     ]
