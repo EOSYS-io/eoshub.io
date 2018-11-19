@@ -85,7 +85,7 @@ import View.Notification as Notification
 
 
 type Page
-    = IndexPage
+    = IndexPage Index.Model
     | SearchPage Search.Model
     | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
@@ -280,8 +280,8 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                             sidebar.account
                         )
 
-                IndexPage ->
-                    Html.map IndexMessage (Index.view language productionState)
+                IndexPage subModel ->
+                    Html.map IndexMessage (Index.view subModel language productionState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -490,13 +490,17 @@ update message ({ page, notification, header, sidebar, productionState } as mode
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
-        ( IndexMessage subMessage, _ ) ->
+        ( IndexMessage subMessage, IndexPage subModel ) ->
             case subMessage of
-                Index.ChangeUrl url ->
-                    ( model, Navigation.newUrl url )
-
                 Index.CloseModal ->
                     ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
+
+                _ ->
+                    let
+                        ( newPage, subCmd ) =
+                            Index.update subMessage subModel
+                    in
+                    ( { model | page = newPage |> IndexPage }, Cmd.map IndexMessage subCmd )
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
@@ -737,6 +741,9 @@ subscriptions { page } =
         [ Port.receivePushActionResponse UpdatePushActionResponse
         , Sub.map SidebarMessage Sidebar.subscriptions
         , case page of
+            IndexPage subModel ->
+                Sub.map IndexMessage (Index.subscriptions subModel)
+
             RammarketPage _ ->
                 Sub.map RammarketMessage Rammarket.subscriptions
 
@@ -788,7 +795,7 @@ getPage account location =
             ResourcePage Resource.initModel
 
         IndexRoute ->
-            IndexPage
+            IndexPage Index.initModel
 
         RammarketRoute ->
             RammarketPage Rammarket.initModel
