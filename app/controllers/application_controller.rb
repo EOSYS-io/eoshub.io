@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   # PATCH admin/products as JSON
-  skip_before_action :verify_authenticity_token, if: -> { admin_products_update? }
+  skip_before_action :verify_authenticity_token, if: -> { admin_update? }
 
   before_action :set_locale
 
@@ -37,9 +37,9 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def admin_products_update?
+  def admin_update?
     v = controller_path.split(/\//)&.dig(0) == 'admin' 
-    v &&= controller_name == 'products' 
+    v &&= (controller_name == 'products' || controller_name == 'announcements')
     v &&= action_name == 'update' 
     v &&= request.format.json?
     v
