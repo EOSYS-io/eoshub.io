@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import walletStatus from './constant';
+import { walletStatus } from './constant';
 import { scatterConfig } from './config';
 import { getScatter, updateScatter } from './state';
 
