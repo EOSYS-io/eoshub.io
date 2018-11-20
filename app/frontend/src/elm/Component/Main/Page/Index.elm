@@ -9,7 +9,7 @@ module Component.Main.Page.Index exposing
     )
 
 import Data.Json exposing (LocalStorageValue, ProductionState, encodeLocalStorageValue)
-import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
+import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
