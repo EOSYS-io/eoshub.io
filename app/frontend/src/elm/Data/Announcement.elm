@@ -1,4 +1,4 @@
-module Data.Announcement exposing (Announcement, initAnnouncement)
+module Data.Announcement exposing (Announcement, announcementDecoder, initAnnouncement)
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)

@@ -15,7 +15,7 @@ import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language(..))
 import Util.Flags exposing (Flags)
-import Util.HttpRequest exposing (getEosAccountProduct)
+import Util.HttpRequest exposing (getApplicationState)
 
 
 
@@ -87,7 +87,7 @@ type Message
     | OnLocationChange Location
     | ChangeUrl String
     | UpdateLanguage Language
-    | OnFetchProduct (Result Http.Error Product)
+    | OnFetchApplicationState (Result Http.Error ApplicationState)
 
 
 initCmd : Model -> Cmd Message
@@ -114,8 +114,8 @@ initCmd { page, flags, language } =
     in
     Cmd.batch
         [ pageCmd
-        , getEosAccountProduct flags Translation.Korean
-            |> Http.send OnFetchProduct
+        , getApplicationState flags
+            |> Http.send OnFetchApplicationState
         ]
 
 
@@ -244,17 +244,10 @@ update message ({ page, language, flags, applicationState } as model) =
         ( UpdateLanguage newLanguage, _ ) ->
             ( { model | language = newLanguage }, Cmd.none )
 
-        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model
-                | applicationState =
-                    { applicationState
-                        | eventActivation = eventActivation
-                    }
-              }
-            , Cmd.none
-            )
+        ( OnFetchApplicationState (Ok data), _ ) ->
+            ( { model | applicationState = data }, Cmd.none )
 
-        ( OnFetchProduct (Err _), _ ) ->
+        ( OnFetchApplicationState (Err _), _ ) ->
             ( model, Cmd.none )
 
         ( _, _ ) ->

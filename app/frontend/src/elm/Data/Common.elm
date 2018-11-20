@@ -5,15 +5,17 @@ module Data.Common exposing
     , PermissionLevel
     , PermissionLevelWeight
     , WaitWeight
+    , applicationStateDecoder
     , authorityDecoder
     , encodeAuthority
     , initApplicationState
     )
 
-import Data.Announcement exposing (Announcement, initAnnouncement)
+import Data.Announcement exposing (Announcement, announcementDecoder, initAnnouncement)
 import Json.Decode as Decode exposing (Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
+import Json.Decode.Pipeline exposing (decode, required, requiredAt)
 import Json.Encode as Encode
+import Util.Formatter exposing (floatToAsset)
 
 
 type alias ApplicationState =
@@ -93,6 +95,45 @@ type alias Authority =
     }
 
 
+
+-- Decoder
+
+
+applicationStateDecoder : Decoder ApplicationState
+applicationStateDecoder =
+    decode ApplicationState
+        |> requiredAt [ "data", "announcement" ] announcementDecoder
+        |> requiredAt [ "data", "setting" ] settingDecoder
+        |> requiredAt [ "data", "event_activation" ] Decode.bool
+
+
+settingDecoder : Decoder Setting
+settingDecoder =
+    decode Setting
+        |> required "id" Decode.int
+        |> required "eosys_proxy_account" Decode.string
+        |> required "history_api_limit" Decode.int
+        |> required "minimum_required_cpu" minimumRequiredResourceDecoder
+        |> required "minimum_required_net" minimumRequiredResourceDecoder
+        |> required "new_account_cpu" newAccountResourceDecoder
+        |> required "new_account_net" newAccountResourceDecoder
+        |> required "new_account_ram" Decode.int
+
+
+minimumRequiredResourceDecoder : Decoder String
+minimumRequiredResourceDecoder =
+    Decode.map
+        (\value ->
+            floatToAsset 1 "EOS" value
+        )
+        Decode.float
+
+
+newAccountResourceDecoder : Decoder String
+newAccountResourceDecoder =
+    Decode.map (\value -> toString value) Decode.float
+
+
 authorityDecoder : Decoder Authority
 authorityDecoder =
     decode Authority
@@ -122,6 +163,10 @@ authorityDecoder =
                     |> required "weight" Decode.int
                 )
             )
+
+
+
+-- Encoder
 
 
 encodeAuthority : Authority -> Encode.Value

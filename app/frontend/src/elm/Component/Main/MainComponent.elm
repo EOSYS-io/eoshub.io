@@ -75,7 +75,7 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
-import Util.HttpRequest exposing (getEosAccountProduct)
+import Util.HttpRequest exposing (getApplicationState)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -157,7 +157,7 @@ type Message
     | ChangeUrl String
     | UpdateLanguage Language
     | InitLocale String
-    | OnFetchProduct (Result Http.Error Product)
+    | OnFetchApplicationState (Result Http.Error ApplicationState)
 
 
 type Query
@@ -188,8 +188,8 @@ initCmd location flags =
         , Cmd.map SidebarMessage
             (Sidebar.initCmd flags)
         , Port.checkLocale ()
-        , getEosAccountProduct flags Translation.Korean
-            |> Http.send OnFetchProduct
+        , getApplicationState flags
+            |> Http.send OnFetchApplicationState
         ]
 
 
@@ -696,17 +696,10 @@ update message ({ page, notification, header, sidebar, applicationState } as mod
             in
             update (UpdateLanguage language) model flags
 
-        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model
-                | applicationState =
-                    { applicationState
-                        | eventActivation = eventActivation
-                    }
-              }
-            , Cmd.none
-            )
+        ( OnFetchApplicationState (Ok data), _ ) ->
+            ( { model | applicationState = data }, Cmd.none )
 
-        ( OnFetchProduct (Err _), _ ) ->
+        ( OnFetchApplicationState (Err _), _ ) ->
             ( model, Cmd.none )
 
         ( _, _ ) ->

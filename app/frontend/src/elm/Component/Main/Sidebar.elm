@@ -66,7 +66,6 @@ type alias Model =
     , configPanelOpen : Bool
     , account : Account
     , now : Time
-    , eventActivation : Bool
     }
 
 
@@ -82,7 +81,6 @@ initModel =
     , configPanelOpen = False
     , account = defaultAccount
     , now = 0
-    , eventActivation = False
     }
 
 
@@ -102,7 +100,6 @@ type Message
     | AndThen Message Message
     | OnFetchAccount (Result Http.Error Account)
     | OnTime Time.Time
-    | OnFetchProduct (Result Http.Error Product)
 
 
 
@@ -114,8 +111,6 @@ initCmd flags =
     Cmd.batch
         [ Port.checkWalletStatus ()
         , getNow OnTime
-        , getEosAccountProduct flags Translation.Korean
-            |> Http.send OnFetchProduct
         ]
 
 
@@ -405,12 +400,6 @@ update message ({ fold, wallet } as model) =
             ( { model | account = data }, Cmd.none )
 
         OnFetchAccount (Err _) ->
-            ( model, Cmd.none )
-
-        OnFetchProduct (Ok { eventActivation }) ->
-            ( { model | eventActivation = eventActivation }, Cmd.none )
-
-        OnFetchProduct (Err _) ->
             ( model, Cmd.none )
 
         OnTime now ->

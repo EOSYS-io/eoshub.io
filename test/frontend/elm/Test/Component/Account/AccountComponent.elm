@@ -11,7 +11,7 @@ import Navigation exposing (Location)
 import Route
 import Test exposing (..)
 import Translation
-import Util.HttpRequest exposing (getEosAccountProduct)
+import Util.HttpRequest exposing (getApplicationState)
 
 
 location : Location
@@ -73,8 +73,8 @@ tests =
                         expectedCmd =
                             Cmd.batch
                                 [ Cmd.map EventCreationMessage subCmd
-                                , getEosAccountProduct flags Translation.Korean
-                                    |> Http.send OnFetchProduct
+                                , getApplicationState flags
+                                    |> Http.send OnFetchApplicationState
                                 ]
 
                         model =
