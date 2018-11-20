@@ -1,17 +1,13 @@
 ActiveAdmin.register Setting do
   # TODO(boseok): make setting singleton
   menu priority: 8
-  permit_params do
-    params =
-    [:eosys_proxy_account,
-     :history_api_limit,
-     :minimum_required_cpu,
-     :minimum_required_net,
-     :new_account_cpu,
-     :new_account_net,
-     :new_account_ram]
-    params
-  end
+  permit_params :eosys_proxy_account, 
+    :history_api_limit,
+    :minimum_required_cpu,
+    :minimum_required_net,
+    :new_account_cpu,
+    :new_account_net,
+    :new_account_ram
 
   index do
     column :new_account_cpu
