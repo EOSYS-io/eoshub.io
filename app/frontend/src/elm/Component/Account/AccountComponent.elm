@@ -175,7 +175,7 @@ view { language, page, applicationState } =
                     Html.map WaitPaymentMessage (WaitPayment.view subModel language)
 
                 CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel language applicationState.isEvent)
+                    Html.map CreatedMessage (Created.view subModel language applicationState.eventActivation)
 
                 EventCreationPage subModel ->
                     Html.map EventCreationMessage (EventCreation.view subModel language)
@@ -248,10 +248,7 @@ update message ({ page, language, flags, applicationState } as model) =
             ( { model
                 | applicationState =
                     { applicationState
-                        | isEvent = eventActivation
-
-                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        -- , isAnnouncement = not eventActivation
+                        | eventActivation = eventActivation
                     }
               }
             , Cmd.none

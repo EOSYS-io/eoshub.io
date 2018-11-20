@@ -1,32 +1,58 @@
 module Data.Common exposing
-    ( Authority
+    ( ApplicationState
+    , Authority
     , KeyWeight
     , PermissionLevel
     , PermissionLevelWeight
-    , ApplicationState
     , WaitWeight
     , authorityDecoder
     , encodeAuthority
     , initApplicationState
     )
 
+import Data.Announcement exposing (Announcement, initAnnouncement)
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
 
 
 type alias ApplicationState =
-    { isEvent : Bool
-    , isAnnouncement : Bool
-    , isAnnouncementCached : Bool
+    { announcement : Announcement
+    , setting : Setting
+    , eventActivation : Bool
     }
 
 
 initApplicationState : ApplicationState
 initApplicationState =
-    { isEvent = False
-    , isAnnouncement = False
-    , isAnnouncementCached = True
+    { eventActivation = False
+    , announcement = initAnnouncement
+    , setting = initSetting
+    }
+
+
+type alias Setting =
+    { id : Int
+    , eosysProxyAccount : String
+    , historyApiLimit : Int
+    , minimumRequiredCpu : String
+    , minimumRequiredNet : String
+    , newAccountCpu : String
+    , newAccountNet : String
+    , newAccountRam : Int
+    }
+
+
+initSetting : Setting
+initSetting =
+    { id = 0
+    , eosysProxyAccount = "bpgovernance"
+    , historyApiLimit = 100
+    , minimumRequiredCpu = "0.8 EOS"
+    , minimumRequiredNet = "0.2 EOS"
+    , newAccountCpu = "0.1"
+    , newAccountNet = "0.1"
+    , newAccountRam = 3072
     }
 
 

@@ -66,7 +66,7 @@ type alias Model =
     , configPanelOpen : Bool
     , account : Account
     , now : Time
-    , isEvent : Bool
+    , eventActivation : Bool
     }
 
 
@@ -82,7 +82,7 @@ initModel =
     , configPanelOpen = False
     , account = defaultAccount
     , now = 0
-    , isEvent = False
+    , eventActivation = False
     }
 
 
@@ -136,12 +136,12 @@ accountCmd state accountName =
 
 
 view : Model -> Language -> Bool -> Html Message
-view ({ state, fold } as model) language isEvent =
+view ({ state, fold } as model) language eventActivation =
     let
         ( baseClass, htmlContent ) =
             case state of
                 SignIn ->
-                    ( "log off", signInView language isEvent )
+                    ( "log off", signInView language eventActivation )
 
                 PairWallet ->
                     ( "log unsync", pairWalletView language )
@@ -163,10 +163,10 @@ view ({ state, fold } as model) language isEvent =
 
 
 signInView : Language -> Bool -> List (Html Message)
-signInView language isEvent =
+signInView language eventActivation =
     let
         ( createAccountUrl, createAccountText ) =
-            if isEvent then
+            if eventActivation then
                 ( "/account/event_creation?locale=" ++ toLocale language
                 , translate language FreeAccountCreation
                 )
@@ -408,7 +408,7 @@ update message ({ fold, wallet } as model) =
             ( model, Cmd.none )
 
         OnFetchProduct (Ok { eventActivation }) ->
-            ( { model | isEvent = eventActivation }, Cmd.none )
+            ( { model | eventActivation = eventActivation }, Cmd.none )
 
         OnFetchProduct (Err _) ->
             ( model, Cmd.none )

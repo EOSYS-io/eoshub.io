@@ -433,7 +433,7 @@ view { page, header, notification, sidebar, selectedNav, applicationState } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language applicationState.isEvent)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language applicationState.eventActivation)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -700,10 +700,7 @@ update message ({ page, notification, header, sidebar, applicationState } as mod
             ( { model
                 | applicationState =
                     { applicationState
-                        | isEvent = eventActivation
-
-                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        -- , isAnnouncement = not eventActivation
+                        | eventActivation = eventActivation
                     }
               }
             , Cmd.none

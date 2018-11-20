@@ -144,7 +144,7 @@ view { bannerIndex, showAnnouncement } language applicationState =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (if applicationState.isEvent then
+                            ++ (if applicationState.eventActivation then
                                     " event_free"
 
                                 else
@@ -157,7 +157,7 @@ view { bannerIndex, showAnnouncement } language applicationState =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , viewEventClickButton language applicationState.isEvent
+                    , viewEventClickButton language applicationState.eventActivation
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -212,8 +212,8 @@ view { bannerIndex, showAnnouncement } language applicationState =
 
 
 viewEventClickButton : Language -> Bool -> Html Message
-viewEventClickButton language isEvent =
-    if isEvent then
+viewEventClickButton language eventActivation =
+    if eventActivation then
         p []
             [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
                 [ text (translate language MakeYourAccount) ]
@@ -224,11 +224,12 @@ viewEventClickButton language isEvent =
 
 
 viewAnnouncementSection : Language -> ApplicationState -> Bool -> Html Message
-viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } showAnnouncement =
+viewAnnouncementSection language { announcement } showAnnouncement =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
     let
+        -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
-            hasAnnouncement && showAnnouncement
+            announcement.active && showAnnouncement
     in
     section
         [ attribute "aria-live" "true"

@@ -130,7 +130,7 @@ type Message
     | ToggleAgreeEosConstitution
     | NotificationMessage Notification.Message
     | ChangeUrl String
-      -- TODO(boseok): Use isEvent instead of ResultEosAccountProduct
+      -- TODO(boseok): Use eventActivation instead of ResultEosAccountProduct
     | ResultEosAccountProduct (Result Http.Error Product)
 
 
