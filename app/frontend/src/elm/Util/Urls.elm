@@ -75,6 +75,11 @@ getRecentVoteStatUrl flags =
     eoshubHost flags ++ "/vote_stats/recent_stat"
 
 
+getApplicationStatesUrl : Flags -> String
+getApplicationStatesUrl flags =
+    eoshubHost flags ++ "/application_states"
+
+
 mainnetRpcUrl : String
 mainnetRpcUrl =
     -- TODO(boseok): Consider to find fastest api node that we can use.

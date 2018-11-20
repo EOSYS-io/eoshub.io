@@ -8,7 +8,8 @@ module Component.Main.Page.Index exposing
     , view
     )
 
-import Data.Json exposing (LocalStorageValue, ProductionState, encodeLocalStorageValue)
+import Data.Common exposing (ApplicationState)
+import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
@@ -134,8 +135,8 @@ update msg model =
 -- VIEW --
 
 
-view : Model -> Language -> ProductionState -> Html Message
-view { bannerIndex, showAnnouncement } language productionState =
+view : Model -> Language -> ApplicationState -> Html Message
+view { bannerIndex, showAnnouncement } language applicationState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -143,7 +144,7 @@ view { bannerIndex, showAnnouncement } language productionState =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (if productionState.isEvent then
+                            ++ (if applicationState.isEvent then
                                     " event_free"
 
                                 else
@@ -156,7 +157,7 @@ view { bannerIndex, showAnnouncement } language productionState =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , viewEventClickButton language productionState.isEvent
+                    , viewEventClickButton language applicationState.isEvent
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -206,7 +207,7 @@ view { bannerIndex, showAnnouncement } language productionState =
                 , viewBannerButton "Nova wallet" 3
                 ]
             ]
-        , viewAnnouncementSection language productionState showAnnouncement
+        , viewAnnouncementSection language applicationState showAnnouncement
         ]
 
 
@@ -222,8 +223,8 @@ viewEventClickButton language isEvent =
         span [] []
 
 
-viewAnnouncementSection : Language -> ProductionState -> Bool -> Html Message
-viewAnnouncementSection language { hasAnnouncement } showAnnouncement =
+viewAnnouncementSection : Language -> ApplicationState -> Bool -> Html Message
+viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } showAnnouncement =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
     let
         isAnnouncementModalOpen =

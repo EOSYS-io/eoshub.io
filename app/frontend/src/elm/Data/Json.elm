@@ -6,14 +6,12 @@ module Data.Json exposing
     , LocalStorageValue
     , Producer
     , Product
-    , ProductionState
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
     , encodeLocalStorageValue
     , initProducer
     , initProduct
-    , initProductionState
     , initVoteStat
     , producerDecoder
     , producersDecoder
@@ -153,19 +151,6 @@ initProduct =
     , cpu = 0.0
     , net = 0.0
     , ram = 0
-    }
-
-
-type alias ProductionState =
-    { isEvent : Bool
-    , hasAnnouncement : Bool
-    }
-
-
-initProductionState : ProductionState
-initProductionState =
-    { isEvent = False
-    , hasAnnouncement = False
     }
 
 

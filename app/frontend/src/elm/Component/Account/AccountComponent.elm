@@ -5,7 +5,8 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
-import Data.Json exposing (Product, ProductionState, initProductionState)
+import Data.Common exposing (ApplicationState, initApplicationState)
+import Data.Json exposing (Product)
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
@@ -33,7 +34,7 @@ type alias Model =
     { page : Page
     , language : Language
     , flags : Flags
-    , productionState : ProductionState
+    , applicationState : ApplicationState
     }
 
 
@@ -70,7 +71,7 @@ initModel location flags =
     { page = page
     , language = language
     , flags = flags
-    , productionState = initProductionState
+    , applicationState = initApplicationState
     }
 
 
@@ -163,7 +164,7 @@ headerView language =
 
 
 view : Model -> Html Message
-view { language, page, productionState } =
+view { language, page, applicationState } =
     let
         newContentHtml =
             case page of
@@ -174,7 +175,7 @@ view { language, page, productionState } =
                     Html.map WaitPaymentMessage (WaitPayment.view subModel language)
 
                 CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel language productionState.isEvent)
+                    Html.map CreatedMessage (Created.view subModel language applicationState.isEvent)
 
                 EventCreationPage subModel ->
                     Html.map EventCreationMessage (EventCreation.view subModel language)
@@ -194,7 +195,7 @@ view { language, page, productionState } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ page, language, flags, productionState } as model) =
+update message ({ page, language, flags, applicationState } as model) =
     case ( message, page ) of
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
@@ -245,8 +246,8 @@ update message ({ page, language, flags, productionState } as model) =
 
         ( OnFetchProduct (Ok { eventActivation }), _ ) ->
             ( { model
-                | productionState =
-                    { productionState
+                | applicationState =
+                    { applicationState
                         | isEvent = eventActivation
 
                         -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server

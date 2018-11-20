@@ -4,7 +4,7 @@ import Component.Account.AccountComponent exposing (..)
 import Component.Account.Page.Create as Create
 import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
-import Data.Json exposing (ProductionState, initProductionState)
+import Data.Common exposing (ApplicationState, initApplicationState)
 import Expect
 import Http
 import Navigation exposing (Location)
@@ -81,7 +81,7 @@ tests =
                             { page = expectedPage
                             , language = Translation.Korean
                             , flags = { rails_env = "test" }
-                            , productionState = initProductionState
+                            , applicationState = initApplicationState
                             }
                     in
                     Expect.equal (toString expectedCmd) (toString (initCmd model))

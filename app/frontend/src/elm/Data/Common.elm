@@ -3,14 +3,31 @@ module Data.Common exposing
     , KeyWeight
     , PermissionLevel
     , PermissionLevelWeight
+    , ApplicationState
     , WaitWeight
     , authorityDecoder
     , encodeAuthority
+    , initApplicationState
     )
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 import Json.Encode as Encode
+
+
+type alias ApplicationState =
+    { isEvent : Bool
+    , isAnnouncement : Bool
+    , isAnnouncementCached : Bool
+    }
+
+
+initApplicationState : ApplicationState
+initApplicationState =
+    { isEvent = False
+    , isAnnouncement = False
+    , isAnnouncementCached = True
+    }
 
 
 

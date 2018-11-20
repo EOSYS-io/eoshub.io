@@ -32,7 +32,8 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Data.Json exposing (Product, ProductionState, initProductionState)
+import Data.Common exposing (ApplicationState, initApplicationState)
+import Data.Json exposing (Product)
 import Html
     exposing
         ( Html
@@ -112,7 +113,7 @@ type alias Model =
     , header : Header
     , sidebar : Sidebar.Model
     , selectedNav : SelectedNav
-    , productionState : ProductionState
+    , applicationState : ApplicationState
     }
 
 
@@ -129,7 +130,7 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
-    , productionState = initProductionState
+    , applicationState = initApplicationState
     }
 
 
@@ -246,7 +247,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, selectedNav, productionState } =
+view { page, header, notification, sidebar, selectedNav, applicationState } =
     let
         { language } =
             header
@@ -284,7 +285,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                         )
 
                 IndexPage subModel ->
-                    Html.map IndexMessage (Index.view subModel language productionState)
+                    Html.map IndexMessage (Index.view subModel language applicationState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -432,7 +433,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language productionState.isEvent)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language applicationState.isEvent)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -449,7 +450,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar, productionState } as model) flags =
+update message ({ page, notification, header, sidebar, applicationState } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -697,8 +698,8 @@ update message ({ page, notification, header, sidebar, productionState } as mode
 
         ( OnFetchProduct (Ok { eventActivation }), _ ) ->
             ( { model
-                | productionState =
-                    { productionState
+                | applicationState =
+                    { applicationState
                         | isEvent = eventActivation
 
                         -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
