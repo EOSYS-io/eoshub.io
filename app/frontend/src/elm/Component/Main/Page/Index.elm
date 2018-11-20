@@ -8,6 +8,7 @@ module Component.Main.Page.Index exposing
     , view
     )
 
+import Data.Announcement exposing (Announcement)
 import Data.Common exposing (ApplicationState)
 import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
@@ -16,7 +17,7 @@ import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
 import Port
 import Time
-import Translation exposing (I18n(..), Language, toLocale, translate)
+import Translation exposing (I18n(..), Language(..), toLocale, translate)
 
 
 
@@ -230,6 +231,9 @@ viewAnnouncementSection language { announcement } showAnnouncement =
         -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
             announcement.active && showAnnouncement
+
+        ( announcementTitle, announcementBody ) =
+            translateAnnouncement language announcement
     in
     section
         [ attribute "aria-live" "true"
@@ -247,9 +251,9 @@ viewAnnouncementSection language { announcement } showAnnouncement =
         ]
         [ div [ class "wrapper" ]
             [ h2 []
-                [ text (translate language AnnouncementModalTitle) ]
+                [ text announcementTitle ]
             , p []
-                [ text (translate language AnnouncementModalParagraph) ]
+                [ text announcementBody ]
             , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
                 [ text "닫기" ]
             ]
@@ -277,6 +281,19 @@ viewBannerButton str index =
         , onMouseOut (ToggleBannerTimer True)
         ]
         [ text str ]
+
+
+translateAnnouncement : Language -> Announcement -> ( String, String )
+translateAnnouncement language announcement =
+    case language of
+        Korean ->
+            ( announcement.titleKo, announcement.bodyKo )
+
+        English ->
+            ( announcement.titleEn, announcement.bodyEn )
+
+        Chinese ->
+            ( announcement.titleCn, announcement.bodyCn )
 
 
 
