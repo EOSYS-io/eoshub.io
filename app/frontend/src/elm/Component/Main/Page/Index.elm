@@ -126,7 +126,7 @@ update msg model =
 
         CloseModal ->
             ( { model | showAnnouncement = False }
-            , Port.pushAction (encodeLocalStorageValue { showAnnouncement = False })
+            , Port.setValueToLocalStorage (encodeLocalStorageValue { showAnnouncement = False })
             )
 
 
