@@ -234,6 +234,9 @@ pageCmd location flags =
         VoteRoute ->
             Cmd.map VoteMessage (Vote.initCmd flags)
 
+        IndexRoute ->
+            Cmd.map IndexMessage Index.initCmd
+
         _ ->
             Cmd.none
 
@@ -491,16 +494,11 @@ update message ({ page, notification, header, sidebar, productionState } as mode
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
         ( IndexMessage subMessage, IndexPage subModel ) ->
-            case subMessage of
-                Index.CloseModal ->
-                    ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
-
-                _ ->
-                    let
-                        ( newPage, subCmd ) =
-                            Index.update subMessage subModel
-                    in
-                    ( { model | page = newPage |> IndexPage }, Cmd.map IndexMessage subCmd )
+            let
+                ( newPage, subCmd ) =
+                    Index.update subMessage subModel
+            in
+            ( { model | page = newPage |> IndexPage }, Cmd.map IndexMessage subCmd )
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let

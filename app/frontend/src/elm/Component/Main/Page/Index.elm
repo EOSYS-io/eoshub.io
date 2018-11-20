@@ -1,17 +1,19 @@
 module Component.Main.Page.Index exposing
     ( Message(..)
     , Model
+    , initCmd
     , initModel
     , subscriptions
     , update
     , view
     )
 
-import Data.Json exposing (ProductionState)
-import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
+import Data.Json exposing (LocalStorageValue, ProductionState, encodeLocalStorageValue)
+import Html exposing (Html, a, br, button, div, h2, h3, main_, node, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
+import Port
 import Time
 import Translation exposing (I18n(..), Language, toLocale, translate)
 
@@ -24,6 +26,7 @@ type alias Model =
     { bannerIndex : Int
     , bannerSecondsLeft : Int
     , isTimerOn : Bool
+    , showAnnouncement : Bool
     }
 
 
@@ -32,6 +35,7 @@ initModel =
     { bannerIndex = 1
     , bannerSecondsLeft = bannerRollingInterval
     , isTimerOn = True
+    , showAnnouncement = False
     }
 
 
@@ -55,6 +59,12 @@ type Message
     | ChangeBanner Int
     | Tick Time.Time
     | ToggleBannerTimer Bool
+    | UpdateShowAnnouncement (Maybe LocalStorageValue)
+
+
+initCmd : Cmd Message
+initCmd =
+    Port.checkValueFromLocalStorage ()
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -106,8 +116,18 @@ update msg model =
             in
             ( { model | isTimerOn = on, bannerSecondsLeft = resetInterval }, Cmd.none )
 
-        _ ->
-            ( model, Cmd.none )
+        UpdateShowAnnouncement resp ->
+            case resp of
+                Nothing ->
+                    ( { model | showAnnouncement = True }, Cmd.none )
+
+                Just { showAnnouncement } ->
+                    ( { model | showAnnouncement = showAnnouncement }, Cmd.none )
+
+        CloseModal ->
+            ( { model | showAnnouncement = False }
+            , Port.pushAction (encodeLocalStorageValue { showAnnouncement = False })
+            )
 
 
 
@@ -115,7 +135,7 @@ update msg model =
 
 
 view : Model -> Language -> ProductionState -> Html Message
-view { bannerIndex } language productionState =
+view { bannerIndex, showAnnouncement } language productionState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -186,7 +206,7 @@ view { bannerIndex } language productionState =
                 , viewBannerButton "Nova wallet" 3
                 ]
             ]
-        , viewAnnouncementSection language productionState
+        , viewAnnouncementSection language productionState showAnnouncement
         ]
 
 
@@ -202,12 +222,12 @@ viewEventClickButton language isEvent =
         span [] []
 
 
-viewAnnouncementSection : Language -> ProductionState -> Html Message
-viewAnnouncementSection language { isAnnouncement, isAnnouncementCached } =
+viewAnnouncementSection : Language -> ProductionState -> Bool -> Html Message
+viewAnnouncementSection language { hasAnnouncement } showAnnouncement =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
     let
         isAnnouncementModalOpen =
-            isAnnouncement && isAnnouncementCached
+            hasAnnouncement && showAnnouncement
     in
     section
         [ attribute "aria-live" "true"
@@ -261,10 +281,18 @@ viewBannerButton str index =
 -- SUBSCRIPTIONS
 
 
-subscriptions : Model -> Sub Message
-subscriptions { isTimerOn } =
+tick : Bool -> Sub Message
+tick isTimerOn =
     if isTimerOn then
         Time.every Time.second Tick
 
     else
         Sub.none
+
+
+subscriptions : Model -> Sub Message
+subscriptions { isTimerOn } =
+    Sub.batch
+        [ tick isTimerOn
+        , Port.receiveValueFromLocalStorage UpdateShowAnnouncement
+        ]

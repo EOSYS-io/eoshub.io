@@ -2,6 +2,7 @@ port module Port exposing
     ( KeyPair
     , authenticateAccount
     , checkLocale
+    , checkValueFromLocalStorage
     , checkWalletStatus
     , copy
     , generateKeys
@@ -12,9 +13,13 @@ port module Port exposing
     , receiveKeys
     , receiveLocale
     , receivePushActionResponse
+    , receiveValueFromLocalStorage
     , receiveWalletStatus
+    , setValueToLocalStorage
     )
 
+import Data.Json exposing (LocalStorageValue)
+import Json.Decode as JD
 import Json.Encode as JE
 import Util.WalletDecoder exposing (PushActionResponse, WalletResponse)
 
@@ -87,3 +92,20 @@ port checkLocale : () -> Cmd message
 
 
 port receiveLocale : (String -> message) -> Sub message
+
+
+
+-- Input parameter: A key of local storage.
+
+
+port checkValueFromLocalStorage : () -> Cmd message
+
+
+port receiveValueFromLocalStorage : (Maybe LocalStorageValue -> message) -> Sub message
+
+
+
+-- Input parameter: A key-value(String-JSON) pair.
+
+
+port setValueToLocalStorage : JE.Value -> Cmd message
