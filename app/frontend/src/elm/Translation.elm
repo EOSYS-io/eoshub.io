@@ -291,8 +291,6 @@ type I18n
     | MakeYourAccount
     | FreeAccountCreation
     | ConfirmEmailDetail
-    | AnnouncementModalTitle
-    | AnnouncementModalParagraph
     | ChangeKey
     | ChangeKeyDetail
     | Caution
@@ -1811,18 +1809,6 @@ getMessages i18n =
             { korean = "만약 3분이 지나도 이메일이 도착하지 않을 경우, '코드 전송' 버튼을 다시 한 번 눌러주시기 바랍니다."
             , english = "If the email doesn't arrive after 3 minutes, hit 'Send' again."
             , chinese = "如果过了3分钟没有收到邮件的话请再次点击“编码传送”"
-            }
-
-        AnnouncementModalTitle ->
-            { korean = "EOS 무료 계정 생성 이벤트 종료"
-            , english = "EOS Free Account Creation Event End"
-            , chinese = "EOS Free Account Creation Event End"
-            }
-
-        AnnouncementModalParagraph ->
-            { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트로 준비한 500 EOS가 모두 소진되어 이벤트를 종료합니다. 이오스 커뮤니티의 많은 관심과 참석 감사드리며, 다음에는 더 재미있는 이벤트로 찾아뵐 수 있도록 하겠습니다.\n\n감사합니다.\nEOSYS 드림"
-            , english = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
-            , chinese = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
             }
 
         ChangeKey ->
