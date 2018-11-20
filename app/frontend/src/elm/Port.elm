@@ -94,10 +94,6 @@ port checkLocale : () -> Cmd message
 port receiveLocale : (String -> message) -> Sub message
 
 
-
--- Input parameter: A key of local storage.
-
-
 port checkValueFromLocalStorage : () -> Cmd message
 
 
@@ -105,7 +101,7 @@ port receiveValueFromLocalStorage : (Maybe LocalStorageValue -> message) -> Sub 
 
 
 
--- Input parameter: A key-value(String-JSON) pair.
+-- Input parameter: A Json value to store.
 
 
 port setValueToLocalStorage : JE.Value -> Cmd message
