@@ -297,12 +297,12 @@ type I18n
     | ChangeKeyDetail
     | Caution
     | CautionDetail
-    | TypeOwnerKey
-    | TypeNewOwnerKey
-    | TypeOwnerKeyDesc
-    | TypeActiveKey
-    | TypeNewActiveKey
-    | TypeActiveKeyDesc
+    | EnterOwnerKey
+    | EnterNewOwnerKey
+    | EnterOwnerKeyDesc
+    | EnterActiveKey
+    | EnterNewActiveKey
+    | EnterActiveKeyDesc
     | ValidKey
     | InvalidKey
     | ChangeKeySucceeded String
@@ -1849,37 +1849,37 @@ getMessages i18n =
             , chinese = "请储存与以下公匙绑定的密匙。\n如果没有密匙将失去账号权限。\nNOTE：需要变更owner key时以@owner权限登入。"
             }
 
-        TypeOwnerKey ->
+        EnterOwnerKey ->
             { korean = "오너 키를 입력하세요"
-            , english = "Put in owner key"
+            , english = "Enter owner key"
             , chinese = "请输入owner key"
             }
 
-        TypeNewOwnerKey ->
+        EnterNewOwnerKey ->
             { korean = "새로운 오너 키를 입력하세요"
-            , english = "Type in new owner key"
+            , english = "Enter new owner key"
             , chinese = "请输入owner key"
             }
 
-        TypeOwnerKeyDesc ->
+        EnterOwnerKeyDesc ->
             { korean = "오너 키는 계정의 마스터 키입니다. 오너 키와 액티브 키를 변경할 때 필요합니다"
             , english = "An owner key is a master key for an account. It can be used to change the owner key or active key."
             , chinese = "owner key是账号的万能钥匙。变更owner key或active key时都需要它。"
             }
 
-        TypeActiveKey ->
+        EnterActiveKey ->
             { korean = "액티브 키를 입력하세요"
-            , english = "Put in active key"
+            , english = "Enter active key"
             , chinese = "请输入active key"
             }
 
-        TypeNewActiveKey ->
+        EnterNewActiveKey ->
             { korean = "새로운 액티브 키를 입력하세요"
-            , english = "Type in new active key"
+            , english = "Enter new active key"
             , chinese = "请输入active key"
             }
 
-        TypeActiveKeyDesc ->
+        EnterActiveKeyDesc ->
             { korean = "액티브 키는 DApp을 사용하거나, 토큰 전송 시 필요한 활동 권한을 가진 키입니다"
             , english = "An active key gives permission to activities such as using DApps or transferring tokens."
             , chinese = "使用DApp或传送代币时需要Active key"

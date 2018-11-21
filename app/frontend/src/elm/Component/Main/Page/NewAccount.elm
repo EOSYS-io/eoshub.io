@@ -201,10 +201,10 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     case pubKeyValidation of
                         EmptyPublicKey ->
                             ( if isActive then
-                                TypeActiveKeyDesc
+                                EnterActiveKeyDesc
 
                               else
-                                TypeOwnerKeyDesc
+                                EnterOwnerKeyDesc
                             , ""
                             )
 
@@ -237,7 +237,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                         ]
                     , li []
                         [ input
-                            [ placeholder (translate language TypeActiveKey)
+                            [ placeholder (translate language EnterActiveKey)
                             , type_ "text"
                             , Html.Attributes.value activeKey
                             , onInput <| InputActiveKey
@@ -249,7 +249,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                         ]
                     , li []
                         [ input
-                            [ placeholder (translate language TypeOwnerKey)
+                            [ placeholder (translate language EnterOwnerKey)
                             , type_ "text"
                             , Html.Attributes.value ownerKey
                             , onInput <| InputOwnerKey
