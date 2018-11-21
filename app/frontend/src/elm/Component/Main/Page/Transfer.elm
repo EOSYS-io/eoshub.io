@@ -127,6 +127,7 @@ type Message
     | SearchToken String
     | OnFetchTableRows (Result Http.Error (List Row))
     | UpdateToken
+    | NoOp
 
 
 
@@ -334,7 +335,7 @@ tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eo
         [ div [ class "wrapper" ]
             [ h2 []
                 [ text (translate language TokenList) ]
-            , form [ onSubmit (SearchToken tokenSearchInput) ]
+            , form [ onSubmit NoOp ]
                 [ input
                     [ class "search_token"
                     , placeholder (translate language TokenName)
