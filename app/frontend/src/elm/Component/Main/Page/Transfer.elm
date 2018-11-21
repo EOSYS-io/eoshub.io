@@ -40,7 +40,7 @@ import Html
         , ul
         )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
@@ -334,7 +334,7 @@ tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eo
         [ div [ class "wrapper" ]
             [ h2 []
                 [ text (translate language TokenList) ]
-            , form []
+            , form [ onSubmit (SearchToken tokenSearchInput) ]
                 [ input
                     [ class "search_token"
                     , placeholder (translate language TokenName)
