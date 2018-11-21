@@ -424,7 +424,7 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
-        _ ->
+        NoOp ->
             ( model, Cmd.none )
 
 

@@ -287,7 +287,7 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
                 ]
             )
 
-        _ ->
+        NoOp ->
             ( model, Cmd.none )
 
 

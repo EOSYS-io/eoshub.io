@@ -287,7 +287,7 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
                     , Cmd.none
                     )
 
-                _ ->
+                NoOpMsg ->
                     ( model, Cmd.none )
 
 
