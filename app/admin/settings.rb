@@ -8,6 +8,7 @@ ActiveAdmin.register Setting do
     :new_account_cpu,
     :new_account_net,
     :new_account_ram
+  actions :index, :show, :update, :edit
 
   index do
     column :new_account_cpu
