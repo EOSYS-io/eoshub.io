@@ -26,10 +26,10 @@ one:
   eosys_proxy_account: MyString
 
 two:
-  new_account_cpu: 1.5
-  new_account_net: 1.5
-  new_account_ram: 1
-  minimum_required_cpu: 1.5
-  minimum_required_net: 1.5
-  history_api_limit: 1
-  eosys_proxy_account: MyString
+  new_account_cpu: 0.1
+  new_account_net: 0.1
+  new_account_ram: 3072
+  minimum_required_cpu: 0.8
+  minimum_required_net: 0.2
+  history_api_limit: 100
+  eosys_proxy_account: bpgovernance

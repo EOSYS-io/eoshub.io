@@ -32,14 +32,14 @@ one:
   updated_at: 2018-11-15 13:17:23
 
 two:
-  title_ko: MyString
-  title_en: MyString
-  title_cn: MyString
-  body_ko: MyText
-  body_en: MyText
-  body_cn: MyText
-  active: false
-  published_at: 2018-11-15 13:17:23
-  ended_at: 2018-11-15 13:17:23
+  title_ko: TitleKo
+  title_en: TitleEn
+  title_cn: TitleCn
+  body_ko: BodyKo
+  body_en: BodyEn
+  body_cn: BodyCn
+  active: true
+  published_at: 2018-11-20 13:17:23
+  ended_at: 2018-12-31 13:17:23
   created_at: 2018-11-15 13:17:23
   updated_at: 2018-11-15 13:17:23
