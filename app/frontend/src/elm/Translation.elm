@@ -279,7 +279,7 @@ type I18n
     | EosConstitutionLink
     | OtherTokens
     | TokenList
-    | TokenName
+    | SearchTokenName
     | LackCpu
     | GotoFillCpu
     | EoshubEosdaq
@@ -1741,10 +1741,10 @@ getMessages i18n =
             , chinese = "代币目录"
             }
 
-        TokenName ->
-            { korean = "토큰 이름"
-            , english = "Token name"
-            , chinese = "代币名称"
+        SearchTokenName ->
+            { korean = "토큰 이름 검색"
+            , english = "Search token name"
+            , chinese = "查询代币名称"
             }
 
         LackCpu ->

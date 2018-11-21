@@ -338,13 +338,11 @@ tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eo
             , form [ onSubmit NoOp ]
                 [ input
                     [ class "search_token"
-                    , placeholder (translate language TokenName)
+                    , placeholder (translate language SearchTokenName)
                     , type_ "text"
                     , onInput <| SearchToken
                     ]
                     []
-                , button [ type_ "button" ]
-                    [ text (translate language Search) ]
                 ]
             , div [ class "result list" ]
                 (List.map (generateTokenButton eosLiquidAmount)
