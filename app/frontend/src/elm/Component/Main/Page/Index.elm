@@ -9,7 +9,7 @@ module Component.Main.Page.Index exposing
     )
 
 import Data.Announcement exposing (Announcement)
-import Data.Common exposing (ApplicationState)
+import Data.Common exposing (AppState)
 import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
@@ -136,8 +136,8 @@ update msg model =
 -- VIEW --
 
 
-view : Model -> Language -> ApplicationState -> Html Message
-view { bannerIndex, showAnnouncement } language applicationState =
+view : Model -> Language -> AppState -> Html Message
+view { bannerIndex, showAnnouncement } language appState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -145,7 +145,7 @@ view { bannerIndex, showAnnouncement } language applicationState =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (if applicationState.eventActivation then
+                            ++ (if appState.eventActivation then
                                     " event_free"
 
                                 else
@@ -158,7 +158,7 @@ view { bannerIndex, showAnnouncement } language applicationState =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , viewEventClickButton language applicationState.eventActivation
+                    , viewEventClickButton language appState.eventActivation
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -208,7 +208,7 @@ view { bannerIndex, showAnnouncement } language applicationState =
                 , viewBannerButton "Nova wallet" 3
                 ]
             ]
-        , viewAnnouncementSection language applicationState showAnnouncement
+        , viewAnnouncementSection language appState showAnnouncement
         ]
 
 
@@ -224,7 +224,7 @@ viewEventClickButton language eventActivation =
         span [] []
 
 
-viewAnnouncementSection : Language -> ApplicationState -> Bool -> Html Message
+viewAnnouncementSection : Language -> AppState -> Bool -> Html Message
 viewAnnouncementSection language { announcement } showAnnouncement =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
     let

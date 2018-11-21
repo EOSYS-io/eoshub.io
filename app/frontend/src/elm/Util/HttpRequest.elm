@@ -1,7 +1,7 @@
 module Util.HttpRequest exposing
     ( getAccount
     , getActions
-    , getApplicationState
+    , getAppState
     , getEosAccountProduct
     , getFullPath
     , getTableRows
@@ -10,7 +10,7 @@ module Util.HttpRequest exposing
 
 import Data.Account exposing (Account, accountDecoder)
 import Data.Action exposing (Action, actionsDecoder)
-import Data.Common exposing (ApplicationState, applicationStateDecoder)
+import Data.Common exposing (AppState, appStateDecoder)
 import Data.Json exposing (Product, productDecoder)
 import Data.Table exposing (Row, rowsDecoder)
 import Http
@@ -21,7 +21,7 @@ import Util.Flags exposing (Flags)
 import Util.Urls
     exposing
         ( eosAccountProductUrl
-        , getApplicationStateUrl
+        , getAppStateUrl
         , mainnetHistoryUrl
         , mainnetRpcUrl
         )
@@ -99,10 +99,10 @@ getEosAccountProduct flags language =
     Http.get url productDecoder
 
 
-getApplicationState : Flags -> Http.Request ApplicationState
-getApplicationState flags =
+getAppState : Flags -> Http.Request AppState
+getAppState flags =
     let
         url =
-            getApplicationStateUrl flags
+            getAppStateUrl flags
     in
-    Http.get url applicationStateDecoder
+    Http.get url appStateDecoder

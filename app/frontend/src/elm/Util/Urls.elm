@@ -5,7 +5,7 @@ module Util.Urls exposing
     , eosAccountProductUrl
     , eosConstitutionUrl
     , getAccountUrl
-    , getApplicationStateUrl
+    , getAppStateUrl
     , getProducersUrl
     , getPubKeyUrl
     , getRecentVoteStatUrl
@@ -76,9 +76,9 @@ getRecentVoteStatUrl flags =
     eoshubHost flags ++ "/vote_stats/recent_stat"
 
 
-getApplicationStateUrl : Flags -> String
-getApplicationStateUrl flags =
-    eoshubHost flags ++ "/application_state"
+getAppStateUrl : Flags -> String
+getAppStateUrl flags =
+    eoshubHost flags ++ "/app_state"
 
 
 mainnetRpcUrl : String

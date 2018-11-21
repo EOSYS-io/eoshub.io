@@ -1,14 +1,14 @@
 module Data.Common exposing
-    ( ApplicationState
+    ( AppState
     , Authority
     , KeyWeight
     , PermissionLevel
     , PermissionLevelWeight
     , WaitWeight
-    , applicationStateDecoder
+    , appStateDecoder
     , authorityDecoder
     , encodeAuthority
-    , initApplicationState
+    , initAppState
     )
 
 import Data.Announcement exposing (Announcement, announcementDecoder, initAnnouncement)
@@ -18,15 +18,15 @@ import Json.Encode as Encode
 import Util.Formatter exposing (floatToAsset)
 
 
-type alias ApplicationState =
+type alias AppState =
     { announcement : Announcement
     , setting : Setting
     , eventActivation : Bool
     }
 
 
-initApplicationState : ApplicationState
-initApplicationState =
+initAppState : AppState
+initAppState =
     { eventActivation = False
     , announcement = initAnnouncement
     , setting = initSetting
@@ -34,8 +34,7 @@ initApplicationState =
 
 
 type alias Setting =
-    { id : Int
-    , eosysProxyAccount : String
+    { eosysProxyAccount : String
     , historyApiLimit : Int
     , minimumRequiredCpu : String
     , minimumRequiredNet : String
@@ -47,8 +46,7 @@ type alias Setting =
 
 initSetting : Setting
 initSetting =
-    { id = 0
-    , eosysProxyAccount = "bpgovernance"
+    { eosysProxyAccount = "bpgovernance"
     , historyApiLimit = 100
     , minimumRequiredCpu = "0.8 EOS"
     , minimumRequiredNet = "0.2 EOS"
@@ -99,9 +97,9 @@ type alias Authority =
 -- Decoder
 
 
-applicationStateDecoder : Decoder ApplicationState
-applicationStateDecoder =
-    decode ApplicationState
+appStateDecoder : Decoder AppState
+appStateDecoder =
+    decode AppState
         |> requiredAt [ "data", "announcement" ] announcementDecoder
         |> requiredAt [ "data", "setting" ] settingDecoder
         |> requiredAt [ "data", "event_activation" ] Decode.bool
@@ -110,7 +108,6 @@ applicationStateDecoder =
 settingDecoder : Decoder Setting
 settingDecoder =
     decode Setting
-        |> required "id" Decode.int
         |> required "eosys_proxy_account" Decode.string
         |> required "history_api_limit" Decode.int
         |> required "minimum_required_cpu" minimumRequiredResourceDecoder

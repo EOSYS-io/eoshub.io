@@ -32,7 +32,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Data.Common exposing (ApplicationState, initApplicationState)
+import Data.Common exposing (AppState, initAppState)
 import Data.Json exposing (Product)
 import Html
     exposing
@@ -75,7 +75,7 @@ import Translation exposing (I18n(..), Language(..), translate)
 import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
-import Util.HttpRequest exposing (getApplicationState)
+import Util.HttpRequest exposing (getAppState)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -113,7 +113,7 @@ type alias Model =
     , header : Header
     , sidebar : Sidebar.Model
     , selectedNav : SelectedNav
-    , applicationState : ApplicationState
+    , appState : AppState
     }
 
 
@@ -130,7 +130,7 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
-    , applicationState = initApplicationState
+    , appState = initAppState
     }
 
 
@@ -157,7 +157,7 @@ type Message
     | ChangeUrl String
     | UpdateLanguage Language
     | InitLocale String
-    | OnFetchApplicationState (Result Http.Error ApplicationState)
+    | OnFetchAppState (Result Http.Error AppState)
 
 
 type Query
@@ -188,14 +188,18 @@ initCmd location flags =
         , Cmd.map SidebarMessage
             (Sidebar.initCmd flags)
         , Port.checkLocale ()
-        , getApplicationState flags
-            |> Http.send OnFetchApplicationState
+        , getAppState flags
+            |> Http.send OnFetchAppState
         ]
 
 
 updateCmd : Location -> Flags -> Cmd Message
 updateCmd location flags =
-    pageCmd location flags
+    Cmd.batch
+        [ pageCmd location flags
+        , getAppState flags
+            |> Http.send OnFetchAppState
+        ]
 
 
 pageCmd : Location -> Flags -> Cmd Message
@@ -247,7 +251,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, selectedNav, applicationState } =
+view { page, header, notification, sidebar, selectedNav, appState } =
     let
         { language } =
             header
@@ -285,7 +289,7 @@ view { page, header, notification, sidebar, selectedNav, applicationState } =
                         )
 
                 IndexPage subModel ->
-                    Html.map IndexMessage (Index.view subModel language applicationState)
+                    Html.map IndexMessage (Index.view subModel language appState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -433,7 +437,7 @@ view { page, header, notification, sidebar, selectedNav, applicationState } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language applicationState.eventActivation)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language appState.eventActivation)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -450,7 +454,7 @@ view { page, header, notification, sidebar, selectedNav, applicationState } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar, applicationState } as model) flags =
+update message ({ page, notification, header, sidebar, appState } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
@@ -696,10 +700,10 @@ update message ({ page, notification, header, sidebar, applicationState } as mod
             in
             update (UpdateLanguage language) model flags
 
-        ( OnFetchApplicationState (Ok data), _ ) ->
-            ( { model | applicationState = data }, Cmd.none )
+        ( OnFetchAppState (Ok data), _ ) ->
+            ( { model | appState = data }, Cmd.none )
 
-        ( OnFetchApplicationState (Err _), _ ) ->
+        ( OnFetchAppState (Err _), _ ) ->
             ( model, Cmd.none )
 
         ( _, _ ) ->

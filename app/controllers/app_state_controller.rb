@@ -1,4 +1,4 @@
-class ApplicationStateController < ApplicationController
+class AppStateController < ApplicationController
   include EosAccount
 
   def index

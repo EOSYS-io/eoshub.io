@@ -1,6 +1,7 @@
 module Data.Announcement exposing (Announcement, announcementDecoder, initAnnouncement)
 
 import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Extra as DecodeExtra exposing (withDefault)
 import Json.Decode.Pipeline exposing (decode, required)
 
 
@@ -44,5 +45,5 @@ announcementDecoder =
         |> required "body_ko" Decode.string
         |> required "body_en" Decode.string
         |> required "body_cn" Decode.string
-        |> required "published_at" Decode.string
-        |> required "ended_at" Decode.string
+        |> required "published_at" (Decode.string |> DecodeExtra.withDefault "")
+        |> required "ended_at" (Decode.string |> DecodeExtra.withDefault "")
