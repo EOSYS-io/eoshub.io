@@ -4,11 +4,13 @@ module Data.Common exposing
     , KeyWeight
     , PermissionLevel
     , PermissionLevelWeight
+    , Setting
     , WaitWeight
     , appStateDecoder
     , authorityDecoder
     , encodeAuthority
     , initAppState
+    , initSetting
     )
 
 import Data.Announcement exposing (Announcement, announcementDecoder, initAnnouncement)

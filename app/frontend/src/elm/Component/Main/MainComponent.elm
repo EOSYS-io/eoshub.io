@@ -32,7 +32,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Data.Common exposing (AppState, initAppState)
+import Data.Common exposing (AppState, Setting, initAppState)
 import Data.Json exposing (Product)
 import Html
     exposing
@@ -72,7 +72,6 @@ import Set
 import Task
 import Time
 import Translation exposing (I18n(..), Language(..), translate)
-import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
 import Util.HttpRequest exposing (getAppState)
@@ -181,10 +180,10 @@ type SelectedNav
     | None
 
 
-initCmd : Location -> Flags -> Cmd Message
-initCmd location flags =
+initCmd : Location -> Model -> Flags -> Cmd Message
+initCmd location { appState } flags =
     Cmd.batch
-        [ pageCmd location flags
+        [ pageCmd location flags appState.setting
         , Cmd.map SidebarMessage
             (Sidebar.initCmd flags)
         , Port.checkLocale ()
@@ -193,17 +192,17 @@ initCmd location flags =
         ]
 
 
-updateCmd : Location -> Flags -> Cmd Message
-updateCmd location flags =
+updateCmd : Location -> Model -> Flags -> Cmd Message
+updateCmd location { appState } flags =
     Cmd.batch
-        [ pageCmd location flags
+        [ pageCmd location flags appState.setting
         , getAppState flags
             |> Http.send OnFetchAppState
         ]
 
 
-pageCmd : Location -> Flags -> Cmd Message
-pageCmd location flags =
+pageCmd : Location -> Flags -> Setting -> Cmd Message
+pageCmd location flags setting =
     let
         route =
             location |> parseLocation
@@ -214,7 +213,7 @@ pageCmd location flags =
                 subInitCmd =
                     case query of
                         Just str ->
-                            Search.initCmd str (Search.initModel str)
+                            Search.initCmd str (Search.initModel str) setting
 
                         Nothing ->
                             Cmd.none
@@ -237,7 +236,7 @@ pageCmd location flags =
             Cmd.map RammarketMessage Rammarket.initCmd
 
         VoteRoute ->
-            Cmd.map VoteMessage (Vote.initCmd flags)
+            Cmd.map VoteMessage (Vote.initCmd setting flags)
 
         IndexRoute ->
             Cmd.map IndexMessage Index.initCmd
@@ -286,6 +285,7 @@ view { page, header, notification, sidebar, selectedNav, appState } =
                             language
                             subModel
                             sidebar.account
+                            appState.setting
                         )
 
                 IndexPage subModel ->
@@ -298,7 +298,7 @@ view { page, header, notification, sidebar, selectedNav, appState } =
                     Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.wallet)
 
                 NewAccountPage subModel ->
-                    Html.map NewAccountMessage (NewAccount.view language subModel sidebar.account)
+                    Html.map NewAccountMessage (NewAccount.view language subModel sidebar.account appState.setting)
 
                 _ ->
                     NotFound.view language
@@ -459,7 +459,7 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Search.update subMessage subModel
+                    Search.update subMessage subModel appState.setting
             in
             ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
 
@@ -488,13 +488,14 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
                         subMessage
                         subModel
                         sidebar.account
+                        appState.setting
             in
             ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
         ( VoteMessage subMessage, VotePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Vote.update subMessage subModel flags sidebar.account
+                    Vote.update subMessage subModel flags sidebar.account appState.setting
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
@@ -522,7 +523,7 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
         ( NewAccountMessage subMessage, NewAccountPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    NewAccount.update subMessage subModel sidebar.account
+                    NewAccount.update subMessage subModel sidebar.account appState.setting
             in
             ( { model | page = newPage |> NewAccountPage }, Cmd.map NewAccountMessage subCmd )
 
@@ -564,7 +565,7 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
                                     ""
 
                                 Vote.ProxyVoteTab ->
-                                    eosysProxyAccount
+                                    appState.setting.eosysProxyAccount
 
                         _ ->
                             ""
@@ -611,10 +612,10 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
 
                 cmd =
                     if newComponent then
-                        initCmd location flags
+                        initCmd location model flags
 
                     else
-                        updateCmd location flags
+                        updateCmd location model flags
             in
             ( { model | page = newPage, selectedNav = newSelectedNav }, cmd )
 

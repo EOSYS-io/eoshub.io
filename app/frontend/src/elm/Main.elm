@@ -160,7 +160,7 @@ initComponent location flags =
                     MainComponent.initModel location
 
                 componentCmd =
-                    MainComponent.initCmd location flags
+                    MainComponent.initCmd location componentModel flags
             in
             ( MainComponent componentModel, Cmd.map MainComponentMessage componentCmd )
 

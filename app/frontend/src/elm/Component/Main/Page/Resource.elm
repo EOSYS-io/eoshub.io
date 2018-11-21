@@ -17,6 +17,7 @@ import Data.Account
     exposing
         ( Account
         )
+import Data.Common exposing (Setting)
 import Html exposing (Html, a, div, h2, main_, p, text)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
@@ -67,8 +68,8 @@ type Message
     | CloseModal
 
 
-update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ tab } as model) ({ accountName } as account) =
+update : Message -> Model -> Account -> Setting -> ( Model, Cmd Message )
+update message ({ tab } as model) ({ accountName } as account) setting =
     case ( message, tab ) of
         ( StakeMessage stakeMessage, Stake stakeModel ) ->
             let
@@ -87,6 +88,7 @@ update message ({ tab } as model) ({ accountName } as account) =
                         unstakeMessage
                         unstakeModel
                         account
+                        setting
             in
             ( { model | tab = Unstake newModel }, Cmd.map UnstakeMessage subCmd )
 
@@ -140,8 +142,8 @@ update message ({ tab } as model) ({ accountName } as account) =
 -- VIEW
 
 
-view : Language -> Model -> Account -> Html Message
-view language ({ tab } as model) account =
+view : Language -> Model -> Account -> Setting -> Html Message
+view language ({ tab } as model) account setting =
     let
         tabHtml =
             case tab of
@@ -149,7 +151,7 @@ view language ({ tab } as model) account =
                     Html.map StakeMessage (StakeTab.view language stakeModel account)
 
                 Unstake unstakeModel ->
-                    Html.map UnstakeMessage (UnstakeTab.view language unstakeModel account)
+                    Html.map UnstakeMessage (UnstakeTab.view language unstakeModel account setting)
 
                 Delegate delegateModel ->
                     Html.map DelegateMessage (DelegateTab.view language delegateModel account)

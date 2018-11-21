@@ -1,6 +1,7 @@
 module Test.Component.Main.Page.Resource.Unstake exposing (tests)
 
 import Component.Main.Page.Resource.Unstake exposing (..)
+import Data.Common exposing (initSetting)
 import Expect
 import Test exposing (..)
 import Translation
@@ -12,7 +13,6 @@ import Translation
         , toLocale
         , translate
         )
-import Util.Constant exposing (minimumRequiredResources)
 import Util.Validation as Validation
     exposing
         ( AccountStatus(..)
@@ -42,6 +42,9 @@ tests =
 
         { undelegatebw } =
             defaultModel
+
+        defaultSetting =
+            initSetting
     in
     describe "Page.Resource.Unstake module"
         [ describe "getPercentageOfResource"
@@ -66,7 +69,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            minimumRequiredResources.cpu
+                            defaultSetting.minimumRequiredCpu
 
                         selfDelegatedAcount =
                             "1.3000 EOS"
@@ -79,7 +82,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            minimumRequiredResources.cpu
+                            defaultSetting.minimumRequiredCpu
 
                         selfDelegatedAcount =
                             "0.3000 EOS"
@@ -92,7 +95,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            minimumRequiredResources.net
+                            defaultSetting.minimumRequiredNet
 
                         selfDelegatedAcount =
                             "0.3000 EOS"
@@ -105,7 +108,7 @@ tests =
                 \() ->
                     let
                         minimum =
-                            minimumRequiredResources.net
+                            defaultSetting.minimumRequiredNet
 
                         selfDelegatedAcount =
                             "0.1000 EOS"

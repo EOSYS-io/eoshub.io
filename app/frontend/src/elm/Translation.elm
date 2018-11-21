@@ -1226,6 +1226,7 @@ getMessages i18n =
             , chinese = "投票哲学"
             }
 
+        -- TODO(boseok): Move VotePhilosophyDesc to Admin
         VotePhilosophyDesc ->
             { korean = "EOS 블록체인은 블록 프로듀서들이 EOS 거버넌스 및 커뮤니티 발전을 위해 기여할 때 비로소 가치를 발현할 수 있습니다. BPGovernance는 EOS New York, EOS Pacific, 그리고 EOSYS가 합작하여 만든 최초의 다중 서명 프록시로 regproducer 합의문 준수, EOS 거버넌스 참여 및 커뮤니티 형성 3가지 기준을 주요 척도로 하여 올바른 BP 선정에 기여합니다."
             , english = "EOS is valuable when Block Producers strive for the development of EOS governance and community overall. BPGovernance, a proxy started by EOS New York, EOS Pacific, and EOSYS, is the first multi-signature proxy to vote for a Block Producer who must demonstrate evident of: Compliance with the regproducer agreement, Contribution to the EOS governance, and Active Involvement in the community."

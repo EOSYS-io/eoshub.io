@@ -1,13 +1,10 @@
 module Util.Constant exposing
     ( day
-    , eosysProxyAccount
     , giga
-    , historyApiLimit
     , hour
     , kilo
     , mega
     , millisec
-    , minimumRequiredResources
     , minute
     , second
     , tera
@@ -68,21 +65,3 @@ giga =
 tera : Int
 tera =
     1024 * 1024 * 1024 * 1024
-
-
-eosysProxyAccount : String
-eosysProxyAccount =
-    "bpgovernance"
-
-
-minimumRequiredResources :
-    { cpu : String
-    , net : String
-    }
-minimumRequiredResources =
-    { cpu = "0.8 EOS", net = "0.2 EOS" }
-
-
-historyApiLimit : Int
-historyApiLimit =
-    100
