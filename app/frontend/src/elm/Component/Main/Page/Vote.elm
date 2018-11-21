@@ -73,7 +73,7 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput, onWithOptions, targetChecked)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, targetChecked)
 import Http
 import Json.Decode
 import Port
@@ -110,6 +110,7 @@ type Message
     | SubmitVoteProducersAction
     | OnToggleProducer String Bool
     | UpdateVoteData Time.Time
+    | NoOp
 
 
 
@@ -286,6 +287,9 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
                 ]
             )
 
+        NoOp ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -414,7 +418,7 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                             []
                         ]
                     , th [ class "search", scope "col" ]
-                        [ form []
+                        [ form [ onSubmit NoOp ]
                             [ input
                                 [ placeholder (translate language SearchBpCandidate)
                                 , type_ "text"

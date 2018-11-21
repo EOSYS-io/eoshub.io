@@ -56,7 +56,7 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Navigation
 import Port
@@ -191,6 +191,7 @@ type Message
     | ClickDistribution Distribution
     | SubmitAction String
     | ChangeUrl String
+    | NoOp
 
 
 getRammarketActions : Cmd Message
@@ -423,6 +424,9 @@ update message ({ modalOpen, buyModel, sellModel, isBuyTab } as model) ({ ramQuo
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
 
+        NoOp ->
+            ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -512,7 +516,7 @@ view language ({ actions, rammarketTable, globalTable, modalOpen, buyModel } as 
                     [ text (translate language BuyForOtherAccount) ]
                 , p []
                     [ text (translate language EnterReceiverAccountName) ]
-                , form []
+                , form [ onSubmit NoOp ]
                     [ input
                         [ class "user"
                         , placeholder "ex) eosio"
@@ -650,7 +654,9 @@ buySellTab language ({ isBuyTab, buyModel, sellModel, rammarketTable } as model)
                 ]
                 []
             ]
-        , form [ class "input panel" ]
+        , form [ onSubmit NoOp
+            , class "input panel" 
+            ]
             [ div []
                 [ input
                     [ type_ "number"

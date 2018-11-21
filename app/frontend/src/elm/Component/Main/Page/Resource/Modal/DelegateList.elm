@@ -9,7 +9,7 @@ module Component.Main.Page.Resource.Modal.DelegateList exposing
 import Data.Table exposing (Row(..), initDelbandFields)
 import Html exposing (Html, button, div, h2, h3, input, li, p, section, text, ul)
 import Html.Attributes exposing (action, attribute, class, id, name, placeholder, type_)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Translation exposing (I18n(..), Language, translate)
 
 
@@ -38,6 +38,7 @@ type Message
     = CloseModal
     | ClickDelband String String String
     | AccountInput String
+    | NoOp
 
 
 update : Message -> Model -> ( Model, Cmd Message )
@@ -76,7 +77,10 @@ view language { isDelegateListModalOpened, query } list accountName =
         [ div [ class "wrapper" ]
             [ h2 []
                 [ text (translate language DelegatedList) ]
-            , Html.form [ action "" ]
+            , Html.form
+                [ onSubmit NoOp
+                , action ""
+                ]
                 [ input
                     [ class "search_token"
                     , id ""

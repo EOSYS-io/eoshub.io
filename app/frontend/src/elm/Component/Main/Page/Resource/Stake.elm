@@ -32,7 +32,7 @@ import Html.Attributes
         , step
         , type_
         )
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
@@ -143,6 +143,7 @@ type StakeAmountMessage
     | NetAmountInput String
     | ClickOk
     | CloseModal
+    | NoOpMsg
 
 
 update : Message -> Model -> Account -> ( Model, Cmd Message )
@@ -286,6 +287,9 @@ update message ({ delegatebw, distributionRatio, stakeAmountModal, isStakeAmount
                     , Cmd.none
                     )
 
+                NoOpMsg ->
+                    ( model, Cmd.none )
+
 
 
 -- VIEW
@@ -380,7 +384,11 @@ viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
             , div [ class "form container" ]
                 [ h3 []
                     [ text "CPU" ]
-                , Html.form [ action "", class "true validate" ]
+                , Html.form
+                    [ onSubmit NoOpMsg
+                    , action ""
+                    , class "true validate"
+                    ]
                     [ input
                         [ class "user"
                         , attribute "data-validate" cpuValidateAttr
@@ -397,7 +405,10 @@ viewStakeAmountModal language { stakeAmountModal } opened coreLiquidBalance =
             , div [ class "form container" ]
                 [ h3 []
                     [ text "NET" ]
-                , Html.form [ action "" ]
+                , Html.form
+                    [ onSubmit NoOpMsg
+                    , action ""
+                    ]
                     [ input
                         [ class "user"
                         , attribute "data-validate" netValidateAttr
