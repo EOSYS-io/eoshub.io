@@ -1,5 +1,4 @@
 ActiveAdmin.register Setting do
-  # TODO(boseok): make setting singleton
   menu priority: 8
   permit_params :eosys_proxy_account, 
     :history_api_limit,
