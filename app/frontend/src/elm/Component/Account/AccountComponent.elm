@@ -5,7 +5,7 @@ import Component.Account.Page.Created as Created
 import Component.Account.Page.EventCreation as EventCreation
 import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
-import Data.Json exposing (Product, ProductionState, initProductionState)
+import Data.Common exposing (AppState, initAppState)
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
@@ -14,7 +14,7 @@ import Navigation exposing (Location)
 import Route exposing (Route(..), parseLocation)
 import Translation exposing (Language(..))
 import Util.Flags exposing (Flags)
-import Util.HttpRequest exposing (getEosAccountProduct)
+import Util.HttpRequest exposing (getAppState)
 
 
 
@@ -33,7 +33,7 @@ type alias Model =
     { page : Page
     , language : Language
     , flags : Flags
-    , productionState : ProductionState
+    , appState : AppState
     }
 
 
@@ -70,7 +70,7 @@ initModel location flags =
     { page = page
     , language = language
     , flags = flags
-    , productionState = initProductionState
+    , appState = initAppState
     }
 
 
@@ -86,7 +86,7 @@ type Message
     | OnLocationChange Location
     | ChangeUrl String
     | UpdateLanguage Language
-    | OnFetchProduct (Result Http.Error Product)
+    | OnFetchAppState (Result Http.Error AppState)
 
 
 initCmd : Model -> Cmd Message
@@ -113,8 +113,8 @@ initCmd { page, flags, language } =
     in
     Cmd.batch
         [ pageCmd
-        , getEosAccountProduct flags Translation.Korean
-            |> Http.send OnFetchProduct
+        , getAppState flags
+            |> Http.send OnFetchAppState
         ]
 
 
@@ -163,7 +163,7 @@ headerView language =
 
 
 view : Model -> Html Message
-view { language, page, productionState } =
+view { language, page, appState } =
     let
         newContentHtml =
             case page of
@@ -174,7 +174,7 @@ view { language, page, productionState } =
                     Html.map WaitPaymentMessage (WaitPayment.view subModel language)
 
                 CreatedPage subModel ->
-                    Html.map CreatedMessage (Created.view subModel language productionState.isEvent)
+                    Html.map CreatedMessage (Created.view subModel language appState.eventActivation)
 
                 EventCreationPage subModel ->
                     Html.map EventCreationMessage (EventCreation.view subModel language)
@@ -194,7 +194,7 @@ view { language, page, productionState } =
 
 
 update : Message -> Model -> ( Model, Cmd Message )
-update message ({ page, language, flags, productionState } as model) =
+update message ({ page, language, flags, appState } as model) =
     case ( message, page ) of
         ( CreateMessage subMessage, CreatePage subModel ) ->
             let
@@ -243,20 +243,10 @@ update message ({ page, language, flags, productionState } as model) =
         ( UpdateLanguage newLanguage, _ ) ->
             ( { model | language = newLanguage }, Cmd.none )
 
-        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model
-                | productionState =
-                    { productionState
-                        | isEvent = eventActivation
+        ( OnFetchAppState (Ok data), _ ) ->
+            ( { model | appState = data }, Cmd.none )
 
-                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        -- , isAnnouncement = not eventActivation
-                    }
-              }
-            , Cmd.none
-            )
-
-        ( OnFetchProduct (Err _), _ ) ->
+        ( OnFetchAppState (Err _), _ ) ->
             ( model, Cmd.none )
 
         ( _, _ ) ->

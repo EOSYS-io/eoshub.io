@@ -19,7 +19,6 @@ port module Port exposing
     )
 
 import Data.Json exposing (LocalStorageValue)
-import Json.Decode as JD
 import Json.Encode as JE
 import Util.WalletDecoder exposing (PushActionResponse, WalletResponse)
 

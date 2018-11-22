@@ -38,7 +38,7 @@ import Data.Action as Action
         , refineAction
         , removeDuplicated
         )
-import Data.Common exposing (Authority, KeyWeight, PermissionLevelWeight)
+import Data.Common exposing (Authority, KeyWeight, PermissionLevelWeight, Setting)
 import Data.Table exposing (Row(..))
 import Date
 import Date.Extra as Date exposing (Interval(..))
@@ -95,7 +95,6 @@ import Navigation
 import Regex exposing (HowMany(..), regex, replace)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (historyApiLimit)
 import Util.Formatter
     exposing
         ( eosAdd
@@ -171,8 +170,8 @@ actionCategory =
         ]
 
 
-initCmd : String -> Model -> Cmd Message
-initCmd query { pagination } =
+initCmd : String -> Model -> Setting -> Cmd Message
+initCmd query { pagination } { historyApiLimit } =
     let
         accountCmd =
             query
@@ -206,8 +205,8 @@ type Message
     | OnTime Time.Time
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update message ({ query, pagination, openedActionSeq } as model) =
+update : Message -> Model -> Setting -> ( Model, Cmd Message )
+update message ({ query, pagination, openedActionSeq } as model) { historyApiLimit } =
     case message of
         OnFetchAccount (Ok data) ->
             ( { model | account = data }, Cmd.none )

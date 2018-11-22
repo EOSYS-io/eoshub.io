@@ -8,14 +8,16 @@ module Component.Main.Page.Index exposing
     , view
     )
 
-import Data.Json exposing (LocalStorageValue, ProductionState, encodeLocalStorageValue)
+import Data.Announcement exposing (Announcement)
+import Data.Common exposing (AppState)
+import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, class, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
 import Port
 import Time
-import Translation exposing (I18n(..), Language, toLocale, translate)
+import Translation exposing (I18n(..), Language(..), toLocale, translate)
 
 
 
@@ -134,8 +136,8 @@ update msg model =
 -- VIEW --
 
 
-view : Model -> Language -> ProductionState -> Html Message
-view { bannerIndex, showAnnouncement } language productionState =
+view : Model -> Language -> AppState -> Html Message
+view { bannerIndex, showAnnouncement } language appState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -143,7 +145,7 @@ view { bannerIndex, showAnnouncement } language productionState =
                 [ div
                     [ class
                         ("greeting"
-                            ++ (if productionState.isEvent then
+                            ++ (if appState.eventActivation then
                                     " event_free"
 
                                 else
@@ -156,7 +158,7 @@ view { bannerIndex, showAnnouncement } language productionState =
                         , br [] []
                         , text (translate language WelcomeEosHub)
                         ]
-                    , viewEventClickButton language productionState.isEvent
+                    , viewEventClickButton language appState.eventActivation
                     ]
                 , a
                     [ onClick (ChangeUrl "/transfer")
@@ -206,13 +208,13 @@ view { bannerIndex, showAnnouncement } language productionState =
                 , viewBannerButton "Nova wallet" 3
                 ]
             ]
-        , viewAnnouncementSection language productionState showAnnouncement
+        , viewAnnouncementSection language appState showAnnouncement
         ]
 
 
 viewEventClickButton : Language -> Bool -> Html Message
-viewEventClickButton language isEvent =
-    if isEvent then
+viewEventClickButton language eventActivation =
+    if eventActivation then
         p []
             [ a [ onClick (ChangeUrl ("/account/event_creation?locale=" ++ toLocale language)) ]
                 [ text (translate language MakeYourAccount) ]
@@ -222,12 +224,16 @@ viewEventClickButton language isEvent =
         span [] []
 
 
-viewAnnouncementSection : Language -> ProductionState -> Bool -> Html Message
-viewAnnouncementSection language { hasAnnouncement } showAnnouncement =
+viewAnnouncementSection : Language -> AppState -> Bool -> Html Message
+viewAnnouncementSection language { announcement } showAnnouncement =
     -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
     let
+        -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
-            hasAnnouncement && showAnnouncement
+            announcement.active && showAnnouncement
+
+        ( announcementTitle, announcementBody ) =
+            translateAnnouncement language announcement
     in
     section
         [ attribute "aria-live" "true"
@@ -245,9 +251,9 @@ viewAnnouncementSection language { hasAnnouncement } showAnnouncement =
         ]
         [ div [ class "wrapper" ]
             [ h2 []
-                [ text (translate language AnnouncementModalTitle) ]
+                [ text announcementTitle ]
             , p []
-                [ text (translate language AnnouncementModalParagraph) ]
+                [ text announcementBody ]
             , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
                 [ text "닫기" ]
             ]
@@ -275,6 +281,19 @@ viewBannerButton str index =
         , onMouseOut (ToggleBannerTimer True)
         ]
         [ text str ]
+
+
+translateAnnouncement : Language -> Announcement -> ( String, String )
+translateAnnouncement language announcement =
+    case language of
+        Korean ->
+            ( announcement.titleKo, announcement.bodyKo )
+
+        English ->
+            ( announcement.titleEn, announcement.bodyEn )
+
+        Chinese ->
+            ( announcement.titleCn, announcement.bodyCn )
 
 
 
