@@ -33,7 +33,6 @@ import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
 import Data.Common exposing (AppState, Setting, initAppState)
-import Data.Json exposing (Product)
 import Html
     exposing
         ( Html

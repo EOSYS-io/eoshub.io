@@ -21,7 +21,6 @@ import Data.Account
         , defaultAccount
         , getTotalAmount
         )
-import Data.Json exposing (Product)
 import Html exposing (Html, a, aside, br, button, div, h2, li, p, span, text, ul)
 import Html.Attributes exposing (attribute, class, href, target, type_)
 import Html.Events exposing (onClick, onMouseEnter, onMouseLeave)

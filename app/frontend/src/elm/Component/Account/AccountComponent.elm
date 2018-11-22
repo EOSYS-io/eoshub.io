@@ -6,7 +6,6 @@ import Component.Account.Page.EventCreation as EventCreation
 import Component.Account.Page.WaitPayment as WaitPayment
 import Component.Main.Page.NotFound as NotFound
 import Data.Common exposing (AppState, initAppState)
-import Data.Json exposing (Product)
 import Html exposing (Html, a, button, div, h1, section, text)
 import Html.Attributes exposing (attribute, class, type_)
 import Html.Events exposing (onClick)
