@@ -16,14 +16,14 @@
 
 class Setting < ApplicationRecord
   validates :new_account_cpu, presence: true
-  validates :new_account_cpu, format: { with: /\A\d+([.]\d{0,4})?\z/, message: "scale upto 4" }
+  validates :new_account_cpu, format: { with: /\A\d+([.]\d{1,4})?\z/, message: "scale upto 4" }
   validates :new_account_net, presence: true
-  validates :new_account_net, format: { with: /\A\d+([.]\d{0,4})?\z/, message: "scale upto 4" }
+  validates :new_account_net, format: { with: /\A\d+([.]\d{1,4})?\z/, message: "scale upto 4" }
   validates :new_account_ram, presence: true
   validates :minimum_required_cpu, presence: true
-  validates :minimum_required_cpu, format: { with: /\A\d+([.]\d{0,4})?\z/, message: "scale upto 4" }
+  validates :minimum_required_cpu, format: { with: /\A\d+([.]\d{1,4})?\z/, message: "scale upto 4" }
   validates :minimum_required_net, presence: true
-  validates :minimum_required_net, format: { with: /\A\d+([.]\d{0,4})?\z/, message: "scale upto 4" }
+  validates :minimum_required_net, format: { with: /\A\d+([.]\d{1,4})?\z/, message: "scale upto 4" }
   validates :history_api_limit, presence: true
   validates :eosys_proxy_account, presence: true
 end
