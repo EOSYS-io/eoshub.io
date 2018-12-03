@@ -426,8 +426,6 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                                 , value searchInput
                                 ]
                                 []
-                            , button [ type_ "submit" ]
-                                []
                             ]
                         ]
                     , th [ scope "col" ]
