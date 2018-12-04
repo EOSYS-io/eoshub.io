@@ -10,7 +10,7 @@ module Component.Main.Page.Index exposing
 
 import Data.Announcement exposing (Announcement)
 import Data.Common exposing (AppState)
-import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
+import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue, initLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, input, label, main_, p, section, span, text)
 import Html.Attributes exposing (attribute, checked, class, for, href, id, name, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
@@ -30,6 +30,7 @@ type alias Model =
     , isTimerOn : Bool
     , showAnnouncement : Bool
     , doNotShowAgainAnnouncement : Bool
+    , localStorageValue : LocalStorageValue
     }
 
 
@@ -40,6 +41,7 @@ initModel =
     , isTimerOn = True
     , showAnnouncement = False
     , doNotShowAgainAnnouncement = False
+    , localStorageValue = initLocalStorageValue
     }
 
 
@@ -72,8 +74,8 @@ initCmd =
     Port.checkValueFromLocalStorage ()
 
 
-update : Message -> Model -> ( Model, Cmd Message )
-update msg model =
+update : Message -> Model -> AppState -> ( Model, Cmd Message )
+update msg model { announcement } =
     case msg of
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
@@ -126,15 +128,20 @@ update msg model =
                 Nothing ->
                     ( { model | showAnnouncement = True }, Cmd.none )
 
-                Just { showAnnouncement } ->
-                    ( { model | showAnnouncement = showAnnouncement }, Cmd.none )
+                Just value ->
+                    ( { model | showAnnouncement = True, localStorageValue = value }, Cmd.none )
 
         ToggleDoNotShowAgainAnnouncement ->
             ( { model | doNotShowAgainAnnouncement = not model.doNotShowAgainAnnouncement }, Cmd.none )
 
         CloseModal ->
             ( { model | showAnnouncement = False }
-            , Port.setValueToLocalStorage (encodeLocalStorageValue { showAnnouncement = not model.doNotShowAgainAnnouncement })
+            , Port.setValueToLocalStorage
+                (encodeLocalStorageValue
+                    { announcementId = announcement.id
+                    , doNotShowAgain = model.doNotShowAgainAnnouncement
+                    }
+                )
             )
 
 
@@ -231,11 +238,13 @@ viewEventClickButton language eventActivation =
 
 
 viewAnnouncementSection : Model -> Language -> AppState -> Html Message
-viewAnnouncementSection { showAnnouncement, doNotShowAgainAnnouncement } language { announcement } =
+viewAnnouncementSection { showAnnouncement, localStorageValue, doNotShowAgainAnnouncement } language { announcement } =
     let
         -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
-            announcement.active && showAnnouncement
+            announcement.active
+                && showAnnouncement
+                && (not localStorageValue.doNotShowAgain || (localStorageValue.announcementId /= announcement.id))
 
         ( announcementTitle, announcementBody ) =
             translateAnnouncement language announcement

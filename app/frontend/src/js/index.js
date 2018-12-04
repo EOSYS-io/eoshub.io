@@ -17,7 +17,7 @@ import {
   invalidateAccount,
   getAuthInfo,
 } from './wallet';
-import { localStorageKey } from './constant';
+import { announceLocalStorageKey } from './constant';
 import { scatterConfig, eosjsConfig } from './config';
 import {
   getScatter,
@@ -159,7 +159,7 @@ app.ports.checkLocale.subscribe(() => {
 app.ports.checkValueFromLocalStorage.subscribe(() => {
   let parsedValue = null;
   try {
-    const value = window.localStorage.getItem(localStorageKey);
+    const value = window.localStorage.getItem(announceLocalStorageKey);
     if (value) {
       parsedValue = JSON.parse(value);
     }
@@ -170,7 +170,7 @@ app.ports.checkValueFromLocalStorage.subscribe(() => {
 });
 
 app.ports.setValueToLocalStorage.subscribe((value) => {
-  window.localStorage.setItem(localStorageKey, JSON.stringify(value));
+  window.localStorage.setItem(announceLocalStorageKey, JSON.stringify(value));
 });
 
 function initScatter() {

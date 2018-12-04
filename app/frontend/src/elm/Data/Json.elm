@@ -10,6 +10,7 @@ module Data.Json exposing
     , VoteStat
     , createEosAccountResponseDecoder
     , encodeLocalStorageValue
+    , initLocalStorageValue
     , initProducer
     , initProduct
     , initVoteStat
@@ -181,10 +182,21 @@ createEosAccountResponseDecoder =
 
 
 type alias LocalStorageValue =
-    { showAnnouncement : Bool
+    { announcementId : Int
+    , doNotShowAgain : Bool
+    }
+
+
+initLocalStorageValue : LocalStorageValue
+initLocalStorageValue =
+    { announcementId = -1
+    , doNotShowAgain = False
     }
 
 
 encodeLocalStorageValue : LocalStorageValue -> Encode.Value
-encodeLocalStorageValue { showAnnouncement } =
-    Encode.object [ ( "showAnnouncement", Encode.bool showAnnouncement ) ]
+encodeLocalStorageValue { announcementId, doNotShowAgain } =
+    Encode.object
+        [ ( "announcementId", Encode.int announcementId )
+        , ( "doNotShowAgain", Encode.bool doNotShowAgain )
+        ]
