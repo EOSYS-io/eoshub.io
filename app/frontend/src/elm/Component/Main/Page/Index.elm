@@ -29,8 +29,8 @@ type alias Model =
     , bannerSecondsLeft : Int
     , isTimerOn : Bool
     , showAnnouncement : Bool
-    , doNotShowAgainAnnouncement : Bool
-    , localStorageValue : LocalStorageValue
+    , skipAnnouncement : Bool
+    , lastSkippedAnnouncementId : Int
     }
 
 
@@ -40,8 +40,8 @@ initModel =
     , bannerSecondsLeft = bannerRollingInterval
     , isTimerOn = True
     , showAnnouncement = False
-    , doNotShowAgainAnnouncement = False
-    , localStorageValue = initLocalStorageValue
+    , skipAnnouncement = False
+    , lastSkippedAnnouncementId = -1
     }
 
 
@@ -66,7 +66,7 @@ type Message
     | Tick Time.Time
     | ToggleBannerTimer Bool
     | UpdateShowAnnouncement (Maybe LocalStorageValue)
-    | ToggleDoNotShowAgainAnnouncement
+    | ToggleSkipAnnouncement
 
 
 initCmd : Cmd Message
@@ -128,21 +128,22 @@ update msg model { announcement } =
                 Nothing ->
                     ( { model | showAnnouncement = True }, Cmd.none )
 
-                Just value ->
-                    ( { model | showAnnouncement = True, localStorageValue = value }, Cmd.none )
+                Just { lastSkippedAnnouncementId } ->
+                    ( { model | showAnnouncement = True, lastSkippedAnnouncementId = lastSkippedAnnouncementId }, Cmd.none )
 
-        ToggleDoNotShowAgainAnnouncement ->
-            ( { model | doNotShowAgainAnnouncement = not model.doNotShowAgainAnnouncement }, Cmd.none )
+        ToggleSkipAnnouncement ->
+            ( { model | skipAnnouncement = not model.skipAnnouncement }, Cmd.none )
 
         CloseModal ->
-            ( { model | showAnnouncement = False }
-            , Port.setValueToLocalStorage
-                (encodeLocalStorageValue
-                    { announcementId = announcement.id
-                    , doNotShowAgain = model.doNotShowAgainAnnouncement
-                    }
-                )
-            )
+            let
+                cmd =
+                    if model.skipAnnouncement then
+                        Port.setValueToLocalStorage (encodeLocalStorageValue { lastSkippedAnnouncementId = announcement.id })
+
+                    else
+                        Cmd.none
+            in
+            ( { model | showAnnouncement = False }, cmd )
 
 
 
@@ -238,13 +239,13 @@ viewEventClickButton language eventActivation =
 
 
 viewAnnouncementSection : Model -> Language -> AppState -> Html Message
-viewAnnouncementSection { showAnnouncement, localStorageValue, doNotShowAgainAnnouncement } language { announcement } =
+viewAnnouncementSection { showAnnouncement, skipAnnouncement, lastSkippedAnnouncementId } language { announcement } =
     let
         -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
             announcement.active
                 && showAnnouncement
-                && (not localStorageValue.doNotShowAgain || (localStorageValue.announcementId /= announcement.id))
+                && (lastSkippedAnnouncementId /= announcement.id)
 
         ( announcementTitle, announcementBody ) =
             translateAnnouncement language announcement
@@ -272,15 +273,14 @@ viewAnnouncementSection { showAnnouncement, localStorageValue, doNotShowAgainAnn
                 [ div [ class "confirm area" ]
                     [ input
                         [ id "donotshow"
-                        , name "donowshow"
                         , type_ "checkbox"
-                        , checked doNotShowAgainAnnouncement
-                        , onClick ToggleDoNotShowAgainAnnouncement
+                        , checked skipAnnouncement
+                        , onClick ToggleSkipAnnouncement
                         ]
                         []
                     , label [ for "donotshow" ]
                         [ text (translate language DoNotShowAgain) ]
-                    , button [ class "ok button", id "closePopup", type_ "button", onClick CloseModal ]
+                    , button [ class "ok button", type_ "button", onClick CloseModal ]
                         [ text (translate language Close) ]
                     ]
                 ]
