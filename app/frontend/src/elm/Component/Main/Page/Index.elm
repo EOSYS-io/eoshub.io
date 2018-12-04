@@ -10,9 +10,9 @@ module Component.Main.Page.Index exposing
 
 import Data.Announcement exposing (Announcement)
 import Data.Common exposing (AppState)
-import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue, initLocalStorageValue)
+import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
 import Html exposing (Html, a, br, button, div, h2, h3, input, label, main_, p, section, span, text)
-import Html.Attributes exposing (attribute, checked, class, for, href, id, name, target, type_)
+import Html.Attributes exposing (attribute, checked, class, for, href, id, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
 import Port
