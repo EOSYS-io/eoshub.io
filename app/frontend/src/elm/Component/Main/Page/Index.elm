@@ -11,8 +11,8 @@ module Component.Main.Page.Index exposing
 import Data.Announcement exposing (Announcement)
 import Data.Common exposing (AppState)
 import Data.Json exposing (LocalStorageValue, encodeLocalStorageValue)
-import Html exposing (Html, a, br, button, div, h2, h3, main_, p, section, span, text)
-import Html.Attributes exposing (attribute, class, href, id, target, type_)
+import Html exposing (Html, a, br, button, div, h2, h3, input, label, main_, p, section, span, text)
+import Html.Attributes exposing (attribute, checked, class, for, href, id, name, target, type_)
 import Html.Events exposing (onClick, onMouseOut, onMouseOver)
 import Navigation
 import Port
@@ -29,6 +29,7 @@ type alias Model =
     , bannerSecondsLeft : Int
     , isTimerOn : Bool
     , showAnnouncement : Bool
+    , doNotShowAgainAnnouncement : Bool
     }
 
 
@@ -38,6 +39,7 @@ initModel =
     , bannerSecondsLeft = bannerRollingInterval
     , isTimerOn = True
     , showAnnouncement = False
+    , doNotShowAgainAnnouncement = False
     }
 
 
@@ -62,6 +64,7 @@ type Message
     | Tick Time.Time
     | ToggleBannerTimer Bool
     | UpdateShowAnnouncement (Maybe LocalStorageValue)
+    | ToggleDoNotShowAgainAnnouncement
 
 
 initCmd : Cmd Message
@@ -126,9 +129,12 @@ update msg model =
                 Just { showAnnouncement } ->
                     ( { model | showAnnouncement = showAnnouncement }, Cmd.none )
 
+        ToggleDoNotShowAgainAnnouncement ->
+            ( { model | doNotShowAgainAnnouncement = not model.doNotShowAgainAnnouncement }, Cmd.none )
+
         CloseModal ->
             ( { model | showAnnouncement = False }
-            , Port.setValueToLocalStorage (encodeLocalStorageValue { showAnnouncement = False })
+            , Port.setValueToLocalStorage (encodeLocalStorageValue { showAnnouncement = not model.doNotShowAgainAnnouncement })
             )
 
 
@@ -137,7 +143,7 @@ update msg model =
 
 
 view : Model -> Language -> AppState -> Html Message
-view { bannerIndex, showAnnouncement } language appState =
+view ({ bannerIndex } as model) language appState =
     main_ [ class "index" ]
         [ section [ class "menu_area" ]
             [ h2 [] [ text "Menu" ]
@@ -208,7 +214,7 @@ view { bannerIndex, showAnnouncement } language appState =
                 , viewBannerButton "Nova wallet" 3
                 ]
             ]
-        , viewAnnouncementSection language appState showAnnouncement
+        , viewAnnouncementSection model language appState
         ]
 
 
@@ -224,9 +230,8 @@ viewEventClickButton language eventActivation =
         span [] []
 
 
-viewAnnouncementSection : Language -> AppState -> Bool -> Html Message
-viewAnnouncementSection language { announcement } showAnnouncement =
-    -- TODO(boseok): It should be changed to use isAnnouncement which will get from Admin Backend server.
+viewAnnouncementSection : Model -> Language -> AppState -> Html Message
+viewAnnouncementSection { showAnnouncement, doNotShowAgainAnnouncement } language { announcement } =
     let
         -- TODO(boseok): Resolve conflict with alpha
         isAnnouncementModalOpen =
@@ -254,8 +259,22 @@ viewAnnouncementSection language { announcement } showAnnouncement =
                 [ text announcementTitle ]
             , p []
                 [ text announcementBody ]
-            , button [ class "close", id "closePopup", type_ "button", onClick CloseModal ]
-                [ text "닫기" ]
+            , div [ class "action container" ]
+                [ div [ class "confirm area" ]
+                    [ input
+                        [ id "donotshow"
+                        , name "donowshow"
+                        , type_ "checkbox"
+                        , checked doNotShowAgainAnnouncement
+                        , onClick ToggleDoNotShowAgainAnnouncement
+                        ]
+                        []
+                    , label [ for "donotshow" ]
+                        [ text (translate language DoNotShowAgain) ]
+                    , button [ class "ok button", id "closePopup", type_ "button", onClick CloseModal ]
+                        [ text (translate language Close) ]
+                    ]
+                ]
             ]
         ]
 

@@ -311,6 +311,7 @@ type I18n
     | CreateAccountDetail
     | CreateAccountDesc Bool
     | AccountPlaceholder
+    | DoNotShowAgain
 
 
 translate : Language -> I18n -> String
@@ -1954,4 +1955,10 @@ getMessages i18n =
             { korean = "새로 만들 계정의 이름을 입력하세요"
             , english = "Type in the account name"
             , chinese = "请输入账户名"
+            }
+
+        DoNotShowAgain ->
+            { korean = "다시 보지 않기"
+            , english = "Do not show again"
+            , chinese = "不再提示"
             }
