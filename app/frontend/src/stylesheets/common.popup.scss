@@ -309,6 +309,7 @@ aside.shrink ~ main .modal.popup {
 		}
 
 	}
+
 }
 
 // for payment (ruby)
@@ -669,6 +670,61 @@ body > .modal.popup.virtual_account_check {
 			transition:background-color 0.2s;
 			&:hover {
 				background-color:$xxxx-dark-gray;
+			}
+		}
+	}
+}
+
+// 사과공지
+
+.modal.popup.notice {
+	z-index:10;
+
+	.wrapper{
+		width:550px;
+		max-width:none;
+		background-color:$xx-dark-gray;
+	}
+
+	h2 {
+		margin-top:-5px;
+		margin-bottom:30px;
+	}
+
+	p {
+		font-size:rem(14);
+		margin-left:32px;
+		margin-right:32px;
+		margin-top:1em;
+		margin-bottom:1em;
+		white-space:pre-line;
+
+		&.sign {
+			margin-top:30px;
+			text-align:right;
+		}
+	}
+
+	.action.container {
+		overflow:hidden;
+		margin-left:32px;
+		margin-right:32px;
+
+		// confirm section
+		.confirm.area {
+			margin-top:32px;
+
+			display:flex;
+			justify-content:space-between;
+			align-items:center;
+
+			label {
+				font-size:$x-small;
+			}
+
+			button.button  {
+				flex:1;
+				max-width:136px;
 			}
 		}
 	}

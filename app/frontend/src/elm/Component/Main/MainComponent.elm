@@ -501,7 +501,7 @@ update message ({ page, notification, header, sidebar, appState } as model) flag
         ( IndexMessage subMessage, IndexPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Index.update subMessage subModel
+                    Index.update subMessage subModel appState
             in
             ( { model | page = newPage |> IndexPage }, Cmd.map IndexMessage subCmd )
 

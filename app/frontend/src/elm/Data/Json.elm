@@ -181,10 +181,10 @@ createEosAccountResponseDecoder =
 
 
 type alias LocalStorageValue =
-    { showAnnouncement : Bool
-    }
+    { lastSkippedAnnouncementId : Int }
 
 
 encodeLocalStorageValue : LocalStorageValue -> Encode.Value
-encodeLocalStorageValue { showAnnouncement } =
-    Encode.object [ ( "showAnnouncement", Encode.bool showAnnouncement ) ]
+encodeLocalStorageValue { lastSkippedAnnouncementId } =
+    Encode.object
+        [ ( "lastSkippedAnnouncementId", Encode.int lastSkippedAnnouncementId ) ]
