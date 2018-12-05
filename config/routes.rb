@@ -35,6 +35,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :app_state, only: [:index]
+
   namespace :eos_ram_price_histories do
     get 'data'
   end

@@ -10,6 +10,7 @@ module Component.Main.Page.NewAccount exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (encodeActions)
+import Data.Common exposing (Setting)
 import Html
     exposing
         ( Html
@@ -93,8 +94,8 @@ initModel =
     }
 
 
-update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as model) { accountName } =
+update : Message -> Model -> Account -> Setting -> ( Model, Cmd Message )
+update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as model) { accountName } { newAccountCpu, newAccountNet, newAccountRam } =
     case message of
         InputActiveKey inputKey ->
             ( validateKey { model | activeKey = inputKey }, Cmd.none )
@@ -136,14 +137,14 @@ update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as mod
                 buyrambytesParams =
                     { payer = accountName
                     , receiver = account
-                    , bytes = 3072
+                    , bytes = newAccountRam
                     }
 
                 delegatebwParams =
                     { from = accountName
                     , receiver = account
-                    , stakeNetQuantity = "0.1"
-                    , stakeCpuQuantity = "0.1"
+                    , stakeNetQuantity = newAccountNet
+                    , stakeCpuQuantity = newAccountCpu
                     , transfer =
                         if isTransfer then
                             1
@@ -164,8 +165,8 @@ update message ({ account, activeKey, ownerKey, modalOpened, isTransfer } as mod
             ( { model | modalOpened = not modalOpened }, cmd )
 
 
-view : Language -> Model -> Account -> Html Message
-view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid, modalOpened, isTransfer } { accountName } =
+view : Language -> Model -> Account -> Setting -> Html Message
+view language { account, accountValidation, activeKey, activeKeyValidation, ownerKey, ownerKeyValidation, isValid, modalOpened, isTransfer } { accountName } { newAccountCpu, newAccountNet, newAccountRam } =
     main_ [ class "create account" ]
         [ h2 []
             [ text (translate language CreateAccount) ]
@@ -201,10 +202,10 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     case pubKeyValidation of
                         EmptyPublicKey ->
                             ( if isActive then
-                                TypeActiveKeyDesc
+                                EnterActiveKeyDesc
 
                               else
-                                TypeOwnerKeyDesc
+                                EnterOwnerKeyDesc
                             , ""
                             )
 
@@ -237,7 +238,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                         ]
                     , li []
                         [ input
-                            [ placeholder (translate language TypeActiveKey)
+                            [ placeholder (translate language EnterActiveKey)
                             , type_ "text"
                             , Html.Attributes.value activeKey
                             , onInput <| InputActiveKey
@@ -249,7 +250,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                         ]
                     , li []
                         [ input
-                            [ placeholder (translate language TypeOwnerKey)
+                            [ placeholder (translate language EnterOwnerKey)
                             , type_ "text"
                             , Html.Attributes.value ownerKey
                             , onInput <| InputOwnerKey
@@ -264,7 +265,7 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
             , div [ class "btn_area align right" ]
                 [ button
                     [ class "ok button"
-                    , disabled (not isValid)
+                    , disabled (accountName == "" || not isValid)
                     , type_ "button"
                     , onClick ToggleModal
                     ]
@@ -291,15 +292,15 @@ view language { account, accountValidation, activeKey, activeKeyValidation, owne
                     [ dt []
                         [ text "CPU" ]
                     , dd []
-                        [ text "0.1 EOS" ]
+                        [ text newAccountCpu ]
                     , dt []
                         [ text "NET" ]
                     , dd []
-                        [ text "0.1 EOS" ]
+                        [ text newAccountNet ]
                     , dt []
                         [ text "RAM" ]
                     , dd []
-                        [ text "3 KB (3072 bytes)" ]
+                        [ text (toString newAccountRam ++ " bytes") ]
                     ]
                 , let
                     ( delegateButtonClass, transferButtonClass ) =

@@ -11,6 +11,7 @@ module Component.Main.Page.Vote exposing
 
 import Data.Account exposing (Account, defaultAccount)
 import Data.Action exposing (encodeActions)
+import Data.Common exposing (Setting)
 import Data.Json
     exposing
         ( Producer
@@ -73,7 +74,7 @@ import Html.Attributes
         , type_
         , value
         )
-import Html.Events exposing (onClick, onInput, onWithOptions, targetChecked)
+import Html.Events exposing (onClick, onInput, onSubmit, onWithOptions, targetChecked)
 import Http
 import Json.Decode
 import Port
@@ -81,7 +82,6 @@ import Round
 import Set exposing (Set)
 import Time exposing (Time)
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat, formatWithUsLocale, getNow)
 import Util.HttpRequest exposing (getAccount, getTableRows)
@@ -110,6 +110,7 @@ type Message
     | SubmitVoteProducersAction
     | OnToggleProducer String Bool
     | UpdateVoteData Time.Time
+    | NoOp
 
 
 
@@ -174,15 +175,15 @@ getProxyAccount proxyAccount =
         |> Http.send OnFetchAccount
 
 
-initCmd : Flags -> Cmd Message
-initCmd flags =
+initCmd : Setting -> Flags -> Cmd Message
+initCmd setting flags =
     Cmd.batch
         [ getGlobalTable
         , getTokenStatTable
         , getProducers flags
         , getRecentVoteStat flags
         , getNow OnTime
-        , getProxyAccount eosysProxyAccount
+        , getProxyAccount setting.eosysProxyAccount
         ]
 
 
@@ -190,8 +191,8 @@ initCmd flags =
 -- UPDATE
 
 
-update : Message -> Model -> Flags -> Account -> ( Model, Cmd Message )
-update message ({ producersLimit, producerNamesToVote } as model) flags { accountName } =
+update : Message -> Model -> Flags -> Account -> Setting -> ( Model, Cmd Message )
+update message ({ producersLimit, producerNamesToVote } as model) flags { accountName } { eosysProxyAccount } =
     case message of
         SwitchTab newTab ->
             ( { model | tab = newTab }, Cmd.none )
@@ -285,6 +286,9 @@ update message ({ producersLimit, producerNamesToVote } as model) flags { accoun
                 , getProxyAccount eosysProxyAccount
                 ]
             )
+
+        NoOp ->
+            ( model, Cmd.none )
 
 
 
@@ -414,15 +418,13 @@ voteView { globalTable, tokenStatTable, producers, voteStat, producersLimit, sea
                             []
                         ]
                     , th [ class "search", scope "col" ]
-                        [ form []
+                        [ form [ onSubmit NoOp ]
                             [ input
                                 [ placeholder (translate language SearchBpCandidate)
                                 , type_ "text"
                                 , onInput <| OnSearchInput
                                 , value searchInput
                                 ]
-                                []
-                            , button [ type_ "submit" ]
                                 []
                             ]
                         ]

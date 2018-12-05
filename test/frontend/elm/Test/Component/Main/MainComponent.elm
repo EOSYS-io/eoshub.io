@@ -1,6 +1,7 @@
 module Test.Component.Main.MainComponent exposing (location, tests)
 
 import Component.Main.MainComponent exposing (..)
+import Component.Main.Page.Index as Index
 import Component.Main.Page.Search as Search
 import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
@@ -45,7 +46,7 @@ tests =
     describe "Page module"
         [ describe "getPage"
             [ test "IndexRoute" <|
-                \() -> Expect.equal IndexPage (getPage defaultAccount { location | pathname = "/" })
+                \() -> Expect.equal (IndexPage Index.initModel) (getPage defaultAccount { location | pathname = "/" })
             , test "VoteRoute" <|
                 \() ->
                     Expect.equal (VotePage (Vote.initModel defaultAccount))

@@ -4,4 +4,9 @@ const walletStatus = {
   notFound: 'WALLET_STATUS_NOT_FOUND',
 };
 
-export default walletStatus;
+const announceLocalStorageKey = 'EOSHUB_ANNOUNCEMENT';
+
+export {
+  walletStatus,
+  announceLocalStorageKey,
+};

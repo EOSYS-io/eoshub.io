@@ -32,7 +32,7 @@ import Component.Main.Page.Transfer as Transfer
 import Component.Main.Page.Vote as Vote
 import Component.Main.Sidebar as Sidebar
 import Data.Account exposing (Account, defaultAccount)
-import Data.Json exposing (Product, ProductionState, initProductionState)
+import Data.Common exposing (AppState, Setting, initAppState)
 import Html
     exposing
         ( Html
@@ -71,10 +71,9 @@ import Set
 import Task
 import Time
 import Translation exposing (I18n(..), Language(..), translate)
-import Util.Constant exposing (eosysProxyAccount)
 import Util.Flags exposing (Flags)
 import Util.Formatter exposing (assetToFloat)
-import Util.HttpRequest exposing (getEosAccountProduct)
+import Util.HttpRequest exposing (getAppState)
 import Util.Validation exposing (isAccount, isPublicKey)
 import Util.WalletDecoder exposing (PushActionResponse, decodePushActionResponse)
 import View.Notification as Notification
@@ -85,7 +84,7 @@ import View.Notification as Notification
 
 
 type Page
-    = IndexPage
+    = IndexPage Index.Model
     | SearchPage Search.Model
     | SearchKeyPage SearchKey.Model
     | TransferPage Transfer.Model
@@ -112,7 +111,7 @@ type alias Model =
     , header : Header
     , sidebar : Sidebar.Model
     , selectedNav : SelectedNav
-    , productionState : ProductionState
+    , appState : AppState
     }
 
 
@@ -129,7 +128,7 @@ initModel location =
         }
     , sidebar = Sidebar.initModel
     , selectedNav = None
-    , productionState = initProductionState
+    , appState = initAppState
     }
 
 
@@ -156,7 +155,7 @@ type Message
     | ChangeUrl String
     | UpdateLanguage Language
     | InitLocale String
-    | OnFetchProduct (Result Http.Error Product)
+    | OnFetchAppState (Result Http.Error AppState)
 
 
 type Query
@@ -180,25 +179,29 @@ type SelectedNav
     | None
 
 
-initCmd : Location -> Flags -> Cmd Message
-initCmd location flags =
+initCmd : Location -> Model -> Flags -> Cmd Message
+initCmd location { appState } flags =
     Cmd.batch
-        [ pageCmd location flags
+        [ pageCmd location flags appState.setting
         , Cmd.map SidebarMessage
             (Sidebar.initCmd flags)
         , Port.checkLocale ()
-        , getEosAccountProduct flags Translation.Korean
-            |> Http.send OnFetchProduct
+        , getAppState flags
+            |> Http.send OnFetchAppState
         ]
 
 
-updateCmd : Location -> Flags -> Cmd Message
-updateCmd location flags =
-    pageCmd location flags
+updateCmd : Location -> Model -> Flags -> Cmd Message
+updateCmd location { appState } flags =
+    Cmd.batch
+        [ pageCmd location flags appState.setting
+        , getAppState flags
+            |> Http.send OnFetchAppState
+        ]
 
 
-pageCmd : Location -> Flags -> Cmd Message
-pageCmd location flags =
+pageCmd : Location -> Flags -> Setting -> Cmd Message
+pageCmd location flags setting =
     let
         route =
             location |> parseLocation
@@ -209,7 +212,7 @@ pageCmd location flags =
                 subInitCmd =
                     case query of
                         Just str ->
-                            Search.initCmd str (Search.initModel str)
+                            Search.initCmd str (Search.initModel str) setting
 
                         Nothing ->
                             Cmd.none
@@ -232,7 +235,10 @@ pageCmd location flags =
             Cmd.map RammarketMessage Rammarket.initCmd
 
         VoteRoute ->
-            Cmd.map VoteMessage (Vote.initCmd flags)
+            Cmd.map VoteMessage (Vote.initCmd setting flags)
+
+        IndexRoute ->
+            Cmd.map IndexMessage Index.initCmd
 
         _ ->
             Cmd.none
@@ -243,7 +249,7 @@ pageCmd location flags =
 
 
 view : Model -> Html Message
-view { page, header, notification, sidebar, selectedNav, productionState } =
+view { page, header, notification, sidebar, selectedNav, appState } =
     let
         { language } =
             header
@@ -278,10 +284,11 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                             language
                             subModel
                             sidebar.account
+                            appState.setting
                         )
 
-                IndexPage ->
-                    Html.map IndexMessage (Index.view language productionState)
+                IndexPage subModel ->
+                    Html.map IndexMessage (Index.view subModel language appState)
 
                 RammarketPage subModel ->
                     Html.map RammarketMessage (Rammarket.view language subModel sidebar.account)
@@ -290,7 +297,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
                     Html.map ChangeKeyMessage (ChangeKey.view language subModel sidebar.wallet)
 
                 NewAccountPage subModel ->
-                    Html.map NewAccountMessage (NewAccount.view language subModel sidebar.account)
+                    Html.map NewAccountMessage (NewAccount.view language subModel sidebar.account appState.setting)
 
                 _ ->
                     NotFound.view language
@@ -429,7 +436,7 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
         [ headerView
         , navigationView
         , section [ class "content" ]
-            [ Html.map SidebarMessage (Sidebar.view sidebar language productionState.isEvent)
+            [ Html.map SidebarMessage (Sidebar.view sidebar language appState.eventActivation)
             , newContentHtml
             , Html.map NotificationMessage
                 (Notification.view
@@ -446,12 +453,12 @@ view { page, header, notification, sidebar, selectedNav, productionState } =
 
 
 update : Message -> Model -> Flags -> ( Model, Cmd Message )
-update message ({ page, notification, header, sidebar, productionState } as model) flags =
+update message ({ page, notification, header, sidebar, appState } as model) flags =
     case ( message, page ) of
         ( SearchMessage subMessage, SearchPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Search.update subMessage subModel
+                    Search.update subMessage subModel appState.setting
             in
             ( { model | page = newPage |> SearchPage }, Cmd.map SearchMessage subCmd )
 
@@ -480,23 +487,23 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                         subMessage
                         subModel
                         sidebar.account
+                        appState.setting
             in
             ( { model | page = newPage |> ResourcePage }, Cmd.map ResourceMessage subCmd )
 
         ( VoteMessage subMessage, VotePage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    Vote.update subMessage subModel flags sidebar.account
+                    Vote.update subMessage subModel flags sidebar.account appState.setting
             in
             ( { model | page = newPage |> VotePage }, Cmd.map VoteMessage subCmd )
 
-        ( IndexMessage subMessage, _ ) ->
-            case subMessage of
-                Index.ChangeUrl url ->
-                    ( model, Navigation.newUrl url )
-
-                Index.CloseModal ->
-                    ( { model | productionState = { productionState | isAnnouncementCached = False } }, Cmd.none )
+        ( IndexMessage subMessage, IndexPage subModel ) ->
+            let
+                ( newPage, subCmd ) =
+                    Index.update subMessage subModel appState
+            in
+            ( { model | page = newPage |> IndexPage }, Cmd.map IndexMessage subCmd )
 
         ( RammarketMessage subMessage, RammarketPage subModel ) ->
             let
@@ -515,7 +522,7 @@ update message ({ page, notification, header, sidebar, productionState } as mode
         ( NewAccountMessage subMessage, NewAccountPage subModel ) ->
             let
                 ( newPage, subCmd ) =
-                    NewAccount.update subMessage subModel sidebar.account
+                    NewAccount.update subMessage subModel sidebar.account appState.setting
             in
             ( { model | page = newPage |> NewAccountPage }, Cmd.map NewAccountMessage subCmd )
 
@@ -557,7 +564,7 @@ update message ({ page, notification, header, sidebar, productionState } as mode
                                     ""
 
                                 Vote.ProxyVoteTab ->
-                                    eosysProxyAccount
+                                    appState.setting.eosysProxyAccount
 
                         _ ->
                             ""
@@ -604,10 +611,10 @@ update message ({ page, notification, header, sidebar, productionState } as mode
 
                 cmd =
                     if newComponent then
-                        initCmd location flags
+                        initCmd location model flags
 
                     else
-                        updateCmd location flags
+                        updateCmd location model flags
             in
             ( { model | page = newPage, selectedNav = newSelectedNav }, cmd )
 
@@ -693,20 +700,10 @@ update message ({ page, notification, header, sidebar, productionState } as mode
             in
             update (UpdateLanguage language) model flags
 
-        ( OnFetchProduct (Ok { eventActivation }), _ ) ->
-            ( { model
-                | productionState =
-                    { productionState
-                        | isEvent = eventActivation
+        ( OnFetchAppState (Ok data), _ ) ->
+            ( { model | appState = data }, Cmd.none )
 
-                        -- TODO(boseok): it should be changed to isAnnouncement value from Backend Admin Server
-                        -- , isAnnouncement = not eventActivation
-                    }
-              }
-            , Cmd.none
-            )
-
-        ( OnFetchProduct (Err _), _ ) ->
+        ( OnFetchAppState (Err _), _ ) ->
             ( model, Cmd.none )
 
         ( _, _ ) ->
@@ -737,6 +734,9 @@ subscriptions { page } =
         [ Port.receivePushActionResponse UpdatePushActionResponse
         , Sub.map SidebarMessage Sidebar.subscriptions
         , case page of
+            IndexPage subModel ->
+                Sub.map IndexMessage (Index.subscriptions subModel)
+
             RammarketPage _ ->
                 Sub.map RammarketMessage Rammarket.subscriptions
 
@@ -788,7 +788,7 @@ getPage account location =
             ResourcePage Resource.initModel
 
         IndexRoute ->
-            IndexPage
+            IndexPage Index.initModel
 
         RammarketRoute ->
             RammarketPage Rammarket.initModel

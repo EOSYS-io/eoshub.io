@@ -16,13 +16,13 @@ module Component.Main.Page.Resource.Unstake exposing
 
 import Data.Account exposing (Account)
 import Data.Action as Action exposing (UndelegatebwParameters, encodeActions)
+import Data.Common exposing (Setting)
 import Html exposing (Html, button, div, h3, input, label, p, section, span, strong, text)
 import Html.Attributes exposing (attribute, class, disabled, for, placeholder, step, type_)
 import Html.Events exposing (onClick, onInput)
 import Port
 import Round
 import Translation exposing (I18n(..), Language, translate)
-import Util.Constant exposing (minimumRequiredResources)
 import Util.Formatter
     exposing
         ( assetToFloat
@@ -87,14 +87,14 @@ type Message
     | SubmitAction
 
 
-update : Message -> Model -> Account -> ( Model, Cmd Message )
-update message ({ undelegatebw } as model) { accountName, selfDelegatedBandwidth } =
+update : Message -> Model -> Account -> Setting -> ( Model, Cmd Message )
+update message ({ undelegatebw } as model) { accountName, selfDelegatedBandwidth } { minimumRequiredCpu, minimumRequiredNet } =
     let
         unstakePossibleCpu =
-            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumRequiredResources.cpu
+            getUnstakePossibleResource selfDelegatedBandwidth.cpuWeight minimumRequiredCpu
 
         unstakePossibleNet =
-            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumRequiredResources.net
+            getUnstakePossibleResource selfDelegatedBandwidth.netWeight minimumRequiredNet
     in
     case message of
         CpuAmountInput value ->
@@ -189,8 +189,8 @@ update message ({ undelegatebw } as model) { accountName, selfDelegatedBandwidth
 -- VIEW
 
 
-view : Language -> Model -> Account -> Html Message
-view language ({ cpuQuantityValidation, netQuantityValidation, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) { selfDelegatedBandwidth } =
+view : Language -> Model -> Account -> Setting -> Html Message
+view language ({ cpuQuantityValidation, netQuantityValidation, percentageOfCpu, percentageOfNet, undelegatebw, isFormValid } as model) { selfDelegatedBandwidth } { minimumRequiredCpu, minimumRequiredNet } =
     let
         ( validatedText, validatedAttr ) =
             validateText language model
@@ -221,7 +221,7 @@ view language ({ cpuQuantityValidation, netQuantityValidation, percentageOfCpu, 
         , section []
             -- NOTE(boseok): new design is needed
             [ h3 []
-                [ text (translate language (RecommendedStakeAmount minimumRequiredResources.cpu minimumRequiredResources.net)) ]
+                [ text (translate language (RecommendedStakeAmount minimumRequiredCpu minimumRequiredNet)) ]
             , p [ class ("validate description" ++ validatedAttr) ]
                 [ text validatedText ]
             , div [ class "field group" ]

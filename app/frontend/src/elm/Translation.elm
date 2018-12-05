@@ -279,7 +279,7 @@ type I18n
     | EosConstitutionLink
     | OtherTokens
     | TokenList
-    | TokenName
+    | SearchTokenName
     | LackCpu
     | GotoFillCpu
     | EoshubEosdaq
@@ -291,18 +291,16 @@ type I18n
     | MakeYourAccount
     | FreeAccountCreation
     | ConfirmEmailDetail
-    | AnnouncementModalTitle
-    | AnnouncementModalParagraph
     | ChangeKey
     | ChangeKeyDetail
     | Caution
     | CautionDetail
-    | TypeOwnerKey
-    | TypeNewOwnerKey
-    | TypeOwnerKeyDesc
-    | TypeActiveKey
-    | TypeNewActiveKey
-    | TypeActiveKeyDesc
+    | EnterOwnerKey
+    | EnterNewOwnerKey
+    | EnterOwnerKeyDesc
+    | EnterActiveKey
+    | EnterNewActiveKey
+    | EnterActiveKeyDesc
     | ValidKey
     | InvalidKey
     | ChangeKeySucceeded String
@@ -313,6 +311,7 @@ type I18n
     | CreateAccountDetail
     | CreateAccountDesc Bool
     | AccountPlaceholder
+    | DoNotShowAgain
 
 
 translate : Language -> I18n -> String
@@ -1228,6 +1227,7 @@ getMessages i18n =
             , chinese = "投票哲学"
             }
 
+        -- TODO(boseok): Move VotePhilosophyDesc to Admin
         VotePhilosophyDesc ->
             { korean = "EOS 블록체인은 블록 프로듀서들이 EOS 거버넌스 및 커뮤니티 발전을 위해 기여할 때 비로소 가치를 발현할 수 있습니다. BPGovernance는 EOS New York, EOS Pacific, 그리고 EOSYS가 합작하여 만든 최초의 다중 서명 프록시로 regproducer 합의문 준수, EOS 거버넌스 참여 및 커뮤니티 형성 3가지 기준을 주요 척도로 하여 올바른 BP 선정에 기여합니다."
             , english = "EOS is valuable when Block Producers strive for the development of EOS governance and community overall. BPGovernance, a proxy started by EOS New York, EOS Pacific, and EOSYS, is the first multi-signature proxy to vote for a Block Producer who must demonstrate evident of: Compliance with the regproducer agreement, Contribution to the EOS governance, and Active Involvement in the community."
@@ -1741,10 +1741,10 @@ getMessages i18n =
             , chinese = "代币目录"
             }
 
-        TokenName ->
-            { korean = "토큰 이름"
-            , english = "Token name"
-            , chinese = "代币名称"
+        SearchTokenName ->
+            { korean = "토큰 이름 검색"
+            , english = "Search token name"
+            , chinese = "查询代币名称"
             }
 
         LackCpu ->
@@ -1813,18 +1813,6 @@ getMessages i18n =
             , chinese = "如果过了3分钟没有收到邮件的话请再次点击“编码传送”"
             }
 
-        AnnouncementModalTitle ->
-            { korean = "EOS 무료 계정 생성 이벤트 종료"
-            , english = "EOS Free Account Creation Event End"
-            , chinese = "EOS Free Account Creation Event End"
-            }
-
-        AnnouncementModalParagraph ->
-            { korean = "안녕하세요, EOSYS입니다.\n\n무료 계정 생성 이벤트로 준비한 500 EOS가 모두 소진되어 이벤트를 종료합니다. 이오스 커뮤니티의 많은 관심과 참석 감사드리며, 다음에는 더 재미있는 이벤트로 찾아뵐 수 있도록 하겠습니다.\n\n감사합니다.\nEOSYS 드림"
-            , english = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
-            , chinese = "Hello EOS community,\n\nWe close the free account creation event as the initial amount 500 EOS has been used up! Thank you all for your participation and enthusiasm, we will re-visit with other interesting events in the future.\n\nThank you.\nEOSYS"
-            }
-
         ChangeKey ->
             { korean = "계정 키 변경"
             , english = "Change Keys"
@@ -1849,37 +1837,37 @@ getMessages i18n =
             , chinese = "请储存与以下公匙绑定的密匙。\n如果没有密匙将失去账号权限。\nNOTE：需要变更owner key时以@owner权限登入。"
             }
 
-        TypeOwnerKey ->
+        EnterOwnerKey ->
             { korean = "오너 키를 입력하세요"
-            , english = "Put in owner key"
+            , english = "Enter owner key"
             , chinese = "请输入owner key"
             }
 
-        TypeNewOwnerKey ->
+        EnterNewOwnerKey ->
             { korean = "새로운 오너 키를 입력하세요"
-            , english = "Type in new owner key"
+            , english = "Enter new owner key"
             , chinese = "请输入owner key"
             }
 
-        TypeOwnerKeyDesc ->
+        EnterOwnerKeyDesc ->
             { korean = "오너 키는 계정의 마스터 키입니다. 오너 키와 액티브 키를 변경할 때 필요합니다"
             , english = "An owner key is a master key for an account. It can be used to change the owner key or active key."
             , chinese = "owner key是账号的万能钥匙。变更owner key或active key时都需要它。"
             }
 
-        TypeActiveKey ->
+        EnterActiveKey ->
             { korean = "액티브 키를 입력하세요"
-            , english = "Put in active key"
+            , english = "Enter active key"
             , chinese = "请输入active key"
             }
 
-        TypeNewActiveKey ->
+        EnterNewActiveKey ->
             { korean = "새로운 액티브 키를 입력하세요"
-            , english = "Type in new active key"
+            , english = "Enter new active key"
             , chinese = "请输入active key"
             }
 
-        TypeActiveKeyDesc ->
+        EnterActiveKeyDesc ->
             { korean = "액티브 키는 DApp을 사용하거나, 토큰 전송 시 필요한 활동 권한을 가진 키입니다"
             , english = "An active key gives permission to activities such as using DApps or transferring tokens."
             , chinese = "使用DApp或传送代币时需要Active key"
@@ -1967,4 +1955,10 @@ getMessages i18n =
             { korean = "새로 만들 계정의 이름을 입력하세요"
             , english = "Type in the account name"
             , chinese = "请输入账户名"
+            }
+
+        DoNotShowAgain ->
+            { korean = "다시 보지 않기"
+            , english = "Do not show again"
+            , chinese = "不再提示"
             }

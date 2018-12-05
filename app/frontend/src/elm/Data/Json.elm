@@ -3,15 +3,15 @@
 
 module Data.Json exposing
     ( CreateEosAccountResponse
+    , LocalStorageValue
     , Producer
     , Product
-    , ProductionState
     , RequestPaymentResponse
     , VoteStat
     , createEosAccountResponseDecoder
+    , encodeLocalStorageValue
     , initProducer
     , initProduct
-    , initProductionState
     , initVoteStat
     , producerDecoder
     , producersDecoder
@@ -22,6 +22,7 @@ module Data.Json exposing
 
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
+import Json.Encode as Encode
 
 
 type alias VoteStat =
@@ -153,21 +154,6 @@ initProduct =
     }
 
 
-type alias ProductionState =
-    { isEvent : Bool
-    , isAnnouncement : Bool
-    , isAnnouncementCached : Bool
-    }
-
-
-initProductionState : ProductionState
-initProductionState =
-    { isEvent = False
-    , isAnnouncement = False
-    , isAnnouncementCached = True
-    }
-
-
 productDecoder : Decoder Product
 productDecoder =
     decode Product
@@ -192,3 +178,13 @@ createEosAccountResponseDecoder =
     decode CreateEosAccountResponse
         |> required "eos_account" Decode.string
         |> required "public_key" Decode.string
+
+
+type alias LocalStorageValue =
+    { lastSkippedAnnouncementId : Int }
+
+
+encodeLocalStorageValue : LocalStorageValue -> Encode.Value
+encodeLocalStorageValue { lastSkippedAnnouncementId } =
+    Encode.object
+        [ ( "lastSkippedAnnouncementId", Encode.int lastSkippedAnnouncementId ) ]

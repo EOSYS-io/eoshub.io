@@ -24,29 +24,20 @@ import Html
         , div
         , dl
         , dt
-        , form
         , h2
         , h3
-        , img
         , input
         , label
-        , li
         , main_
-        , ol
         , p
         , section
         , span
-        , strong
         , text
         , textarea
-        , time
-        , ul
         )
 import Html.Attributes
     exposing
-        ( action
-        , alt
-        , attribute
+        ( attribute
         , checked
         , class
         , disabled
@@ -55,14 +46,11 @@ import Html.Attributes
         , id
         , name
         , placeholder
-        , src
         , style
         , target
-        , title
         , type_
-        , value
         )
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Encode as Encode
 import Navigation
@@ -189,8 +177,8 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             , Port.copy ()
             )
 
-        ValidateAccountNameInput accountName ->
-            validateAccountNameInput { model | accountName = accountName } NotSent
+        ValidateAccountNameInput newAccountName ->
+            validateAccountNameInput { model | accountName = newAccountName } NotSent
 
         OnFetchAccountToVerify (Ok _) ->
             validateAccountNameInput model Succeed
@@ -203,7 +191,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             , createEosAccountRequest model flags language
             )
 
-        NewEosAccount (Ok res) ->
+        NewEosAccount (Ok _) ->
             ( { model | createAccountRequestStatus = Succeded }
             , Navigation.newUrl ("/account/created?eos_account=" ++ accountName ++ "&public_key=" ++ keys.publicKey)
             )
@@ -245,7 +233,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
             , sendCodeRequest model flags language
             )
 
-        SendCodeResponse (Ok res) ->
+        SendCodeResponse (Ok _) ->
             ( { model
                 | notification =
                     { content = Notification.Ok { message = ConfirmEmailSent, detail = ConfirmEmailDetail }
@@ -327,7 +315,7 @@ update msg ({ accountName, keys, notification, emailValidationSecondsLeft } as m
 
 
 accountInputViews : Model -> Language -> List (Html Message)
-accountInputViews { accountName, accountValidation } language =
+accountInputViews { accountValidation } language =
     let
         ( accountValidationMsg, visibility, classAttr ) =
             case accountValidation of
@@ -488,7 +476,7 @@ okButton { accountValidation, emailConfirmed, agreeEosConstitution, createAccoun
 
 
 view : Model -> Language -> Html Message
-view ({ agreeEosConstitution, notification } as model) language =
+view ({ notification } as model) language =
     main_ [ class "join" ]
         [ div [ class "event disposable banner" ]
             [ p []

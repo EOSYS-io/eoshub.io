@@ -206,6 +206,7 @@ main.vote {
 
 			th.search {
 				z-index:20;
+
 				form {
 					justify-content:space-between;
 					align-items:center;
@@ -219,14 +220,11 @@ main.vote {
 					input {
 						outline:0;
 						flex:1;
-					}
-
-					button[type='submit'] {
-						@include ir();
 						width:16px;
 						height:16px;
-						background:url('../image/icon-search.svg') center center no-repeat;
+						background:url('../image/icon-search.svg') left center no-repeat;
 						background-size:16px;
+						padding-left:28px;
 					}
 
 					transition:transform 0.1s ease-in;

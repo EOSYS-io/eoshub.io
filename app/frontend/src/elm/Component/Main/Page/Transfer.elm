@@ -40,7 +40,7 @@ import Html
         , ul
         )
 import Html.Attributes exposing (attribute, autofocus, class, disabled, placeholder, step, type_)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Port
 import Translation exposing (I18n(..), Language, translate)
@@ -127,6 +127,7 @@ type Message
     | SearchToken String
     | OnFetchTableRows (Result Http.Error (List Row))
     | UpdateToken
+    | NoOp
 
 
 
@@ -334,16 +335,14 @@ tokenListSection language { modalOpened, tokenSearchInput, possessingTokens } eo
         [ div [ class "wrapper" ]
             [ h2 []
                 [ text (translate language TokenList) ]
-            , form []
+            , form [ onSubmit NoOp ]
                 [ input
                     [ class "search_token"
-                    , placeholder (translate language TokenName)
+                    , placeholder (translate language SearchTokenName)
                     , type_ "text"
                     , onInput <| SearchToken
                     ]
                     []
-                , button [ type_ "button" ]
-                    [ text (translate language Search) ]
                 ]
             , div [ class "result list" ]
                 (List.map (generateTokenButton eosLiquidAmount)

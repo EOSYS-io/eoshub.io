@@ -20,29 +20,6 @@ export default async function loadTV() {
     'use_localstorage_for_settings',
   ];
 
-  const overrides = {
-    'mainSeriesProperties.style': 1, // Default chart : 1. Candle.
-    'mainSeriesProperties.candleStyle.upColor': '#c61919',
-    'mainSeriesProperties.candleStyle.downColor': '#0b5db3',
-    'mainSeriesProperties.candleStyle.wickUpColor': '#c61919',
-    'mainSeriesProperties.candleStyle.wickDownColor': '#0b5db3',
-    'mainSeriesProperties.candleStyle.borderUpColor': '#c61919',
-    'mainSeriesProperties.candleStyle.borderDownColor': '#0b5db3',
-    'mainSeriesProperties.hollowCandleStyle.upColor': '#c61919',
-    'mainSeriesProperties.hollowCandleStyle.downColor': '#0b5db3',
-    'mainSeriesProperties.hollowCandleStyle.wickUpColor': '#c61919',
-    'mainSeriesProperties.hollowCandleStyle.wickDownColor': '#0b5db3',
-    'mainSeriesProperties.hollowCandleStyle.borderUpColor': '#c61919',
-    'mainSeriesProperties.hollowCandleStyle.borderDownColor': '#0b5db3',
-    'mainSeriesProperties.haStyle.upColor': '#c61919',
-    'mainSeriesProperties.haStyle.downColor': '#0b5db3',
-    'mainSeriesProperties.haStyle.wickUpColor': '#c61919',
-    'mainSeriesProperties.haStyle.wickDownColor': '#0b5db3',
-    'mainSeriesProperties.haStyle.borderUpColor': '#c61919',
-    'mainSeriesProperties.haStyle.borderDownColor': '#0b5db3',
-    'study_Overlay@tv-basicstudies.style': 1,
-    'study_Overlay@tv-basicstudies.lineStyle.color': '#351c75',
-  };
 
   const timeFramesOption = [
     { text: '1w', resolution: 'D', description: '1 Week' },
@@ -64,7 +41,8 @@ export default async function loadTV() {
     enabled_features: [],
     client_id: 'tradingview.com',
     user_id: 'public_user_id',
-    overrides,
+    theme: 'Dark',
+    overrides: {},
     studies_overrides: {},
     time_frames: timeFramesOption,
   };

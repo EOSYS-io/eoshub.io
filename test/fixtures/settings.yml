@@ -1,0 +1,35 @@
+# == Schema Information
+#
+# Table name: settings
+#
+#  id                   :bigint(8)        not null, primary key
+#  eosys_proxy_account  :string           not null
+#  history_api_limit    :integer          not null
+#  minimum_required_cpu :float            not null
+#  minimum_required_net :float            not null
+#  new_account_cpu      :float            not null
+#  new_account_net      :float            not null
+#  new_account_ram      :integer          not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  new_account_cpu: 1.5
+  new_account_net: 1.5
+  new_account_ram: 1
+  minimum_required_cpu: 1.5
+  minimum_required_net: 1.5
+  history_api_limit: 1
+  eosys_proxy_account: MyString
+
+two:
+  new_account_cpu: 0.1
+  new_account_net: 0.1
+  new_account_ram: 3072
+  minimum_required_cpu: 0.8
+  minimum_required_net: 0.2
+  history_api_limit: 100
+  eosys_proxy_account: bpgovernance
