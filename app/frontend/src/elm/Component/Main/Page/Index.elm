@@ -75,7 +75,7 @@ initCmd =
 
 
 update : Message -> Model -> AppState -> ( Model, Cmd Message )
-update msg model { announcement } =
+update msg ({ bannerIndex, bannerSecondsLeft, skipAnnouncement } as model) { announcement } =
     case msg of
         ChangeUrl url ->
             ( model, Navigation.newUrl url )
@@ -92,14 +92,14 @@ update msg model { announcement } =
         Tick _ ->
             let
                 secondsLeft =
-                    model.bannerSecondsLeft - 1
+                    bannerSecondsLeft - 1
 
                 newIndex =
-                    if model.bannerIndex + 1 > bannerMaxCount then
+                    if bannerIndex + 1 > bannerMaxCount then
                         1
 
                     else
-                        model.bannerIndex + 1
+                        bannerIndex + 1
             in
             if secondsLeft <= 0 then
                 ( { model
@@ -116,7 +116,7 @@ update msg model { announcement } =
             let
                 resetInterval =
                     if on then
-                        model.bannerSecondsLeft
+                        bannerSecondsLeft
 
                     else
                         bannerRollingInterval
@@ -132,13 +132,15 @@ update msg model { announcement } =
                     ( { model | showAnnouncement = True, lastSkippedAnnouncementId = lastSkippedAnnouncementId }, Cmd.none )
 
         ToggleSkipAnnouncement ->
-            ( { model | skipAnnouncement = not model.skipAnnouncement }, Cmd.none )
+            ( { model | skipAnnouncement = not skipAnnouncement }, Cmd.none )
 
         CloseModal ->
             let
                 cmd =
-                    if model.skipAnnouncement then
-                        Port.setValueToLocalStorage (encodeLocalStorageValue { lastSkippedAnnouncementId = announcement.id })
+                    if skipAnnouncement then
+                        { lastSkippedAnnouncementId = announcement.id }
+                            |> encodeLocalStorageValue
+                            |> Port.setValueToLocalStorage
 
                     else
                         Cmd.none
