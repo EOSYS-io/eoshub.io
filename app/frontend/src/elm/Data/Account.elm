@@ -121,7 +121,7 @@ accountDecoder =
         |> optional "core_liquid_balance" JD.string "0 EOS"
         |> optional "voter_info"
             (decode VoterInfo
-                |> required "staked" JD.int
+                |> required "staked" intOrStringDecoder
                 |> required "producers" (JD.list JD.string)
             )
             (VoterInfo 0 [])
