@@ -495,6 +495,20 @@ main.proxy.vote {
 
 // $spritesheet-width: 1216px;
 // $spritesheet-height: 1179px;
+.bi.bp-eosyskoreabp:after {
+    content:'';
+    display:block;
+    position:absolute;
+    width:inherit;
+    height:inherit;
+    top:50%;
+    left:50%;
+    width:48px;
+    height:48px;
+    transform:translate(-50%,-50%);
+    background: url(../image/bi_eosys_96.png) center center no-repeat;
+    background-size:cover;
+}
 
 @mixin sprites-bi($sprites) {
 	@each $sprite in $sprites {
