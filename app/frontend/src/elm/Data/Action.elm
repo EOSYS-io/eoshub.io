@@ -32,6 +32,7 @@ module Data.Action exposing
     , voteproducerDecoder
     )
 
+import Data.Account exposing (intOrStringDecoder)
 import Data.Common
     exposing
         ( Authority
@@ -189,7 +190,7 @@ actionsDecoder =
         (Decode.list
             (decode
                 Action
-                |> requiredAt [ "receipt", "global_sequence" ] Decode.int
+                |> requiredAt [ "receipt", "global_sequence" ] intOrStringDecoder
                 |> required "block_num" Decode.int
                 |> required "block_time" Decode.string
                 |> requiredAt [ "act", "account" ] Decode.string
