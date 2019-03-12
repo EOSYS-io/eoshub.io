@@ -58,16 +58,16 @@ getAccount accountName =
 
 getActions : String -> Int -> Int -> Http.Request (List Action)
 getActions query skip limit =
-    Http.get
-        (mainnetHistoryUrl
-            ++ "/v1/history/get_actions/"
-            ++ query
-            ++ "?skip="
-            ++ toString skip
-            ++ "&limit="
-            ++ toString limit
-        )
-        actionsDecoder
+    let
+        body =
+            [ ( "account_name", query |> Encode.string )
+            , ( "skip", skip |> Encode.int )
+            , ( "limit", limit |> Encode.int )
+            ]
+                |> Encode.object
+                |> Http.jsonBody
+    in
+    post (mainnetHistoryUrl ++ "/v1/history/get_actions") body actionsDecoder
 
 
 

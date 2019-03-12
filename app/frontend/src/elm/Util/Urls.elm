@@ -91,7 +91,7 @@ mainnetRpcUrl =
 
 mainnetHistoryUrl : String
 mainnetHistoryUrl =
-    "https://history.cryptolions.io"
+    "http://history.eosys.io"
 
 
 eosConstitutionUrl : String
